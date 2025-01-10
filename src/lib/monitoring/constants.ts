@@ -1,0 +1,6 @@
+export const MONITORING_CONSTANTS = {
+  SLOW_OPERATION_THRESHOLD: 1000, // ms
+  MAX_EVENTS: 1000,
+  EVENT_RETENTION: 30 * 60 * 1000, // 30 minutes
+  CLEANUP_INTERVAL: 5 * 60 * 1000, // 5 minutes
+} as const;

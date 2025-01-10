@@ -1,0 +1,13 @@
+export { default as SuperAdminDashboard } from './SuperAdminDashboard';
+export { default as AdminDashboard } from './AdminDashboard';
+export { default as TechnicalHeadDashboard } from './TechnicalHeadDashboard';
+export { default as DeveloperDashboard } from './DeveloperDashboard';
+export { default as SalesHeadDashboard } from './SalesHeadDashboard';
+export { default as SalesExecutiveDashboard } from './SalesExecutiveDashboard';
+export { default as ContentHeadDashboard } from './ContentHeadDashboard';
+export { default as AccountsDashboard } from './AccountsDashboard';
+export { default as AccountsExecutiveDashboard } from './AccountsExecutiveDashboard';
+export { default as SchoolLeaderDashboard } from './SchoolLeaderDashboard';
+export { default as SchoolPrincipalDashboard } from './SchoolPrincipalDashboard';
+export { default as TeacherHeadDashboard } from './TeacherHeadDashboard';
+export { default as TeacherDashboard } from './TeacherDashboard';
