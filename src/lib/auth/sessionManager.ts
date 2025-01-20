@@ -1,5 +1,8 @@
 import { supabase } from '../supabase';
 import { logger } from '../logger';
+import type { Session } from '@supabase/gotrue-js';
+
+export type UserRole = 'admin' | 'teacher' | 'student' | 'parent';
 
 class SessionManager {
   private static instance: SessionManager;
@@ -57,7 +60,7 @@ class SessionManager {
     }
   }
 
-  public async refreshSession(): Promise<void> {
+  public async refreshSession(): Promise<Session | null> {
     try {
       // Get current session with retry
       let session;

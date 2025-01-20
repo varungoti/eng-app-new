@@ -6,21 +6,14 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { 
-  Trash2, 
-  ChevronDown, 
-  ChevronRight, 
-  Image as ImageIcon, 
-  Video, 
-  FileText,
-  Check,
-  X,
-  Loader2
-} from 'lucide-react';
+//import { Trash2, ChevronDown, ChevronRight, Image, Video, FileText, Check, X, Loader2 } from 'lucide-react';
+import { APP_ICONS } from '@/lib/constants/icons';
 import { ExercisePromptCardProps } from '../types';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { logger } from '@/lib/logger';
+import React from 'react';
+import { Icon } from '@/components/ui/icons';
 
 export function ExercisePromptCard({
   prompt,
@@ -38,7 +31,6 @@ export function ExercisePromptCard({
       mounted.current = false;
     };
   }, []);
-  const mounted = useRef(true);
 
   const handleFieldChange = async (field: string, value: string) => {
     setIsSaving(true);
@@ -75,12 +67,18 @@ export function ExercisePromptCard({
     if (!url) return null;
     const extension = url.split('.').pop()?.toLowerCase();
     if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(extension || '')) {
-      return <ImageIcon className="h-4 w-4" />;
+      return React.createElement(APP_ICONS.IMAGE, {
+        className: "h-4 w-4"
+      });
     }
     if (['mp4', 'webm', 'ogg'].includes(extension || '')) {
-      return <Video className="h-4 w-4" />;
+      return React.createElement(APP_ICONS.VIDEO, {
+        className: "h-4 w-4"
+      });
     }
-    return <FileText className="h-4 w-4" />;
+    return React.createElement(APP_ICONS.FILE_TEXT, {
+      className: "h-4 w-4"
+    });
   };
 
   const renderMediaPreview = (url: string) => {
@@ -120,6 +118,16 @@ export function ExercisePromptCard({
     return null;
   };
 
+  // Ensure default values for all fields
+  const safePrompt = {
+    ...prompt, // Spread first to get all fields
+    text: prompt.text || '',
+    type: prompt.type || 'text',
+    narration: prompt.narration || '',
+    saytext: prompt.saytext || '',
+    media: prompt.media || ''
+  };
+
   return (
     <Card className={cn(
       "border-l-4 transition-colors duration-200",
@@ -143,8 +151,16 @@ export function ExercisePromptCard({
               className="hover:bg-accent"
             >
               {isExpanded ? 
-                <ChevronDown className="h-4 w-4 text-primary" /> : 
-                <ChevronRight className="h-4 w-4 text-primary" />
+                <Icon 
+                  type="phosphor"
+                  name="CHEVRON_DOWN"
+                  className="h-4 w-4 text-primary"
+                /> : 
+                <Icon 
+                  type="phosphor"
+                  name="CHEVRON_RIGHT"
+                  className="h-4 w-4 text-primary"
+                />
               }
             </Button>
             <Button
@@ -153,7 +169,11 @@ export function ExercisePromptCard({
               onClick={() => onRemove()}
               className="hover:bg-destructive/10 hover:text-destructive"
             >
-              <Trash2 className="h-4 w-4" />
+              <Icon 
+                type="phosphor"
+                name="TRASH_SIMPLE"
+                className="h-4 w-4"
+              />
             </Button>
           </div>
         </div>
@@ -172,13 +192,25 @@ export function ExercisePromptCard({
                   <div className="flex items-center justify-between">
                     <Label>Prompt Text</Label>
                     <div className="flex items-center gap-2">
-                      {isSaving && <Loader2 className="h-4 w-4 animate-spin text-primary" />}
-                      {lastSaved === 'success' && <Check className="h-4 w-4 text-green-500" />}
-                      {lastSaved === 'error' && <X className="h-4 w-4 text-destructive" />}
+                      {isSaving && <Icon 
+                        type="phosphor"
+                        name="SPINNER"
+                        className="h-4 w-4 animate-spin text-primary"
+                      />}
+                      {lastSaved === 'success' && <Icon 
+                        type="phosphor"
+                        name="CHECK"
+                        className="h-4 w-4 text-green-500"
+                      />}
+                      {lastSaved === 'error' && <Icon 
+                        type="phosphor"
+                        name="X"
+                        className="h-4 w-4 text-destructive"
+                      />}
                     </div>
                   </div>
                   <Textarea
-                    value={prompt.text}
+                    value={safePrompt.text}
                     onChange={(e) => handleFieldChange('text', e.target.value)}
                     placeholder="Enter prompt text"
                     className="min-h-[80px] resize-none"
@@ -189,31 +221,55 @@ export function ExercisePromptCard({
                   <div className="flex items-center justify-between">
                     <Label>Media URL</Label>
                     <div className="flex items-center gap-2">
-                      {getMediaTypeIcon(prompt.media)}
-                      {isSaving && <Loader2 className="h-4 w-4 animate-spin text-primary" />}
-                      {lastSaved === 'success' && <Check className="h-4 w-4 text-green-500" />}
-                      {lastSaved === 'error' && <X className="h-4 w-4 text-destructive" />}
+                      {safePrompt.media && getMediaTypeIcon(safePrompt.media)}
+                      {isSaving && <Icon 
+                        type="phosphor"
+                        name="SPINNER"
+                        className="h-4 w-4 animate-spin text-primary"
+                      />}
+                      {lastSaved === 'success' && <Icon 
+                        type="phosphor"
+                        name="CHECK"
+                        className="h-4 w-4 text-green-500"
+                      />}
+                      {lastSaved === 'error' && <Icon 
+                        type="phosphor"
+                        name="X"
+                        className="h-4 w-4 text-destructive"
+                      />}
                     </div>
                   </div>
                   <Input
-                    value={prompt.media}
+                    value={safePrompt.media}
                     onChange={(e) => handleFieldChange('media', e.target.value)}
                     placeholder="Enter media URL"
                   />
-                  {prompt.media && renderMediaPreview(prompt.media)}
+                  {safePrompt.media && renderMediaPreview(safePrompt.media)}
                 </div>
 
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <Label>Narration</Label>
                     <div className="flex items-center gap-2">
-                      {isSaving && <Loader2 className="h-4 w-4 animate-spin text-primary" />}
-                      {lastSaved === 'success' && <Check className="h-4 w-4 text-green-500" />}
-                      {lastSaved === 'error' && <X className="h-4 w-4 text-destructive" />}
+                      {isSaving && <Icon 
+                        type="phosphor"
+                        name="SPINNER"
+                        className="h-4 w-4 animate-spin text-primary"
+                      />}
+                      {lastSaved === 'success' && <Icon 
+                        type="phosphor"
+                        name="CHECK"
+                        className="h-4 w-4 text-green-500"
+                      />}
+                      {lastSaved === 'error' && <Icon 
+                        type="phosphor"
+                        name="X"
+                        className="h-4 w-4 text-destructive"
+                      />}
                     </div>
                   </div>
                   <Input
-                    value={prompt.narration}
+                    value={safePrompt.narration}
                     onChange={(e) => handleFieldChange('narration', e.target.value)}
                     placeholder="Enter narration text"
                   />
@@ -223,14 +279,26 @@ export function ExercisePromptCard({
                   <div className="flex items-center justify-between">
                     <Label>Say Text</Label>
                     <div className="flex items-center gap-2">
-                      {isSaving && <Loader2 className="h-4 w-4 animate-spin text-primary" />}
-                      {lastSaved === 'success' && <Check className="h-4 w-4 text-green-500" />}
-                      {lastSaved === 'error' && <X className="h-4 w-4 text-destructive" />}
+                      {isSaving && <Icon 
+                        type="phosphor"
+                        name="SPINNER"
+                        className="h-4 w-4 animate-spin text-primary"
+                      />}
+                      {lastSaved === 'success' && <Icon 
+                        type="phosphor"
+                        name="CHECK"
+                        className="h-4 w-4 text-green-500"
+                      />}
+                      {lastSaved === 'error' && <Icon 
+                        type="phosphor"
+                        name="X"
+                        className="h-4 w-4 text-destructive"
+                      />}
                     </div>
                   </div>
                   <Input
-                    value={prompt.sayText}
-                    onChange={(e) => handleFieldChange('sayText', e.target.value)}
+                    value={safePrompt.saytext}
+                    onChange={(e) => handleFieldChange('saytext', e.target.value)}
                     placeholder="Enter text to say"
                   />
                 </div>

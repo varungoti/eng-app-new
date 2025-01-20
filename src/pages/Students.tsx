@@ -55,7 +55,11 @@ const Students = () => {
     
     // Add students in batches
     for (const student of newStudents) {
-      await addStudent(student);
+      await addStudent.mutateAsync({
+        ...student,
+        studentAddress: student.address,
+        dateOfBirth: student.dateOfBirth
+      });
     }
     
     setIsImportModalOpen(false);
@@ -71,7 +75,7 @@ const Students = () => {
     return (
       <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
         <h3 className="text-lg font-medium text-red-800">Error</h3>
-        <p className="mt-2 text-sm text-red-600">{error}</p>
+        <p className="mt-2 text-sm text-red-600">{error.message}</p>
       </div>
     );
   }

@@ -2,9 +2,10 @@
 
 import { useEffect } from 'react';
 import { ThemeProvider } from "next-themes";
-import { ErrorBoundary } from './ErrorBoundary';
+import ErrorBoundary from '@/components/ErrorBoundary';
 import { checkApiHealth } from "@/services/api";
 import { Providers } from "@/components/common/providers";
+import { logger } from '@/lib/logger';
 
 export function RootLayoutClient({
   children
@@ -12,9 +13,22 @@ export function RootLayoutClient({
   children: React.ReactNode;
 }) {
   useEffect(() => {
-    checkApiHealth().then(isHealthy => {
-      console.log('API is healthy:', isHealthy);
-    });
+    const checkHealth = async () => {
+      try {
+        const isHealthy = await checkApiHealth();
+        logger.info('API health status', {
+          context: { isHealthy },
+          source: 'RootLayoutClient'
+        });
+      } catch (error) {
+        logger.error('Failed to check API health', {
+          context: { error: error instanceof Error ? error.message : String(error) },
+          source: 'RootLayoutClient'
+        });
+      }
+    };
+
+    checkHealth();
   }, []);
 
   return (
@@ -26,7 +40,7 @@ export function RootLayoutClient({
         disableTransitionOnChange
         storageKey="theme"
       >
-        <ErrorBoundary>
+        <ErrorBoundary source="RootLayout">
           {children}
         </ErrorBoundary>
       </ThemeProvider>

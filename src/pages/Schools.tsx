@@ -10,6 +10,10 @@ import { useSchools } from '../hooks/useSchools';
 import { useToast } from '../hooks/useToast';
 import LoadingSpinner from '../components/LoadingSpinner';
 
+const isSchool = (school: unknown): school is SchoolType => {
+  return typeof school === 'object' && school !== null && 'type' in school && 'id' in school;
+};
+
 const Schools = () => {
   const { schools, loading, error, addSchool, updateSchool, deleteSchool } = useSchools();
   const { setError } = useError();
@@ -22,7 +26,7 @@ const Schools = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleEditSchool = (updatedSchool: SchoolType) => {
-    updateSchool(updatedSchool.id, updatedSchool);
+    updateSchool.mutate(updatedSchool);
     setEditingSchool(null);
   };
 
@@ -56,7 +60,7 @@ const Schools = () => {
     }
 
     // Create school object
-    const newSchool: SchoolType = {
+    const newSchool: Omit<SchoolType, 'id'> = {
       name: formData.get('name') as string,
       type: 'main',
       address,
@@ -73,7 +77,7 @@ const Schools = () => {
       // Show loading state
       setIsLoading(true);
 
-      const result = await addSchool(newSchool);
+      const result = await addSchool.mutateAsync(newSchool);
       if (result) {
         setIsAddModalOpen(false);
         setSelectedGrades([]);
@@ -92,12 +96,12 @@ const Schools = () => {
 
   const handleAddBranch = async (branch: Omit<SchoolType, 'id' | 'type' | 'parentId'>) => {
     if (selectedSchool) {
-      const newBranch: SchoolType = {
+      const newBranch: Omit<SchoolType, 'id'> = {
         ...branch,
         type: 'branch',
         parentId: selectedSchool.id,
       };
-      await addSchool(newBranch);
+      await addSchool.mutateAsync(newBranch);
       setIsAddBranchOpen(false);
     }
   };
@@ -119,7 +123,10 @@ const Schools = () => {
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {schools
-          .filter((school) => school.type !== 'branch')
+          .filter((school): school is SchoolType => {
+            if (!isSchool(school)) return false;
+            return school.type !== 'branch';
+          })
           .map((school) => (
             <div key={school.id} className="bg-white shadow rounded-lg overflow-hidden">
               <div className="px-4 py-4 flex items-center sm:px-6">
@@ -172,7 +179,7 @@ const Schools = () => {
                       </button>
                       <button
                         onClick={() => {
-                          deleteSchool(school.id);
+                          deleteSchool.mutate(school.id);
                         }}
                         className="text-red-400 hover:text-red-500"
                       >
@@ -188,7 +195,11 @@ const Schools = () => {
                   <h3 className="text-sm font-medium text-gray-600">Branches</h3>
                   <div className="mt-2 space-y-2">
                     {schools
-                      .filter((branch) => branch.type === 'branch' && branch.parentId === school.id)
+                      .filter((branch): branch is SchoolType => 
+                        isSchool(branch) && 
+                        branch.type === 'branch' && 
+                        branch.parentId === school.id
+                      )
                       .map((branch) => (
                         <div
                           key={branch.id}
@@ -212,7 +223,7 @@ const Schools = () => {
                             </button>
                             <button
                               onClick={() => {
-                                deleteSchool(branch.id);
+                                deleteSchool.mutate(branch.id);
                               }}
                               className="text-red-400 hover:text-red-500"
                             >

@@ -1,73 +1,23 @@
 import { create } from 'zustand';
-import { logger } from '../logger';
 
-interface ContentState {
-  selectedGrade?: string;
-  selectedTopic?: string;
-  selectedSubTopic?: string;
-  selectedLesson?: string;
-  setSelectedGrade: (id?: string) => void;
-  setSelectedTopic: (id?: string) => void;
-  setSelectedSubTopic: (id?: string) => void;
-  setSelectedLesson: (id?: string) => void;
-  reset: () => void;
+interface ContentStore {
+  selectedGrade: string | null;
+  selectedTopic: string | null;
+  selectedSubtopic: string | null;
+  selectedLesson: string | null;
+  setSelectedGrade: (id: string | null) => void;
+  setSelectedTopic: (id: string | null) => void;
+  setSelectedSubtopic: (id: string | null) => void;
+  setSelectedLesson: (id: string | null) => void;
 }
 
-export const useContentStore = create<ContentState>((set) => ({
-  selectedGrade: undefined,
-  selectedTopic: undefined,
-  selectedSubTopic: undefined,
-  selectedLesson: undefined,
-  setSelectedGrade: (id) => {
-    logger.info('Setting selected grade', {
-      context: { gradeId: id },
-      source: 'ContentStore'
-    });
-    // Only reset other selections if grade changes
-    set((state) => ({
-      selectedGrade: id,
-      selectedTopic: state.selectedGrade === id ? state.selectedTopic : undefined,
-      selectedSubTopic: state.selectedGrade === id ? state.selectedSubTopic : undefined,
-      selectedLesson: state.selectedGrade === id ? state.selectedLesson : undefined
-    }));
-  },
-  setSelectedTopic: (id) => {
-    logger.info('Setting selected topic', {
-      context: { topicId: id },
-      source: 'ContentStore'
-    });
-    set({ 
-      selectedTopic: id, 
-      selectedSubTopic: undefined, 
-      selectedLesson: undefined 
-    });
-  },
-  setSelectedSubTopic: (id) => {
-    logger.info('Setting selected sub-topic', {
-      context: { subTopicId: id },
-      source: 'ContentStore'
-    });
-    set({ 
-      selectedSubTopic: id, 
-      selectedLesson: undefined 
-    });
-  },
-  setSelectedLesson: (id) => {
-    logger.info('Setting selected lesson', {
-      context: { lessonId: id },
-      source: 'ContentStore'
-    });
-    set({ selectedLesson: id });
-  },
-  reset: () => {
-    logger.info('Resetting content selection', {
-      source: 'ContentStore'
-    });
-    set({ 
-      selectedGrade: undefined, 
-      selectedTopic: undefined, 
-      selectedSubTopic: undefined, 
-      selectedLesson: undefined 
-    });
-  }
+export const useContentStore = create<ContentStore>((set) => ({
+  selectedGrade: null,
+  selectedTopic: null,
+  selectedSubtopic: null,
+  selectedLesson: null,
+  setSelectedGrade: (id) => set({ selectedGrade: id, selectedTopic: null, selectedSubtopic: null, selectedLesson: null }),
+  setSelectedTopic: (id) => set({ selectedTopic: id, selectedSubtopic: null, selectedLesson: null }),
+  setSelectedSubtopic: (id) => set({ selectedSubtopic: id, selectedLesson: null }),
+  setSelectedLesson: (id) => set({ selectedLesson: id }),
 }));

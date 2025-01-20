@@ -36,7 +36,31 @@ export const useRoleStore = create<RoleState>()(
     }),
     {
       name: 'role-storage',
-      partialize: (state) => ({ currentRole: state.currentRole })
+     // partialize: (state) => ({ currentRole: state.currentRole }),
+      storage: {
+        getItem: (name) => {
+          const str = localStorage.getItem(name);
+          if (!str) return null;
+          try {
+            const state = JSON.parse(str);
+            return {
+              state: {
+                currentRole: state.currentRole,
+                previousRole: null,
+                isTransitioning: false
+              }
+            };
+          } catch {
+            return null;
+          }
+        },
+        setItem: (name, value) => {
+          localStorage.setItem(name, JSON.stringify({
+            currentRole: value.state.currentRole
+          }));
+        },
+        removeItem: (name) => localStorage.removeItem(name)
+      }
     }
   )
 );

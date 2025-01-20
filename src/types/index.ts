@@ -87,20 +87,11 @@ export interface SubTopic {
 
 export interface Lesson {
   id: string;
-  subTopicId: string;
   title: string;
-  description: string;
-  order: number;
-  teacherScript: string;
-  teacherPrompt: string;
-  sampleAnswer?: string;
-  exercises: Exercise[];
-  duration: number;
-  difficulty: 'Beginner' | 'Intermediate' | 'Advanced';
-  materials: string[];
-  objectives: string[];
-  vocabulary: string[];
-  activities: Activity[];
+  description?: string;
+  subtopicId: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface Exercise {
@@ -127,19 +118,13 @@ export interface ContentModule {
 
 export interface Question {
   id: string;
-  type: 'speaking' | 'roleplay' | 'pronunciation' | 'vocabulary';
-  question: string;
-  expectedAnswer?: string;
-  hints?: string[];
+  title: string;
+  description?: string;
+  type: string;
   points: number;
-  prompt: string;
-  correctAnswer: string;
-  sentence?: string;
-  imageUrl?: string;
-  videoUrl?: string;
-  interval?: number;
-  easeFactor?: number;
-  nextReviewDate?: Date;
+  lessonId: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface Activity {
@@ -240,5 +225,14 @@ interface RepeatQuestion extends BaseQuestion {
   type: 'repeat';
   content: string;
 }
-
 export type QuestionUnion = SentenceRepetitionQuestion | ImageDescriptionQuestion | VideoDescriptionQuestion | MultipleChoiceQuestion | FillInBlankQuestion | RepeatQuestion;
+
+export interface Subtopic {
+  id: string;
+  title: string;
+  description?: string;
+  topicId: string;
+  createdAt: string;
+  updatedAt: string;
+}
+

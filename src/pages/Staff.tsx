@@ -150,8 +150,8 @@ const Staff = () => {
         {/* Staff List */}
         <StaffList
           staff={staff}
-          onUpdate={updateStaff}
-          onDelete={deleteStaff}
+          onUpdate={(id, updates) => updateStaff.mutate({ id, updates })}
+          onDelete={(id) => deleteStaff.mutate(id)}
           filters={filters}
         />
 

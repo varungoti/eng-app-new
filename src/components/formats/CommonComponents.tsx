@@ -1,13 +1,15 @@
-
 import * as Popover from '@radix-ui/react-popover';
-import { Volume2, Mic } from 'lucide-react';
+import { X as X,SpeakerHifi as Volume2, Microphone as Mic } from '@phosphor-icons/react';
 
-export const ListenButton: React.FC<{
+interface ListenButtonProps {
   text: string;
   onListen: (text: string) => Promise<void>;
   isPlaying: boolean;
   className?: string;
-}> = ({ text, onListen, isPlaying, className = "" }) => (
+  small?: boolean;
+}
+
+export const ListenButton = ({ text, onListen, isPlaying, className, small }: ListenButtonProps) => (
   <button 
     className={`rounded-2xl flex space-x-2 border dark:border-primary/30 border-primary/40 
       items-center text-left hover:shadow-md transition-all ${className}`}
@@ -21,12 +23,15 @@ export const ListenButton: React.FC<{
   </button>
 );
 
-export const SpeakButton: React.FC<{
+interface SpeakButtonProps {
   onSpeak: () => void;
   isListening: boolean;
   isProcessing: boolean;
   userAnswer?: string;
-}> = ({ onSpeak, isListening, isProcessing, userAnswer }) => (
+  customText?: string;
+}
+
+export const SpeakButton = ({ onSpeak, isListening, isProcessing, customText }: SpeakButtonProps) => (
   <button 
     className="rounded-2xl flex space-x-2 border dark:border-primary/30 border-primary/40 
       items-center text-left hover:shadow-md transition-all"
@@ -38,7 +43,7 @@ export const SpeakButton: React.FC<{
     </div>
     <div className="px-4">
       <p>{isListening ? "Listening..." : isProcessing ? "Processing..." : "Tap to speak"}</p>
-      {userAnswer && <p className="text-sm text-gray-600">You said: {userAnswer}</p>}
+      {customText && <p className="text-sm text-gray-600">You said: {customText}</p>}
     </div>
   </button>
 );
@@ -53,8 +58,14 @@ export const QuestionContainer: React.FC<{
   </div>
 );
 
-// Common Components
-export const WordPopover = ({ word, definition, phonetic, onListen }) => (
+interface WordPopoverProps {
+  word: string;
+  definition: string;
+  phonetic: string;
+  onListen: (word: string) => Promise<void>;
+}
+
+export const WordPopover = ({ word, definition, phonetic, onListen }: WordPopoverProps) => (
     <Popover.Root>
       <Popover.Trigger asChild>
         <button 
@@ -94,28 +105,34 @@ export const WordPopover = ({ word, definition, phonetic, onListen }) => (
     </Popover.Root>
   );
   
-  export const InteractiveSentence = ({ text, dictionary, onListen }) => {
-    const words = text.split(/(\s+)/);
-    
-    return (
-      <p className="leading-relaxed">
-        {words.map((word, index) => {
-          const cleanWord = word.toLowerCase().replace(/[.,!?]$/, '');
-          const wordInfo = dictionary[cleanWord];
-          
-          return wordInfo ? (
-            <WordPopover
-              key={index}
-              word={word}
-              definition={wordInfo.definition}
-              phonetic={wordInfo.phonetic}
-              onListen={onListen}
-            />
-          ) : (
-            <span key={index}>{word}</span>
-          );
-        })}
-      </p>
-    );
-  };
+interface InteractiveSentenceProps {
+  text: string;
+  dictionary: Record<string, { definition: string; phonetic: string }>;
+  onListen: (word: string) => Promise<void>;
+}
+
+export const InteractiveSentence = ({ text, dictionary, onListen }: InteractiveSentenceProps) => {
+  const words = text.split(/(\s+)/);
+  
+  return (
+    <p className="leading-relaxed">
+      {words.map((word, index) => {
+        const cleanWord = word.toLowerCase().replace(/[.,!?]$/, '');
+        const wordInfo = dictionary[cleanWord];
+        
+        return wordInfo ? (
+          <WordPopover
+            key={index}
+            word={word}
+            definition={wordInfo.definition}
+            phonetic={wordInfo.phonetic}
+            onListen={onListen}
+          />
+        ) : (
+          <span key={index}>{word}</span>
+        );
+      })}
+    </p>
+  );
+};
   

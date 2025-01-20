@@ -9,3 +9,15 @@ export interface ContentState {
   setSelectedLesson: (id?: string) => void;
   reset: () => void;
 }
+
+export interface Lesson {
+  id: string;
+  title: string;
+  content?: string;
+  subtopic_id: string;
+  status?: 'draft' | 'published';
+  questions?: any[];
+  activities?: any[];
+  created_at?: string;
+  updated_at?: string;
+}

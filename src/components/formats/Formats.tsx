@@ -6,33 +6,185 @@ import {
 } from "./CommonComponents";
 import { motion, AnimatePresence } from "framer-motion";
 
+interface SpeakingFormatProps {
+  question: {
+    prompt: string;
+    sampleAnswer?: string;
+  };
+  onListen: (text: string) => Promise<void>;
+  onSpeak: () => void;
+  isListening: boolean;
+  isProcessing: boolean;
+  playingStatus: Record<string, boolean>;
+  dictionary: Record<string, { definition: string; phonetic: string }>;
+}
+
+interface StorytellingFormatProps {
+  question: {
+    storyPrompt: string;
+    keywords?: string[];
+    hints?: string[];
+  };
+  onListen: (text: string) => Promise<void>;
+  onSpeak: () => void;
+  isListening: boolean;
+  isProcessing: boolean;
+  dictionary: Record<string, { definition: string; phonetic: string }>;
+}
+
+interface ListeningFormatProps {
+  question: {
+    audioContent: string;
+    transcript?: string;
+    questions?: string[];
+  };
+  onListen: (text: string) => Promise<void>;
+  onSpeak: (index?: number) => void;
+  isListening: boolean;
+  isProcessing: boolean;
+  playingStatus: Record<string, boolean>;
+  dictionary: Record<string, { definition: string; phonetic: string }>;
+}
+
+interface ListenAndRepeatFormatProps {
+  question: {
+    phrases: string[];
+    translations?: string[];
+  };
+  onListen: (text: string) => Promise<void>;
+  onSpeak: (index?: number) => void;
+  isListening: boolean;
+  isProcessing: boolean;
+  playingStatus: Record<string, boolean>;
+  dictionary: Record<string, { definition: string; phonetic: string }>;
+}
+
+interface MultipleChoiceFormatProps {
+  question: {
+    prompt: string;
+    options: string[];
+  };
+  onListen: (text: string) => Promise<void>;
+  onSpeak: () => void;
+  isListening: boolean;
+  isProcessing: boolean;
+  playingStatus: Record<string, boolean>;
+  dictionary: Record<string, { definition: string; phonetic: string }>;
+  selectedOption?: number;
+  onOptionSelect: (index: number) => void;
+}
+
+interface DebateFormatProps {
+  question: {
+    topic: string;
+    position: string;
+    keyPoints?: string[];
+  };
+  onListen: (text: string) => Promise<void>;
+  onSpeak: () => void;
+  isListening: boolean;
+  isProcessing: boolean;
+  dictionary: Record<string, { definition: string; phonetic: string }>;
+}
+
+interface PresentationFormatProps {
+  question: {
+    topic: string;
+    duration?: string;
+    structure?: Array<{ title: string; points?: string[] }>;
+    visualAids?: Array<{ url: string; description: string }>;
+  };
+  onListen: (text: string) => Promise<void>;
+  onSpeak: () => void;
+  isListening: boolean;
+  isProcessing: boolean;
+  playingStatus: Record<string, boolean>;
+  dictionary: Record<string, { definition: string; phonetic: string }>;
+}
+
+interface GrammarSpeakingFormatProps {
+  question: {
+    grammarPoint: string;
+    example: string;
+    prompt: string;
+  };
+  onListen: (text: string) => Promise<void>;
+  onSpeak: () => void;
+  isListening: boolean;
+  isProcessing: boolean;
+  playingStatus: Record<string, boolean>;
+  dictionary: Record<string, { definition: string; phonetic: string }>;
+}
+
+interface IdiomPracticeFormatProps {
+  question: {
+    idiom: string;
+    meaning: string;
+    example: string;
+    usageNotes?: string;
+    prompt: string;
+  };
+  onListen: (text: string) => Promise<void>;
+  onSpeak: () => void;
+  isListening: boolean;
+  isProcessing: boolean;
+  playingStatus: Record<string, boolean>;
+  dictionary: Record<string, { definition: string; phonetic: string }>;
+}
+
+interface LookAndSpeakFormatProps {
+  question: {
+    imageUrl?: string;
+    imageCaption?: string;
+    prompt: string;
+    helpfulVocabulary?: string[];
+  };
+  onListen: (text: string) => Promise<void>;
+  onSpeak: () => void;
+  isListening: boolean;
+  isProcessing: boolean;
+  playingStatus: Record<string, boolean>;
+  dictionary: Record<string, { definition: string; phonetic: string }>;
+}
+
+interface WatchAndSpeakFormatProps {
+  question: {
+    videoUrl?: string;
+    prompt: string;
+    discussionPoints?: string[];
+  };
+  onListen: (text: string) => Promise<void>;
+  onSpeak: () => void;
+  isListening: boolean;
+  isProcessing: boolean;
+  playingStatus: Record<string, boolean>;
+  dictionary: Record<string, { definition: string; phonetic: string }>;
+}
+
 // Speaking Format
 const SpeakingFormat = ({
   question,
   onListen,
   onSpeak,
-  isListening,
-  isProcessing,
-  playingStatus,
-  dictionary,
-}) => (
+  ...props
+}: SpeakingFormatProps) => (
   <QuestionContainer title="Speaking Practice">
     <div className="p-4 rounded-2xl border dark:border-primary/30 border-primary/40">
       <InteractiveSentence
         text={question.prompt}
-        dictionary={dictionary}
+        dictionary={props.dictionary}
         onListen={onListen}
       />
       <div className="mt-4 flex gap-4">
         <ListenButton
           text={question.prompt}
           onListen={onListen}
-          isPlaying={playingStatus[question.prompt]}
+          isPlaying={props.playingStatus[question.prompt]}
         />
         <SpeakButton
           onSpeak={onSpeak}
-          isListening={isListening}
-          isProcessing={isProcessing}
+          isListening={props.isListening}
+          isProcessing={props.isProcessing}
         />
       </div>
       {question.sampleAnswer && (
@@ -44,7 +196,7 @@ const SpeakingFormat = ({
           <p className="font-semibold mb-2">Sample Answer:</p>
           <InteractiveSentence
             text={question.sampleAnswer}
-            dictionary={dictionary}
+            dictionary={props.dictionary}
             onListen={onListen}
           />
         </motion.div>
@@ -56,11 +208,12 @@ const SpeakingFormat = ({
 // Storytelling Format
 const StorytellingFormat = ({
   question,
+  onListen,
   onSpeak,
   isListening,
   isProcessing,
   dictionary,
-}) => (
+}: StorytellingFormatProps) => (
   <QuestionContainer title="Storytelling Practice">
     <div className="space-y-4">
       <div className="p-4 rounded-2xl border dark:border-primary/30 border-primary/40">
@@ -118,7 +271,7 @@ const ListeningFormat = ({
   isProcessing,
   playingStatus,
   dictionary,
-}) => (
+}: ListeningFormatProps) => (
   <QuestionContainer title="Listening Practice">
     <div className="space-y-4">
       <div className="p-4 rounded-2xl border dark:border-primary/30 border-primary/40">
@@ -181,7 +334,7 @@ const ListenAndRepeatFormat = ({
   isProcessing,
   playingStatus,
   dictionary,
-}) => (
+}: ListenAndRepeatFormatProps) => (
   <QuestionContainer title="Listen and Repeat">
     <div className="space-y-4">
       {question.phrases.map((phrase, index) => (
@@ -233,7 +386,7 @@ const MultipleChoiceFormat = ({
   dictionary,
   selectedOption,
   onOptionSelect,
-}) => (
+}: MultipleChoiceFormatProps) => (
   <QuestionContainer title="Multiple Choice">
     <div className="space-y-4">
       <div className="p-4 rounded-2xl border dark:border-primary/30 border-primary/40">
@@ -274,6 +427,7 @@ const MultipleChoiceFormat = ({
                 onListen={onListen}
               />
               <ListenButton
+                text={option}
                 onListen={() => onListen(option)}
                 isPlaying={playingStatus[option]}
                 small
@@ -304,7 +458,7 @@ const GrammarSpeakingFormat = ({
   isProcessing,
   playingStatus,
   dictionary,
-}) => (
+}: GrammarSpeakingFormatProps) => (
   <QuestionContainer title="Grammar Speaking Practice">
     <div className="space-y-4">
       <div className="p-4 bg-primary/5 rounded-xl">
@@ -360,7 +514,7 @@ const IdiomPracticeFormat = ({
   isProcessing,
   playingStatus,
   dictionary,
-}) => (
+}: IdiomPracticeFormatProps) => (
   <QuestionContainer title="Idiom Practice">
     <div className="space-y-4">
       <div className="p-4 rounded-2xl border dark:border-primary/30 border-primary/40">
@@ -427,7 +581,7 @@ const LookAndSpeakFormat = ({
   isProcessing,
   playingStatus,
   dictionary,
-}) => (
+}: LookAndSpeakFormatProps) => (
   <QuestionContainer title="Look and Speak">
     <div className="space-y-4">
       {question.imageUrl && (
@@ -498,7 +652,7 @@ const WatchAndSpeakFormat = ({
   isProcessing,
   playingStatus,
   dictionary,
-}) => (
+}: WatchAndSpeakFormatProps) => (
   <QuestionContainer title="Watch and Speak">
     <div className="space-y-4">
       {question.videoUrl && (
@@ -532,7 +686,7 @@ const WatchAndSpeakFormat = ({
         <div className="p-4 bg-primary/5 rounded-xl">
           <p className="font-semibold mb-2">Discussion Points:</p>
           <ul className="list-disc list-inside space-y-2">
-            {question.discussionPoints.map((point, index) => (
+            {question.discussionPoints.map((point: string, index: number) => (
               <li key={index}>{point}</li>
             ))}
           </ul>
@@ -550,7 +704,7 @@ const DebateFormat = ({
   isListening,
   isProcessing,
   dictionary,
-}) => (
+}: DebateFormatProps) => (
   <QuestionContainer title="Debate Practice">
     <div className="space-y-4">
       <div className="p-4 bg-primary/5 rounded-xl">
@@ -615,8 +769,9 @@ const PresentationFormat = ({
   onSpeak,
   isListening,
   isProcessing,
+  playingStatus,
   dictionary,
-}) => (
+}: PresentationFormatProps) => (
   <QuestionContainer title="Presentation Practice">
     <div className="space-y-4">
       <div className="p-4 bg-primary/5 rounded-xl">
@@ -701,7 +856,7 @@ const PresentationFormat = ({
   </QuestionContainer>
 );
 
-export {
+export const QuestionFormats = {
   SpeakingFormat,
   DebateFormat,
   GrammarSpeakingFormat,

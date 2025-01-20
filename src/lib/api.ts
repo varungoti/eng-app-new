@@ -1,7 +1,7 @@
 import { supabase } from './supabase';
 import { logger } from './logger';
 import { DataCache } from './cache';
-import { dataFlowMonitor } from './monitoring'; 
+import { dataFlowMonitor } from './monitoring/instance';
 
 export class APIError extends Error {
   constructor(message: string, public statusCode: number) {
@@ -62,7 +62,7 @@ export const api = {
       }
       dataFlowMonitor.endOperation(opId);
       
-      return data || [];
+      return ( data ||[]) as T[];
     } catch (err) {
       return handleQueryError(err, path);
     }
@@ -81,7 +81,7 @@ export const api = {
       // Invalidate relevant cache entries
       cache.clear();
 
-      return result;
+      return result as T;
     } catch (err) {
       logger.error(`Failed to create ${path}`, {
         context: { error: err, data },
@@ -105,7 +105,7 @@ export const api = {
       // Invalidate relevant cache entries
       cache.clear();
 
-      return result;
+      return result as T;
     } catch (err) {
       logger.error(`Failed to update ${path}`, {
         context: { error: err, id, data },
@@ -138,9 +138,9 @@ export const api = {
   },
 
   // Batch operations with transaction support
-  async batch<T>(operations: (() => Promise<any>)[]): Promise<T[]> {
+  async batch<T>(operations: (() => Promise<T>)[]): Promise<T[]> {
     try {
-      const results = await Promise.allSettled(operations);
+      const results = await Promise.allSettled(operations.map(op => op()));
       
       const failures = results.filter(r => r.status === 'rejected');
       if (failures.length > 0) {
@@ -150,13 +150,8 @@ export const api = {
         });
       }
 
-      // Invalidate cache on any successful operations
-      if (results.some(r => r.status === 'fulfilled')) {
-        cache.clear();
-      }
-
       return results
-        .filter((r): r is PromiseFulfilledResult<T> => r.status === 'fulfilled')
+        .filter((r): r is PromiseFulfilledResult<Awaited<T>> => r.status === 'fulfilled')
         .map(r => r.value);
     } catch (err) {
       logger.error('Batch operation failed', {

@@ -32,7 +32,7 @@ class Logger {
         return value;
       }
       if (value && typeof value === 'object') {
-        return JSON.stringify(value, (key, val) => {
+        return JSON.stringify(value, (_key, val) => {
           // Handle circular references and non-serializable objects
           if (val instanceof Error) {
             return {

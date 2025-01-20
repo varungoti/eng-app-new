@@ -334,6 +334,17 @@ export interface Database {
           updated_at?: string;
         };
       };
+      [key: string]: any;
+    };
+    Views: {
+      [key: string]: any;
+    };
+    Functions: {
+      update_health_check: {
+        Args: Record<string, never>;
+        Returns: boolean;
+      };
+      [key: string]: any;
     };
   };
 }

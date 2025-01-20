@@ -1,21 +1,29 @@
 import { logger } from '../logger';
-import { InitializationStrategy } from './strategies/InitializationStrategy';
+import { LoadingMonitor, type MonitoringConfig } from '../monitoring';
 import { LoadingStrategy } from './strategies/LoadingStrategy';
 import { CacheStrategy } from './strategies/CacheStrategy';
+import { InitializationStrategy } from './strategies/InitializationStrategy';
+import { supabase } from '../supabase';
 
 const AUTH_CACHE_KEY = 'auth_state';
 
 export class AuthLoader {
+  private loadingMonitor: LoadingMonitor;
+  private loadingStrategy: LoadingStrategy;
+  private cacheStrategy: CacheStrategy<{ initialized: boolean }>;
+  private initialized: boolean = false;
+  private initializationTimeout: number = 5000;
   private static instance: AuthLoader;
   private loadingPromise: Promise<void> | null = null;
-  private loadingStrategy: LoadingStrategy;
-  private cacheStrategy: CacheStrategy;
-  private initialized: boolean = false;
-  private initializationTimeout: number = 5000; // 5 second timeout
 
-  private constructor() {
+  constructor() {
+    this.loadingMonitor = new LoadingMonitor(supabase, { 
+      retryCount: 3,
+      retryInterval: 1000,
+      timeoutMs: 5000 
+    } as MonitoringConfig);
     this.loadingStrategy = new LoadingStrategy('AuthLoader');
-    this.cacheStrategy = new CacheStrategy();
+    this.cacheStrategy = new CacheStrategy<{ initialized: boolean }>(1);
   }
 
   public static getInstance(): AuthLoader {

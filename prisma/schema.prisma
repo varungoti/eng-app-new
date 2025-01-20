@@ -90,20 +90,20 @@ model SubTopic {
 }
 
 model Lesson {
-  id            String    @id @default(uuid())
-  subTopicId    String
-  title         String
-  description   String?
-  order         Int       @default(0)
-  teacherScript String?
-  teacherPrompt String?
-  sampleAnswer  String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  status      String   // 'scheduled' | 'in-progress' | 'completed' | 'cancelled'
+  duration    Int
+  subjectId   String
+  teacherId   String
+  classId     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  // Relations
-  subTopic  SubTopic   @relation(fields: [subTopicId], references: [id])
-  exercises Exercise[]
+  @@index([subjectId])
+  @@index([teacherId])
+  @@index([classId])
 }
 
 model Exercise {

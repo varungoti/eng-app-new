@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Settings as SettingsIcon, Shield, Bell, Globe, Clock, LayoutDashboard } from 'lucide-react';
 import RoleManagement from '../components/RoleManagement';
-import DashboardCustomizer from '../components/DashboardCustomizer';
+import DashboardCustomization from '../components/DashboardCustomization';
 import {
   Accordion,
   AccordionContent,
@@ -17,7 +17,7 @@ const Settings = () => {
     timezone: 'UTC',
   });
 
-  const [isDashboardCustomizerOpen, setIsDashboardCustomizerOpen] = useState(false);
+  const [isDashboardCustomizationOpen, setIsDashboardCustomizationOpen] = useState(false);
 
   const handleSettingChange = (setting: string, value: any) => {
     setSettings((prev) => ({ ...prev, [setting]: value }));
@@ -56,7 +56,7 @@ const Settings = () => {
                 </div>
               </div>
               <button
-                onClick={() => setIsDashboardCustomizerOpen(true)}
+                onClick={() => setIsDashboardCustomizationOpen(true)}
                 className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700"
               >
                 Customize Dashboard
@@ -196,8 +196,8 @@ const Settings = () => {
         </section>
       </div>
       
-      {isDashboardCustomizerOpen && (
-        <DashboardCustomizer onClose={() => setIsDashboardCustomizerOpen(false)} />
+      {isDashboardCustomizationOpen && (
+        <DashboardCustomization onClose={() => setIsDashboardCustomizationOpen(false)} />
       )}
     </div>
   );

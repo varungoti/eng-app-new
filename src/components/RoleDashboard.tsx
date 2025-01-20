@@ -3,17 +3,18 @@ import { useAuth } from '../hooks/useAuth';
 import { usePermissions } from '../hooks/usePermissions';
 import { canAccessDashboard } from '../lib/permissions';
 import { useRoleSettings } from '../hooks/useRoleSettings';
-import { AlertTriangle, RefreshCw } from 'lucide-react';
-import { useQueryClient } from '@tanstack/react-query';
-import type { RoleSettings } from '../hooks/useRoleSettings';
+//import { APP_ICONS } from '../lib/constants/icons';
+import { QueryClient } from '@tanstack/react-query';
+//import type { RoleSettings } from '../hooks/useRoleSettings';
 import LoadingSpinner from './LoadingSpinner';
 import {
   SuperAdminDashboard, AdminDashboard, TechnicalHeadDashboard,
   DeveloperDashboard, SalesHeadDashboard, SalesExecutiveDashboard,
-  ContentHeadDashboard, AccountsDashboard, AccountsExecutiveDashboard,
+  ContentHeadDashboard, ContentEditorDashboard, AccountsDashboard, AccountsExecutiveDashboard,
   SchoolLeaderDashboard, SchoolPrincipalDashboard, TeacherHeadDashboard,
   TeacherDashboard
 } from './dashboards';
+import { Icon } from '@/components/ui/icons';
 
 interface RoleDashboardProps {
   selectedRole: string;
@@ -22,7 +23,7 @@ interface RoleDashboardProps {
 
 const RoleDashboard: React.FC<RoleDashboardProps> = ({ selectedRole, onError }) => {
   const { settings, loading, error } = useRoleSettings(selectedRole);
-  const queryClient = useQueryClient();
+  const queryClient = new QueryClient();
   const { user } = useAuth();
   const { can } = usePermissions();
 
@@ -54,7 +55,7 @@ const RoleDashboard: React.FC<RoleDashboardProps> = ({ selectedRole, onError }) 
         showRetry={true}
         showProgress={true}
         onRetry={() => {
-          queryClient.invalidateQueries(['role_settings']);
+          queryClient.invalidateQueries({ queryKey: ['role_settings'] });
           window.location.reload();
         }}
       />
@@ -68,18 +69,18 @@ const RoleDashboard: React.FC<RoleDashboardProps> = ({ selectedRole, onError }) 
     return (
       <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
         <div className="flex items-center">
-          <AlertTriangle className="h-5 w-5 text-red-400 mr-2" />
+          <Icon name="ALERT_TRIANGLE" className="h-5 w-5 text-red-400 mr-2" />
           <h3 className="text-lg font-medium text-red-800">Error</h3>
         </div>
         <p className="mt-2 text-sm text-red-600">{error}</p>
         <button
           onClick={() => {
-            queryClient.invalidateQueries(['role_settings']);
+            queryClient.invalidateQueries({ queryKey: ['role_settings'] });
             window.location.reload();
           }}
           className="mt-4 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200"
         >
-          <RefreshCw className="h-4 w-4 mr-2" />
+          <Icon name="REFRESH" className="h-4 w-4 mr-2" />
           Try Again
         </button>
       </div>
@@ -113,6 +114,7 @@ const RoleDashboard: React.FC<RoleDashboardProps> = ({ selectedRole, onError }) 
     case 'sales_head': return <SalesHeadDashboard settings={settings} />;
     case 'sales_executive': return <SalesExecutiveDashboard settings={settings} />;
     case 'content_head': return <ContentHeadDashboard settings={settings} />;
+    case 'content_editor': return <ContentEditorDashboard settings={settings} />;
     case 'accounts_head': return <AccountsDashboard settings={settings} />;
     case 'accounts_executive': return <AccountsExecutiveDashboard settings={settings} />;
     case 'school_leader': return <SchoolLeaderDashboard settings={settings} />;

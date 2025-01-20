@@ -44,7 +44,7 @@ export default function DashboardStats() {
   const [selectedGrade, setSelectedGrade] = useState(dashboardData.grades[0]);
 
   // Retrieve data for the selected grade
-  const gradeData = dashboardData.classWiseData[selectedGrade];
+  const gradeData = dashboardData.classWiseData[selectedGrade as keyof typeof dashboardData.classWiseData];
   const lessonCompletionPercentage = Math.round((gradeData.lessons.completed / gradeData.lessons.planned) * 100);
 
   return (

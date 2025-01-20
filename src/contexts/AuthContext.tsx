@@ -1,19 +1,21 @@
 import React, { createContext, useState, useEffect, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 import { useRoleStore } from '../lib/auth/store';
-import { useQueryClient } from '@tanstack/react-query';
+import { QueryClient } from '@tanstack/react-query';
 import { logger } from '../lib/logger';
 import { useNavigate } from 'react-router-dom';
 import type { User } from '../types';
 import type { UserRole } from '../types/roles';
+import type { UserPreferences } from '../types/preferences';
+import type { AuthError, Session, AuthChangeEvent } from '@supabase/gotrue-js';
 
 interface AuthContextType {
   user: (User & { role: UserRole }) | null;
   loading: boolean;
   error: string | null;
   setUser: (user: (User & { role: UserRole }) | null) => void;
-  login: (email: string, password: string, role?: string) => Promise<void>;
-  logout: () => void;
+  login: (email: string, password: string) => Promise<void>;
+  logout: () => Promise<void>;
 }
 
 export const AuthContext = createContext<AuthContextType>({
@@ -22,8 +24,97 @@ export const AuthContext = createContext<AuthContextType>({
   error: null,
   setUser: () => {},
   login: async () => {},
-  logout: () => {},
+  logout: async () => {},
 });
+
+// Move QueryClient instance outside of component
+export const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      cacheTime: 10 * 60 * 1000, // 10 minutes
+    },
+  },
+});
+
+const fetchRoleSettings = async (role: string) => {
+  const { data, error } = await supabase
+    .from('role_settings')
+    .select(`
+      id,
+      role_key,
+      settings,
+      created_at,
+      updated_at
+    `)
+    .eq('role_key', role);
+
+  if (error) {
+    logger.error('Failed to fetch role settings', {
+      context: { error },
+      source: 'AuthContext'
+    });
+    return null;
+  }
+  return data;
+};
+
+const fetchUserPreferences = async (userId: string): Promise<UserPreferences | null> => {
+  try {
+    const { data, error } = await supabase
+      .from('user_preference')
+      .select(`
+        id,
+        user_id,
+        preferences,
+        created_at,
+        updated_at
+      `)
+      .eq('user_id', userId)
+      .single();
+
+    if (error && error.code === 'PGRST116') {
+      const { data: newData, error: insertError } = await supabase
+        .from('user_preference')
+        .insert([{
+          user_id: userId,
+          preferences: {
+            theme: 'light',
+            language: 'en',
+            notifications: true
+          }
+        }])
+        .select()
+        .single();
+
+      if (insertError) {
+        logger.error('Failed to create user preferences', {
+          context: { error: insertError },
+          source: 'AuthContext'
+        });
+        return null;
+      }
+
+      return newData;
+    }
+
+    if (error) {
+      logger.error('Failed to fetch user preferences', {
+        context: { error },
+        source: 'AuthContext'
+      });
+      return null;
+    }
+
+    return data;
+  } catch (error) {
+    logger.error('Error in fetchUserPreferences', {
+      context: { error },
+      source: 'AuthContext'
+    });
+    return null;
+  }
+};
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<(User & { role: UserRole }) | null>(null);
@@ -31,7 +122,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [error, setError] = useState<string | null>(null);
   const setRole = useRoleStore((state) => state.setRole);
   const mounted = useRef(true);
-  const queryClient = useQueryClient();
   const navigate = useNavigate(); 
   const initializeRef = useRef(false);
 
@@ -62,16 +152,41 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           const role = session.user.user_metadata?.role as UserRole;
           setRole(role || 'user');
           
-          // Prefetch critical data in parallel
-          const prefetchPromises = [
-            ['role_settings'],
-            ['user_preferences'], 
-            ['schools'],
-            ['grades']
-          ].map(key => queryClient.prefetchQuery({ queryKey: key }));
-          
+          // Prefetch critical data with proper query functions
           await Promise.all([
-            ...prefetchPromises
+            queryClient.prefetchQuery({
+              queryKey: ['role_settings', role],
+              queryFn: () => fetchRoleSettings(role),
+              retry: 1,
+              staleTime: 5 * 60 * 1000
+            }),
+            queryClient.prefetchQuery({
+              queryKey: ['user_preferences', session.user.id],
+              queryFn: () => fetchUserPreferences(session.user.id),
+              retry: 1,
+              staleTime: 5 * 60 * 1000
+            }),
+            queryClient.prefetchQuery({
+              queryKey: ['schools'],
+              queryFn: async () => {
+                const { data, error } = await supabase
+                  .from('schools')
+                  .select('*');
+                if (error) throw error;
+                return data;
+              }
+            }),
+            queryClient.prefetchQuery({
+              queryKey: ['grades'],
+              queryFn: async () => {
+                const { data, error } = await supabase
+                  .from('grades')
+                  .select('*')
+                  .order('name');
+                if (error) throw error;
+                return data;
+              }
+            })
           ]);
           
           setUser({
@@ -81,7 +196,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             role: role || 'user',
           });
           
-          // Navigate to home after successful login
           navigate('/', { replace: true });
         }
       } catch (err) {
@@ -100,21 +214,98 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     initializeAuth();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event: AuthChangeEvent, session: Session | null) => {
       if (!mounted) return;
 
       if (event === 'SIGNED_IN' && session?.user) {
         const role = session.user.user_metadata?.role as UserRole;
         setRole(role || 'user');
         
-        // Prefetch critical data
+        // Prefetch with proper query functions
         await Promise.all([
-          queryClient.prefetchQuery({ queryKey: ['role_settings'] }),
-          queryClient.prefetchQuery({ queryKey: ['user_preferences'] }),
-          queryClient.prefetchQuery({ queryKey: ['schools'] }),
-          queryClient.prefetchQuery({ queryKey: ['grades'] }),
-          queryClient.prefetchQuery({ queryKey: ['sales_leads'] }),
-          queryClient.prefetchQuery({ queryKey: ['students'] })
+          queryClient.prefetchQuery({
+            queryKey: ['role_settings', role],
+            queryFn: () => fetchRoleSettings(role),
+            retry: 1,
+            staleTime: 5 * 60 * 1000
+          }),
+          queryClient.prefetchQuery({
+            queryKey: ['user_preferences', session.user.id],
+            queryFn: () => fetchUserPreferences(session.user.id),
+            retry: 1,
+            staleTime: 5 * 60 * 1000
+          }),
+          queryClient.prefetchQuery({
+            queryKey: ['schools'],
+            queryFn: async () => {
+              const { data, error } = await supabase
+                .from('schools')
+                .select('*');
+              if (error) throw error;
+              return data;
+            }
+          }),
+          queryClient.prefetchQuery({
+            queryKey: ['grades'],
+            queryFn: async () => {
+              const { data, error } = await supabase
+                .from('grades')
+                .select('*')
+                .order('name');
+              if (error) throw error;
+              return data;
+            }
+          }),
+          queryClient.prefetchQuery({
+            queryKey: ['sales_leads'],
+            queryFn: async () => {
+              const { data, error } = await supabase
+                .from('sales_leads')
+                .select('*');
+              if (error) throw error;
+              return data;
+            }
+          }),
+          queryClient.prefetchQuery({
+            queryKey: ['students'],
+            queryFn: async () => {
+              const { data, error } = await supabase
+                .from('students')
+                .select('*');
+              if (error) throw error;
+              return data;
+            }
+          }),
+          queryClient.prefetchQuery({
+            queryKey: ['teachers'],
+            queryFn: async () => {
+              const { data, error } = await supabase
+                .from('teachers')
+                .select('*');
+              if (error) throw error;
+              return data;
+            }
+          }),
+          queryClient.prefetchQuery({
+            queryKey: ['users'],
+            queryFn: async () => {
+              const { data, error } = await supabase
+                .from('users')
+                .select('*');
+              if (error) throw error;
+              return data;
+            }
+          }),
+          queryClient.prefetchQuery({
+            queryKey: ['permissions'],
+            queryFn: async () => {
+              const { data, error } = await supabase
+                .from('permissions')
+                .select('*');
+              if (error) throw error;
+              return data;
+            }
+          })
         ]);
         
         const userData = {
@@ -125,7 +316,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         };
         setUser(userData);
         
-        // Navigate to home after successful login
         navigate('/', { replace: true });
       } else if (event === 'SIGNED_OUT') {
         setUser(null);

@@ -1,107 +1,74 @@
-import { logger } from '../logger';
-import { WarningCache } from './WarningCache';
+import BaseMonitor from './BaseMonitor';
+import type { LoadingState } from './types';
+import { v4 as uuid } from 'uuid';
+import type SupabaseClient from '@supabase/supabase-js/dist/module/SupabaseClient';
 
-export interface LoadingState {
-  id: string;
-  component: string;
-  startTime: number;
-  endTime?: number;
-  duration?: number;
-  status: 'pending' | 'complete' | 'error';
-  error?: Error;
-}
+export interface MonitoringConfig {
+  retryCount: number;
+  retryInterval: number;
+  timeoutMs: number;
+  attempts: number;
+  intervalMs: number;
+  maxAttempts: number;
+  retryDelay: number;
+  timeoutDuration: number;
+  maxTries: number;
+  maxRetries: number;
+  } 
 
-export class LoadingMonitor {
-  private static instance: LoadingMonitor;
+class LoadingMonitor extends BaseMonitor {
   private loadingStates: Map<string, LoadingState> = new Map();
-  private warningCache = new WarningCache(30000); // 30 second cooldown
-  private readonly SLOW_THRESHOLD = 3000; // 3 seconds
 
-  private constructor() {
-    setInterval(() => this.cleanup(), 60000);
-  }
-
-  public static getInstance(): LoadingMonitor {
-    if (!LoadingMonitor.instance) {
-      LoadingMonitor.instance = new LoadingMonitor();
-    }
-    return LoadingMonitor.instance;
-  }
-
-  public startLoading(component: string): string {
-    const id = crypto.randomUUID();
-    
-    const existingState = Array.from(this.loadingStates.values())
-      .find(state => state.component === component && state.status === 'pending');
-
-    if (existingState) {
-      if (this.warningCache.shouldLog(`supersede:${component}`)) {
-        logger.warn(`Superseding existing loading state for ${component}`, {
-          context: {
-            oldId: existingState.id,
-            newId: id,
-            duration: performance.now() - existingState.startTime
-          },
-          source: 'LoadingMonitor'
-        });
+  async startLoading(component: string): Promise<string> {
+    try {
+      if (!component) {
+        throw new Error('Component name is required');
       }
-      this.endLoading(existingState.id);
-    }
 
-    const state: LoadingState = {
-      id,
-      component,
-      startTime: performance.now(),
-      status: 'pending'
+      const loadingId = uuid();
+      const { error } = await (this.supabase as SupabaseClient)
+        .from('loading_states')
+        .insert({
+          id: loadingId,
+          component: component.toString(),
+          status: 'started',
+          created_at: new Date().toISOString()
+        });
+      
+      if (error) {
+        console.error('Failed to start loading:', error);
+        throw error;
+      }
+      
+      return loadingId;
+    } catch (err) {
+      console.error('Error in startLoading:', err);
+      throw err;
+    }
+  }
+
+  endLoading(component: string) {
+    try {
+      const state = this.loadingStates.get(component);
+      if (state && state.startTime) {
+        state.isLoading = false;
+        state.duration = Date.now() - state.startTime;
+        this.loadingStates.set(component, state);
+        this.log('info', `Ended loading: ${component}`, { duration: state.duration });
+      }
+    } catch (error) {
+      this.log('error', `Error ending loading for ${component}`, error);
+    }
+  }
+
+  getLoadingState(component: string): LoadingState {
+    return this.loadingStates.get(component) || {
+      isLoading: false,
+      duration: 0
     };
-
-    this.loadingStates.set(id, state);
-    return id;
-  }
-
-  public endLoading(id: string, error?: Error): void {
-    const state = this.loadingStates.get(id);
-    if (!state || state.status !== 'pending') return;
-
-    state.endTime = performance.now();
-    state.duration = state.endTime - state.startTime;
-    state.status = error ? 'error' : 'complete';
-    if (error) state.error = error;
-
-    if (!error && state.duration > this.SLOW_THRESHOLD) {
-      if (this.warningCache.shouldLog(`slow:${state.component}`)) {
-        logger.warn(`Slow loading detected: ${state.component}`, {
-          context: {
-            duration: state.duration,
-            threshold: this.SLOW_THRESHOLD
-          },
-          source: 'LoadingMonitor'
-        });
-      }
-    }
-
-    setTimeout(() => {
-      this.loadingStates.delete(id);
-    }, 5000);
-  }
-
-  public getActiveLoadingStates(): LoadingState[] {
-    return Array.from(this.loadingStates.values())
-      .filter(state => state.status === 'pending')
-      .sort((a, b) => a.startTime - b.startTime);
-  }
-
-  private cleanup(): void {
-    const now = performance.now();
-    for (const [id, state] of this.loadingStates.entries()) {
-      if (state.status !== 'pending' && state.endTime && now - state.endTime > 300000) {
-        this.loadingStates.delete(id);
-      }
-      if (state.status === 'pending' && now - state.startTime > 300000) {
-        this.endLoading(id, new Error('Loading timeout'));
-      }
-    }
   }
 }
 
-export const loadingMonitor = LoadingMonitor.getInstance();
+// Export both as default and named export
+export { LoadingMonitor };
+export default LoadingMonitor;

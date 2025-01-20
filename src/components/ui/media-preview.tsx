@@ -1,8 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import Image from 'next/image';
-import { logger } from "@/lib/logger";
+import React, { useState } from 'react';
 import { cn } from "@/lib/utils";
 
 interface MediaPreviewProps {
@@ -21,61 +19,51 @@ export const MediaPreview: React.FC<MediaPreviewProps> = ({
   onError
 }) => {
   const [error, setError] = useState<string | null>(null);
-  const mounted = React.useRef(true);
 
-  useEffect(() => {
-    return () => {
-      mounted.current = false;
-    };
-  }, []);
+  const getProxiedUrl = (url: string) => {
+    try {
+      new URL(url); // Validate URL
+      return `https://images.weserv.nl/?url=${encodeURIComponent(url)}`;
+    } catch {
+      return null;
+    }
+  };
 
-  if (!url) return null;
+  const handleError = (e: any) => {
+    const error = new Error('Failed to load media');
+    setError('Media not available');
+    if (onError) {
+      onError(error);
+    }
+  };
+
+  if (error || !url || !getProxiedUrl(url)) {
+    return (
+      <div className={cn("flex items-center justify-center bg-muted h-full", className)}>
+        <span className="text-sm text-muted-foreground">
+          {error || 'Invalid media URL'}
+        </span>
+      </div>
+    );
+  }
 
   if (type === 'video') {
     return (
       <video
         src={url}
         controls
-        className={cn("w-full rounded-lg", className)}
-        onError={(e) => {
-          const error = new Error('Failed to load video');
-          setError('Failed to load video');
-          logger.error('Video load error', {
-            context: { error, url },
-            source: 'MediaPreview'
-          });
-          if (onError) {
-            onError(error);
-          }
-        }}
+        className={cn("w-full h-full object-cover", className)}
+        onError={handleError}
       />
     );
   }
 
   return (
-    <div className={cn("relative aspect-video w-full rounded-lg overflow-hidden", className)}>
-      <Image
-        src={url}
-        alt={alt}
-        fill
-        className="object-cover"
-        onError={(e) => {
-          const error = new Error('Failed to load image');
-          setError('Failed to load image');
-          logger.error('Image load error', {
-            context: { error, url },
-            source: 'MediaPreview'
-          });
-          if (onError) {
-            onError(error);
-          }
-        }}
-      />
-      {error && (
-        <div className="absolute inset-0 flex items-center justify-center bg-gray-100 text-gray-500">
-          {error}
-        </div>
-      )}
-    </div>
+    <img 
+      src={getProxiedUrl(url) ?? ''}
+      alt={alt}
+      className={cn("w-full h-full object-cover", className)}
+      onError={handleError}
+    />
   );
-}; 
+};

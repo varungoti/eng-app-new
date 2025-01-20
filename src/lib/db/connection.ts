@@ -1,8 +1,9 @@
 import { supabase } from '../supabase';
 import { logger } from '../logger';
-import { databaseMonitor } from '../monitoring/DatabaseMonitor';
+import { DatabaseMonitor } from '../monitoring/DatabaseMonitor';
 import { checkDatabaseHealth } from './healthCheck';
 import { RetryStrategy } from './retryStrategy';
+import { monitors } from '../monitoring';
 
 export class DatabaseConnection {
   private static instance: DatabaseConnection;
@@ -39,7 +40,7 @@ export class DatabaseConnection {
       
       if (isHealthy) {
         this.isConnected = true;
-        databaseMonitor.updateConnectionStatus(true);
+        monitors.databaseMonitor.updateConnectionStatus(true);
         logger.info('Database connection initialized successfully', {
           source: 'DatabaseConnection'
         });
@@ -51,13 +52,13 @@ export class DatabaseConnection {
       logger.error('Failed to initialize database connection', {
         context: { 
           error: err,
-          url: supabase.getUrl(),
+          url: process.env.NEXT_PUBLIC_SUPABASE_URL,
           retryAttempts: this.retryStrategy.getAttempts()
         },
         source: 'DatabaseConnection'
       });
       this.isConnected = false;
-      databaseMonitor.updateConnectionStatus(false);
+      monitors.databaseMonitor.updateConnectionStatus(false);
       return false;
     });
 

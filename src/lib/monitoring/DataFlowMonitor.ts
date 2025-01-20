@@ -1,153 +1,151 @@
+import type SupabaseClient from '@supabase/supabase-js/dist/module/SupabaseClient';
+import { MonitorConfig } from './index';
 import { logger } from '../logger';
-import { DEBUG_CONFIG } from '../config';
 
-interface DataFlowEvent {
-  id: string;
-  type: 'query' | 'mutation' | 'subscription' | 'auth' | 'network';
-  operation: string;
-  startTime: number;
-  endTime?: number;
-  duration?: number;
-  status: 'pending' | 'success' | 'error';
-  error?: Error;
-  context?: Record<string, any>;
+export interface DataFlowMetrics {
+  operationsPerSecond: number;
+  averageResponseTime: number;
+  errorRate: number;
+  activeConnections: number;
 }
 
-class DataFlowMonitor {
-  private static instance: DataFlowMonitor;
-  private events: Map<string, DataFlowEvent> = new Map();
-  
-  private constructor() {}
+interface Operation {
+  id: string;
+  type: string;
+  name: string;
+  startTime: number;
+  metadata?: Record<string, any>;
+}
 
-  public static getInstance(): DataFlowMonitor {
-    if (!DataFlowMonitor.instance) {
-      DataFlowMonitor.instance = new DataFlowMonitor();
-    }
-    return DataFlowMonitor.instance;
+export class DataFlowMonitor {
+  private supabase: SupabaseClient;
+  private config: MonitorConfig;
+  private metrics: DataFlowMetrics;
+  private activeOperations: Map<string, Operation>;
+
+  constructor(supabase: SupabaseClient, config: MonitorConfig) {
+    this.supabase = supabase;
+    this.config = config;
+    this.metrics = {
+      operationsPerSecond: 0,
+      averageResponseTime: 0,
+      errorRate: 0,
+      activeConnections: 0
+    };
+    this.activeOperations = new Map();
   }
 
-  public startOperation(type: DataFlowEvent['type'], operation: string, context?: Record<string, any>): string {
+  public startOperation(type: string, name: string, metadata?: Record<string, any>): string {
     const id = crypto.randomUUID();
-    const event: DataFlowEvent = {
+    const operation: Operation = {
       id,
       type,
-      operation,
+      name,
       startTime: performance.now(),
-      status: 'pending',
-      context
+      metadata
     };
 
-    this.events.set(id, event);
-
-    if (DEBUG_CONFIG.showDebug) {
-      logger.debug(`Started ${type} operation: ${operation}`, {
-        context: { operationId: id, ...context },
-        source: 'DataFlowMonitor'
-      });
-    }
+    this.activeOperations.set(id, operation);
+    
+    logger.debug(`Started operation: ${name}`, {
+      source: 'DataFlowMonitor',
+      context: {
+        operationId: id,
+        type,
+        metadata
+      }
+    });
 
     return id;
   }
 
-  public endOperation(id: string, error?: Error): void {
-    const event = this.events.get(id);
-    if (!event) return;
-
-    event.endTime = performance.now();
-    event.duration = event.endTime - event.startTime;
-    event.status = error ? 'error' : 'success';
-    if (error) event.error = error;
-
-    // Log slow operations
-    if (event.duration > DEBUG_CONFIG.performance.slowQueryThreshold) {
-      logger.warn(`Slow ${event.type} operation detected`, {
-        context: {
-          operationId: id,
-          operation: event.operation,
-          duration: `${event.duration.toFixed(2)}ms`,
-          threshold: DEBUG_CONFIG.performance.slowQueryThreshold,
-          error: event.error,
-          ...event.context
-        },
+  public endOperation(id: string, error?: Error) {
+    const operation = this.activeOperations.get(id);
+    if (!operation) {
+      logger.warn(`Attempted to end unknown operation: ${id}`, {
         source: 'DataFlowMonitor'
       });
+      return;
     }
 
-    // Log errors
+    const duration = performance.now() - operation.startTime;
+    const success = !error;
+
+    this.recordOperation(operation.name, duration, success);
+    this.activeOperations.delete(id);
+
     if (error) {
-      logger.error(`${event.type} operation failed: ${event.operation}`, {
+      logger.error(`Operation failed: ${operation.name}`, {
+        source: 'DataFlowMonitor',
         context: {
           operationId: id,
+          duration,
           error,
-          duration: event.duration,
-          ...event.context
-        },
-        source: 'DataFlowMonitor'
+          metadata: operation.metadata
+        }
       });
-    } else if (DEBUG_CONFIG.showDebug) {
-      logger.debug(`Completed ${event.type} operation: ${event.operation}`, {
+    } else {
+      logger.debug(`Completed operation: ${operation.name}`, {
+        source: 'DataFlowMonitor',
         context: {
           operationId: id,
-          duration: `${event.duration.toFixed(2)}ms`,
-          ...event.context
-        },
-        source: 'DataFlowMonitor'
+          duration,
+          metadata: operation.metadata
+        }
       });
     }
+  }
 
-    // Cleanup old events periodically
-    if (this.events.size > 1000) {
-      this.cleanup();
+  public async recordOperation(operation: string, duration: number, success: boolean) {
+    if (Math.random() > this.config.sampleRate!) return;
+
+    try {
+      await this.supabase.from('audit_logs').insert({
+        action: 'data_flow_operation',
+        details: {
+          operation,
+          duration,
+          success,
+          timestamp: new Date().toISOString()
+        }
+      });
+
+      this.updateMetrics(duration, success);
+    } catch (error) {
+      logger.error('Failed to record data flow operation', {
+        source: 'DataFlowMonitor',
+        context: {
+          operation,
+          duration,
+          success,
+          error
+        }
+      });
     }
   }
 
-  private cleanup(): void {
-    const now = performance.now();
-    const maxAge = 30 * 60 * 1000; // 30 minutes
+  private updateMetrics(duration: number, success: boolean) {
+    this.metrics.averageResponseTime = 
+      (this.metrics.averageResponseTime * 0.9) + (duration * 0.1);
+    this.metrics.operationsPerSecond++;
+    if (!success) this.metrics.errorRate++;
 
-    for (const [id, event] of this.events.entries()) {
-      if (now - event.startTime > maxAge) {
-        this.events.delete(id);
-      }
+    if (this.metrics.averageResponseTime > 1000) {
+      logger.warn('High average response time detected', {
+        source: 'DataFlowMonitor',
+        context: {
+          averageResponseTime: this.metrics.averageResponseTime,
+          threshold: 1000
+        }
+      });
     }
   }
 
-  public getOperationStats(): Record<string, any> {
-    const stats = {
-      totalOperations: this.events.size,
-      pendingOperations: 0,
-      successfulOperations: 0,
-      failedOperations: 0,
-      averageDuration: 0,
-      slowOperations: 0
-    };
+  public getMetrics(): DataFlowMetrics {
+    return { ...this.metrics };
+  }
 
-    let totalDuration = 0;
-    let completedOps = 0;
-
-    for (const event of this.events.values()) {
-      if (event.status === 'pending') {
-        stats.pendingOperations++;
-      } else {
-        if (event.status === 'success') {
-          stats.successfulOperations++;
-        } else {
-          stats.failedOperations++;
-        }
-        if (event.duration) {
-          totalDuration += event.duration;
-          completedOps++;
-          if (event.duration > DEBUG_CONFIG.performance.slowQueryThreshold) {
-            stats.slowOperations++;
-          }
-        }
-      }
-    }
-
-    stats.averageDuration = completedOps > 0 ? totalDuration / completedOps : 0;
-
-    return stats;
+  public getActiveOperations(): Operation[] {
+    return Array.from(this.activeOperations.values());
   }
 }
-
-export const dataFlowMonitor = DataFlowMonitor.getInstance();

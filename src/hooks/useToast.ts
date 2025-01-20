@@ -22,10 +22,9 @@ export const useToast = () => {
           return message;
         }
         if (message && typeof message === 'object') {
-          const clean = { ...message };
-          // Remove any Symbol properties
+          const clean: Record<string | symbol, unknown> = { ...message };
           Object.getOwnPropertySymbols(message).forEach(sym => {
-            delete clean[sym as any];
+            delete clean[sym];
           });
           return JSON.stringify(clean);
         }

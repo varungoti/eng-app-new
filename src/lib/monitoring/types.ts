@@ -1,26 +1,35 @@
-export interface MonitoringEvent {
-  id: string;
-  type: string;
-  timestamp: number;
-  duration?: number;
-  status: 'success' | 'error' | 'warning';
-  context?: Record<string, any>;
-  source: string;
+import type { SupabaseClient } from '@supabase/supabase-js';
+import type { Database } from '../database.types';
+
+export interface MonitoringConfig {
+  supabase?: SupabaseClient<Database>;
+  enableLogging?: boolean;
+  logLevel?: 'debug' | 'info' | 'warn' | 'error';
+  sampleRate?: number;
 }
 
 export interface LoadingState {
-  id: string;
-  component: string;
-  startTime: number;
-  endTime?: number;
+  isLoading: boolean;
+  startTime?: number;
   duration?: number;
-  status: 'pending' | 'complete' | 'error';
-  error?: Error;
-  timeoutId?: number;
 }
-export interface PerformanceMetrics {
+
+export interface DataFlowMetrics {
   operationCount: number;
   errorCount: number;
   averageDuration: number;
-  slowOperations: number;
+}
+
+export interface DataLoadMetrics {
+  recordCount: number;
+  errorCount: number;
+  averageDuration: number;
+}
+
+export interface DatabaseMetrics {
+  connectionStatus: 'error' | 'healthy' | 'degraded';
+  lastCheckTime: Date;
+  responseTime: number;
+  count: number;
+  errorCount: number;
 }

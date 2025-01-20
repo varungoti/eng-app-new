@@ -1,72 +1,31 @@
-import React from 'react';
-import { Toast } from './Toast';
-import { logger } from '../../lib/logger';
+"use client"
 
-export interface ToasterProps {
-  position?: 'top' | 'bottom';
-  timeout?: number;
-}
+import {
+  Toast,
+  ToastClose,
+  ToastDescription,
+  ToastProvider,
+  ToastTitle,
+  ToastViewport,
+} from "@/components/ui/toast"
+import { useToast } from "@/components/ui/use-toast"
 
-export interface ToastMessage {
-  id: string;
-  message: string;
-  type: 'error' | 'success' | 'warning' | 'info';
-}
-
-export const Toaster: React.FC<ToasterProps> = ({
-  position = 'top',
-  timeout = 5000
-}) => {
-  const [toasts, setToasts] = React.useState<ToastMessage[]>([]);
-  const mounted = React.useRef(true);
-
-  React.useEffect(() => {
-    return () => {
-      mounted.current = false;
-    };
-  }, []);
-
-  const removeToast = React.useCallback((id: string) => {
-    try {
-      if (mounted.current) {
-        setToasts(prev => prev.filter(t => t.id !== id));
-      }
-    } catch (err) {
-      logger.error('Failed to remove toast', {
-        context: { error: err, toastId: id },
-        source: 'Toaster'
-      });
-    }
-  }, []);
-
-  const addToast = React.useCallback((message: string, type: ToastMessage['type'] = 'info') => {
-    try {
-      const id = crypto.randomUUID();
-      if (mounted.current) {
-        setToasts(prev => [...prev, { id, message, type }]);
-      }
-      return id;
-    } catch (err) {
-      logger.error('Failed to add toast', {
-        context: { error: err, message, type },
-        source: 'Toaster'
-      });
-      return null;
-    }
-  }, []);
+export function Toaster() {
+  const { toasts } = useToast()
 
   return (
-    <>
-      {toasts.map(toast => (
-        <Toast
-          key={toast.id}
-          message={toast.message}
-          type={toast.type}
-          onClose={() => removeToast(toast.id)}
-          position={position}
-          timeout={timeout}
-        />
+    <ToastProvider>
+      {toasts.map(({ id, title, description, action, ...props }) => (
+        <Toast key={id} {...props}>
+          <div className="grid gap-1">
+            {title && <ToastTitle>{title}</ToastTitle>}
+            {description && <ToastDescription>{description}</ToastDescription>}
+          </div>
+          {action}
+          <ToastClose />
+        </Toast>
       ))}
-    </>
-  );
-};
+      <ToastViewport />
+    </ToastProvider>
+  )
+}

@@ -1,22 +1,26 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import Link from "next/link";
 import { useTheme } from 'next-themes';
-import { Home, AlignLeft, Trophy, Target, ShoppingBag, User, Sun, Moon, Book, Zap, BookOpen, Briefcase, Award, Mic, Lock, Pin } from "lucide-react";
-import { useAuth } from '@/hooks/useAuth';
-import { usePathname } from 'next/navigation';
+import { Icon } from "@/components/ui/icons";
+import { APP_ICONS } from "@/lib/constants/icons";
 import { Button } from '../ui/button';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/hooks/useAuth';
 
 interface SidebarProps {
   className?: string;
   currentPath: string;
-  sidebarItems: any;
+  sidebarItems: Array<{
+    href: string;
+    label: string;
+    icon: keyof typeof APP_ICONS;
+    isActive?: boolean;
+  }>;
 }
 
-export default function Sidebar({ className = "", sidebarItems }: SidebarProps) {
+export default function Sidebar({ className = "", sidebarItems, currentPath }: SidebarProps) {
   const { user, logout } = useAuth();
   const { theme, setTheme } = useTheme();
-  const pathname = usePathname();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isLocked, setIsLocked] = useState(true);
 
@@ -40,6 +44,35 @@ export default function Sidebar({ className = "", sidebarItems }: SidebarProps) 
     }
   };
 
+  // Debug log the sidebar items
+  console.log('Sidebar Items:', {
+    count: sidebarItems.length,
+    items: sidebarItems.map(item => ({
+      label: item.label,
+      href: item.href,
+      icon: item.icon
+    }))
+  });
+
+  console.log('Rendering Sidebar with items:', 
+    sidebarItems.map(item => ({
+      label: item.label,
+      href: item.href,
+      isActive: item.isActive
+    }))
+  );
+
+  // Debug sidebar items before render
+  console.log('Sidebar Render:', {
+    itemCount: sidebarItems.length,
+    items: sidebarItems.map(item => ({
+      label: item.label,
+      href: item.href,
+      icon: item.icon,
+      isActive: currentPath === item.href
+    }))
+  });
+
   return (
     <div 
       className={cn(
@@ -52,7 +85,7 @@ export default function Sidebar({ className = "", sidebarItems }: SidebarProps) 
       <div className="flex items-center justify-between p-4 border-b">
         {!isCollapsed && (
           <h1 className="text-2xl font-bold text-primary">
-            <span className="text-[#3C4DFF]">Eng</span>spiration
+            <span className="text-[#3C4DFF]">Engspiration</span>
           </h1>
         )}
         <div className="flex items-center gap-2">
@@ -62,7 +95,7 @@ export default function Sidebar({ className = "", sidebarItems }: SidebarProps) 
             onClick={toggleLock}
             className="hover:bg-accent"
           >
-            <Lock className={cn(
+            <Icon name={APP_ICONS.LOCK} className={cn(
               "h-4 w-4 transition-colors",
               isLocked ? "text-primary" : "text-muted-foreground"
             )} />
@@ -83,13 +116,13 @@ export default function Sidebar({ className = "", sidebarItems }: SidebarProps) 
       {/* Navigation */}
       <div className="flex-1 overflow-y-auto">
         <nav className="p-2 space-y-1">
-          {sidebarItems.map((item: any, index: number) => (
+          {sidebarItems.map((item, index) => (
             <SidebarItem
-              key={index}
+              key={`${item.href}-${index}`}
               icon={item.icon}
               label={item.label}
               href={item.href}
-              isActive={pathname === item.href}
+              isActive={currentPath === item.href}
               isCollapsed={isCollapsed}
             />
           ))}
@@ -105,12 +138,12 @@ export default function Sidebar({ className = "", sidebarItems }: SidebarProps) 
         >
           {theme === 'dark' ? (
             <>
-              <Sun className="h-4 w-4 mr-2" />
+              <Icon name={APP_ICONS.SUN} className="h-4 w-4 mr-2" />
               {!isCollapsed && <span>Light Mode</span>}
             </>
           ) : (
             <>
-              <Moon className="h-4 w-4 mr-2" />
+              <Icon name={APP_ICONS.MOON} className="h-4 w-4 mr-2" />
               {!isCollapsed && <span>Dark Mode</span>}
             </>
           )}
@@ -136,20 +169,30 @@ export default function Sidebar({ className = "", sidebarItems }: SidebarProps) 
 }
 
 function SidebarItem({ 
-  icon: Icon, 
+  icon, 
   label, 
   href, 
   isActive, 
   isCollapsed 
 }: { 
-  icon: React.ElementType; 
+  icon: keyof typeof APP_ICONS;
   label: string; 
   href: string; 
   isActive: boolean;
   isCollapsed: boolean;
 }) {
-  const pathname = usePathname();
-  const active = pathname.startsWith(href);
+  // Debug icon rendering
+  console.log('Rendering SidebarItem:', {
+    label,
+    icon,
+    iconValue: APP_ICONS[icon],
+    exists: icon in APP_ICONS
+  });
+
+  const iconName = APP_ICONS[icon];
+  if (!iconName) {
+    console.warn(`Icon not found: ${icon}`);
+  }
 
   return (
     <Link
@@ -157,14 +200,17 @@ function SidebarItem({
       className={cn(
         "flex items-center px-2 py-2 rounded-md transition-colors",
         "hover:bg-accent hover:text-accent-foreground",
-        active && "bg-primary/10 text-primary",
+        isActive && "bg-primary/10 text-primary",
         isCollapsed ? "justify-center" : "justify-start"
       )}
     >
-      <Icon className={cn(
-        "flex-shrink-0",
-        isCollapsed ? "h-5 w-5" : "h-5 w-5 mr-3"
-      )} />
+      <Icon 
+        name={iconName || 'FileText'}
+        className={cn(
+          "flex-shrink-0",
+          isCollapsed ? "h-5 w-5" : "h-5 w-5 mr-3"
+        )} 
+      />
       {!isCollapsed && <span className="text-sm">{label}</span>}
     </Link>
   );

@@ -1,6 +1,6 @@
 import { Libraries } from '@react-google-maps/api';
 import { useLoadScript } from '@react-google-maps/api';
-import { useMemo } from 'react';
+import { useMemo, useEffect } from 'react';
 import { logger } from './logger';
 
 export const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
@@ -49,19 +49,17 @@ export const useGoogleMaps = () => {
   
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: apiKey || '',
-    libraries: GOOGLE_MAPS_CONFIG.libraries,
-    onLoad: () => {
+    libraries: GOOGLE_MAPS_CONFIG.libraries
+  });
+
+  // Log after load check
+  useEffect(() => {
+    if (isLoaded) {
       logger.info('Google Maps loaded successfully', {
         source: 'GoogleMaps'
       });
-    },
-    onError: (error) => {
-      logger.error('Failed to load Google Maps', {
-        context: { error },
-        source: 'GoogleMaps'
-      });
     }
-  });
+  }, [isLoaded]);
 
   const error = useMemo(() => {
     if (!apiKey) {

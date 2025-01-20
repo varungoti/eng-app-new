@@ -1,4 +1,5 @@
 import { supabase } from './supabase';
+import { createClient } from '@/lib/supabase';
 import { logger } from './logger';
 import { checkDatabaseHealth } from './db/healthCheck';
 import { dbConnection } from './db/connection';

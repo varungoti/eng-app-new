@@ -1,24 +1,22 @@
-import React, { createContext, useState, useContext } from 'react';
-import type { Theme } from '../lib/themes';
+import React, { createContext, useContext } from 'react';
+import { useTheme } from 'next-themes';
+import { themes } from '@/lib/themes';
 
-interface ThemeContextType {
-  theme: Theme;
-  setTheme: (theme: Theme) => void;
-}
+type ThemeContextType = {
+  currentTheme: typeof themes.light;
+};
 
-const ThemeContext = createContext<ThemeContextType>({
-  theme: 'light',
-  setTheme: () => {},
-});
+const ThemeContext = createContext<ThemeContextType>({ currentTheme: themes.light });
 
-export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [theme, setTheme] = useState<Theme>('light');
+export function ThemeContextProvider({ children }: { children: React.ReactNode }) {
+  const { theme, resolvedTheme } = useTheme();
+  const currentTheme = themes[theme as keyof typeof themes] || themes[resolvedTheme as keyof typeof themes] || themes.light;
 
   return (
-    <ThemeContext.Provider value={{ theme, setTheme }}>
+    <ThemeContext.Provider value={{ currentTheme }}>
       {children}
     </ThemeContext.Provider>
   );
-};
+}
 
-export const useTheme = () => useContext(ThemeContext);
+export const useCurrentTheme = () => useContext(ThemeContext);

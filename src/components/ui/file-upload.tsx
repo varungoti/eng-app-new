@@ -1,4 +1,4 @@
-import { ChangeEvent, useState, useEffect } from 'react';
+import { ChangeEvent, useState, useEffect, useRef } from 'react';
 import { Input } from './input';
 import { Button } from './button';
 import { logger } from '@/lib/logger';

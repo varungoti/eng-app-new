@@ -1,0 +1,7 @@
+-- Drop tables in reverse order of dependencies
+DROP TABLE IF EXISTS lesson_content CASCADE;
+DROP TABLE IF EXISTS questions CASCADE;
+DROP TABLE IF EXISTS lessons CASCADE;
+DROP TABLE IF EXISTS subtopics CASCADE;
+DROP TABLE IF EXISTS topics CASCADE;
+DROP TABLE IF EXISTS grades CASCADE; 

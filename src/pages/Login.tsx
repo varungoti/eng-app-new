@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { logger } from '../lib/logger';
 import { ROLE_PERMISSIONS } from '../types/roles';
-import { Shield } from 'lucide-react';
+import { Shield } from '@phosphor-icons/react';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -22,7 +22,7 @@ const Login = () => {
     setLoading(true);
     
     try {
-      await login(email, password, selectedRole); 
+      await login(email, password ); 
       navigate(from);
       logger.info('Login successful', {
         context: { email, role: selectedRole },

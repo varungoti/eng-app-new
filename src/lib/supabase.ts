@@ -1,11 +1,15 @@
-import { createClient } from '@supabase/supabase-js';
+import { DEBUG_CONFIG } from './config';
+//import { createClient } from '@supabase/supabase-js';
 import type { Database } from './database.types';
 import { logger } from './logger';
-import { DEBUG_CONFIG } from './config';
+import { createBrowserClient } from '@supabase/ssr'
+//import type { SupabaseClient as Client } from '@supabase/supabase-js'
 
 // Validate environment variables
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+//type SupabaseClient = Client<Database>;
 
 if (!supabaseUrl || !supabaseAnonKey) {
   const error = 'Missing Supabase environment variables';
@@ -27,11 +31,11 @@ const supabaseOptions = {
     storageKey: 'sb-auth-token',
     storage: window.localStorage,
     detectSessionInUrl: true,
-    flowType: 'pkce',
+    flowType: 'pkce' as const,
     debug: DEBUG_CONFIG.enabled,
     cookieOptions: {
       maxAge: 7 * 24 * 60 * 60, // 7 days
-      sameSite: 'lax',
+      sameSite: 'lax' as const,
       secure: true
     },
   },
@@ -47,7 +51,7 @@ const supabaseOptions = {
     }
   },
   db: {
-    schema: 'public',
+    schema: 'public' as const,
     debug: DEBUG_CONFIG.enabled
   }
 };
@@ -62,7 +66,7 @@ if (DEBUG_CONFIG.enabled) {
 }
 
 // Create Supabase client with enhanced error handling
-const supabaseClient = createClient<Database>(
+const supabaseClient = createBrowserClient<Database>(
   supabaseUrl,
   supabaseAnonKey,
   supabaseOptions
@@ -84,7 +88,17 @@ setInterval(async () => {
       source: 'SupabaseClient' 
     });
   }
-}, 4 * 60 * 1000); // Check every 4 minutes
+}, 15 * 60 * 1000); // Check every 15 minutes
 
+
+const supabase = createBrowserClient(
+  import.meta.env.VITE_SUPABASE_URL,
+  import.meta.env.VITE_SUPABASE_ANON_KEY
+)
+export const createClient = createBrowserClient(
+  import.meta.env.VITE_SUPABASE_URL,
+  import.meta.env.VITE_SUPABASE_ANON_KEY
+)
+export { supabase };
 // Export the Supabase client
-export const supabase = supabaseClient;
+export { supabaseClient };

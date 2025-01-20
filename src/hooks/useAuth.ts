@@ -1,13 +1,21 @@
-import React, { useContext, useEffect } from 'react';
+import { useContext, useEffect } from 'react';
 import { AuthContext } from '../contexts/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useQueryClient } from '@tanstack/react-query';
+import { QueryClient } from '@tanstack/query-core';
 import { roleTransitionManager } from '../lib/auth/RoleTransitionManager';
 import { useRoleStore } from '../lib/auth/store';
 import { logger } from '../lib/logger';
 import { ROLE_PERMISSIONS } from '../types/roles';
 import { sessionManager } from '../lib/auth/sessionManager';
 import type { UserRole } from '../types/roles';
+//import { useQueryClient } from '@tanstack/react-query';
+
+//const queryClient = new QueryClient();
+
+interface LoginCredentials {
+  email: string;
+  password: string;
+}
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
@@ -17,7 +25,7 @@ export const useAuth = () => {
 
   const { isTransitioning } = useRoleStore();
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
+  const queryClient = new QueryClient();
   const location = useLocation();
   const { user, loading } = context;
   
@@ -51,7 +59,7 @@ export const useAuth = () => {
     };
   }, [user]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (user) {
       logger.debug('Auth state check on route change', {
         context: {
@@ -90,9 +98,34 @@ export const useAuth = () => {
     }
   };
 
+  const login = async (credentials: LoginCredentials) => {
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(credentials)
+      });
+      
+      if (!response.ok) {
+        throw new Error('Login failed');
+      }
+
+      const data = await response.json();
+      context.setUser(data.user);
+      return data;
+    } catch (error) {
+      logger.error('Login failed', {
+        context: { error: error },
+        source: 'useAuth'
+      });
+      throw error;
+    }
+  };
+
   return {
     ...context,
     changeRole,
-    isTransitioning
+    isTransitioning,
+    login
   };
 };

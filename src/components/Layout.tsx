@@ -1,10 +1,12 @@
+"use client";
+
 import React, { useState } from 'react';
-import * as Icons from 'lucide-react';
 import { useLocation, Link, Outlet } from 'react-router-dom';
-import { useTheme } from '../contexts/ThemeContext';
+import { useTheme } from "next-themes";
 import { AuthContext } from '../contexts/AuthContext';
 import { logger } from '../lib/logger';
 import { useError } from '../hooks/useError';
+import { Icon } from './ui/icons';
 import NotificationBell from './notifications/NotificationBell';
 import UserProfileMenu from './UserProfileMenu';
 import ErrorBoundary from './ErrorBoundary';
@@ -14,20 +16,29 @@ import { ErrorMetricsDisplay } from './ErrorMonitor/ErrorMetricsDisplay';
 import { themes } from '../lib/themes';
 import { getNavigationItems } from '../lib/permissions';
 import UserRoleIndicator from './UserRoleIndicator';
+import ThemeSelector from './ThemeSelector';
+import { ThemeToggle } from "./theme-toggle";
+import { IconName } from '../types/icons';
 
 interface NavItem {
   name: string;
   href?: string;
-  icon: string;
-  submenu?: { name: string; href: string; icon: string; }[];
+  icon: IconName;
+  current?: boolean;
+  submenu?: { 
+    name: string; 
+    href: string; 
+    icon: IconName;
+    current?: boolean; 
+  }[];
 }
 
 const Layout: React.FC = () => {
   const location = useLocation();
-  const { theme } = useTheme();
+  const { theme, resolvedTheme } = useTheme();
   const { user, loading } = React.useContext(AuthContext);
   const { error } = useError();
-  const currentTheme = themes[theme];
+  const currentTheme = themes[theme as keyof typeof themes] || themes[resolvedTheme as keyof typeof themes] || themes.light;
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
 
   const navigation = user ? getNavigationItems(user.role).map(item => ({
@@ -48,32 +59,36 @@ const Layout: React.FC = () => {
     });
   }, [location.pathname, user?.role, navigation.length]);
 
-  // Show loading state while initializing
   if (loading || !user) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center space-y-2">
-          <Icons.Loader2 className="h-12 w-12 text-indigo-600 animate-spin mx-auto" />
+          <Icon 
+            type="phosphor"
+            name="SPINNER"
+            className="h-12 w-12 text-indigo-600 animate-spin mx-auto"
+          />
           <p className="mt-4 text-gray-600">Loading application...</p>
-          <p className="text-sm text-gray-500">Please wait while we initialize your session</p>
         </div>
       </div>
     );
   }
 
-  // Show error state if there's an error
   if (error) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center space-y-4 max-w-md mx-auto px-4">
-          <Icons.AlertTriangle className="h-12 w-12 text-red-600 mx-auto" />
+          <Icon 
+            type="phosphor"
+            name="WARNING"
+            className="h-12 w-12 text-red-600 mx-auto"
+          />
           <h2 className="text-lg font-medium text-gray-900">Application Error</h2>
           <p className="text-sm text-gray-600">{error}</p>
           <button
             onClick={() => window.location.reload()}
             className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
           >
-            <Icons.RefreshCw className="h-4 w-4 mr-2" />
             Reload Application
           </button>
         </div>
@@ -87,49 +102,56 @@ const Layout: React.FC = () => {
       const isOpen = openSubmenu === item.name;
       
       return (
-        <div key={item.name}>
+        <div className="mb-2">
           <button
             onClick={() => setOpenSubmenu(openSubmenu === item.name ? null : item.name)}
             className={`${
               isSubmenuActive || isOpen
-                ? `${currentTheme.primary.replace('bg-', 'bg-opacity-10')} ${currentTheme.primary.replace('bg-', 'text-')}`
-                : `${currentTheme.textMuted} ${currentTheme.sidebarHover}`
-            } w-full group flex items-center justify-between px-2 py-2 text-sm font-medium rounded-md`}
+                ? `bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 shadow-sm ring-1 ring-indigo-500/20`
+                : `text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/50`
+            } w-full group flex items-center justify-between px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ease-in-out hover:shadow-md`}
           >
             <div className="flex items-center">
-              {React.createElement(Icons[item.icon], {
-                className: `${
+              <Icon 
+                type="phosphor"
+                name={item.icon as IconName}
+                className={`${
                   isSubmenuActive || isOpen
-                    ? currentTheme.primary.replace('bg-', 'text-') 
-                    : currentTheme.textMuted
-                } mr-3 flex-shrink-0 h-6 w-6`
-              })}
+                    ? 'text-indigo-600 dark:text-indigo-400' 
+                    : 'text-gray-400 group-hover:text-gray-500 dark:text-gray-400'
+                } mr-3 flex-shrink-0 h-5 w-5 transition-all duration-200 group-hover:scale-110`}
+              />
               {item.name}
             </div>
-            <Icons.ChevronDown 
-              className={`h-5 w-5 transform transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+            <Icon 
+              type="phosphor"
+              name={isOpen ? "CARET_UP" : "CARET_DOWN"}
+              className={`h-4 w-4 text-gray-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
             />
           </button>
           
           {isOpen && (
-            <div className="mt-1 ml-4 space-y-0.5">
-              {item.submenu.map(subitem => (
+            <div className="mt-1 ml-4 space-y-1 animate-slideDown">
+              {item.submenu.map((subitem, subIndex) => (
                 <Link
                   key={subitem.href}
                   to={subitem.href}
                   className={`${
                     location.pathname.startsWith(subitem.href)
-                      ? `${currentTheme.primary.replace('bg-', 'bg-opacity-10')} ${currentTheme.primary.replace('bg-', 'text-')}`
-                      : `${currentTheme.textMuted} ${currentTheme.sidebarHover}`
-                  } group flex items-center px-4 py-2 text-sm font-medium rounded-md`}
+                      ? `bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 shadow-sm ring-1 ring-indigo-500/20`
+                      : `text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/50`
+                  } group flex items-center px-4 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 hover:shadow-sm`}
+                  style={{ animationDelay: `${subIndex * 50}ms` }}
                 >
-                  {React.createElement(Icons[subitem.icon], {
-                    className: `${
+                  <Icon 
+                    type="phosphor"
+                    name={subitem.icon as IconName}
+                    className={`${
                       location.pathname === subitem.href 
-                        ? currentTheme.primary.replace('bg-', 'text-') 
-                        : currentTheme.textMuted
-                    } mr-3 flex-shrink-0 h-4 w-4`
-                  })}
+                        ? 'text-indigo-600 dark:text-indigo-400' 
+                        : 'text-gray-400 group-hover:text-gray-500 dark:text-gray-400'
+                    } mr-3 flex-shrink-0 h-4 w-4 transition-all duration-200 group-hover:scale-110`}
+                  />
                   {subitem.name}
                 </Link>
               ))}
@@ -145,17 +167,19 @@ const Layout: React.FC = () => {
         to={item.href || '#'}
         className={`${
           location.pathname === item.href
-            ? `${currentTheme.primary.replace('bg-', 'bg-opacity-10')} ${currentTheme.primary.replace('bg-', 'text-')}`
-            : `${currentTheme.textMuted} ${currentTheme.sidebarHover}`
-        } group flex items-center px-2 py-2 text-sm font-medium rounded-md`}
+            ? `bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 shadow-sm ring-1 ring-indigo-500/20`
+            : `text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/50`
+        } group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 hover:shadow-md mb-1`}
       >
-        {React.createElement(Icons[item.icon], {
-          className: `${
-            item.current 
-              ? currentTheme.primary.replace('bg-', 'text-') 
-              : currentTheme.textMuted
-          } mr-3 flex-shrink-0 h-6 w-6`
-        })}
+        <Icon 
+          type="phosphor"
+          name={item.icon as IconName}
+          className={`${
+            location.pathname === item.href
+              ? 'text-indigo-600 dark:text-indigo-400' 
+              : 'text-gray-400 group-hover:text-gray-500 dark:text-gray-400'
+          } mr-3 flex-shrink-0 h-5 w-5 transition-all duration-200 group-hover:scale-110`}
+        />
         {item.name}
       </Link>
     );
@@ -165,26 +189,43 @@ const Layout: React.FC = () => {
     <div className={`min-h-screen ${currentTheme.background}`}>
       <div className="flex h-screen overflow-hidden">
         <ErrorBoundary source="Notifications">
-          <div className="fixed top-4 right-4 z-50">
+          <div className="fixed top-4 right-16 z-50">
             <NotificationBell />
           </div>
         </ErrorBoundary>
 
         <div className="hidden md:flex md:flex-shrink-0 relative">
-          <div className="flex flex-col w-64">
+          <div className="flex flex-col w-80">
             <ErrorBoundary source="Sidebar">
-              <div className={`flex flex-col flex-grow pt-5 overflow-y-auto ${currentTheme.sidebar} border-r ${currentTheme.border} shadow-sm`}>
-                <div className="flex items-center justify-between px-4">
-                  <Icons.Book className={`w-8 h-8 ${currentTheme.primary.replace('bg-', 'text-')}`} />
-                  <span className={`ml-2 text-xl font-semibold ${currentTheme.text}`}>
-                    SpeakWell Admin
-                  </span>
-                  <UserProfileMenu />
+              <div className={`flex flex-col flex-grow pt-6 overflow-y-auto ${currentTheme.sidebar} border-r ${currentTheme.border} shadow-xl backdrop-blur-sm bg-opacity-95 transition-all duration-300 ease-in-out`}>
+                <div className="flex items-center justify-between px-6 mb-8">
+                  <div className="flex items-center space-x-3 group">
+                    <Icon 
+                      type="phosphor"
+                      name="BOOKMARK"
+                      className={`w-8 h-8 ${currentTheme.primary.replace('bg-', 'text-')} transform transition-transform group-hover:scale-110 duration-200`}
+                    />
+                    <span className={`text-xl font-bold tracking-tight ${currentTheme.text} group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors duration-200`}>
+                      SpeakWell Admin
+                    </span>
+                  </div>
                 </div>
-                <div className="mt-8 flex-grow flex flex-col">
-                  <nav className="flex-1 px-2 space-y-1">
-                    {navigation.map(renderNavItem)}
+
+                <div className="flex-grow flex flex-col px-3">
+                  <nav className="flex-1 space-y-1.5">
+                    {navigation.map((item, index) => (
+                      <div key={item.name} 
+                        className="animate-fadeIn" 
+                        style={{ animationDelay: `${index * 50}ms` }}
+                      >
+                        {renderNavItem(item)}
+                      </div>
+                    ))}
                   </nav>
+                </div>
+
+                <div className="p-5 mt-6 border-t border-gray-200 dark:border-gray-700/50 backdrop-blur-sm">
+                  <UserProfileMenu />
                 </div>
               </div>
             </ErrorBoundary>
@@ -192,11 +233,13 @@ const Layout: React.FC = () => {
         </div>
 
         <div className={`flex flex-col flex-1 overflow-hidden ${currentTheme.background}`}>
-          <main className="flex-1 relative overflow-y-auto focus:outline-none bg-gray-50">
-            <div className="py-6 min-h-screen">
-              <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 space-y-6">
+          <main className="flex-1 relative overflow-y-auto focus:outline-none">
+            <div className={`py-6 ${currentTheme.background} ${currentTheme.text}`}>
+              <div className={`max-w-7xl mx-auto px-4 sm:px-6 md:px-8 ${currentTheme.background}`}>
                 <ErrorBoundary source="MainContent">
-                  <Outlet />
+                  <div className={`${currentTheme.card} rounded-lg p-6`}>
+                    <Outlet />
+                  </div>
                 </ErrorBoundary>
               </div>
             </div>
@@ -207,7 +250,7 @@ const Layout: React.FC = () => {
       <ErrorBoundary source="Monitoring">
         <div className="fixed bottom-4 right-4 z-50 space-y-4">
           <PerformanceIndicator source="Layout" showCompleted={true} />
-          <LoadingIndicator source="Layout" />
+          <LoadingIndicator resource="Layout" />
           <ErrorMetricsDisplay />
         </div>
       </ErrorBoundary>
@@ -215,6 +258,8 @@ const Layout: React.FC = () => {
       <ErrorBoundary source="UserRole">
         <UserRoleIndicator />
       </ErrorBoundary>
+
+      <ThemeToggle />
     </div>
   );
 };

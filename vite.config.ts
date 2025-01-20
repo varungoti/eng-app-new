@@ -3,11 +3,7 @@ import react from '@vitejs/plugin-react';
 import path from 'path';
 
 export default defineConfig({
-  plugins: [
-    react({
-      fastRefresh: true,
-    })
-  ],
+  plugins: [react()],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, 'src'),
@@ -22,7 +18,7 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+          'react-vendor': ['react', 'react-dom'],
           'ui-vendor': ['@tanstack/react-query', 'lucide-react'],
         }
       }
@@ -31,10 +27,14 @@ export default defineConfig({
   },
   optimizeDeps: {
     include: [
+      'lucide-react',
       'react',
       'react-dom',
       'react-router-dom',
-      '@tanstack/react-query'
+      '@tanstack/react-query',
+      '@supabase/ssr',
+      '@supabase/supabase-js',
+      '@supabase/gotrue-js'
     ]
   },
   server: {
@@ -45,6 +45,13 @@ export default defineConfig({
       'Cross-Origin-Embedder-Policy': 'require-corp',
       'Cross-Origin-Opener-Policy': 'same-origin',
       'Access-Control-Allow-Origin': '*',
-    }
-  }
+    },
+  },
+  envDir: './',
+  envPrefix: 'VITE_',
+  define: {
+    'process.env': process.env,
+    'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
+    'process.browser': true
+  },
 });

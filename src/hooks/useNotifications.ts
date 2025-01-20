@@ -38,7 +38,7 @@ export const useNotifications = () => {
 
       if (fetchError) throw fetchError;
 
-      const mappedNotifications = (data || []).map(n => ({
+      const mappedNotifications = (data || []).map((n: any) => ({
         id: n.id,
         userId: n.user_id,
         type: n.type,
@@ -106,6 +106,6 @@ export const useNotifications = () => {
     loading,
     error,
     markAsRead,
-    unreadCount: notifications.filter(n => !n.read).length
+    unreadCount: notifications.filter((n: any) => !n.read).length
   };
 };

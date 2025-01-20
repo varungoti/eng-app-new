@@ -9,7 +9,7 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter,
-} from './ui/dialog';
+} from '@/components/ui/dialog';
 import ContentSelectionDropdowns from './content/ContentSelectionDropdowns';
 import type { Grade, Topic, SubTopic, Lesson } from '../types';
 
@@ -102,9 +102,9 @@ const AddContentDialog: React.FC<AddContentDialogProps> = ({
           {/* Content Selection Dropdowns */}
           <ContentSelectionDropdowns
             grades={gradesData}
-            topics={topics}
-            subTopics={subTopics}
-            lessons={lessons}
+            topics={topics || []}
+            subTopics={subTopics || []}
+            lessons={lessons || []}
             selectedGrade={selectedGrade}
             selectedTopic={selectedTopic}
             selectedSubTopic={selectedSubTopic}

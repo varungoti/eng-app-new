@@ -3,23 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import {
-  ArrowRight,
-  BookOpen,
-  BookOpenIcon,
-  Calendar,
-  CheckCircle2,
-  CheckCircleIcon,
-  Clock,
-  ClockIcon,
-  Lock,
-  Plus,
-  RotateCcw,
-  Unlock,
-  Users,
-} from "lucide-react";
-import Link from "next/link";
-import ClassHeader from "./ClassHeader";
+import { Button } from "../ui/button";
+import { classesData, lessonsData } from "@/data/mockData";
+import { Icon } from '@/components/ui/icons';
 import {
   Dialog,
   DialogContent,
@@ -28,8 +14,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Button } from "../ui/button";
-import { classesData, lessonsData } from "@/data/mockData";
+import ClassHeader from "./ClassHeader";
 
 interface SubLesson {
   id: number;
@@ -72,7 +57,7 @@ interface MyClassesProps {
   data?: any;
 }
 
-export function MYClasses({ data }: MyClassesProps) {
+export function MyClasses({ data }: MyClassesProps) {
   const [lessons, setLessons] = useState<ExtendedLesson[]>(lessonsData);
   const [selectedClass, setSelectedClass] = useState<ExtendedClass>(classesData[0]);
   const [selectedLesson, setSelectedLesson] = useState<ExtendedLesson>(lessonsData[0]);
@@ -153,74 +138,44 @@ export function MYClasses({ data }: MyClassesProps) {
         selectedClass={selectedClass}
         onClassChange={handleClassChange}
       />
-      <div className="sticky top-0 z-30 w-full ">
-       <Card className={`text-gray-700 bg-white bg-opacity-15 rounded-3xl mb-4 border-0 shadow`}>
-            <CardHeader>
-              <CardTitle className="text-2xl">{selectedClass?.name}</CardTitle>
-              <div className="grid grid-cols-4 gap-4">
-                <div className="flex items-center space-x-2">
-                  <Users size={16} className="text-blue-300" />
-                  <span className="text-sm font-medium">
-                    {selectedClass?.studentIds?.length ?? 0}/
-                    {selectedClass?.maxStudents ?? 0} Students
-                  </span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <BookOpen size={16} className="text-green-300" />
-                  <span className="text-sm font-medium">
-                    {selectedClass?.lessonIds?.length ?? 0} Lessons
-                  </span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Calendar size={16} className="text-purple-300" />
-                  <span className="text-sm font-medium">
-                    {selectedClass?.assignments?.length ?? 0} Assignments
-                  </span>
-                </div>
-                <div className="text-sm mt-2">70% Completed</div>
-              </div> 
-            </CardHeader>
-          </Card> 
-
-        <Card className={`${selectedLesson.color} text-white rounded-xl `}>
-          <CardHeader className="p-2 md:p-4 md:pl-6">
-            <CardTitle className="text-2xl">{selectedLesson.title}</CardTitle>
-            <div className="flex flex-row md:flex-row items-center text-white text-sm space-y-2 md:space-y-0 md:space-x-4 md:p-2">
-              <div className="flex items-center space-x-2">
-                <BookOpenIcon className="h-5 w-5 text-white" />
-                <div className="text-sm font-medium">
-                  {selectedClass?.name}{" "}
-                </div>
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <span>Lesson {selectedLesson.lessonNumber}</span>
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <span className="flex items-center space-x-1">
-                  <ClockIcon className="h-5 w-5 text-white" />
-                  <span>{selectedLesson.duration} minutes</span>
-                </span>
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <span className="flex items-center space-x-1">
-                  <BookOpenIcon className="h-5 w-5 text-white" />
-                  <span>{selectedLesson.totalTopics} Topics</span>
-                </span>
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <div className="flex items-center space-x-1">
-                  <CheckCircleIcon className="h-5 w-5 text-white" />
-                  <span>1/5 Completed</span>
-                </div>
-              </div>
+      
+      <Card className="text-gray-700 bg-white bg-opacity-15 rounded-3xl mb-4 border-0 shadow">
+        <CardHeader>
+          <CardTitle className="text-2xl">{selectedClass?.name}</CardTitle>
+          <div className="grid grid-cols-4 gap-4">
+            <div className="flex items-center space-x-2">
+              <Icon type="phosphor" name="USERS" className="h-4 w-4 text-blue-300" />
+              <span className="text-sm font-medium">
+                {selectedClass?.studentIds?.length ?? 0}/
+                {selectedClass?.maxStudents ?? 0} Students
+              </span>
             </div>
-          </CardHeader>
-        </Card>
-      </div>
+            <div className="flex items-center space-x-2">
+              <Icon type="phosphor" name="BOOK_OPEN" className="h-4 w-4 text-green-300" />
+              <span className="text-sm font-medium">
+                {selectedClass?.lessonIds?.length ?? 0} Lessons
+              </span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Icon type="phosphor" name="CALENDAR" className="h-4 w-4 text-purple-300" />
+              <span className="text-sm font-medium">
+                {selectedClass?.assignments?.length ?? 0} Assignments
+              </span>
+            </div>
+            <div className="text-sm mt-2">70% Completed</div>
+          </div> 
+        </CardHeader>
+      </Card>
+
+      <Card className={`${selectedLesson.color} text-white rounded-xl`}>
+        <CardHeader className="p-2 md:p-4 md:pl-6">
+          <CardTitle className="text-2xl">{selectedLesson.title}</CardTitle>
+          <div className="flex items-center gap-2">
+            <Icon type="phosphor" name="CLOCK_COUNTDOWN" className="h-4 w-4" />
+            <span>{selectedLesson.duration} minutes</span>
+          </div>
+        </CardHeader>
+      </Card>
 
       <div className="space-y-8 -z-10 pb-[100vh]">
         {lessons.map((lesson, index) => (
@@ -306,71 +261,39 @@ export function MYClasses({ data }: MyClassesProps) {
       </div>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent>
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
+              <Icon type="phosphor" name="BOOK_OPEN" className="h-5 w-5" />
               {selectedSubLesson?.title}
-              {selectedSubLesson?.completed && (
-                <CheckCircle2 className="h-5 w-5 text-green-500" />
-              )}
             </DialogTitle>
-            <DialogDescription className="space-y-4">
-              <div className="space-y-4">
-                <div className="flex items-center gap-2 text-sm">
-                  <Clock className="h-4 w-4" />
-                  <span>{selectedSubLesson?.duration} minutes</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm">
-                  <BookOpen className="h-4 w-4" />
-                  <span>Part of {currentLesson?.title}</span>
-                </div>
-                <div>{selectedSubLesson?.description}</div>
-
-                {selectedSubLesson?.completed && (
-                  <div className="mt-4 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                    <div className="text-green-700 dark:text-green-300 text-sm">
-                      You've already completed this lesson!
-                    </div>
-                  </div>
-                )}
-              </div>
-            </DialogDescription>
           </DialogHeader>
+          
+          <div className="flex items-center gap-2">
+            <Icon type="phosphor" name="CLOCK_COUNTDOWN" className="h-4 w-4" />
+            <span>{selectedSubLesson?.duration} minutes</span>
+          </div>
+
           <DialogFooter className="sm:justify-start gap-2">
             {!selectedSubLesson?.unlocked ? (
-              <div className="text-sm text-gray-500">
-                Complete previous lessons to unlock this content
+              <div className="flex items-center gap-2 text-gray-500">
+                <Icon type="phosphor" name="LOCK_SIMPLE" className="h-4 w-4" />
+                <span>Complete previous lessons to unlock</span>
               </div>
             ) : selectedSubLesson.completed ? (
               <>
-                <Button
-                  onClick={() =>
-                    selectedSubLesson && currentLesson?.id &&
-                    handleRestartLesson(currentLesson.id, selectedSubLesson.id)
-                  }
-                  variant="outline"
-                  className="gap-2"
-                >
-                  <RotateCcw className="h-4 w-4" />
+                <Button variant="outline" className="gap-2">
+                  <Icon type="phosphor" name="ARROWS_CLOCKWISE" className="h-4 w-4" />
                   Restart Lesson
                 </Button>
-                <Button
-                  onClick={() =>
-                    selectedSubLesson && currentLesson?.id &&
-                    handleStartLesson(currentLesson.id, selectedSubLesson.id)
-                  }
-                >
+                <Button>
+                  <Icon type="phosphor" name="CARET_RIGHT" className="h-4 w-4 mr-2" />
                   Continue to Review
                 </Button>
               </>
             ) : (
-              <Button
-                className="w-full"
-                onClick={() =>
-                  selectedSubLesson && currentLesson?.id &&
-                  handleStartLesson(currentLesson.id, selectedSubLesson.id)
-                }
-              >
+              <Button className="w-full gap-2">
+                <Icon type="phosphor" name="PLAY_CIRCLE" className="h-4 w-4" />
                 Start Lesson
               </Button>
             )}

@@ -1,6 +1,7 @@
 import React from 'react';
-import { CheckCircle, Clock, AlertTriangle, XCircle } from 'lucide-react';
-import type { OnboardingTask, OnboardingProgress as Progress } from '../types/onboarding';
+import { APP_ICONS } from '@/lib/constants/icons';
+import type { OnboardingTask, OnboardingProgress as Progress } from '@/types/onboarding';
+import { Icon } from '@/components/ui/icons';
 
 interface OnboardingProgressProps {
   tasks: OnboardingTask[];
@@ -9,10 +10,10 @@ interface OnboardingProgressProps {
 }
 
 const statusIcons = {
-  pending: Clock,
-  in_progress: AlertTriangle,
-  completed: CheckCircle,
-  blocked: XCircle,
+  pending: APP_ICONS.CLOCK,
+  in_progress: APP_ICONS.ALERT_TRIANGLE,
+  completed: APP_ICONS.CHECK_CIRCLE,
+  blocked: APP_ICONS.X_CIRCLE,
 };
 
 const statusColors = {
@@ -27,9 +28,15 @@ const OnboardingProgress: React.FC<OnboardingProgressProps> = ({
   progress,
   onUpdateProgress,
 }) => {
-  const getTaskProgress = (taskId: string) => {
+  const getTaskProgress = (taskId: string): Progress => {
     return progress.find((p) => p.taskId === taskId) || {
+      id: `temp-${taskId}`,
+      taskId,
       status: 'pending' as const,
+      notes: '',
+      schoolId: '',
+      createdAt: new Date(),
+      updatedAt: new Date()
     };
   };
 
@@ -55,7 +62,8 @@ const OnboardingProgress: React.FC<OnboardingProgressProps> = ({
                 <div className="px-4 py-4 sm:px-6">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
-                      <StatusIcon
+                      <Icon 
+                        name={statusIcons[taskProgress.status]}
                         className={`h-5 w-5 ${statusColor} mr-3 flex-shrink-0`}
                       />
                       <div className="min-w-0 flex-1">

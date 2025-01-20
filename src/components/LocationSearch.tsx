@@ -1,3 +1,5 @@
+/// <reference types="@types/google.maps" />
+
 import React, { useEffect, useRef, useState } from 'react';
 import { GoogleMap, Marker } from '@react-google-maps/api';
 import { Search } from 'lucide-react';
@@ -219,8 +221,8 @@ const LocationSearch: React.FC<LocationSearchProps> = ({ onLocationSelect }) => 
                   inputRef.current.value = address;
                 }
                 onLocationSelect({
-                  lat: e.latLng.lat(),
-                  lng: e.latLng.lng(),
+                  lat: e.latLng!.lat(),
+                  lng: e.latLng!.lng(),
                   address,
                 });
                 setSearchError(null);

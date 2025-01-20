@@ -4,14 +4,60 @@ import { logger } from '../lib/logger';
 import { useDataLoadTimeout } from './useDataLoadTimeout';
 import type { Student } from '../types';
 
+type DatabaseStudent = {
+  id: string;
+  name: string;
+  roll_number: string;
+  school_id: string;
+  grade_id: string;
+  gender: string;
+  date_of_birth: string;
+  contact_number: string;
+  email: string;
+  address: string;
+  guardian_name: string;
+  guardian_contact: string;
+  created_at: string;
+  updated_at: string;
+  school: { name: string };
+  grade: { name: string };
+};
+
+type StudentInput = {
+  name: string;
+  rollNumber: string;
+  schoolId: string;
+  gradeId: string;
+  gender: string;
+  dateOfBirth: Date;
+  contactNumber: string;
+  email: string;
+  studentAddress: string;
+  guardianName: string;
+  guardianContact: string;
+};
+
+type StudentUpdate = {
+  id: string;
+  name?: string;
+  rollNumber?: string;
+  schoolId?: string;
+  gradeId?: string;
+  gender?: string;
+  dateOfBirth?: Date;
+  contactNumber?: string;
+  email?: string;
+  studentAddress?: string;
+  guardianName?: string;
+  guardianContact?: string;
+};
+
 export const useStudents = () => {
   const queryClient = useQueryClient();
   const { clearTimeout } = useDataLoadTimeout({
     source: 'useStudents',
     onTimeout: () => {
-      logger.error('Failed to load students data', {
-        source: 'useStudents'
-      });
+      logger.error('Failed to load students data', { source: 'useStudents' });
     }
   });
 
@@ -30,7 +76,7 @@ export const useStudents = () => {
       if (fetchError) throw fetchError;
       if (!studentsData) return [];
 
-      return (studentsData || []).map(student => ({
+      return (studentsData as unknown as DatabaseStudent[]).map((student) => ({
         id: student.id,
         name: student.name,
         rollNumber: student.roll_number,
@@ -40,7 +86,7 @@ export const useStudents = () => {
         dateOfBirth: new Date(student.date_of_birth),
         contactNumber: student.contact_number,
         email: student.email,
-        address: student.address,
+        studentAddress: student.address,
         guardianName: student.guardian_name,
         guardianContact: student.guardian_contact,
         createdAt: new Date(student.created_at),
@@ -53,7 +99,7 @@ export const useStudents = () => {
   });
 
   const addStudent = useMutation({
-    mutationFn: async (student: Omit<Student, 'id' | 'createdAt' | 'updatedAt'>) => {
+    mutationFn: async (student: StudentInput) => {
       const { data, error } = await supabase
         .from('students')
         .insert([{
@@ -65,7 +111,7 @@ export const useStudents = () => {
           date_of_birth: student.dateOfBirth.toISOString(),
           contact_number: student.contactNumber,
           email: student.email,
-          address: student.address,
+          address: student.studentAddress,
           guardian_name: student.guardianName,
           guardian_contact: student.guardianContact
         }])
@@ -73,7 +119,7 @@ export const useStudents = () => {
         .single();
 
       if (error) throw error;
-      return data;
+      return data as unknown as DatabaseStudent;
     },
     onSuccess: () => {
       clearTimeout();
@@ -82,7 +128,7 @@ export const useStudents = () => {
   });
 
   const updateStudent = useMutation({
-    mutationFn: async ({ id, ...updates }: Partial<Student> & { id: string }) => {
+    mutationFn: async ({ id, ...updates }: StudentUpdate) => {
       const { error } = await supabase
         .from('students')
         .update({
@@ -94,7 +140,7 @@ export const useStudents = () => {
           date_of_birth: updates.dateOfBirth?.toISOString(),
           contact_number: updates.contactNumber,
           email: updates.email,
-          address: updates.address,
+          address: updates.studentAddress,
           guardian_name: updates.guardianName,
           guardian_contact: updates.guardianContact
         })

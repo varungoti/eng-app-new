@@ -3,6 +3,8 @@ import { supabase } from '../lib/supabase';
 import { useToast } from './useToast';
 import { logger } from '../lib/logger';
 import type { Staff } from '../types/staff';
+import { useMutation } from '@tanstack/react-query';
+import { queryClient } from '../lib/queryClient';
 
 export const useStaff = () => {
   const [staff, setStaff] = useState<Staff[]>([]);
@@ -28,7 +30,7 @@ export const useStaff = () => {
             .order('created_at', { ascending: false });
 
           if (fetchError) throw fetchError;
-          setStaff(data || []);
+          setStaff(data as unknown as Staff[] || []);
           break; // Success - exit retry loop
         } catch (err) {
           attempts++;
@@ -63,7 +65,7 @@ export const useStaff = () => {
 
       if (createError) throw createError;
       
-      setStaff(prev => [data, ...prev]);
+      setStaff(prev => [data as unknown as Staff, ...prev]);
       return data;
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Failed to add staff member';
@@ -75,48 +77,37 @@ export const useStaff = () => {
     }
   };
 
-  const updateStaff = async (id: string, updates: Partial<Staff>) => {
-    try {
-      const { data, error: updateError } = await supabase
+  const updateStaff = useMutation({
+    mutationFn: async (data: { id: string; updates: Partial<Staff> }) => {
+      const { data: updatedStaff, error } = await supabase
         .from('staff')
-        .update(updates)
-        .eq('id', id)
+        .update(data.updates)
+        .eq('id', data.id)
         .select()
         .single();
-
-      if (updateError) throw updateError;
       
-      setStaff(prev => prev.map(s => s.id === id ? data : s));
-      return data;
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to update staff member';
-      logger.error(message, {
-        context: { error: err, id, updates },
-        source: 'useStaff'
-      });
-      throw err;
+      if (error) throw error;
+      return void 0; // Return void instead of the data
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['staff'] });
     }
-  };
+  });
 
-  const deleteStaff = async (id: string) => {
-    try {
-      const { error: deleteError } = await supabase
+  const deleteStaff = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
         .from('staff')
         .delete()
         .eq('id', id);
-
-      if (deleteError) throw deleteError;
       
-      setStaff(prev => prev.filter(s => s.id !== id));
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to delete staff member';
-      logger.error(message, {
-        context: { error: err, id },
-        source: 'useStaff'
-      });
-      throw err;
+      if (error) throw error;
+      return void 0;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['staff'] });
     }
-  };
+  });
 
   const inviteStaff = async (email: string, role: string) => {
     try {
@@ -143,7 +134,7 @@ export const useStaff = () => {
 
       if (staffError) throw staffError;
 
-      setStaff(prev => [staffData, ...prev]);
+      setStaff(prev => [staffData as unknown as Staff, ...prev]);
       return staffData;
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Failed to invite staff member';
