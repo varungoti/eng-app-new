@@ -1,0 +1,11 @@
+---
+description: We are trying to build a app wherein we are trying to solve a problem at school level for teaching English Two young students from grade PP1 to grade 9
+globs: 
+---
+
+# Your rule content
+
+- You can @ files here
+- You can use markdown but dont have to
+- When a feature is added in the past, and you are trying to edit the file, you will never re remove any old features, components, functionalities, UI designs or UX  unless and until explicitlytold to do so, in worst case scenario, if you are planning to remove one or any, please seek permission from me.
+- When we are editing one sectionof the applicationyou are not going to editor solve any lender errors of any other file, apart from that particular section

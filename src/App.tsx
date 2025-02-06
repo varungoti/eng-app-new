@@ -3,6 +3,7 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClientProvider } from '@tanstack/react-query';
+import { QueryClient  } from '@tanstack/query-core';
 import { AuthProvider } from './contexts/AuthContext';
 import { logger } from './lib/logger';
 import { ErrorProvider } from './contexts/ErrorContext';
@@ -10,7 +11,7 @@ import { ThemeProvider as NextThemesProvider } from "next-themes";
 import Layout from './components/Layout';
 import PrivateRoute from './components/PrivateRoute';
 import ErrorToast from './components/ErrorToast';
-import { queryClient } from '@/providers/query-provider';
+//import { queryClient } from '@/providers/query-provider';
 import ErrorBoundary from './components/ErrorBoundary';
 import LoadingSpinner from './components/LoadingSpinner';
 import ThemeSelector from './components/ThemeSelector';
@@ -20,9 +21,13 @@ import { ThemeToggle } from "@/components/theme-toggle"
 import { useTheme } from "next-themes"
 import { themes } from "@/lib/themes"
 import { ThemeContextProvider } from './contexts/ThemeContext';
+import { Toaster } from "@/components/ui/toaster";
+import { ToastProvider } from "@/components/ui/toast";
+import { BrowserRouter } from 'react-router-dom';
 
 // Import Dashboard page directly to avoid dynamic import issues
 import DashboardPage from './pages/Dashboard';
+import MyClassesPage from './app/teacher/lessons/page';
 
 // Lazy load pages with proper error boundaries
 const Login = React.lazy(() => import('./pages/Login'));
@@ -32,15 +37,12 @@ const Infrastructure = React.lazy(() => import('./pages/Infrastructure'));
 const Reports = React.lazy(() => import('./pages/Reports'));
 const Sales = React.lazy(() => import('./pages/Sales'));
 const Content = React.lazy(() => import('./pages/Content'));
-const LessonManagement = React.lazy(() => import('./pages/Content/lesson-management/'));
+const LearningManagement = React.lazy(() => import('./app/learning/page'));
 
 // Import Staff page with retry logic
 const Staff = React.lazy(() => {
   return import('./pages/Staff').catch(err => {
-    logger.error('Failed to load Staff page', { 
-      context: { error: err }, 
-      source: 'App' 
-    }); 
+    logger.error('Failed to load Staff page', err);
     return Promise.resolve({
       default: () => (
         <ErrorBoundary source="Staff">
@@ -60,13 +62,36 @@ const ErrorTest = React.lazy(() => import('./pages/ErrorTest'));
 const Schools = React.lazy(() => import('./pages/Schools'));
 const Finance = React.lazy(() => import('./pages/Finance'));
 const Analytics = React.lazy(() => import('./pages/Analytics'));
+const MyClasses = React.lazy(() => import('./app/teacher/lessons/page'));
+
+import TeacherLayout from './app/teacher/layout';
+import ProtectedRoute from './components/ProtectedRoute';
+import TeacherDashboard from './app/teacher/dashboard/page';
+import Classes from './app/teacher/lessons/page';
+import AIConversationPage from './app/teacher/ai-conversation/page';
+//import CourseDetails from '/src/app/teacher/courses/page'; //';
+
+// Import the TeacherMyClassPage component
+const TeacherMyClassPage = React.lazy(() => import('./app/teacher/my-class/page'));
+
+import { ResetPassword } from "@/components/auth/ResetPassword";
+
+// Create a new QueryClient instance
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000,
+      gcTime: 10 * 60 * 1000,
+    },
+  },
+});
 
 function App() {
   const { theme, resolvedTheme } = useTheme()
   const currentTheme = themes[theme as keyof typeof themes] || themes[resolvedTheme as keyof typeof themes] || themes.light
 
   console.log('[App] Rendering...');
-  logger.info('App initializing', { source: 'App' });
+  logger.info('App initializing', 'App');
 
   return (
     <ErrorBoundary source="App">
@@ -84,6 +109,7 @@ function App() {
               }}
             >
               <ThemeContextProvider>
+                <ToastProvider>
                 <div className={`relative min-h-screen w-full ${currentTheme.background} ${currentTheme.text}`}>
                   <ThemeToggle />
                   <div className={`w-full ${currentTheme.background} ${currentTheme.text}`}>
@@ -107,6 +133,14 @@ function App() {
                       }>
                         <Route index element={<Navigate to="/dashboard" replace />} />
                         <Route path="/dashboard" element={<DashboardPage />} />
+                        <Route 
+                          path="app/learning/*" 
+                          element={
+                            <React.Suspense fallback={<LoadingSpinner message="Loading learning management..." />}>
+                              <LearningManagement />
+                            </React.Suspense>
+                          } 
+                        />
                         <Route path="analytics" element={
                           <React.Suspense fallback={<LoadingSpinner message="Loading analytics..." />}>
                             <Analytics />
@@ -185,7 +219,39 @@ function App() {
                             </React.Suspense>
                           } 
                         />
+                        <Route
+                          path="my-classes" 
+                          element={
+                            <React.Suspense fallback={<LoadingSpinner message="Loading My Classes..." />}>
+                              <MyClasses/>
+                            </React.Suspense>
+                          } 
+                        />
                       </Route>
+                      <Route 
+                        path="/teacher/*" 
+                        element={
+                          <TeacherLayout>
+                            <Routes>
+                              <Route path="/" element={<Navigate to="dashboard" replace />} />
+                              <Route path="dashboard" element={<TeacherDashboard />} />
+                              <Route path="classes" element={<Classes />} />
+                              <Route path="lessons" element={<Classes />} />
+                              <Route path="my-class" element={
+                                <React.Suspense fallback={<LoadingSpinner message="Loading My Class..." />}>
+                                  <TeacherMyClassPage />
+                                </React.Suspense>
+                              } />
+                              <Route path="AI-Conversation" element={<AIConversationPage />} />
+                            </Routes>
+                          </TeacherLayout>
+                        } 
+                      />
+                      <Route 
+                        path="/reset-password/*" 
+                        element={<ResetPassword />} 
+                      />
+                      <Route path="*" element={<Navigate to="/dashboard" replace />} />
                     </Routes>
                     <ErrorToast />
                     {process.env.NODE_ENV === 'development' && (
@@ -195,7 +261,9 @@ function App() {
                     )}
                   </div>
                 </div>
-              </ThemeContextProvider>
+                <Toaster />
+              </ToastProvider>
+            </ThemeContextProvider>
             </NextThemesProvider>
           </ErrorProvider>
         </AuthProvider>

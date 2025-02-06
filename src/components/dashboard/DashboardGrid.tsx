@@ -6,6 +6,7 @@ import { Loader2 } from 'lucide-react';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 
+
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
 interface DashboardGridProps {

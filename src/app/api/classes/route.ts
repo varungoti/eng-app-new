@@ -1,7 +1,13 @@
 import { NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs';
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
+import { cookies } from 'next/headers';
 import { db } from '@/lib/db';
 import { z } from 'zod';
+import { UserRole } from '@/types/roles';
+import { SupabaseClient } from '@supabase/supabase-js';
+import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/hooks/useAuth';
+import { database } from '@/lib/db';
 
 const createClassSchema = z.object({
   name: z.string().min(1),
@@ -10,61 +16,76 @@ const createClassSchema = z.object({
   teacherIds: z.array(z.string().uuid()),
   studentIds: z.array(z.string().uuid()),
   content: z.array(z.object({
-    contentType: z.enum(['TOPIC', 'SUBTOPIC', 'LESSON']),
+    contentType: z.enum(['TOPIC', 'SUBTOPIC', 'LESSON', 'QUESTION', 'EXERCISE', 'ACTIVITY']),
     contentId: z.string().uuid(),
     validUntil: z.string().datetime().optional()
   }))
 });
 
 export async function POST(req: Request) {
+  const supabase = createRouteHandlerClient({ cookies });
+  const { data: { session } } = await supabase.auth.getSession();
+  
+  if (!session) {
+    return new Response('Unauthorized', { status: 401 });
+  }
+
+  const userId = session.user.id;
+  const role = session.user.role;
+
+  if (!session.user.role || !['SUPER_ADMIN', 'ADMIN', 'SCHOOL_LEADER', 'SCHOOL_PRINCIPAL'].includes(session.user.role)) {
+    return new NextResponse('Forbidden', { status: 403 });
+  }
+
   try {
-    const { userId, sessionClaims } = auth();
-    if (!userId) return new NextResponse('Unauthorized', { status: 401 });
-
-    const role = sessionClaims?.role as string;
-    if (!['SUPER_ADMIN', 'ADMIN', 'SCHOOL_LEADER', 'SCHOOL_PRINCIPAL'].includes(role)) {
-      return new NextResponse('Forbidden', { status: 403 });
-    }
-
     const body = await req.json();
     const validatedData = createClassSchema.parse(body);
 
-    const result = await db.transaction(async (trx) => {
-      // Create class
-      const [classRecord] = await trx('classes')
-        .insert({
-          name: validatedData.name,
-          description: validatedData.description,
-          grade_id: validatedData.gradeId,
-          created_by: userId
-        })
-        .returning('*');
+    const { data: classRecord, error: classError } = await supabase
+      .from('classes')
+      .insert({
+        name: validatedData.name,
+        description: validatedData.description,
+        grade_id: validatedData.gradeId,
+        created_by: userId
+      })
+      .select()
+      .single();
 
-      // Assign teachers
-      if (validatedData.teacherIds.length) {
-        await trx('class_teachers').insert(
+    if (classError) throw classError;
+
+    // Insert teachers
+    if (validatedData.teacherIds.length) {
+      const { error: teacherError } = await supabase
+        .from('class_teachers')
+        .insert(
           validatedData.teacherIds.map(teacherId => ({
             class_id: classRecord.id,
             teacher_id: teacherId,
             assigned_by: userId
           }))
         );
-      }
+      if (teacherError) throw teacherError;
+    }
 
-      // Assign students
-      if (validatedData.studentIds.length) {
-        await trx('class_students').insert(
+    // Assign students
+    if (validatedData.studentIds.length) {
+      await supabase
+        .from('class_students')
+        .insert(
           validatedData.studentIds.map(studentId => ({
             class_id: classRecord.id,
             student_id: studentId,
             assigned_by: userId
           }))
         );
-      }
+    }
 
-      // Assign content
-      if (validatedData.content.length) {
-        await trx('assigned_content').insert(
+    // Assign content
+    if (validatedData.content.length) {
+      await supabase
+        .from('assigned_content')
+        .insert(
           validatedData.content.map(content => ({
             class_id: classRecord.id,
             content_type: content.contentType,
@@ -73,65 +94,116 @@ export async function POST(req: Request) {
             assigned_by: userId
           }))
         );
-      }
+    }
 
-      return classRecord;
-    });
-
-    return NextResponse.json(result);
+    return NextResponse.json(classRecord);
   } catch (error) {
     console.error('Error creating class:', error);
     return new NextResponse('Internal Error', { status: 500 });
   }
 }
 
-export async function GET(req: Request) {
+export async function GET() {
   try {
-    const { userId, sessionClaims } = auth();
-    if (!userId) return new NextResponse('Unauthorized', { status: 401 });
-
-    const role = sessionClaims?.role as string;
-    const { searchParams } = new URL(req.url);
+    const supabase = createRouteHandlerClient({ cookies });
+    const { data: { session } } = await supabase.auth.getSession();
     
-    let query = db('classes')
-      .select(
-        'classes.*',
-        db.raw(`
-          json_agg(DISTINCT jsonb_build_object(
-            'id', users.id,
-            'name', users.name,
-            'email', users.email
-          )) FILTER (WHERE class_teachers.teacher_id IS NOT NULL) as teachers
-        `)
-      )
-      .leftJoin('class_teachers', 'classes.id', 'class_teachers.class_id')
-      .leftJoin('users', 'class_teachers.teacher_id', 'users.id')
-      .groupBy('classes.id');
-
-    // Apply role-based filters
-    switch (role) {
-      case 'STUDENT':
-        query = query
-          .innerJoin('class_students', 'classes.id', 'class_students.class_id')
-          .where('class_students.student_id', userId);
-        break;
-      case 'TEACHER':
-        query = query
-          .where('class_teachers.teacher_id', userId);
-        break;
-      case 'SCHOOL_PRINCIPAL':
-      case 'TEACHER_HEAD':
-        const schoolId = searchParams.get('schoolId');
-        if (!schoolId) return new NextResponse('School ID required', { status: 400 });
-        query = query.where('classes.school_id', schoolId);
-        break;
-      // Super admins and admins can see all classes
+    if (!session?.user?.id) {
+      return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const classes = await query;
-    return NextResponse.json(classes);
+    const userId = session.user.id;
+    const userRole = session.user.user_metadata?.role?.toUpperCase();
+
+    console.log('API - User Role:', userRole); // Debug log
+
+    const allowedRoles = [
+      'SUPER_ADMIN',
+      'ADMIN',
+      'SCHOOL_LEADER',
+      'SCHOOL_PRINCIPAL',
+      'TEACHER_HEAD',
+      'TEACHER',
+      'SALES_HEAD',
+      'SALES_LEAD',
+      'SALES_EXECUTIVE',
+      'DEVELOPER',
+      'TECHNICAL_HEAD',
+      'CONTENT_HEAD'
+    ];
+
+    if (!userRole || !allowedRoles.includes(userRole)) {
+      console.log('API - Role not allowed:', userRole); // Debug log
+      return new NextResponse("Forbidden", { status: 403 });
+    }
+
+    // For non-teacher roles, fetch all classes
+    if (userRole !== 'TEACHER') {
+      const { data: classes, error: classesError } = await supabase
+        .from('classes')
+        .select(`
+          id,
+          name,
+          description,
+          created_at,
+          grade_id,
+          teacher_classes (
+            teacher_id,
+            teacher:teachers(id, name)
+          ),
+          grade:grades(id, name)
+        `);
+
+      if (classesError) {
+        console.error('Classes fetch error:', classesError);
+        throw classesError;
+      }
+
+      // Transform data to match expected format
+      const transformedClasses = classes?.map(cls => ({
+        id: cls.id,
+        attributes: {
+          name: cls.name,
+          description: cls.description,
+          courses: { data: [] } // Add empty courses array if needed
+        }
+      }));
+
+      return NextResponse.json({ data: transformedClasses });
+    }
+
+    // For teachers, fetch only their assigned classes
+    const { data: classes, error: classesError } = await supabase
+      .from('classes')
+      .select(`
+        id,
+        name,
+        description,
+        created_at,
+        grade_id,
+        teacher_classes!inner(teacher_id),
+        grade:grades(id, name)
+      `)
+      .eq('teacher_classes.teacher_id', userId);
+
+    if (classesError) {
+      console.error('Classes fetch error:', classesError);
+      throw classesError;
+    }
+
+    // Transform data to match expected format
+    const transformedClasses = classes?.map(cls => ({
+      id: cls.id,
+      attributes: {
+        name: cls.name,
+        description: cls.description,
+        courses: { data: [] } // Add empty courses array if needed
+      }
+    }));
+
+    return NextResponse.json({ data: transformedClasses });
   } catch (error) {
     console.error('Error fetching classes:', error);
-    return new NextResponse('Internal Error', { status: 500 });
+    return new NextResponse("Internal Server Error", { status: 500 });
   }
 } 

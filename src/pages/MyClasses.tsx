@@ -1,10 +1,7 @@
 'use client';
 
-import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Icon } from '@/components/ui/icons';
 import { LoadingIndicator } from '@/components/LoadingIndicator';
 import { Badge } from '@/components/ui/badge';
 import { formatDistanceToNow } from 'date-fns';

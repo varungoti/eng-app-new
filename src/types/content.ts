@@ -1,3 +1,5 @@
+import { QUESTION_TYPES } from "../app/content-management/constants";
+
 export type QuestionData = {
   prompt?: string;
   teacherScript?: string;
@@ -117,7 +119,7 @@ export interface Question {
   id: string;
   title: string;
   content: string;
-  type: QuestionType;
+  type: keyof typeof QUESTION_TYPES;
   lessonId: string;
   lesson?: Lesson;
   points: number;

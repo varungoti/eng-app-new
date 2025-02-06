@@ -1,3 +1,5 @@
+"use client";
+
 import { useContext, useEffect } from 'react';
 import { AuthContext } from '../contexts/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -8,26 +10,47 @@ import { logger } from '../lib/logger';
 import { ROLE_PERMISSIONS } from '../types/roles';
 import { sessionManager } from '../lib/auth/sessionManager';
 import type { UserRole } from '../types/roles';
-//import { useQueryClient } from '@tanstack/react-query';
-
-//const queryClient = new QueryClient();
+import { supabaseClient } from '../lib/supabaseClient';
 
 interface LoginCredentials {
   email: string;
   password: string;
 }
 
+interface SignUpCredentials extends LoginCredentials {
+  name?: string;
+}
+
+interface ResetPasswordCredentials {
+  email: string;
+  newPassword: string;
+  accessToken: string;
+}
+
+
 export const useAuth = () => {
   const context = useContext(AuthContext);
+  
   if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    console.warn('useAuth must be used within an AuthProvider');
+    return { user: null, loading: false };
   }
+
+  const { user, loading } = context;
+
+  // Add debug logging
+  console.log('Auth Context:', {
+    hasUser: !!user,
+    userRole: user?.role,
+    userId: user?.id,
+    isLoading: loading,
+    fullUser: user // Log the full user object for debugging
+  });
 
   const { isTransitioning } = useRoleStore();
   const navigate = useNavigate();
   const queryClient = new QueryClient();
   const location = useLocation();
-  const { user, loading } = context;
   
   // Add loading state check
   useEffect(() => {
@@ -71,6 +94,7 @@ export const useAuth = () => {
       });
     }
   }, [user, location.pathname]);
+
   const changeRole = async (newRole: UserRole): Promise<void> => {
     if (!context.user || isTransitioning) return;
 
@@ -100,32 +124,271 @@ export const useAuth = () => {
 
   const login = async (credentials: LoginCredentials) => {
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(credentials)
+      console.log('[Auth] Attempting login:', {
+        email: credentials.email,
+        timestamp: new Date().toISOString()
       });
       
-      if (!response.ok) {
-        throw new Error('Login failed');
+      const { data, error } = await supabaseClient.auth.signInWithPassword({
+        email: credentials.email,
+        password: credentials.password,
+      });
+
+      if (error) {
+        console.error('[Auth] Supabase login error:', {
+          message: error.message,
+          status: error.status,
+          name: error.name,
+          timestamp: new Date().toISOString()
+        });
+        
+        // Provide more specific error messages
+        if (error.message.includes('Invalid login credentials')) {
+          throw new Error('Invalid email or password. Please check your credentials and try again.');
+        }
+        
+        logger.error('Login failed', {
+          context: { 
+            error,
+            credentials: { email: credentials.email }
+          },
+          source: 'useAuth'
+        });
+        throw new Error(error.message);
       }
 
-      const data = await response.json();
-      context.setUser(data.user);
-      return data;
+      console.log('[Auth] Login response:', {
+        hasUser: !!data.user,
+        userId: data.user?.id,
+        userEmail: data.user?.email,
+        metadata: data.user?.user_metadata,
+        timestamp: new Date().toISOString()
+      });
+
+      if (!data.user) {
+        throw new Error('Login successful but user data is missing');
+      }
+
+      // Map Supabase user to our user format
+      const mappedUser = {
+        id: data.user.id,
+        email: data.user.email!,
+        name: data.user.user_metadata?.name || data.user.email!.split('@')[0],
+        role: data.user.user_metadata?.role || 'student',
+        photoUrl: data.user.user_metadata?.avatar_url,
+      };
+
+      console.log('[Auth] Mapped user:', mappedUser);
+
+      context.setUser(mappedUser);
+      return { user: mappedUser };
     } catch (error) {
+      const errorDetails = error instanceof Error ? {
+        message: error.message,
+        name: error.name,
+        stack: error.stack
+      } : error;
+
+      console.error('[Auth] Login error details:', {
+        error: errorDetails,
+        timestamp: new Date().toISOString()
+      });
+
       logger.error('Login failed', {
-        context: { error: error },
+        context: { 
+          error: errorDetails,
+          credentials: { email: credentials.email }
+        },
+        source: 'useAuth'
+      });
+
+      if (error instanceof Error) {
+        throw error;
+      } else {
+        throw new Error('An unexpected error occurred. Please try again.');
+      }
+    }
+  };
+
+  const logout = async () => {
+    try {
+      const { error } = await supabaseClient.auth.signOut();
+      
+      if (error) {
+        throw error;
+      }
+
+      context.setUser(null);
+      queryClient.clear();
+      navigate('/login');
+    } catch (error) {
+      logger.error('Logout failed', {
+        context: { error },
         source: 'useAuth'
       });
       throw error;
     }
   };
 
+  const signUp = async (credentials: SignUpCredentials) => {
+    try {
+      console.log('[Auth] Attempting signup:', {
+        email: credentials.email,
+        timestamp: new Date().toISOString()
+      });
+      
+      const { data, error } = await supabaseClient.auth.signUp({
+        email: credentials.email,
+        password: credentials.password,
+        options: {
+          data: {
+            name: credentials.name || credentials.email.split('@')[0],
+            role: 'student'
+          }
+        }
+      });
+
+      if (error) {
+        console.error('[Auth] Supabase signup error:', {
+          message: error.message,
+          status: error.status,
+          name: error.name,
+          timestamp: new Date().toISOString()
+        });
+        
+        logger.error('Signup failed', {
+          context: { 
+            error,
+            credentials: { email: credentials.email }
+          },
+          source: 'useAuth'
+        });
+        throw new Error(error.message);
+      }
+
+      console.log('[Auth] Signup response:', {
+        hasUser: !!data.user,
+        userId: data.user?.id,
+        userEmail: data.user?.email,
+        metadata: data.user?.user_metadata,
+        timestamp: new Date().toISOString()
+      });
+
+      if (!data.user) {
+        throw new Error('Signup successful but user data is missing');
+      }
+
+      // Map Supabase user to our user format
+      const mappedUser = {
+        id: data.user.id,
+        email: data.user.email!,
+        name: data.user.user_metadata?.name || data.user.email!.split('@')[0],
+        role: data.user.user_metadata?.role || 'student',
+        photoUrl: data.user.user_metadata?.avatar_url,
+      };
+
+      console.log('[Auth] Mapped user:', mappedUser);
+
+      context.setUser(mappedUser);
+      return { user: mappedUser };
+    } catch (error) {
+      const errorDetails = error instanceof Error ? {
+        message: error.message,
+        name: error.name,
+        stack: error.stack
+      } : error;
+
+      console.error('[Auth] Signup error details:', {
+        error: errorDetails,
+        timestamp: new Date().toISOString()
+      });
+
+      logger.error('Signup failed', {
+        context: { 
+          error: errorDetails,
+          credentials: { email: credentials.email }
+        },
+        source: 'useAuth'
+      });
+
+      if (error instanceof Error) {
+        throw error;
+      } else {
+        throw new Error('An unexpected error occurred during signup. Please try again.');
+      }
+    }
+  };
+
+  const resetPassword = async (credentials: ResetPasswordCredentials) => {
+    try {
+      console.log('[Auth] Attempting password reset:', {
+        email: credentials.email,
+        timestamp: new Date().toISOString()
+      });
+      
+      const { data, error } = await supabaseClient.auth.resetPasswordForEmail(
+        credentials.email,
+        { redirectTo: `${window.location.origin}/reset-password` }
+      );
+
+      if (error) {
+        console.error('[Auth] Supabase password reset error:', {
+          message: error.message,
+          status: error.status,
+          name: error.name,
+          timestamp: new Date().toISOString()
+        });
+        
+        logger.error('Password reset failed', {
+          context: { 
+            error,
+            credentials: { email: credentials.email }
+          },
+          source: 'useAuth'
+        });
+        throw new Error(error.message);
+      }
+
+      return data;
+    } catch (error) {
+      const errorDetails = error instanceof Error ? {
+        message: error.message,
+        name: error.name,
+        stack: error.stack
+      } : error;
+
+      console.error('[Auth] Password reset error details:', {
+        error: errorDetails,
+        timestamp: new Date().toISOString()
+      });
+
+      logger.error('Password reset failed', {
+        context: { 
+          error: errorDetails,
+          credentials: { email: credentials.email }
+        },
+        source: 'useAuth'
+      });
+
+      if (error instanceof Error) {
+        throw error;
+      } else {
+        throw new Error('An unexpected error occurred during password reset. Please try again.');
+      }
+    }
+  };
+
   return {
-    ...context,
+    user: user ? {
+      ...user,
+      role: user.role || 'unknown'
+    } : null,
+    loading,
     changeRole,
     isTransitioning,
-    login
+    login,
+    logout,
+    signUp,
+    resetPassword
   };
 };

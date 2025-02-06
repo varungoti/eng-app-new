@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,12 +8,20 @@ import { Icon } from '@/components/ui/icons';
 import { LoadingIndicator } from '@/components/LoadingIndicator';
 import { Badge } from '@/components/ui/badge';
 import { formatDistanceToNow } from 'date-fns';
-import { useAuth } from '@clerk/nextjs';
+import { useSupabaseClient } from '@supabase/auth-helpers-react';
 import { Class } from '@/types/class';
 
 export default function MyClassesPage() {
-  const { userId, sessionClaims } = useAuth();
-  const role = sessionClaims?.role as string;
+  const supabase = useSupabaseClient();
+  const [role, setRole] = useState<string>();
+
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setRole(user?.user_metadata?.role);
+    };
+    getUser();
+  }, [supabase]);
 
   const { data: classes, isLoading } = useQuery<Class[]>({
     queryKey: ['classes'],
@@ -32,7 +40,7 @@ export default function MyClassesPage() {
     <div className="container mx-auto py-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">My Classes</h1>
-        {['SUPER_ADMIN', 'ADMIN', 'SCHOOL_LEADER', 'SCHOOL_PRINCIPAL'].includes(role) && (
+        {['SUPER_ADMIN', 'ADMIN', 'SCHOOL_LEADER', 'SCHOOL_PRINCIPAL', 'TEACHER_HEAD'].includes(role as string) && (
           <Button onClick={() => window.location.href = '/my-classes/create'}>
             <Icon type="phosphor" name="PLUS" className="h-4 w-4 mr-2" />
             Create Class
@@ -79,7 +87,7 @@ export default function MyClassesPage() {
                 <Icon type="phosphor" name="BOOK_OPEN" className="h-4 w-4 mr-2" />
                 View Content
               </Button>
-              {['SUPER_ADMIN', 'ADMIN', 'SCHOOL_LEADER', 'SCHOOL_PRINCIPAL'].includes(role) && (
+              {['SUPER_ADMIN', 'ADMIN', 'SCHOOL_LEADER', 'SCHOOL_PRINCIPAL'].includes(role as string) && (
                 <Button variant="outline" className="w-full"
                   onClick={() => window.location.href = `/my-classes/${classItem.id}/manage`}
                 >

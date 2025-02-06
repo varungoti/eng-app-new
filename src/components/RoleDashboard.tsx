@@ -3,6 +3,7 @@ import { useAuth } from '../hooks/useAuth';
 import { usePermissions } from '../hooks/usePermissions';
 import { canAccessDashboard } from '../lib/permissions';
 import { useRoleSettings } from '../hooks/useRoleSettings';
+import { useError } from '@/hooks/useError';
 //import { APP_ICONS } from '../lib/constants/icons';
 import { QueryClient } from '@tanstack/react-query';
 //import type { RoleSettings } from '../hooks/useRoleSettings';
@@ -14,7 +15,7 @@ import {
   SchoolLeaderDashboard, SchoolPrincipalDashboard, TeacherHeadDashboard,
   TeacherDashboard
 } from './dashboards';
-import { Icon } from '@/components/ui/icons';
+import { AlertTriangle, RefreshCw } from 'lucide-react';
 
 interface RoleDashboardProps {
   selectedRole: string;
@@ -26,6 +27,7 @@ const RoleDashboard: React.FC<RoleDashboardProps> = ({ selectedRole, onError }) 
   const queryClient = new QueryClient();
   const { user } = useAuth();
   const { can } = usePermissions();
+  const { setError } = useError();
 
   // Handle session timeout
   useEffect(() => {
@@ -34,6 +36,13 @@ const RoleDashboard: React.FC<RoleDashboardProps> = ({ selectedRole, onError }) 
       window.location.href = '/login';
     }
   }, [error, queryClient]);
+
+  // Handle error effect separately from render
+  useEffect(() => {
+    if (error) {
+      setError(error.toString());
+    }
+  }, [error, setError]);
 
   // Check access permissions first
   if (!user || !canAccessDashboard(user.role, selectedRole)) {
@@ -69,7 +78,7 @@ const RoleDashboard: React.FC<RoleDashboardProps> = ({ selectedRole, onError }) 
     return (
       <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
         <div className="flex items-center">
-          <Icon name="ALERT_TRIANGLE" className="h-5 w-5 text-red-400 mr-2" />
+          <AlertTriangle className="h-5 w-5 text-red-400 mr-2" />
           <h3 className="text-lg font-medium text-red-800">Error</h3>
         </div>
         <p className="mt-2 text-sm text-red-600">{error}</p>
@@ -80,7 +89,7 @@ const RoleDashboard: React.FC<RoleDashboardProps> = ({ selectedRole, onError }) 
           }}
           className="mt-4 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200"
         >
-          <Icon name="REFRESH" className="h-4 w-4 mr-2" />
+          <RefreshCw className="h-4 w-4 mr-2" />
           Try Again
         </button>
       </div>

@@ -178,23 +178,23 @@ export const QUESTION_TYPES = {
     }
   },
   speakingAndListening: {
-    label: 'Speaking and Listening',
-    description: 'Practice speaking and listening in a structured format.',
+    label: 'Listening and Speaking',
+    description: 'Practice listening and speaking in a structured format.',
     defaultData: {
       prompt: '',
       teacherScript: '',
-      speakingPrompt: '',
-      listeningPrompt: ''
+      listeningPrompt: '',
+      speakingPrompt: ''
     }
   },
-  speakingAndReading: {
-    label: 'Speaking and Reading',
-    description: 'Practice speaking and reading in a structured format.',
+  readingAndSpeaking: {
+    label: 'Reading and Speaking',
+    description: 'Practice reading and speaking in a structured format.',
     defaultData: {
       prompt: '',
       teacherScript: '',
-      speakingPrompt: '',
-      readingPrompt: ''
+      readingPrompt: '',
+      speakingPrompt: ''
     }
   },
   speakingAndSpeaking: {
@@ -207,6 +207,113 @@ export const QUESTION_TYPES = {
       speakingPrompt2: ''
     }
   },
+  speakingWithAPartner: {
+    label: 'Speaking with a Partner',
+    description: 'Practice speaking with a partner in a structured format.',
+    defaultData: {
+      prompt: '',
+      teacherScript: '',
+      speakingPrompt: '',
+      partnerPrompt: ''
+    }
+  },
+  actionAndSpeaking: {
+    label: 'Action and Speaking',
+    description: 'Practice speaking with a partner in a structured format.',
+    defaultData: {
+      prompt: '',
+      teacherScript: '',
+      speakingPrompt: '',
+      actionPrompt: ''
+    }
+  },
+  objectAndSpeaking: {
+    label: 'Object and Speaking',
+    description: 'Practice speaking with an object in a structured format.',
+    defaultData: {
+      prompt: '',
+      teacherScript: '',
+      speakingPrompt: '',
+      objectPrompt: ''
+    }
+  },
+  objectActionAndSpeaking: {
+    label: 'Object Action and Speaking',
+    description: 'Practice speaking with an object and action in a structured format.',
+    defaultData: {
+      prompt: '',
+      teacherScript: '',
+      speakingPrompt: '',
+      objectPrompt: '',
+      actionPrompt: ''
+    }
+  },
+  vocabularyAndSpeaking: {
+    label: 'Vocabulary and Speaking',
+    description: 'Practice speaking with vocabulary in a structured format.',
+    defaultData: {
+      prompt: '',
+      teacherScript: '',
+      speakingPrompt: '',
+      vocabularyPrompt: ''
+    },
+  },
+  vocabularyAndWordlist: {
+    label: 'Vocabulary and Wordlist',
+    description: 'Practice speaking with vocabulary and wordlist in a structured format.',
+    defaultData: {
+        prompt: '',
+        teacherScript: '',
+        wordlistPrompt: [] as Array<{ word: string; definition: string; correctPronunciation: string; phoneticGuide: string; pronunciationAudio: string; example: string; usageNotes: string; synonyms: string[]; antonyms: string[] }>,
+        vocabularyPrompt: ''
+    }
+  },
+  sentenceFormation: {
+    label: 'Sentence Formation',
+    description: 'Practice speaking with sentence formation in a structured format.',
+    defaultData: {
+      prompt: '',
+      originalSentence: '',
+      hint: [] as string[] ,
+      correctAnswer: '',
+      teacherScript: ''
+    }
+  },
+  sentenceTransformation: {
+    label: 'Sentence Transformation',
+    description: 'Practice speaking with sentence transformation in a structured format.',
+    defaultData: {
+      prompt: '',
+      originalSentence: '',
+      tenseToTransform: '',
+      hint: [] as string[],
+      correctAnswer: '',
+      teacherScript: ''
+    }
+  },
+  sentenceCompletion: {
+    label: 'Sentence Completion',
+    description: 'Practice speaking with sentence completion in a structured format.',
+    defaultData: {
+      prompt: '',
+      sentence: '',
+      hint: [] as string[],
+      correctAnswer: '',
+      teacherScript: ''
+    }
+  },
+  sentenceTransformationAndCompletion: {
+    label: 'Sentence Transformation and Completion',
+    description: 'Practice speaking with sentence transformation and completion in a structured format.',
+    defaultData: {
+      prompt: '',
+      originalSentence: '',
+      tenseToTransform: '',
+      hint: [] as string[],
+      correctAnswer: '',
+      teacherScript: ''
+    }
+  }
 } as const;
 
 export type QuestionType = keyof typeof QUESTION_TYPES;

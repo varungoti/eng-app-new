@@ -33,6 +33,7 @@ const navigationItems: NavigationItem[] = [
     href: '/my-classes',
     icon: 'GRADUATION_CAP',
     roles: ['SUPER_ADMIN', 'ADMIN', 'SALES_HEAD', 'SCHOOL_LEADER', 'SCHOOL_PRINCIPAL', 'TEACHER_HEAD', 'TEACHER', 'STUDENT']
+
   },
   {
     title: 'Users',

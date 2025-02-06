@@ -1,12 +1,14 @@
 import { env } from './env';
 
+const BASE_PATH = '/api';
+
 export const API_ENDPOINTS = {
-  LESSONS: `${env.API_URL}/lessons`,
-  TOPICS: `${env.API_URL}/topics`,
-  SUBTOPICS: `${env.API_URL}/subtopics`,
-  GRADES: `${env.API_URL}/grades`,
-  QUESTIONS: `${env.API_URL}/questions`,
-  ACTIVITIES: `${env.API_URL}/activities`,
+  LESSONS: `${BASE_PATH}/lessons`,
+  TOPICS: `${BASE_PATH}/topics`,
+  SUBTOPICS: `${BASE_PATH}/subtopics`,
+  GRADES: `${BASE_PATH}/grades`,
+  QUESTIONS: `${BASE_PATH}/questions`,
+  ACTIVITIES: `${BASE_PATH}/activities`,
 } as const;
 
 export const API_CONFIG = {

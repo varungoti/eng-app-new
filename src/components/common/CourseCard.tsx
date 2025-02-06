@@ -1,13 +1,15 @@
 import { BookOpen } from "lucide-react";
 
-interface Course {
+export interface Course {
   id: number;
-  documentId: string;
+  documentId?: string;
   title: string;
   description?: string;
   imageUrl?: string;
+  grade?: string;
   level?: string;
   progress?: number;
+  topicsCount?: number;
 }
 
 interface CourseCardProps {

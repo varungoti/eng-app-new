@@ -1,5 +1,6 @@
 import { API_CONFIG, API_ENDPOINTS, ApiError } from '@/config/api';
 import { supabase } from '@/lib/supabase';
+import { Activity } from '@/app/content-management/types';
 //import { Lesson } from '@/types/content';
 
 interface CreateLessonInput {
@@ -126,14 +127,29 @@ export class ContentService {
 
   async createSubtopic(data: { title: string; topicId: string }) {
     try {
-      const response = await fetch(API_ENDPOINTS.SUBTOPICS, {
-        method: 'POST',
-        headers: API_CONFIG.headers,
-        body: JSON.stringify(data)
-      });
-      return this.handleResponse(response);
+      const { data: newSubtopic, error } = await supabase
+        .from('subtopics')
+        .insert([{ 
+          title: data.title, 
+          topic_id: data.topicId,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        }])
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Supabase error:', error);
+        throw new ApiError(500, error.message);
+      }
+
+      return newSubtopic;
     } catch (error) {
-      throw new Error('Failed to create subtopic');
+      console.error('Error in createSubtopic:', error);
+      if (error instanceof ApiError) {
+        throw error;
+      }
+      throw new ApiError(500, 'Failed to create subtopic');
     }
   }
 
@@ -415,7 +431,14 @@ export class ContentService {
     }
   }
 
-  
+  async saveActivity(activity: Activity): Promise<void> {
+    const { error } = await supabase
+      .from('activities')
+      .upsert(activity, { onConflict: 'id' });
+      
+    if (error) throw error;
+  }
+
   private async handleResponse(response: Response) {
     if (!response.ok) {
       throw new ApiError(response.status, 'API request failed');

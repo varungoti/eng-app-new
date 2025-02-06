@@ -1,11 +1,15 @@
-import { supabase } from './supabase';
-import { createClient } from '@/lib/supabase';
+import { createClient } from '@supabase/supabase-js';
 import { logger } from './logger';
 import { checkDatabaseHealth } from './db/healthCheck';
 import { dbConnection } from './db/connection';
 
 const MAX_INIT_RETRIES = 3;
 const INIT_RETRY_DELAY = 2000;
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+
+export const db = createClient(supabaseUrl, supabaseKey);
 
 export const database = {
   isHealthy: async () => {
@@ -45,4 +49,4 @@ export const database = {
 };
 
 // Export all database utilities
-export { dbConnection, checkDatabaseHealth };
+export { dbConnection , checkDatabaseHealth };

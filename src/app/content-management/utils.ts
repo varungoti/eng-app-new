@@ -60,7 +60,7 @@ export const validateQuestion = (question: Question): ValidationResult => {
   }
 
   if (questionType === 'fillInTheBlank') {
-    if (!question.metadata?.answer?.trim()) {
+    if (!question.metadata?.sampleAnswer?.trim()) {
       errors.push('Fill in the blank questions require an answer');
       result.isValid = false;
       result.isDraft = true;

@@ -7,6 +7,26 @@ export interface BaseQuestionData {
   teacherScript: string;
 }
 
+interface TextBlock {
+  type: 'heading' | 'paragraph' | 'image';
+  content: string;
+  level?: 1 | 2 | 3 | 4 | 5 | 6;
+  imageUrl?: string;
+  altText?: string;
+  format?: {
+    isBold?: boolean;
+    isItalic?: boolean;
+    isUnderline?: boolean;
+    color?: string;
+    fontSize?: number;
+    alignment?: 'left' | 'center' | 'right';
+    indentation?: number;
+    lineHeight?: number;
+    marginTop?: number;
+    marginBottom?: number;
+  };
+}
+
 export interface Question {
   id: string;
   title: string;
@@ -17,7 +37,9 @@ export interface Question {
   data?: {
     prompt: string;
     teacherScript: string;
+    followup_prompt: string[];
     sampleAnswer?: string;
+    answer?: string;
   };
   metadata: {
     prompt?: string;
@@ -45,22 +67,7 @@ export interface Question {
     // Grammar Speaking
     grammarPoint?: string;
     example?: string;
-    
-    // Idiom Practice
-    idiom?: string;
-    meaning?: string;
-    usageNotes?: string;
-    
-    // Look and Speak
-    imageUrl?: string;
-    imageCaption?: string;
-    speakingPrompt?: string;
-    helpfulVocabulary?: string[];
-    
-    // Watch and Speak
-    videoUrl?: string;
-    discussionPoints?: string[];
-    
+  
     // Debate
     topic?: string;
     position?: string;
@@ -79,60 +86,124 @@ export interface Question {
     visualAidsInstructions?: string;
 
     // Matching
-    matchingOptions?: Array<{
+    matching?: Array<{
       text: string;
       correct: boolean;
     }>;
 
     //fill in the blank
-    fillInTheBlankOptions?: Array<{
+    fillInTheBlank?: Array<{
       sentence: string;
       blanks: string[];
     }>;
       
     //fill in the blank with multiple choices
-    fillInTheBlankWithMultipleChoicesOptions?: Array<{
+    fillInTheBlankWithMultipleChoices?: Array<{
       sentence: string;
       blanks: string[];
       options: string[];
       correctAnswer: number;
       }>;
     //True or False
-    trueOrFalseOptions?: Array<{
+    trueOrFalse?: Array<{
       sentence: string;
       correctAnswer: boolean;
     }>;
 
     //Reading Comprehension
-    readingComprehensionOptions?: Array<{
+    readingComprehension?: Array<{
       passage: string;
       questions: string[];
     }>;
 
     //Speaking and Writing
-    speakingAndWritingOptions?: Array<{
+    speakingAndWriting?: Array<{
       speakingPrompt: string;
       writingPrompt: string;
     }>;
 
     //Listening and Speaking
-    listeningAndSpeakingOptions?: Array<{
+    listeningAndSpeaking?: Array<{
       listeningPrompt: string;
       speakingPrompt: string;
     }>;
 
     //reading and speaking
-    readingAndSpeakingOptions?: Array<{
+    readingAndSpeaking?: Array<{
       readingPrompt: string;
       speakingPrompt: string;
     }>;
 
     //Speaking with a partner
-    speakingWithAPartnerOptions?: Array<{
+    speakingWithAPartner?: Array<{
       speakingPrompt: string;
       partnerPrompt: string;
     }>;
+
+    //Action and Reaction
+    actionAndReaction?: Array<{
+      action: string;
+      reaction: string;
+    }>;
+
+    // Action and Speaking
+    actionAndSpeaking?: Array<{
+      action: string;
+      speakingPrompt: string;
+    }>;
+
+    //Vocabulary Practice
+    vocabularyPractice?: Array<{
+      word: string;
+      spelling: string;
+      definition: string;
+      sentences: string[];
+    }>;
+
+    //spelling practice
+    spellingPractice?: Array<{
+      word: string;
+      spelling: string;
+      sentences: string[];
+    }>;
+
+    //Watch and Speak
+    watchAndSpeak?: Array<{
+      videoUrl: string;
+      discussionPoints: string[];
+      instructions: string;
+    }>;
+
+    //Look and Speak
+    lookAndSpeak?: Array<{
+      imageUrl: string;
+      imageCaption: string;
+      helpfulVocabulary: string[];
+      instructions: string;
+    }>;
+
+    //idiom_practice
+    idiomPractice?: Array<{
+      idiom: string;
+      meaning: string;
+      example: string;
+      usageNotes: string;
+    }>; 
+
     
+    
+    items?: string[];
+    sentence?: string;
+    blanks?: string[];
+    statement?: string;
+    passage?: string | { text: TextBlock[] }[];
+    answer?: string;
+    response?: string | { text: TextBlock[] }[];
+    speakingPrompt?: string;
+    writingPrompt?: string;
+    listeningPrompt?: string;
+    partnerPrompt?: string;
+    actionPrompt?: string;
   };
   exercisePrompts: ExercisePrompt[];
   order_index?: number;
@@ -140,7 +211,7 @@ export interface Question {
   updated_at?: string;
   status?: 'draft' | 'published';
   isDraft?: boolean;
-  //data: Record<string, any>;
+   //data: Record<string, any>;
 }
 
 export interface ExercisePrompt {
@@ -267,5 +338,5 @@ export interface Activity {
 
 export interface QuestionTypeSelectProps {
   value: string;
-  onValueChange: (type: string) => void;
+  onChange: (type: string) => void;
 }

@@ -5,11 +5,13 @@ import { usePermissions } from '../hooks/usePermissions';
 interface ProtectedRouteProps {
   children: React.ReactNode;
   requiredPermission: string;
+  allowedRoles: string[];
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   children,
   requiredPermission,
+  allowedRoles,
 }) => {
   const { can } = usePermissions();
 

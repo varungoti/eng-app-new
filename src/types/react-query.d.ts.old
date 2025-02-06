@@ -1,4 +1,4 @@
-declare module '@tanstack/react-query' {
+import module '@tanstack/react-query' {
   export interface QueryClient {
     new (config?: QueryClientConfig): QueryClient;
     prefetchQuery: <TData = unknown>(
@@ -6,6 +6,10 @@ declare module '@tanstack/react-query' {
     ) => Promise<void>;
     clear(): void;
     invalidateQueries: (options: { queryKey: unknown[] }) => Promise<void>;
+  }
+
+  export interface QueryClientProvider {
+    new (config?: QueryClientConfig): QueryClient;
   }
 
   export interface QueryClientConfig {
@@ -17,6 +21,20 @@ declare module '@tanstack/react-query' {
       };
     };
   }
+
+  export interface QueryClientProviderProps {
+    children: ReactNode;
+  }
+
+  export interface QueryProviderProps {
+    children: ReactNode;
+  }
+
+  export interface QueryProviderProps {
+    children: ReactNode;
+  }
+
+
 
   export interface PrefetchQueryOptions<TData> {
     queryKey: unknown[];

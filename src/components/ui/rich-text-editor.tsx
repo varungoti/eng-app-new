@@ -11,25 +11,26 @@ import { Toggle } from '@/components/ui/toggle';
 import { cn } from '@/lib/utils';
 import {
   List,
-  TextB as Bold,
-  TextItalic as Italic,
-  AlignLeft as AlignLeft,
-  AlignCenterHorizontal as AlignCenter,
-  TextAlignRight as AlignRight,
-  TextHOne as Heading1,
-  TextHTwo as Heading2,
-  ArrowCounterClockwise as Undo,
-  ArrowClockwise as Redo,
-  ListNumbers as ListOrdered,
+  Bold,
+  Italic,
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
+  Heading1,
+  Heading2,
+  Undo,
+  Redo,
+  ListOrdered,
   Image as ImageIcon,
   Link as LinkIcon,
-} from '@phosphor-icons/react';
+} from 'lucide-react';
 
 interface RichTextEditorProps {
   value: string;
   onChange: (value: string) => void;
-  onSave?: () => void;
+  onSave?: (content: string) => Promise<void>;
   onCancel?: () => void;
+  placeholder?: string;
 }
 
 export function RichTextEditor({ value, onChange, onSave, onCancel }: RichTextEditorProps) {
@@ -154,7 +155,7 @@ export function RichTextEditor({ value, onChange, onSave, onCancel }: RichTextEd
         <Button variant="outline" onClick={() => editor.commands.clearContent()}>
           Cancel
         </Button>
-        <Button onClick={onSave}>
+        <Button onClick={() => onSave?.(editor?.getHTML() || '')}>
           Save Changes
         </Button>
       </div>

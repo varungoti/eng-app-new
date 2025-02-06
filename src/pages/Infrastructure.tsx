@@ -1,11 +1,12 @@
 import React from 'react';
 import { Server, Database, Cloud, Activity } from 'lucide-react';
 import { usePermissions } from '../hooks/usePermissions';
+import { Permissions } from '../types/roles';
 
 const Infrastructure = () => {
   const { can } = usePermissions();
 
-  if (!can('infrastructure')) {
+  if (!can('infrastructure' as keyof Permissions)) {
     return (
       <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
         <h3 className="text-lg font-medium text-red-800">Access Denied</h3>

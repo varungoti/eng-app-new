@@ -38,7 +38,7 @@ export interface QuestionFormProps {
 
 export interface ExercisePromptCardProps {
   prompt: ExercisePrompt;
-  promptIndex: number;
-  onUpdate: (updatedPrompt: ExercisePrompt) => void;
+  index: number;
   onRemove: () => void;
+  onUpdate: (prompt: ExercisePrompt) => void;
 }

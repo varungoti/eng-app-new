@@ -71,6 +71,8 @@ const Sales: React.FC = () => {
           <div className="flex items-center bg-gray-100 rounded-lg p-1">
             <button
               onClick={() => setViewMode('list')}
+              title="List View"
+              aria-label="Switch to List View"
               className={`p-2 rounded ${
                 viewMode === 'list'
                   ? 'bg-white shadow text-indigo-600'
@@ -81,6 +83,8 @@ const Sales: React.FC = () => {
             </button>
             <button
               onClick={() => setViewMode('table')}
+              title="Table View"
+              aria-label="Switch to Table View"
               className={`p-2 rounded ${
                 viewMode === 'table'
                   ? 'bg-white shadow text-indigo-600'
@@ -125,7 +129,7 @@ const Sales: React.FC = () => {
               label: "Won Deals",
               value: stats?.wonDeals || 0,
               trend: "up",
-              subtext: formatCurrency(stats?.totalValue || 0)
+              subtext: formatCurrency(stats?.pipelineValue || 0)
             },
             {
               icon: TrendingUp,

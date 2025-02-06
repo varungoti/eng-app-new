@@ -10,12 +10,13 @@ import { ThemeProvider as NextThemesProvider } from "next-themes"
 import { ThemeToggle } from '@/components/theme-toggle'
 import { cn } from "@/lib/utils"
 import { fontSans } from "@/lib/fonts"
+import Script from 'next/script';
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 60 * 1000,
-      retry: 1,
+      retry: 5,
     },
   },
 });
@@ -38,16 +39,13 @@ export default function RootLayout({ children }: RootLayoutProps) {
           enableSystem
           disableTransitionOnChange
         >
-          <QueryClientProvider client={queryClient}>
-            <div className="relative min-h-screen">
-              <div className="absolute top-4 right-8">
-                <ThemeToggle />
-              </div>
-              {children}
-              <Toaster />
-              <ReactQueryDevtools initialIsOpen={false} />
+          <div className="relative min-h-screen">
+            <div className="absolute top-4 right-8">
+              <ThemeToggle />
             </div>
-          </QueryClientProvider>
+            {children}
+            <Toaster />
+          </div>
         </NextThemesProvider>
       </body>
     </html>

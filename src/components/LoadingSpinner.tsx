@@ -1,8 +1,10 @@
+"use client";
+
 import React, { useEffect, useState, useRef } from 'react';
 import { Loader2, RefreshCw, AlertTriangle } from 'lucide-react';
 import { logger } from '../lib/logger';
 
-interface LoadingSpinnerProps {
+export interface LoadingSpinnerProps {
   message?: string;
   timeout?: number;
   showRetry?: boolean;
@@ -11,7 +13,7 @@ interface LoadingSpinnerProps {
   onRetry?: () => void;
 }
 
-const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
+export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
   message = 'Loading...',
   timeout = 10000,
   showRetry = true,

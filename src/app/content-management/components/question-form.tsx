@@ -1,16 +1,23 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { Plus, Trash2, ChevronDown, ChevronRight, X, Check, Loader2  } from 'lucide-react';
+import { logger } from '@/lib/logger';
+import { Plus, Trash as Trash2, ChevronDown, ChevronRight, X, Check, Loader } from 'lucide-react';
 import { QuestionFormProps } from '../types';
-import { ExercisePromptCard } from './exercise-prompt-card_bak';
+import { ExercisePromptCard } from './exercise-prompt-card';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { Icon } from '@/components/ui/icons';
+import { ImageIcon } from 'lucide-react';
+import { Question, QuestionType } from "@/app/content-management/types";
+import { QUESTION_TYPES } from "@/app/content-management/constants";
+import { Select, SelectValue, SelectTrigger, SelectItem, SelectContent } from '@/components/ui/select';
+import { RichTextEditor, RichTextEditorProps } from '@/components/editor/RichTextEditor';
 
 export function QuestionForm({
   question,
@@ -24,6 +31,13 @@ export function QuestionForm({
   const [isExpanded, setIsExpanded] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<'success' | 'error' | null>(null);
+  const mounted = useRef(true);
+
+  useEffect(() => {
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
 
   const handleFieldChange = async (field: string, value: string) => {
     setIsSaving(true);
@@ -31,15 +45,387 @@ export function QuestionForm({
     try {
       await onUpdate(index, {
         ...question,
-        data: { ...question.data, [field]: value } as { prompt: string; teacherScript: string; sampleAnswer?: string },
-        metadata: { ...question.metadata, [field]: value } as { sampleAnswer?: string },
+        data: { ...question.data, [field]: value } as any
       });
-      setLastSaved('success');
+      if (mounted.current) {
+        setLastSaved('success');
+      }
     } catch (error) {
-      setLastSaved('error');
+      if (mounted.current) {
+        setLastSaved('error');
+        logger.error({
+          message: 'Failed to update question field',
+          context: { error, field, index },
+          source: 'QuestionForm'
+        });
+      }
     } finally {
-      setIsSaving(false);
-      setTimeout(() => setLastSaved(null), 2000);
+      if (mounted.current) {
+        setIsSaving(false);
+        setTimeout(() => {
+          if (mounted.current) {
+            setLastSaved(null);
+          }
+        }, 2000);
+      }
+    }
+  };
+
+  const handleMetadataChange = (field: string, value: any) => {
+    onUpdate(index, {
+      ...question,
+      metadata: {
+        ...question.metadata,
+        [field]: value
+      }
+    });
+  };
+
+  const handleQuestionTypeChange = (type: string, defaultData: any) => {
+    const updatedQuestion: Question = {
+      ...question,
+      data: {
+        ...defaultData,
+        prompt: question.data?.prompt || '',
+        teacherScript: question.data?.teacherScript || '',
+        sampleAnswer: question.data?.sampleAnswer || ''
+      }
+    };
+    onUpdate(index, updatedQuestion);
+  };
+
+  const renderQuestionFields = (type: QuestionType) => {
+    const metadata = question.metadata || {};
+    
+    switch (type) {
+      case 'speaking':
+        return (
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>Sample Answer</Label>
+              <Input
+                value={metadata.sampleAnswer || ''}
+                onChange={(e) => handleMetadataChange('sampleAnswer', e.target.value)}
+              />
+            </div>
+          </div>
+        );
+      case 'multipleChoice':
+        return (
+          <div className="space-y-2">
+            <Label>Options</Label>
+            {metadata.options?.map((option: string, index: number) => (
+              <Input
+                key={index}
+                value={option}
+                onChange={(e) => {
+                  const newOptions = [...(metadata.options || [])];
+                  newOptions[index] = e.target.value;
+                  handleMetadataChange('options', newOptions);
+                }}
+              />
+            ))}
+            <button onClick={() => handleMetadataChange('options', [...(metadata.options || []), ''])}>
+              Add Option
+            </button>
+          </div>
+        );
+      case 'matching':
+        return (
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>Items to Match</Label>
+              {metadata.items?.map((item: string, idx: number) => (
+                <Input
+                  key={`item-${idx}`}
+                  value={item}
+                  onChange={(e) => {
+                    const newItems = [...(metadata.items || [])];
+                    newItems[idx] = e.target.value;
+                    handleMetadataChange('items', newItems);
+                  }}
+                />
+              ))}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handleMetadataChange('items', [...(metadata.items || []), ''])}
+              >
+                Add Item
+              </Button>
+            </div>
+          </div>
+        );
+
+      case 'fillInTheBlank':
+        return (
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>Sentence with Blanks</Label>
+              <Textarea
+                value={metadata.sentence || ''}
+                onChange={(e) => handleMetadataChange('sentence', e.target.value)}
+                placeholder="Enter sentence with ___ for blanks"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Correct Answers</Label>
+              {metadata.blanks?.map((blank: string, idx: number) => (
+                <Input
+                  key={`blank-${idx}`}
+                  value={blank}
+                  onChange={(e) => {
+                    const newBlanks = [...(metadata.blanks || [])];
+                    newBlanks[idx] = e.target.value;
+                    handleMetadataChange('blanks', newBlanks);
+                  }}
+                />
+              ))}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handleMetadataChange('blanks', [...(metadata.blanks || []), ''])}
+              >
+                Add Answer
+              </Button>
+            </div>
+          </div>
+        );
+
+      case 'trueOrFalse':
+        return (
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>Statement</Label>
+              <Textarea
+                value={metadata.statement || ''}
+                onChange={(e) => handleMetadataChange('statement', e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Correct Answer</Label>
+              <div className="flex gap-4">
+                <Button
+                  variant={metadata.correctAnswer?.toString() === 'true' ? 'default' : 'outline'}
+                  onClick={() => handleMetadataChange('correctAnswer', 'true')}
+                >
+                  True
+                </Button>
+                <Button
+                  variant={metadata.correctAnswer?.toString() === 'false' ? 'default' : 'outline'}
+                  onClick={() => handleMetadataChange('correctAnswer', 'false')}
+                >
+                  False
+                </Button>
+              </div>
+            </div>
+          </div>
+        );
+
+      case 'reading':
+        return (
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>Reading Passage</Label>
+              <RichTextEditor
+                value={typeof metadata.passage === 'string' 
+                  ? metadata.passage 
+                  : JSON.stringify(metadata.passage) || ''}
+                onChange={(value) => handleMetadataChange('passage', value)}
+                placeholder="Enter reading passage..."
+                className="min-h-[200px]"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Comprehension Questions</Label>
+              {metadata.questions?.map((q: string, idx: number) => (
+                <Input
+                  key={`question-${idx}`}
+                  value={q}
+                  onChange={(e) => {
+                    const newQuestions = [...(metadata.questions || [])];
+                    newQuestions[idx] = e.target.value;
+                    handleMetadataChange('questions', newQuestions);
+                  }}
+                />
+              ))}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handleMetadataChange('questions', [...(metadata.questions || []), ''])}
+              >
+                Add Question
+              </Button>
+            </div>
+          </div>
+        );
+
+      case 'writing':
+        return (
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>Writing Prompt</Label>
+              <RichTextEditor
+                value={metadata.writingPrompt || ''}
+                onChange={(value) => handleMetadataChange('writingPrompt', value)}
+              />
+            </div>
+          </div>
+        );
+
+      case 'speakingAndWriting':
+        return (
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>Speaking Prompt</Label>
+              <Textarea
+                value={metadata.speakingPrompt || ''}
+                onChange={(e) => handleMetadataChange('speakingPrompt', e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Writing Prompt</Label>
+              <RichTextEditor
+                value={metadata.writingPrompt || ''}
+                onChange={(value) => handleMetadataChange('writingPrompt', value)}
+              />
+            </div>
+          </div>
+        );
+
+      case 'speakingAndListening':
+        return (
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>Speaking Prompt</Label>
+              <Textarea
+                value={metadata.speakingPrompt || ''}
+                onChange={(e) => handleMetadataChange('speakingPrompt', e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Listening Prompt</Label>
+              <Textarea
+                value={metadata.listeningPrompt || ''}
+                onChange={(e) => handleMetadataChange('listeningPrompt', e.target.value)}
+              />
+            </div>
+          </div>
+        );
+
+      case 'readingAndSpeaking':
+        return (
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>Speaking Prompt</Label>
+              <Textarea
+                value={metadata.speakingPrompt || ''}
+                onChange={(e) => handleMetadataChange('speakingPrompt', e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Reading Prompt</Label>
+              <RichTextEditor
+                value={typeof metadata.passage === 'string' 
+                  ? metadata.passage 
+                  : JSON.stringify(metadata.passage) || ''}
+                onChange={(value) => handleMetadataChange('passage', value)}
+                placeholder="Enter reading passage..."
+                className="min-h-[200px]"
+              />
+            </div>
+          </div>
+        );
+
+      case 'speakingWithAPartner':
+        return (
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>Speaking Prompt</Label>
+              <Textarea
+                value={metadata.speakingPrompt || ''}
+                onChange={(e) => handleMetadataChange('speakingPrompt', e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Partner Prompt</Label>
+              <Textarea
+                value={metadata.partnerPrompt || ''}
+                onChange={(e) => handleMetadataChange('partnerPrompt', e.target.value)}
+              />
+            </div>
+          </div>
+        );
+      case 'actionAndSpeaking':
+        return (
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>Speaking Prompt</Label>
+              <Textarea
+                value={metadata.speakingPrompt || ''}
+                onChange={(e) => handleMetadataChange('speakingPrompt', e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Action Prompt</Label>
+              <Textarea
+                value={metadata.actionPrompt || ''}
+                onChange={(e) => handleMetadataChange('actionPrompt', e.target.value)}
+              />
+            </div>
+          </div>
+        );
+
+      // case 'grammar_speaking':
+      //   return (
+      //     <>
+      //       <div className="space-y-4">
+      //         <div className="space-y-2">
+      //           <Label>Options</Label>
+      //           {question.metadata?.options?.map((option: string, idx: number) => (
+      //             <Input
+      //               key={`option-${idx}`}
+      //               value={option}
+      //               onChange={(e) => {
+      //                 const newOptions = [...(question.metadata?.options || [])];
+      //                 newOptions[idx] = e.target.value;
+      //                 handleMetadataChange('options', newOptions);
+      //               }}
+      //             />
+      //           ))}
+      //           <Button
+      //             variant="outline"
+      //             size="sm"
+      //             onClick={() => handleMetadataChange('options', [...(question.metadata?.options || []), ''])}
+      //           >
+      //             Add Option
+      //           </Button>
+      //         </div>
+      //         <div className="space-y-2">
+      //           <Label>Correct Answer</Label>
+      //           <Select
+      //             value={question.metadata?.correctAnswer?.toString() || ''}
+      //             onValueChange={(value) => handleMetadataChange('correctAnswer', parseInt(value))}
+      //           >
+      //             <SelectTrigger>
+      //               <SelectValue placeholder="Select correct answer" />
+      //             </SelectTrigger>
+      //             <SelectContent>
+      //               {question.metadata?.options?.map((_, idx) => (
+      //                 <SelectItem key={idx} value={idx.toString()}>
+      //                   Option {idx + 1}
+      //                 </SelectItem>
+      //               ))}
+      //             </SelectContent>
+      //           </Select>
+      //         </div>
+      //       </div>
+      //     </>
+      //   );
+
+      
+
+      
     }
   };
 
@@ -95,9 +481,21 @@ export function QuestionForm({
                   <div className="flex items-center justify-between">
                     <Label>Question Text</Label>
                     <div className="flex items-center gap-2">
-                      {isSaving && <Loader2 className="h-4 w-4 animate-spin text-primary" />}
-                      {lastSaved === 'success' && <Check className="h-4 w-4 text-green-500" />}
-                      {lastSaved === 'error' && <X className="h-4 w-4 text-destructive" />}
+                      {isSaving && <Icon 
+                        type="phosphor"
+                        name="SPINNER"
+                        className="h-4 w-4 animate-spin text-primary"
+                      />}
+                      {lastSaved === 'success' && <Icon 
+                        type="phosphor"
+                        name="CHECK"
+                        className="h-4 w-4 text-green-500"
+                      />}
+                      {lastSaved === 'error' && <Icon 
+                        type="phosphor"
+                        name="X"
+                        className="h-4 w-4 text-destructive"
+                      />}
                     </div>
                   </div>
                   <Textarea
@@ -112,9 +510,21 @@ export function QuestionForm({
                   <div className="flex items-center justify-between">
                     <Label>Teacher Script (Optional)</Label>
                     <div className="flex items-center gap-2">
-                      {isSaving && <Loader2 className="h-4 w-4 animate-spin text-primary" />}
-                      {lastSaved === 'success' && <Check className="h-4 w-4 text-green-500" />}
-                      {lastSaved === 'error' && <X className="h-4 w-4 text-destructive" />}
+                      {isSaving && <Icon 
+                        type="phosphor"
+                        name="SPINNER"
+                        className="h-4 w-4 animate-spin text-primary"
+                      />}
+                      {lastSaved === 'success' && <Icon 
+                        type="phosphor"
+                        name="CHECK"
+                        className="h-4 w-4 text-green-500"
+                      />}
+                      {lastSaved === 'error' && <Icon 
+                        type="phosphor"
+                        name="X"
+                        className="h-4 w-4 text-destructive"
+                      />}
                     </div>
                   </div>
                   <Textarea
@@ -142,9 +552,21 @@ export function QuestionForm({
                     <div className="flex items-center justify-between">
                       <Label>Sample Answer</Label>
                       <div className="flex items-center gap-2">
-                        {isSaving && <Loader2 className="h-4 w-4 animate-spin text-primary" />}
-                        {lastSaved === 'success' && <Check className="h-4 w-4 text-green-500" />}
-                        {lastSaved === 'error' && <X className="h-4 w-4 text-destructive" />}
+                        {isSaving && <Icon 
+                          type="phosphor"
+                          name="SPINNER"
+                          className="h-4 w-4 animate-spin text-primary"
+                        />}
+                        {lastSaved === 'success' && <Icon 
+                          type="phosphor"
+                          name="CHECK"
+                          className="h-4 w-4 text-green-500"
+                        />}
+                        {lastSaved === 'error' && <Icon 
+                          type="phosphor"
+                          name="X"
+                          className="h-4 w-4 text-destructive"
+                        />}
                       </div>
                     </div>
                     <Textarea
@@ -172,6 +594,8 @@ export function QuestionForm({
                     />
                   ))}
                 </div>
+
+                {renderQuestionFields(question.type)}
               </div>
             </CardContent>
           </motion.div>

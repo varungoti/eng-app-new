@@ -14,13 +14,14 @@ import { cn } from '@/lib/utils';
 import { logger } from '@/lib/logger';
 import React from 'react';
 import { Icon } from '@/components/ui/icons';
+import { ExercisePrompt } from '@/app/content-management/types';
 
-export function ExercisePromptCard({
+export const ExercisePromptCard: React.FC<ExercisePromptCardProps> = ({
   prompt,
-  promptIndex,
-  onUpdate,
-  onRemove
-}: ExercisePromptCardProps) {
+  index,
+  onRemove,
+  onUpdate
+}) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<'success' | 'error' | null>(null);
@@ -137,7 +138,7 @@ export function ExercisePromptCard({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="w-6 h-6 flex items-center justify-center rounded-full bg-primary/10 text-sm font-medium">
-              {promptIndex + 1}
+              {index + 1}
             </span>
             <span className="text-sm text-muted-foreground line-clamp-1">
               {prompt.text || 'No prompt text'}

@@ -6,7 +6,6 @@ import { useTheme } from "next-themes";
 import { AuthContext } from '../contexts/AuthContext';
 import { logger } from '../lib/logger';
 import { useError } from '../hooks/useError';
-import { Icon } from './ui/icons';
 import NotificationBell from './notifications/NotificationBell';
 import UserProfileMenu from './UserProfileMenu';
 import ErrorBoundary from './ErrorBoundary';
@@ -18,17 +17,29 @@ import { getNavigationItems } from '../lib/permissions';
 import UserRoleIndicator from './UserRoleIndicator';
 import ThemeSelector from './ThemeSelector';
 import { ThemeToggle } from "./theme-toggle";
-import { IconName } from '../types/icons';
+import { SidebarItem } from '../types/navigation';
+import { 
+  Home, 
+  Bookmark, 
+  ChevronUp, 
+  ChevronDown, 
+  Loader, 
+  AlertTriangle, 
+  BookOpen, 
+  Book,
+  type LucideIcon 
+} from 'lucide-react';
+//import { Books } from '@phosphor-icons/react/dist/ssr';
 
-interface NavItem {
+interface NavItem  {
   name: string;
   href?: string;
-  icon: IconName;
+  icon: LucideIcon;
   current?: boolean;
   submenu?: { 
     name: string; 
-    href: string; 
-    icon: IconName;
+    href: string;
+    icon: LucideIcon;
     current?: boolean; 
   }[];
 }
@@ -63,9 +74,7 @@ const Layout: React.FC = () => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center space-y-2">
-          <Icon 
-            type="phosphor"
-            name="SPINNER"
+          <Loader 
             className="h-12 w-12 text-indigo-600 animate-spin mx-auto"
           />
           <p className="mt-4 text-gray-600">Loading application...</p>
@@ -78,9 +87,7 @@ const Layout: React.FC = () => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center space-y-4 max-w-md mx-auto px-4">
-          <Icon 
-            type="phosphor"
-            name="WARNING"
+          <AlertTriangle 
             className="h-12 w-12 text-red-600 mx-auto"
           />
           <h2 className="text-lg font-medium text-gray-900">Application Error</h2>
@@ -112,9 +119,7 @@ const Layout: React.FC = () => {
             } w-full group flex items-center justify-between px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ease-in-out hover:shadow-md`}
           >
             <div className="flex items-center">
-              <Icon 
-                type="phosphor"
-                name={item.icon as IconName}
+              <item.icon 
                 className={`${
                   isSubmenuActive || isOpen
                     ? 'text-indigo-600 dark:text-indigo-400' 
@@ -123,11 +128,11 @@ const Layout: React.FC = () => {
               />
               {item.name}
             </div>
-            <Icon 
-              type="phosphor"
-              name={isOpen ? "CARET_UP" : "CARET_DOWN"}
-              className={`h-4 w-4 text-gray-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
-            />
+            {isOpen ? (
+              <ChevronUp className="h-4 w-4 text-gray-400 transition-transform duration-200" />
+            ) : (
+              <ChevronDown className="h-4 w-4 text-gray-400 transition-transform duration-200" />
+            )}
           </button>
           
           {isOpen && (
@@ -143,9 +148,7 @@ const Layout: React.FC = () => {
                   } group flex items-center px-4 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 hover:shadow-sm`}
                   style={{ animationDelay: `${subIndex * 50}ms` }}
                 >
-                  <Icon 
-                    type="phosphor"
-                    name={subitem.icon as IconName}
+                  <subitem.icon 
                     className={`${
                       location.pathname === subitem.href 
                         ? 'text-indigo-600 dark:text-indigo-400' 
@@ -171,9 +174,7 @@ const Layout: React.FC = () => {
             : `text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/50`
         } group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 hover:shadow-md mb-1`}
       >
-        <Icon 
-          type="phosphor"
-          name={item.icon as IconName}
+        <item.icon 
           className={`${
             location.pathname === item.href
               ? 'text-indigo-600 dark:text-indigo-400' 
@@ -200,9 +201,7 @@ const Layout: React.FC = () => {
               <div className={`flex flex-col flex-grow pt-6 overflow-y-auto ${currentTheme.sidebar} border-r ${currentTheme.border} shadow-xl backdrop-blur-sm bg-opacity-95 transition-all duration-300 ease-in-out`}>
                 <div className="flex items-center justify-between px-6 mb-8">
                   <div className="flex items-center space-x-3 group">
-                    <Icon 
-                      type="phosphor"
-                      name="BOOKMARK"
+                    <Bookmark 
                       className={`w-8 h-8 ${currentTheme.primary.replace('bg-', 'text-')} transform transition-transform group-hover:scale-110 duration-200`}
                     />
                     <span className={`text-xl font-bold tracking-tight ${currentTheme.text} group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors duration-200`}>

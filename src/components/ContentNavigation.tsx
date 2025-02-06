@@ -76,7 +76,6 @@ const ContentNavigation: React.FC<ContentNavigationProps> = ({
                 onSelectSubTopic('');
                 onSelectLesson('');
               }}
-              className="w-full"
             >
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select a grade" />
@@ -227,7 +226,7 @@ const ContentNavigation: React.FC<ContentNavigationProps> = ({
             </div>
             <div className="space-y-1 pl-8">
               {lessons
-                .filter((lesson) => lesson.subTopicId === selectedSubTopic)
+                .filter((lesson) => lesson.subtopicId === selectedSubTopic)
                 .map((lesson) => (
                   <div
                     key={lesson.id}

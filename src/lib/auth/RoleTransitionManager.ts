@@ -2,6 +2,7 @@ import { supabase } from '../supabase';
 import { useRoleStore } from './store';
 import { logger } from '../logger';
 import type { UserRole } from '../../types/roles';
+import type { School } from '@/types';
 
 class RoleTransitionManager {
   private static instance: RoleTransitionManager;
@@ -16,18 +17,10 @@ class RoleTransitionManager {
     return RoleTransitionManager.instance;
   }
 
-  public async transitionRole(newRole: UserRole): Promise<void> {
+  public async transitionRole(newRole: UserRole, school?: School): Promise<void> {
     const store = useRoleStore.getState();
     
-    if (store.isTransitioning) {
-      return;
-    }
-
-    if (newRole === store.currentRole) {
-      return;
-    }
-
-    if (this.isTransitioning) {
+    if (store.isTransitioning || this.isTransitioning || newRole === store.currentRole) {
       return;
     }
 
@@ -35,46 +28,43 @@ class RoleTransitionManager {
     store.startTransition();
     
     try {
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-      
-      if (sessionError || !session) {
-        throw new Error('No active session');
-      }
+      // First try to refresh the session
+      const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
+      if (refreshError) throw refreshError;
 
-      // Use stored procedure for role change
-      await supabase.rpc('handle_role_change', {
-        p_user_id: session.user.id,
-        p_new_role: newRole,
-        p_old_role: store.currentRole
+      const session = refreshData?.session;
+      if (!session) throw new Error('Please sign in to change roles');
+
+      // Save previous state in session storage
+      sessionStorage.setItem('roleTransition', JSON.stringify({
+        previousRole: store.currentRole,
+        currentRole: newRole,
+        impersonatedSchool: school || null,
+        isImpersonating: !!school
+      }));
+
+      // Update user metadata
+      const { error: updateError } = await supabase.auth.updateUser({
+        data: { 
+          role: newRole,
+          previous_role: store.currentRole,
+          school_id: school?.id,
+          updated_at: new Date().toISOString()
+        }
       });
 
-      const { error: refreshError } = await supabase.auth.refreshSession();
-      if (refreshError) throw refreshError;
+      if (updateError) throw updateError;
 
       store.setRole(newRole);
       store.completeTransition();
 
-      logger.info('Role transition completed successfully', {
-        context: { 
-          from: store.currentRole,
-          to: newRole,
-          userId: session.user.id
-        },
-        source: 'RoleTransitionManager'
-      });
-
     } catch (err) {
       store.resetTransition();
-
+      sessionStorage.removeItem('roleTransition');
       logger.error('Role transition failed', {
-        context: {
-          error: err,
-          from: store.currentRole,
-          to: newRole
-        },
+        context: { error: err, from: store.currentRole, to: newRole },
         source: 'RoleTransitionManager'
       });
-
       throw err;
     } finally {
       this.isTransitioning = false;

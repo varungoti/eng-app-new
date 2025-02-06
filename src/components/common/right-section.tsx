@@ -1,6 +1,7 @@
+"use client";
+
 import { useState } from 'react'
-import { Icon } from '@/components/ui/icons'
-import { APP_ICONS } from '@/lib/constants/icons'
+import { Lock, Zap, ChevronRight } from 'lucide-react'
 // import AuthModal from '@/app/components/authentication/auth-modal'
 // import AuthModal from './auth-modal'
 
@@ -19,7 +20,7 @@ export default function RightSection() {
         <h2 className="font-bold text-lg mb-2">Unlock Leaderboards!</h2>
         <div className="flex items-center space-x-3">
           <div className="bg-gray-100 p-2 rounded-full">
-            <Icon name={APP_ICONS.LOCK} className="w-6 h-6 text-gray-400" />
+            <Lock className="w-6 h-6 text-gray-400" />
           </div>
           <p className="text-sm text-gray-600">Complete 10 more lessons to start competing</p>
         </div>
@@ -31,7 +32,7 @@ export default function RightSection() {
           <button className="text-[#1cb0f6] text-sm font-bold">VIEW ALL</button>
         </div>
         <div className="flex items-center space-x-3">
-          <Icon name={APP_ICONS.ZAP} className="w-6 h-6 text-yellow-400" />
+          <Zap className="w-6 h-6 text-yellow-400" />
           <div className="flex-grow">
             <p className="text-sm font-bold">Earn 10 XP</p>
             <div className="bg-gray-200 h-2 rounded-full mt-1">
@@ -39,7 +40,7 @@ export default function RightSection() {
             </div>
           </div>
           <div className="bg-[#fff0d4] p-1 rounded">
-            <Icon name={APP_ICONS.CHEVRON_RIGHT} className="w-4 h-4 text-[#ffc800]" />
+            <ChevronRight className="w-4 h-4 text-[#ffc800]" />
           </div>
         </div>
       </div>

@@ -133,4 +133,17 @@ class DashboardManager {
   }
 }
 
+
+export interface DashboardWidget {
+  id: string;
+  title: string;
+  type: string;
+  position: {
+    x: number;
+    y: number;
+    w: number;
+    h: number;
+  };
+}
+
 export const dashboardManager = DashboardManager.getInstance();

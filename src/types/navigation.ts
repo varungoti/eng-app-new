@@ -1,10 +1,17 @@
-import { APP_ICONS } from '@/lib/constants/icons';
+import { type LucideIcon } from 'lucide-react';
 
-export interface NavigationItem {
+export interface SidebarItem {
   label: string;
   href: string;
-  icon: keyof typeof APP_ICONS;
+  icon: LucideIcon;
   isActive: boolean;
+}
+
+export interface NavigationItem {
+  name: string;
+  href: string;
+  icon: LucideIcon;
+  permission: string;
 }
 
 export type NavigationItems = NavigationItem[]; 

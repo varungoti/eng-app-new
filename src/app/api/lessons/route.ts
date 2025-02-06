@@ -1,18 +1,26 @@
 import { NextResponse } from 'next/server';
-import { connectToDatabase } from '@/lib/db/mongodb';
+import { supabase } from '@/lib/supabase';
 import { Lesson } from '@/lib/models/lesson';
 import { logger } from '@/lib/logger';
 
 export async function GET(request: Request) {
   try {
-    await connectToDatabase();
-    const lessons = await Lesson.find().sort({ createdAt: -1 });
+    const { data: lessons, error } = await supabase
+      .from('lessons')
+      .select()
+      .order('createdAt', { ascending: false });
+
+    if (error) {
+      throw new Error('Failed to fetch lessons');
+    }
+
     return NextResponse.json(lessons);
   } catch (error) {
     logger.error('Failed to fetch lessons', {
       context: { error },
       source: 'LessonsAPI'
     });
+
     return NextResponse.json(
       { error: 'Failed to fetch lessons' },
       { status: 500 }
@@ -22,15 +30,20 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    await connectToDatabase();
-    const data = await request.json();
-    const lesson = await Lesson.create(data);
+    const { data } = await request.json();
+    const { data: lesson, error } = await supabase.from('lessons').insert(data);
+
+    if (error) {
+      throw new Error('Failed to create lesson');
+    }
+
     return NextResponse.json(lesson);
   } catch (error) {
     logger.error('Failed to create lesson', {
       context: { error },
       source: 'LessonsAPI'
     });
+
     return NextResponse.json(
       { error: 'Failed to create lesson' },
       { status: 500 }

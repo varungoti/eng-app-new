@@ -36,7 +36,7 @@ export function CreateTopicDialog({ open, onOpenChange, gradeId }: CreateTopicDi
       toast({
         title: "Error",
         description: error instanceof Error ? error.message : "Failed to create topic",
-        variant: "destructive"
+        //variant: "destructive"
       })
     }
   })

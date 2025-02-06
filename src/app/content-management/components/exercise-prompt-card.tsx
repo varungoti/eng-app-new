@@ -1,66 +1,35 @@
 "use client";
 
-import React, { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { 
-  Trash2, 
-  ChevronDown, 
-  ChevronRight, 
-  ImageIcon,
-  Video as VideoIcon,
-  FileTextIcon,
-  Check,
-  X,
-  Loader2
-} from 'lucide-react';
+import { ChevronDown, ChevronRight, HomeIcon } from 'lucide-react';
 import { ExercisePromptCardProps } from '../types';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { MediaPreview } from '@/components/ui/media-preview';
+import { logger } from '@/lib/logger';
+import { ImageIcon, PlayCircle, FileText } from 'lucide-react';
+import { Icon } from '@/components/ui/icons';
 
-interface ExercisePrompt {
-  type: 'image' | 'video' | 'gif';
-  text: string;
-  media: string;
-  narration?: string;
-  saytext?: string;
-  id: string;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface ExercisePromptProps {
-  prompt: ExercisePrompt;
-  promptIndex: number;
-  onUpdate: (updatedPrompt: ExercisePrompt) => void;
-  onRemove: () => void;
-}
-
-// Initialize with default values
-const defaultPrompt: ExercisePrompt = {
-  id: '',  // Will be set when saved
-  text: '',
-  media: '',
-  narration: '',
-  saytext: '',
-  type: 'image',
-  created_at: new Date().toISOString(),
-  updated_at: new Date().toISOString()
-};
-
-export function ExercisePromptCard({
-  prompt = defaultPrompt,
+export const ExercisePromptCard: React.FC<ExercisePromptCardProps> = ({
+  prompt,
   promptIndex,
-  onUpdate,
-  onRemove
-}: ExercisePromptCardProps) {
+  onRemove,
+  onUpdate
+}) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<'success' | 'error' | null>(null);
+  const mounted = useRef(true);
+
+  useEffect(() => {
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
 
   const handleFieldChange = async (field: string, value: string) => {
     setIsSaving(true);
@@ -70,29 +39,27 @@ export function ExercisePromptCard({
         ...prompt,
         [field]: value
       });
-      setLastSaved('success');
+      if (mounted.current) {
+        setLastSaved('success');
+      }
     } catch (error) {
-      setLastSaved('error');
+      if (mounted.current) {
+        setLastSaved('error');
+        logger.error('Failed to update exercise prompt', {
+          context: { error, field },
+          source: 'ExercisePromptCard'
+        });
+      }
     } finally {
-      setIsSaving(false);
-      setTimeout(() => setLastSaved(null), 2000);
+      if (mounted.current) {
+        setIsSaving(false);
+        setTimeout(() => {
+          if (mounted.current) {
+            setLastSaved(null);
+          }
+        }, 2000);
+      }
     }
-  };
-
-  const handleContentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newContent = e.target.value;
-    onUpdate({
-      ...prompt,
-      text: newContent
-    });
-  };
-
-  const handleUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newUrl = e.target.value;
-    onUpdate({
-      ...prompt,
-      media: newUrl
-    });
   };
 
   const getMediaTypeIcon = (url: string) => {
@@ -102,37 +69,56 @@ export function ExercisePromptCard({
       return <ImageIcon className="h-4 w-4" />;
     }
     if (['mp4', 'webm', 'ogg'].includes(extension || '')) {
-      return <VideoIcon className="h-4 w-4" />;
+      return <PlayCircle className="h-4 w-4" />;
     }
-    return <FileTextIcon className="h-4 w-4" />;
-  };
-
-  const getMediaType = (url: string): 'image' | 'video' | 'gif' => {
-    const extension = url.split('.').pop()?.toLowerCase();
-    if (['mp4', 'webm', 'ogg'].includes(extension || '')) {
-      return 'video';
-    }
-    if (extension === 'gif') {
-      return 'gif';
-    }
-    return 'image';
+    return <FileText className="h-4 w-4" />;
   };
 
   const renderMediaPreview = (url: string) => {
     if (!url) return null;
+    const extension = url.split('.').pop()?.toLowerCase();
     
-    return (
-      <div className="relative h-[200px] rounded-lg overflow-hidden bg-muted">
-        <MediaPreview
-          url={url}
-          type={getMediaType(url)}
-          className="w-full h-full"
-          onError={(error) => {
-            console.error('Media preview error:', error);
-          }}
-        />
-      </div>
-    );
+    if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(extension || '')) {
+      return (
+        <div className="relative h-[200px] rounded-lg overflow-hidden bg-muted">
+          <img 
+            src={url} 
+            alt="Media preview" 
+            className="object-contain w-full h-full"
+            onError={(e) => {
+              e.currentTarget.src = 'https://via.placeholder.com/400x225?text=Invalid+Image+URL';
+            }}
+          />
+        </div>
+      );
+    }
+    
+    if (['mp4', 'webm', 'ogg'].includes(extension || '')) {
+      return (
+        <div className="relative h-[200px] rounded-lg overflow-hidden bg-muted">
+          <video 
+            src={url} 
+            controls 
+            className="w-full h-full object-contain"
+            onError={(e) => {
+              e.currentTarget.parentElement!.innerHTML = 'Invalid video URL';
+            }}
+          />
+        </div>
+      );
+    }
+    
+    return null;
+  };
+
+  // Ensure default values for all fields
+  const safePrompt = {
+    ...prompt,
+    text: prompt.text || '',
+    type: prompt.type || 'text',
+    narration: prompt.narration || '',
+    saytext: prompt.saytext || '',
+    media: prompt.media || ''
   };
 
   return (
@@ -147,7 +133,7 @@ export function ExercisePromptCard({
               {promptIndex + 1}
             </span>
             <span className="text-sm text-muted-foreground line-clamp-1">
-              {prompt.text || 'No prompt text'}
+              {safePrompt.text || 'No prompt text'}
             </span>
           </div>
           <div className="flex items-center gap-2">
@@ -165,10 +151,10 @@ export function ExercisePromptCard({
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => onRemove()}
+              onClick={onRemove}
               className="hover:bg-destructive/10 hover:text-destructive"
             >
-              <Trash2 className="h-4 w-4" />
+              <Icon type="phosphor" name="TRASH_SIMPLE" className="h-4 w-4" />
             </Button>
           </div>
         </div>
@@ -187,15 +173,16 @@ export function ExercisePromptCard({
                   <div className="flex items-center justify-between">
                     <Label>Prompt Text</Label>
                     <div className="flex items-center gap-2">
-                      {isSaving && <Loader2 className="h-4 w-4 animate-spin text-primary" />}
-                      {lastSaved === 'success' && <Check className="h-4 w-4 text-green-500" />}
-                      {lastSaved === 'error' && <X className="h-4 w-4 text-destructive" />}
+                      {isSaving && <Icon type="phosphor" name="SPINNER" className="h-4 w-4 animate-spin text-primary" />}
+                      {lastSaved === 'success' && <Icon type="phosphor" name="CHECK" className="h-4 w-4 text-green-500" />}
+                      {lastSaved === 'error' && <Icon type="phosphor" name="X" className="h-4 w-4 text-destructive" />}
                     </div>
                   </div>
-                  <Input
-                    value={prompt.text || ''}
-                    onChange={handleContentChange}
-                    placeholder="Enter prompt content"
+                  <Textarea
+                    value={safePrompt.text}
+                    onChange={(e) => handleFieldChange('text', e.target.value)}
+                    placeholder="Enter prompt text"
+                    className="min-h-[80px] resize-none"
                   />
                 </div>
 
@@ -203,31 +190,31 @@ export function ExercisePromptCard({
                   <div className="flex items-center justify-between">
                     <Label>Media URL</Label>
                     <div className="flex items-center gap-2">
-                      {getMediaTypeIcon(prompt.media)}
-                      {isSaving && <Loader2 className="h-4 w-4 animate-spin text-primary" />}
-                      {lastSaved === 'success' && <Check className="h-4 w-4 text-green-500" />}
-                      {lastSaved === 'error' && <X className="h-4 w-4 text-destructive" />}
+                      {safePrompt.media && getMediaTypeIcon(safePrompt.media)}
+                      {isSaving && <Icon type="phosphor" name="SPINNER" className="h-4 w-4 animate-spin text-primary" />}
+                      {lastSaved === 'success' && <Icon type="phosphor" name="CHECK" className="h-4 w-4 text-green-500" />}
+                      {lastSaved === 'error' && <Icon type="phosphor" name="X" className="h-4 w-4 text-destructive" />}
                     </div>
                   </div>
                   <Input
-                    value={prompt.media || ''}
-                    onChange={handleUrlChange}
+                    value={safePrompt.media}
+                    onChange={(e) => handleFieldChange('media', e.target.value)}
                     placeholder="Enter media URL"
                   />
-                  {prompt.media && renderMediaPreview(prompt.media)}
+                  {safePrompt.media && renderMediaPreview(safePrompt.media)}
                 </div>
 
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <Label>Narration</Label>
                     <div className="flex items-center gap-2">
-                      {isSaving && <Loader2 className="h-4 w-4 animate-spin text-primary" />}
-                      {lastSaved === 'success' && <Check className="h-4 w-4 text-green-500" />}
-                      {lastSaved === 'error' && <X className="h-4 w-4 text-destructive" />}
+                      {isSaving && <Icon type="phosphor" name="SPINNER" className="h-4 w-4 animate-spin text-primary" />}
+                      {lastSaved === 'success' && <Icon type="phosphor" name="CHECK" className="h-4 w-4 text-green-500" />}
+                      {lastSaved === 'error' && <Icon type="phosphor" name="X" className="h-4 w-4 text-destructive" />}
                     </div>
                   </div>
                   <Input
-                    value={prompt.narration}
+                    value={safePrompt.narration}
                     onChange={(e) => handleFieldChange('narration', e.target.value)}
                     placeholder="Enter narration text"
                   />
@@ -237,14 +224,14 @@ export function ExercisePromptCard({
                   <div className="flex items-center justify-between">
                     <Label>Say Text</Label>
                     <div className="flex items-center gap-2">
-                      {isSaving && <Loader2 className="h-4 w-4 animate-spin text-primary" />}
-                      {lastSaved === 'success' && <Check className="h-4 w-4 text-green-500" />}
-                      {lastSaved === 'error' && <X className="h-4 w-4 text-destructive" />}
+                      {isSaving && <Icon type="phosphor" name="SPINNER" className="h-4 w-4 animate-spin text-primary" />}
+                      {lastSaved === 'success' && <Icon type="phosphor" name="CHECK" className="h-4 w-4 text-green-500" />}
+                      {lastSaved === 'error' && <Icon type="phosphor" name="X" className="h-4 w-4 text-destructive" />}
                     </div>
                   </div>
                   <Input
-                    value={prompt.saytext}
-                    onChange={(e) => handleFieldChange('sayText', e.target.value)}
+                    value={safePrompt.saytext}
+                    onChange={(e) => handleFieldChange('saytext', e.target.value)}
                     placeholder="Enter text to say"
                   />
                 </div>
@@ -255,4 +242,4 @@ export function ExercisePromptCard({
       </AnimatePresence>
     </Card>
   );
-} 
+}; 

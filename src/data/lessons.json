@@ -1,0 +1,432 @@
+{
+    "lessons": [
+      {
+        "id": 1,
+        "title": "Verb Agreement and Comparatives",
+        "level": "Basic Level",
+        "duration": "60min",
+        "exercises": [
+          {
+            "id": 1,
+            "title": "Verb Agreement",
+            "type": "speaking",
+            "instructions": "You're going to say sentences.",
+            "questions": [
+              {
+                "prompt": "Listen: One dog barks.",
+                "task": "Say the sentence.",
+                "answer": "One dog barks.",
+                "variations": [
+                  {
+                    "prompt": "Say the sentence about three dogs.",
+                    "answer": "Three dogs bark."
+                  },
+                  {
+                    "prompt": "Say the sentence about a lot of dogs.",
+                    "answer": "A lot of dogs bark."
+                  },
+                  {
+                    "prompt": "Say the sentence about this dog.",
+                    "answer": "This dog barks."
+                  },
+                  {
+                    "prompt": "Say the sentence about Mary's dog.",
+                    "answer": "Mary's dog barks."
+                  }
+                ]
+              },
+              {
+                "prompt": "Listen: Three dogs swim.",
+                "task": "Say the sentence.",
+                "answer": "Three dogs swim.",
+                "variations": [
+                  {
+                    "prompt": "Say the sentence about one dog.",
+                    "answer": "One dog swims."
+                  },
+                  {
+                    "prompt": "Say the sentence about that dog.",
+                    "answer": "That dog swims."
+                  },
+                  {
+                    "prompt": "Say the sentence about those dogs.",
+                    "answer": "Those dogs swim."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": 2,
+            "title": "Comparatives",
+            "type": "listening_and_speaking",
+            "instructions": "Listen and answer questions about comparatives.",
+            "questions": [
+              {
+                "prompt": "What is the opposite of a hot day?",
+                "answer": "A cold day."
+              },
+              {
+                "prompt": "Listen: On Sunday it was 45 degrees. On Monday it was 55 degrees. Which day was hotter, Sunday or Monday?",
+                "answer": "Monday",
+                "followUp": {
+                  "prompt": "Say the sentence: Monday was hotter than Sunday.",
+                  "answer": "Monday was hotter than Sunday."
+                }
+              },
+              {
+                "prompt": "What's the opposite of something that is wet?",
+                "answer": "Something that is dry."
+              },
+              {
+                "prompt": "Listen: It rained two inches on Sunday. It rained four inches on Monday. Which day was wetter, Sunday or Monday?",
+                "answer": "Monday",
+                "followUp": {
+                  "prompt": "Say the sentence about Monday.",
+                  "answer": "Monday was wetter than Sunday."
+                }
+              }
+            ]
+          },
+          {
+            "id": 3,
+            "title": "Present and Past Tense",
+            "type": "speaking",
+            "instructions": "You're going to practice present and past tense.",
+            "questions": [
+              {
+                "prompt": "Start with Sunday and say the days of the week.",
+                "answer": "Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday."
+              },
+              {
+                "prompt": "Listen: He walks to work. Does that tell about today or yesterday?",
+                "answer": "Today",
+                "followUp": {
+                  "prompt": "Say the sentence about yesterday.",
+                  "answer": "He walked to work."
+                }
+              },
+              {
+                "prompt": "New sentence: They listen to music. Does that sentence tell about today or yesterday?",
+                "answer": "Today",
+                "followUp": {
+                  "prompt": "Say the sentence about yesterday.",
+                  "answer": "They listened to music."
+                }
+              }
+            ]
+          },
+          {
+            "id": 4,
+            "title": "Body Parts",
+            "type": "action_and_speaking",
+            "instructions": "Follow instructions and answer questions about body parts.",
+            "questions": [
+              {
+                "prompt": "Touch your elbow.",
+                "action": "Touch elbow",
+                "followUp": {
+                  "prompt": "Say the sentence about what you did.",
+                  "answer": "I touched my elbow."
+                }
+              },
+              {
+                "prompt": "Is the elbow part of the arm?",
+                "answer": "Yes",
+                "followUp": {
+                  "prompt": "Say the sentence about the elbow.",
+                  "answer": "The elbow is part of the arm."
+                }
+              },
+              {
+                "prompt": "Touch your wrist.",
+                "action": "Touch wrist",
+                "followUp": {
+                  "prompt": "Say the sentence about what you did.",
+                  "answer": "I touched my wrist."
+                }
+              },
+              {
+                "prompt": "Touch your knees.",
+                "action": "Touch knees",
+                "followUp": {
+                  "prompt": "Are knees part of arms?",
+                  "answer": "No",
+                  "additionalPrompt": "What are knees part of?",
+                  "additionalAnswer": "Legs"
+                }
+              }
+            ]
+          },
+          {
+            "id": 5,
+            "title": "Pronouns",
+            "type": "speaking",
+            "instructions": "Practice using pronouns in sentences.",
+            "questions": [
+              {
+                "prompt": "What is another word for a boy?",
+                "answer": "He"
+              },
+              {
+                "prompt": "What is another word for a woman?",
+                "answer": "She"
+              },
+              {
+                "prompt": "Listen: Boys and girls were reading. Say the sentence with another word for boys and girls.",
+                "answer": "They were reading."
+              },
+              {
+                "prompt": "Listen: You and I are talking. Say the sentence with another word for you and I.",
+                "answer": "We are talking."
+              },
+              {
+                "prompt": "They looked at four trucks. Say the sentence with another word for four trucks.",
+                "answer": "They looked at them."
+              }
+            ]
+          },
+          {
+            "id": 12,
+            "title": "Verb Agreement",
+            "type": "speaking",
+            "instructions": "Listen to the sentence and repeat it with the given changes.",
+            "questions": [
+              {
+                "prompt": "Listen: One dog barks.",
+                "task": "Say the sentence.",
+                "answer": "One dog barks.",
+                "variations": [
+                  {"prompt": "Say the sentence about three dogs", "answer": "Three dogs bark."},
+                  {"prompt": "Say the sentence about a lot of dogs", "answer": "A lot of dogs bark."},
+                  {"prompt": "Say the sentence about this dog", "answer": "This dog barks."},
+                  {"prompt": "Say the sentence about Mary's dog", "answer": "Mary's dog barks."}
+                ]
+              },
+              {
+                "prompt": "Listen: Three dogs swim.",
+                "task": "Say the sentence.",
+                "answer": "Three dogs swim.",
+                "variations": [
+                  {"prompt": "Say the sentence about one dog", "answer": "One dog swims."},
+                  {"prompt": "Say the sentence about that dog", "answer": "That dog swims."},
+                  {"prompt": "Say the sentence about those dogs", "answer": "Those dogs swim."}
+                ]
+              }
+            ]
+          },
+          {
+            "id": 13,
+            "title": "Comparatives",
+            "type": "sentence_transformation",
+            "instructions": "Listen to the scenario and form comparative sentences.",
+            "questions": [
+              {
+                "prompt": "Listen: Sunday was 45 degrees. Monday was 55 degrees. Which day was hotter?",
+                "content": "Sunday was 45 degrees. Monday was 55 degrees.",
+                "correctAnswer": "Monday was hotter than Sunday."
+              },
+              {
+                "prompt": "Now make a sentence about which day was colder.",
+                "correctAnswer": "Sunday was colder than Monday."
+              },
+              {
+                "prompt": "What's the opposite of something that is wet?",
+                "answer": "Something that is dry."
+              },
+              {
+                "prompt": "Listen: It rained two inches on Sunday. It rained four inches on Monday. Which day was wetter?",
+                "answer": "Monday was wetter than Sunday."
+              }
+            ]
+          },
+          {
+            "id": 14,
+            "title": "Present and Past Tense",
+            "type": "speaking",
+            "instructions": "Practice using present and past tense.",
+            "questions": [
+              {
+                "prompt": "Start with Sunday and say the days of the week.",
+                "answer": "Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday."
+              },
+              {
+                "prompt": "Listen: He walks to work. Does that tell about today or yesterday?",
+                "answer": "Today",
+                "followUp": {
+                  "prompt": "Say the sentence about yesterday.",
+                  "answer": "He walked to work."
+                }
+              },
+              {
+                "prompt": "Listen: They listen to music. Does that sentence tell about today or yesterday?",
+                "answer": "Today",
+                "followUp": {
+                  "prompt": "Say the sentence about yesterday.",
+                  "answer": "They listened to music."
+                }
+              }
+            ]
+          },
+          {
+            "id": 15,
+            "title": "Body Parts",
+            "type": "action_and_speaking",
+            "instructions": "Follow instructions and answer questions about body parts.",
+            "questions": [
+              {
+                "prompt": "Touch your elbow.",
+                "action": "Touch elbow",
+                "followUp": {
+                  "prompt": "Say the sentence about what you did.",
+                  "answer": "I touched my elbow."
+                }
+              },
+              {
+                "prompt": "Is the elbow part of the arm?",
+                "answer": "Yes",
+                "followUp": {
+                  "prompt": "Say the sentence about the elbow.",
+                  "answer": "The elbow is part of the arm."
+                }
+              },
+              {
+                "prompt": "Touch your knees.",
+                "action": "Touch knees",
+                "followUp": {
+                  "prompt": "Are knees part of arms?",
+                  "answer": "No",
+                  "additionalPrompt": "What are knees part of?",
+                  "additionalAnswer": "Legs"
+                }
+              }
+            ]
+          },
+          {
+            "id": 16,
+            "title": "Pronouns",
+            "type": "speaking",
+            "instructions": "Practice using pronouns in sentences.",
+            "questions": [
+              {
+                "prompt": "What is another word for a boy?",
+                "answer": "He"
+              },
+              {
+                "prompt": "Listen: Boys and girls were reading. Say the sentence with another word for boys and girls.",
+                "answer": "They were reading."
+              },
+              {
+                "prompt": "They looked at four trucks. Say the sentence with another word for four trucks.",
+                "answer": "They looked at them."
+              }
+            ]
+          },
+          {
+            "id": 17,
+            "title": "Vocabulary Practice",
+            "type": "vocabulary_practice",
+            "instructions": "Listen to the word and its definition, then use it in a sentence.",
+            "questions": [
+              {
+                "word": "Ambiguous",
+                "definition": "Open to more than one interpretation; not having one obvious meaning.",
+                "inSentence": "The politician's statement was ambiguous, leaving room for multiple interpretations.",
+                "prompt": "Now use 'ambiguous' in your own sentence."
+              },
+              {
+                "word": "Benevolent",
+                "definition": "Kind, generous, and caring about other people.",
+                "inSentence": "The benevolent donor gave millions to charity.",
+                "prompt": "Now use 'benevolent' in your own sentence."
+              }
+            ]
+          },
+          {
+            "id": 18,
+            "title": "Spelling Practice",
+            "type": "spelling",
+            "instructions": "Listen to the word and spell it out loud.",
+            "questions": [
+              {
+                "word": "Necessary",
+                "usage": "It is necessary to study for the exam.",
+                "prompt": "Spell the word 'necessary'."
+              },
+              {
+                "word": "Rhythm",
+                "usage": "The song has a catchy rhythm.",
+                "prompt": "Spell the word 'rhythm'."
+              }
+            ]
+          },
+          {
+            "id": 19,
+            "title": "Grammar Guide Practice",
+            "type": "grammar_speaking",
+            "instructions": "Listen to the grammar rule and example, then create your own sentence using the rule.",
+            "questions": [
+              {
+                "rule": "Use 'fewer' for countable nouns and 'less' for uncountable nouns.",
+                "example": "I have fewer apples than you, but less money.",
+                "prompt": "Create a sentence using both 'fewer' and 'less'."
+              },
+              {
+                "rule": "In conditional sentences, use 'would have' in the main clause when the if-clause uses the past perfect.",
+                "example": "If I had studied harder, I would have passed the exam.",
+                "prompt": "Create a sentence using this conditional structure."
+              }
+            ]
+          },
+          {
+            "id": 20,
+            "title": "Picture Description",
+            "type": "look_and_speak",
+            "instructions": "Describe the image you see in detail.",
+            "questions": [
+              {
+                "type": "imageDescription",
+                "prompt": "Describe this city scene.",
+                "imageUrl": "/images/city_scene.jpg",
+                "sampleAnswer": "I see a busy city street with tall buildings, cars, and people walking on the sidewalk."
+              }
+            ]
+          },
+          {
+            "id": 21,
+            "title": "Video Response",
+            "type": "watch_and_speak",
+            "instructions": "Watch the video clip and answer the question.",
+            "questions": [
+              {
+                "type": "videoDescription",
+                "prompt": "What happened in the traffic scene?",
+                "videoUrl": "/videos/traffic_scene.mp4",
+                "sampleAnswer": "A red car stopped at a traffic light, and then it turned green, allowing the car to continue driving."
+              }
+            ]
+          },
+          {
+            "id": 22,
+            "title": "Idiomatic Expressions",
+            "type": "idiom_practice",
+            "instructions": "Listen to the idiom and its meaning, then use it in your own sentence.",
+            "questions": [
+              {
+                "idiom": "Break the ice",
+                "meaning": "To do or say something to relieve tension or get conversation going in a strained situation or when strangers meet.",
+                "example": "The host told a joke to break the ice at the beginning of the party.",
+                "prompt": "Now use 'break the ice' in your own sentence."
+              },
+              {
+                "idiom": "Cut corners",
+                "meaning": "To do something in the easiest, cheapest, or fastest way, often by ignoring rules or leaving something out.",
+                "example": "The company cut corners by using cheaper materials, resulting in a lower quality product.",
+                "prompt": "Now use 'cut corners' in your own sentence."
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }

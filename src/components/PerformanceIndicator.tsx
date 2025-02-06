@@ -1,7 +1,7 @@
 import React from 'react';
 import { usePerformanceMonitor } from '../hooks/usePerformanceMonitor';
-import { APP_ICONS } from '@/lib/constants/icons';
-import { Icon } from '@/components/ui/icons';
+import { Loader2, CheckCircle, AlertTriangle } from 'lucide-react';
+
 
 interface PerformanceIndicatorProps {
   source: string;
@@ -23,13 +23,14 @@ export const PerformanceIndicator: React.FC<PerformanceIndicatorProps> = ({
       <div className="flex items-center justify-between mb-2">
         <h3 className="text-sm font-medium text-gray-900">Performance Metrics</h3>
         {activeOperations.length > 0 && (
-          <Icon name={APP_ICONS.LOADER} className="h-4 w-4 text-indigo-600 animate-spin" />
+          <Loader2 className="h-4 w-4 text-indigo-600 animate-spin" />
         )}
       </div>
 
       {/* Active Operations */}
       {activeOperations.length > 0 && (
         <div className="space-y-2 mb-4">
+
           <p className="text-xs font-medium text-gray-500">Active Operations</p>
           {activeOperations.map(op => (
             <div key={op.id} className="text-sm">
@@ -62,10 +63,11 @@ export const PerformanceIndicator: React.FC<PerformanceIndicatorProps> = ({
                 <div className="flex items-center space-x-2">
                   <span className="text-gray-900">{op.duration?.toFixed(0)}ms</span>
                   {op.status === 'success' ? (
-                    <Icon name={APP_ICONS.CHECK_CIRCLE} className="h-4 w-4 text-green-500" />
+                    <CheckCircle className="h-4 w-4 text-green-500" />
                   ) : (
-                    <Icon name={APP_ICONS.ALERT_TRIANGLE} className="h-4 w-4 text-red-500" />
+                    <AlertTriangle className="h-4 w-4 text-red-500" />
                   )}
+
                 </div>
               </div>
             </div>

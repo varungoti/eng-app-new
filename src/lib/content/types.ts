@@ -20,4 +20,12 @@ export interface Lesson {
   activities?: any[];
   created_at?: string;
   updated_at?: string;
+  exercise_prompts?: any[];
+  order_index?: number;
+  lesson_id?: string;
+  type?: string;
+  narration?: string;
+  saytext?: string;
+  media?: string;
+  question_id?: string;
 }

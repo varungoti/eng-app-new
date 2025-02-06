@@ -44,7 +44,7 @@ export function QuestionForm({
     try {
       await onUpdate(index, {
         ...question,
-        data: { ...question.data, [field]: value }
+        data: { ...question.data, [field]: value } as any
       });
       if (mounted.current) {
         setLastSaved('success');
@@ -148,7 +148,7 @@ export function QuestionForm({
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => handleMetadataChange('items', [...(question.data?.items || []), ''])}
+                  onClick={() => handleMetadataChange('items', [...(question.metadata?.items || []), ''])}
                 >
                   Add Item
                 </Button>
@@ -164,19 +164,19 @@ export function QuestionForm({
               <div className="space-y-2">
                 <Label>Sentence with Blanks</Label>
                 <Textarea
-                  value={question.data?.sentence || ''}
+                  value={question.metadata?.sentence || ''}
                   onChange={(e) => handleMetadataChange('sentence', e.target.value)}
                   placeholder="Enter sentence with ___ for blanks"
                 />
               </div>
               <div className="space-y-2">
                 <Label>Correct Answers</Label>
-                {question.data?.blanks?.map((blank: string, idx: number) => (
+                {question.metadata?.blanks?.map((blank: string, idx: number) => (
                   <Input
                     key={`blank-${idx}`}
                     value={blank}
                     onChange={(e) => {
-                      const newBlanks = [...(question.data?.blanks || [])];
+                      const newBlanks = [...(question.metadata?.blanks || [])];
                       newBlanks[idx] = e.target.value;
                       handleMetadataChange('blanks', newBlanks);
                     }}
@@ -185,7 +185,7 @@ export function QuestionForm({
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => handleMetadataChange('blanks', [...(question.data?.blanks || []), ''])}
+                  onClick={() => handleMetadataChange('blanks', [...(question.metadata?.blanks || []), ''])}
                 >
                   Add Answer
                 </Button>
@@ -201,7 +201,7 @@ export function QuestionForm({
               <div className="space-y-2">
                 <Label>Statement</Label>
                 <Textarea
-                  value={question.data?.statement || ''}
+                  value={question.metadata?.statement || ''}
                   onChange={(e) => handleMetadataChange('statement', e.target.value)}
                 />
               </div>
@@ -209,13 +209,13 @@ export function QuestionForm({
                 <Label>Correct Answer</Label>
                 <div className="flex gap-4">
                   <Button
-                    variant={question.data?.correctAnswer === 'true' ? 'default' : 'outline'}
+                    variant={question.metadata?.correctAnswer === 'true' ? 'default' : 'outline'}
                     onClick={() => handleMetadataChange('correctAnswer', 'true')}
                   >
                     True
                   </Button>
                   <Button
-                    variant={question.data?.correctAnswer === 'false' ? 'default' : 'outline'}
+                    variant={question.metadata?.correctAnswer === 'false' ? 'default' : 'outline'}
                     onClick={() => handleMetadataChange('correctAnswer', 'false')}
                   >
                     False
@@ -233,18 +233,18 @@ export function QuestionForm({
               <div className="space-y-2">
                 <Label>Reading Passage</Label>
                 <Textarea
-                  value={question.data?.passage || ''}
+                  value={question.metadata?.passage || ''}
                   onChange={(e) => handleMetadataChange('passage', e.target.value)}
                 />
               </div>
               <div className="space-y-2">
                 <Label>Comprehension Questions</Label>
-                {question.data?.questions?.map((q: string, idx: number) => (
+                {question.metadata?.questions?.map((q: string, idx: number) => (
                   <Input
                     key={`question-${idx}`}
                     value={q}
                     onChange={(e) => {
-                      const newQuestions = [...(question.data?.questions || [])];
+                      const newQuestions = [...(question.metadata?.questions || [])];
                       newQuestions[idx] = e.target.value;
                       handleMetadataChange('questions', newQuestions);
                     }}
@@ -253,7 +253,7 @@ export function QuestionForm({
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => handleMetadataChange('questions', [...(question.data?.questions || []), ''])}
+                  onClick={() => handleMetadataChange('questions', [...(question.metadata?.questions || []), ''])}
                 >
                   Add Question
                 </Button>
@@ -269,7 +269,7 @@ export function QuestionForm({
               <div className="space-y-2">
                 <Label>Writing Prompt</Label>
                 <Textarea
-                  value={question.data?.response || ''}
+                  value={question.metadata?.response || ''}
                   onChange={(e) => handleMetadataChange('response', e.target.value)}
                 />
               </div>
@@ -284,14 +284,14 @@ export function QuestionForm({
               <div className="space-y-2">
                 <Label>Speaking Prompt</Label>
                 <Textarea
-                  value={question.data?.speakingPrompt || ''}
+                  value={question.metadata?.speakingPrompt || ''}
                   onChange={(e) => handleMetadataChange('speakingPrompt', e.target.value)}
                 />
               </div>
               <div className="space-y-2">
                 <Label>Writing Prompt</Label>
                 <Textarea
-                  value={question.data?.writingPrompt || ''}
+                  value={question.metadata?.writingPrompt || ''}
                   onChange={(e) => handleMetadataChange('writingPrompt', e.target.value)}
                 />
               </div>
@@ -306,14 +306,14 @@ export function QuestionForm({
               <div className="space-y-2">
                 <Label>Speaking Prompt</Label>
                 <Textarea
-                  value={question.data?.speakingPrompt || ''}
+                  value={question.metadata?.speakingPrompt || ''}
                   onChange={(e) => handleMetadataChange('speakingPrompt', e.target.value)}
                 />
               </div>
               <div className="space-y-2">
                 <Label>Listening Prompt</Label>
                 <Textarea
-                  value={question.data?.listeningPrompt || ''}
+                  value={question.metadata?.listeningPrompt || ''}
                   onChange={(e) => handleMetadataChange('listeningPrompt', e.target.value)}
                 />
               </div>
@@ -321,21 +321,21 @@ export function QuestionForm({
           </>
         );
 
-      case 'speakingAndReading':
+      case 'readingAndSpeaking':
         return (
           <>
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label>Speaking Prompt</Label>
                 <Textarea
-                  value={question.data?.speakingPrompt || ''}
+                  value={question.metadata?.speakingPrompt || ''}
                   onChange={(e) => handleMetadataChange('speakingPrompt', e.target.value)}
                 />
               </div>
               <div className="space-y-2">
                 <Label>Reading Prompt</Label>
                 <Textarea
-                  value={question.data?.readingPrompt || ''}
+                  value={question.metadata?.readingPrompt || ''}
                   onChange={(e) => handleMetadataChange('readingPrompt', e.target.value)}
                 />
               </div>
@@ -350,14 +350,14 @@ export function QuestionForm({
               <div className="space-y-2">
                 <Label>First Speaking Prompt</Label>
                 <Textarea
-                  value={question.data?.speakingPrompt || ''}
+                  value={question.metadata?.speakingPrompt || ''}
                   onChange={(e) => handleMetadataChange('speakingPrompt', e.target.value)}
                 />
               </div>
               <div className="space-y-2">
                 <Label>Second Speaking Prompt</Label>
                 <Textarea
-                  value={question.data?.speakingPrompt2 || ''}
+                  value={question.metadata?.speakingPrompt2 || ''}
                   onChange={(e) => handleMetadataChange('speakingPrompt2', e.target.value)}
                 />
               </div>
@@ -371,7 +371,7 @@ export function QuestionForm({
               <div className="space-y-2">
                 <Label>Sample Answer</Label>
                 <Textarea
-                  value={question.data?.sampleAnswer || ''}
+                  value={question.metadata?.sampleAnswer || ''}
                   onChange={(e) => handleMetadataChange('sampleAnswer', e.target.value)}
                 />
               </div>
@@ -385,12 +385,12 @@ export function QuestionForm({
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label>Options</Label>
-                {question.data?.options?.map((option: string, idx: number) => (
+                {question.metadata?.options?.map((option: string, idx: number) => (
                   <Input
                     key={`option-${idx}`}
                     value={option}
                     onChange={(e) => {
-                      const newOptions = [...(question.data?.options || [])];
+                      const newOptions = [...(question.metadata?.options || [])];
                       newOptions[idx] = e.target.value;
                       handleMetadataChange('options', newOptions);
                     }}
@@ -399,7 +399,7 @@ export function QuestionForm({
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => handleMetadataChange('options', [...(question.data?.options || []), ''])}
+                  onClick={() => handleMetadataChange('options', [...(question.metadata?.options || []), ''])}
                 >
                   Add Option
                 </Button>
@@ -407,14 +407,14 @@ export function QuestionForm({
               <div className="space-y-2">
                 <Label>Correct Answer</Label>
                 <Select
-                  value={question.data?.correctAnswer?.toString() || ''}
+                  value={question.metadata?.correctAnswer?.toString() || ''}
                   onValueChange={(value) => handleMetadataChange('correctAnswer', parseInt(value))}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select correct answer" />
                   </SelectTrigger>
                   <SelectContent>
-                    {question.data?.options?.map((_, idx) => (
+                    {question.metadata?.options?.map((_, idx) => (
                       <SelectItem key={idx} value={idx.toString()}>
                         Option {idx + 1}
                       </SelectItem>
@@ -426,84 +426,9 @@ export function QuestionForm({
           </>
         );
 
-      case 'matching':
-        return (
-          <>
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label>Items and Descriptions</Label>
-                {question.data?.items?.map((item: string, idx: number) => (
-                  <div key={`item-${idx}`} className="flex gap-2">
-                    <Input
-                      value={item}
-                      onChange={(e) => {
-                        const newItems = [...(question.data?.items || [])];
-                        newItems[idx] = e.target.value;
-                        handleMetadataChange('items', newItems);
-                      }}
-                      placeholder="Item"
-                    />
-                    <Input
-                      value={question.data?.descriptions?.[idx] || ''}
-                      onChange={(e) => {
-                        const newDescriptions = [...(question.data?.descriptions || [])];
-                        newDescriptions[idx] = e.target.value;
-                        handleMetadataChange('descriptions', newDescriptions);
-                      }}
-                      placeholder="Description"
-                    />
-                  </div>
-                ))}
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    handleMetadataChange('items', [...(question.data?.items || []), '']);
-                    handleMetadataChange('descriptions', [...(question.data?.descriptions || []), '']);
-                  }}
-                >
-                  Add Pair
-                </Button>
-              </div>
-            </div>
-          </>
-        );
+      
 
-      case 'fillInTheBlank':
-        return (
-          <>
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label>Sentence</Label>
-                <Textarea
-                  value={question.data?.sentence || ''}
-                  onChange={(e) => handleMetadataChange('sentence', e.target.value)}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Blanks</Label>
-                {question.data?.blanks?.map((blank: string, idx: number) => (
-                  <Input
-                    key={`blank-${idx}`}
-                    value={blank}
-                    onChange={(e) => {
-                      const newBlanks = [...(question.data?.blanks || [])];
-                      newBlanks[idx] = e.target.value;
-                      handleMetadataChange('blanks', newBlanks);
-                    }}
-                  />
-                ))}
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleMetadataChange('blanks', [...(question.data?.blanks || []), ''])}
-                >
-                  Add Blank
-                </Button>
-              </div>
-            </div>
-          </>
-        );
+      
     }
   };
 

@@ -140,10 +140,21 @@ export const useDashboard = () => {
     }
   };
 
+  const updateWidgetPosition = async (id: string, position: { x: number; y: number; w: number; h: number }) => {
+    if (!dashboard) return;
+    
+    return saveDashboard({
+      widgets: dashboard.widgets.map(widget => 
+        widget.id === id ? { ...widget, position } : widget
+      )
+    });
+  };
+
   return {
     dashboard,
     loading,
     error,
-    saveDashboard
+    saveDashboard,
+    updateWidgetPosition
   };
 };

@@ -1,8 +1,36 @@
+import Classes from '@/app/teacher/classes/page';
 import type { UserRole } from '../types/roles';
 import { ROLE_PERMISSIONS } from '../types/roles';
-import { House, Users, Calendar, Gear, BookOpen, ChartLine, FolderOpen } from "@phosphor-icons/react";
-import type { Icon } from '@/Components/ui/icons';
-import { IconName } from '@/types/icons';
+import { TEACHER_ROUTES } from './content/routes';
+import { 
+  Home, 
+  Users, 
+  Calendar, 
+  Settings, 
+  BookOpen, 
+  BarChart2, 
+  FolderOpen,
+  GraduationCap,
+  School,
+  FileText,
+  DollarSign,
+  Bell,
+  Bookmark,
+  FolderPlus,
+  Building,
+  Folders,
+  Eye,
+  Edit,
+  Code,
+  ServerIcon,
+  CreditCard,
+  FileBarChart,
+  AlertTriangle,
+  LucideCloudHail,
+  CloudHailIcon
+} from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+
 
 // Get allowed roles for staff management based on user role
 export const getAllowedStaffRoles = (userRole: UserRole): string[] => {
@@ -31,11 +59,11 @@ export const canAccessDashboard = (userRole: UserRole, targetRole: string): bool
 interface NavigationItem {
   name: string;
   href?: string;
-  icon: IconName;
+  icon: LucideIcon;
   submenu?: { 
     name: string; 
     href: string; 
-    icon: IconName;
+    icon: LucideIcon;
   }[];
 }
 
@@ -50,14 +78,14 @@ export const getNavigationItems = (role: string): NavigationItem[] => {
   items.push({ 
     name: 'Dashboard', 
     href: '/dashboard',
-    icon: 'BOOKMARK' as IconName 
+    icon: Bookmark 
   });
 
   if (permissions.content) {
     items.push({ 
-      name: 'Lesson Management', 
-      href: '/content/lesson-management', 
-      icon: 'BOOK_OPEN' as IconName 
+      name: 'Learning Management', 
+      href: '/app/learning', 
+      icon: BookOpen
     });
   }
 
@@ -65,15 +93,15 @@ export const getNavigationItems = (role: string): NavigationItem[] => {
     items.push({ 
       name: 'Content Management', 
       href: '/content-management', 
-      icon: 'BOOKS' as IconName 
+      icon: FolderPlus
     });
   }
 
   if (permissions.myclasses) {
     items.push({ 
       name: 'My Classes', 
-      href: '/MyClasses', 
-      icon: 'ChalkboardTeacher' as IconName 
+      href: TEACHER_ROUTES.LESSONS,
+      icon: CloudHailIcon
     });
   }
 
@@ -82,7 +110,7 @@ export const getNavigationItems = (role: string): NavigationItem[] => {
     items.push({ 
       name: 'Schools', 
       href: '/schools', 
-      icon: 'BUILDING' as IconName 
+      icon: Building
     });
   }
 
@@ -90,7 +118,7 @@ export const getNavigationItems = (role: string): NavigationItem[] => {
     items.push({ 
       name: 'Students', 
       href: '/students', 
-      icon: 'USERS' as IconName 
+      icon: Users
     });
   }
 
@@ -98,29 +126,29 @@ export const getNavigationItems = (role: string): NavigationItem[] => {
     items.push({ 
       name: 'Sales', 
       href: '/sales', 
-      icon: 'DollarSign' as IconName 
+      icon: DollarSign 
     });
   }
 
   if (permissions.content) {
     items.push({
       name: 'Content',
-      icon: 'FOLDER' as IconName,
+      icon: Folders,
       submenu: [
         { 
           name: 'View Content', 
           href: '/content/view', 
-          icon: 'Eye' as IconName 
+          icon: Eye 
         },
         { 
           name: 'Edit Content', 
           href: '/content/edit', 
-          icon: 'Edit' as IconName
+          icon: Edit
         },
         {
           name: 'Lesson Management',
           href: '/content/lesson-management',
-          icon: 'BookOpen' as IconName
+          icon: BookOpen 
         }
       ]
     });
@@ -130,7 +158,7 @@ export const getNavigationItems = (role: string): NavigationItem[] => {
     items.push({ 
       name: 'Development', 
       href: '/development', 
-      icon: 'Code' as IconName 
+      icon: Code 
     });
   }
 
@@ -138,29 +166,29 @@ export const getNavigationItems = (role: string): NavigationItem[] => {
     items.push({ 
       name: 'Infrastructure', 
       href: '/infrastructure', 
-      icon: 'Server' as IconName 
+      icon: ServerIcon 
     });
   }
 
   if (permissions.finance) {
     items.push({
       name: 'Finance',
-      icon: 'DollarSign' as IconName,
+      icon: DollarSign,
       submenu: [
         {
           name: 'Overview',
           href: '/finance',
-          icon: 'BarChart' as IconName
+          icon: BarChart2
         },
         {
           name: 'Invoices',
           href: '/finance/invoices',
-          icon: 'FileText' as IconName
+          icon: FileText
         },
         {
           name: 'Payments',
           href: '/finance/payments',
-          icon: 'CreditCard' as IconName
+          icon: CreditCard
         }
       ]
     });
@@ -170,7 +198,7 @@ export const getNavigationItems = (role: string): NavigationItem[] => {
     items.push({ 
       name: 'Staff', 
       href: '/staff', 
-      icon: 'USERS' as IconName 
+      icon: Users 
     });
   }
 
@@ -178,7 +206,7 @@ export const getNavigationItems = (role: string): NavigationItem[] => {
     items.push({ 
       name: 'Schedule', 
       href: '/schedule', 
-      icon: 'CALENDAR' as IconName 
+      icon: Calendar 
     });
   }
 
@@ -186,7 +214,7 @@ export const getNavigationItems = (role: string): NavigationItem[] => {
     items.push({ 
       name: 'Reports', 
       href: '/reports', 
-      icon: 'FileBarChart' as IconName 
+      icon: FileBarChart 
     });
   }
 
@@ -194,7 +222,7 @@ export const getNavigationItems = (role: string): NavigationItem[] => {
   items.push({ 
     name: 'Events', 
     href: '/events', 
-    icon: 'CALENDAR' as IconName 
+    icon: Calendar 
   });
 
   // Error Test only for technical roles
@@ -202,7 +230,7 @@ export const getNavigationItems = (role: string): NavigationItem[] => {
     items.push({ 
       name: 'Error Test', 
       href: '/error-test', 
-      icon: 'AlertTriangle' as IconName 
+      icon: AlertTriangle 
     });
   }
 
@@ -211,7 +239,7 @@ export const getNavigationItems = (role: string): NavigationItem[] => {
     items.push({ 
       name: 'Settings', 
       href: '/settings', 
-      icon: 'GEAR' as IconName 
+      icon: Settings 
     });
   }
 

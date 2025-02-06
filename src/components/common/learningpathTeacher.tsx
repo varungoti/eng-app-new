@@ -1,118 +1,372 @@
-/**
- * @locked
- * ⚠️ WARNING: THIS CODE IS LOCKED AND SHOULD NOT BE MODIFIED ⚠️
- * 
- * This component represents the core functionality of the My Courses tab.
- * It has been thoroughly tested and optimized for production use.
- * 
- * Any modifications to this code could lead to:
- * 1. Broken functionality
- * 2. Performance issues
- * 3. Inconsistent behavior
- * 4. Security vulnerabilities
- * 
- * If changes are absolutely necessary:
- * 1. Create a backup of this file
- * 2. Make changes in a new component
- * 3. Test thoroughly before deployment
- * 4. Get approval from the team lead
- * 
- * Last Modified: ${new Date().toISOString()}
- * Status: Production Ready & Locked
- */
-
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, memo, useCallback, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import {
-  ArrowRight,
-  BookOpen,
-  Calendar,
-  CheckCircle2,
-  Clock,
-  Lock,
-  Plus,
-  RotateCcw,
-  Unlock,
-  Users,
-  Shield,
-} from "lucide-react";
-import Link from "next/link";
+import {  ArrowRight, BookOpen, Calendar, CheckCircle2, Clock, Lock, Plus, RotateCcw, Unlock, Users, Shield, GraduationCap, } from "lucide-react";
+import { useNavigate, Link } from "react-router-dom";
 import ClassHeader from "./ClassHeader";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from "@/components/ui/dialog";
+import {  Dialog,  DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, } from "@/components/ui/dialog";
 import { Button } from "../ui/button";
-import { classesData, lessonsData } from "@/data/mockData";
-import { Class } from "@/types/index";
+import { Class, ExtendedLesson, SubLesson, ClassStudent, Student } from "@/types";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/lib/supabase";
+import type { Database } from "@/types/supabase";
+import { useComponentLogger } from "@/hooks/useComponentLogger";
+import type { PostgrestResponse, PostgrestError, SupabaseClient } from '@supabase/supabase-js';
+import { transformLearningPathData } from "@/lib/transforms/learningPath";
 
-interface ExtendedLesson {
-  id: number;
-  classId: number;
-  title: string;
-  topic: string;
-  duration: number;
-  lessonNumber: string;
-  totalTopics: string;
-  difficulty: string;
+const MAX_RETRIES = 3;
+const RETRY_DELAY = 1000; // 1 second
+
+// Helper functions defined outside the component
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+async function fetchWithRetry<T>(
+  fetchFn: () => Promise<{ data: T[] | null; error: PostgrestError | null }>,
+  retries = MAX_RETRIES
+): Promise<T[]> {
+  let lastError: Error | null = null;
+
+  for (let attempt = 0; attempt < retries; attempt++) {
+    try {
+      const { data, error } = await fetchFn();
+      
+      if (error) {
+        throw new Error(error.message || 'Database operation failed');
+      }
+      
+      if (!data) {
+        throw new Error('No data returned from the database');
+      }
+
+      return data;
+    } catch (error) {
+      lastError = error instanceof Error ? error : new Error(String(error));
+      
+      if (attempt === retries - 1) {
+        throw lastError;
+      }
+      
+      await delay(RETRY_DELAY * Math.pow(2, attempt));
+    }
+  }
+
+  throw lastError || new Error('Failed to fetch data after retries');
+}
+
+type Tables = Database['public']['Tables'];
+type DbClass = Tables['classes']['Row'];
+type DbLesson = Tables['lessons']['Row'] & {
+  topic?: { title: string };
+  subtopic?: { title: string };
+};
+type DbStudent = Tables['students']['Row'];
+type DbClassStudent = Tables['class_students']['Row'] & {
+  student: DbStudent;
+};
+
+interface ExtendedClass extends Omit<DbClass, 'id'> {
+  id: string;
+  students: number;
+}
+
+interface CustomLesson extends Omit<DbLesson, 'id' | 'status'> {
+  id: string;
+  status?: 'draft' | 'published';
   color: string;
   unlocked: boolean;
   completed: boolean;
-  subLessons: SubLesson[];
+  lessonNumber: string;
+  totalTopics: string;
+  difficulty: string;
+  customSubLessons: CustomSubLesson[];
 }
 
-interface SubLesson {
-  id: number;
+interface CustomSubLesson {
+  id: string;
   title: string;
   unlocked: boolean;
-  completed?: boolean;
-  duration?: number;
-  description?: string;
+  completed: boolean;
+  duration: number;
+  description: string;
 }
 
-export function LearningPathTeacher() {
-  const [lessons, setLessons] = useState<ExtendedLesson[]>(lessonsData);
-  const [selectedClass, setSelectedClass] = useState<Class>(classesData[0] as Class);
-  const [selectedLesson, setSelectedLesson] = useState<ExtendedLesson>(lessonsData[0]);
-  const [selectedSubLesson, setSelectedSubLesson] = useState<SubLesson | null>(null);
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [currentLesson, setCurrentLesson] = useState<ExtendedLesson | null>(null);
-  const [isLocked, setIsLocked] = useState(true);
+interface ClassHeaderProps {
+  classes: ExtendedClass[];
+  selectedClass: ExtendedClass | null;
+  onClassChange: (classData: ExtendedClass) => void;
+}
 
-  useEffect(() => {
-    const savedLockState = localStorage.getItem('myCoursesTabLocked');
-    if (savedLockState !== null) {
-      setIsLocked(JSON.parse(savedLockState));
+interface ClassCardProps {
+  classData: ExtendedClass;
+  isSelected: boolean;
+  onClassChange: (classData: ExtendedClass) => Promise<void>;
+  logError: (error: unknown) => void;
+}
+
+const ClassCard = memo(({ 
+  classData, 
+  isSelected, 
+  onClassChange, 
+  logError 
+}: ClassCardProps): JSX.Element => {
+  const handleClick = useCallback(async () => {
+    try {
+      await onClassChange(classData);
+    } catch (error) {
+      logError(error);
     }
-  }, []);
+  }, [classData, onClassChange, logError]);
 
+  const cardClassName = useMemo(() => 
+    cn(
+      "flex-shrink-0 cursor-pointer p-4",
+      isSelected ? "border-primary" : "border-transparent"
+    ),
+    [isSelected]
+  );
+
+  return (
+    <Card
+      key={classData.id}
+      className={cardClassName}
+      onClick={handleClick}
+    >
+      <div className="flex items-center gap-2">
+        <GraduationCap 
+          className="h-5 w-5 text-primary" 
+        />
+        <span className="font-medium">{classData.name}</span>
+      </div>
+      <div className="mt-2 text-sm text-gray-500">
+        <div className="flex items-center gap-2">
+          <Users className="h-4 w-4" />
+          <span>{classData.students} Students</span>
+        </div>
+      </div>
+    </Card>
+  );
+});
+
+ClassCard.displayName = 'ClassCard';
+
+export function LearningPathTeacher() {
+  const navigate = useNavigate();
+  const { logError } = useComponentLogger('LearningPathTeacher');
+  const lessonRefs = useRef<(HTMLDivElement | null)[]>([]);
+  
+  const [lessons, setLessons] = useState<CustomLesson[]>([]);
+  const [selectedClass, setSelectedClass] = useState<ExtendedClass | null>(null);
+  const [classes, setClasses] = useState<ExtendedClass[]>([]);
+  const [selectedLesson, setSelectedLesson] = useState<CustomLesson | null>(null);
+  const [selectedSubLesson, setSelectedSubLesson] = useState<CustomSubLesson | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [currentLesson, setCurrentLesson] = useState<CustomLesson | null>(null);
+  const [isLocked, setIsLocked] = useState(true);
+  const [classStudents, setClassStudents] = useState<DbStudent[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
+
+  // Load lock state from localStorage
   useEffect(() => {
-    localStorage.setItem('myCoursesTabLocked', JSON.stringify(isLocked));
-  }, [isLocked]);
+    try {
+      const savedLockState = localStorage.getItem('myCoursesTabLocked');
+      if (savedLockState !== null) {
+        setIsLocked(JSON.parse(savedLockState));
+      }
+    } catch (error) {
+      logError(error);
+    }
+  }, [logError]);
 
-  const handleClassChange = (classData: Class) => {
+  // Save lock state to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem('myCoursesTabLocked', JSON.stringify(isLocked));
+    } catch (error) {
+      logError(error);
+    }
+  }, [isLocked, logError]);
+
+  // Fetch initial data
+  useEffect(() => {
+    const fetchInitialData = async () => {
+      try {
+        setIsLoading(true);
+        setFetchError(null);
+
+        const { data: classesData, error: classesError } = await supabase
+          .from('classes')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (classesError) {
+          throw new Error('Error fetching classes: ' + classesError.message);
+        }
+
+        if (!classesData || classesData.length === 0) {
+          throw new Error('No classes found');
+        }
+
+        const extendedClasses: ExtendedClass[] = classesData.map(cls => ({
+          ...cls,
+          id: String(cls.id),
+          students: 0 // Will be updated with actual count
+        }));
+
+        setClasses(extendedClasses);
+        setSelectedClass(extendedClasses[0]);
+
+        const { data: lessonsData, error: lessonsError } = await supabase
+          .from('lessons')
+          .select(`
+            *,
+            topic:topics(title),
+            subtopic:subtopics(title)
+          `)
+          .eq('grade_id', classesData[0].grade_id)
+          .order('order_index', { ascending: true });
+
+        if (lessonsError) {
+          throw new Error('Error fetching lessons: ' + lessonsError.message);
+        }
+
+        const customLessons: CustomLesson[] = lessonsData.map((lesson, index) => ({
+          ...lesson,
+          id: String(lesson.id),
+          status: lesson.status as 'draft' | 'published' | undefined,
+          color: getColorForIndex(index),
+          unlocked: index === 0,
+          completed: false,
+          lessonNumber: `${index + 1}`,
+          totalTopics: '5',
+          difficulty: 'Beginner',
+          customSubLessons: [
+            {
+              id: String(lesson.id),
+              title: lesson.title,
+              unlocked: index === 0,
+              completed: false,
+              duration: lesson.duration || 15,
+              description: lesson.description || ''
+            }
+          ]
+        }));
+
+        setLessons(customLessons);
+        if (customLessons.length > 0) {
+          setSelectedLesson(customLessons[0]);
+        }
+
+        const { data: studentsData, error: studentsError } = await supabase
+          .from('class_students')
+          .select(`
+            *,
+            student:students!class_students_student_id_fkey (
+              id,
+              first_name,
+              last_name,
+              roll_number,
+              email,
+              grade_id
+            )
+          `)
+          .eq('class_id', classesData[0].id);
+
+        if (studentsError) {
+          throw new Error('Error fetching students: ' + studentsError.message);
+        }
+
+        if (studentsData) {
+          const students = studentsData.map(data => data.student);
+          setClassStudents(students);
+          
+          // Update the selected class with the correct student count
+          setSelectedClass(prev => prev ? { ...prev, students: students.length } : null);
+          
+          // Update all classes with their student counts
+          setClasses(prev => prev.map(cls => 
+            cls.id === extendedClasses[0].id 
+              ? { ...cls, students: students.length }
+              : cls
+          ));
+        }
+
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
+        setFetchError(errorMessage);
+        logError(error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchInitialData();
+  }, [logError]);
+
+  const handleClassChange = async (classData: ExtendedClass) => {
     if (isLocked) return;
     setSelectedClass(classData);
-    if (classData) {
-      const filteredLessons = lessonsData.filter(
-        (lesson) => lesson.classId === classData?.id
-      );
-      setLessons(filteredLessons);
+    
+    try {
+      const { data: lessonsData, error: lessonsError } = await supabase
+        .from('lessons')
+        .select(`
+          *,
+          topic:topics(title),
+          subtopic:subtopics(title)
+        `)
+        .eq('grade_id', classData.grade_id)
+        .order('order_index', { ascending: true });
+
+      if (lessonsError) {
+        throw new Error('Error fetching lessons: ' + lessonsError.message);
+      }
+
+      const customLessons: CustomLesson[] = lessonsData.map((lesson, index) => ({
+        ...lesson,
+        id: String(lesson.id),
+        status: lesson.status as 'draft' | 'published' | undefined,
+        color: getColorForIndex(index),
+        unlocked: index === 0,
+        completed: false,
+        lessonNumber: `${index + 1}`,
+        totalTopics: '5',
+        difficulty: 'Beginner',
+        customSubLessons: [
+          {
+            id: String(lesson.id),
+            title: lesson.title,
+            unlocked: index === 0,
+            completed: false,
+            duration: lesson.duration || 15,
+            description: lesson.description || ''
+          }
+        ]
+      }));
+
+      setLessons(customLessons);
+    } catch (error) {
+      logError(error);
     }
+  };
+
+  const getColorForIndex = (index: number): string => {
+    const colors = [
+      'bg-blue-500',
+      'bg-green-500',
+      'bg-purple-500',
+      'bg-orange-500',
+      'bg-pink-500'
+    ];
+    return colors[index % colors.length];
   };
 
   const handleSubLessonClick = (
     e: React.MouseEvent,
-    subLesson: SubLesson,
-    lesson: ExtendedLesson
+    subLesson: CustomSubLesson,
+    lesson: CustomLesson
   ) => {
     if (isLocked && !subLesson.unlocked) {
       e.preventDefault();
@@ -124,35 +378,36 @@ export function LearningPathTeacher() {
     setDialogOpen(true);
   };
 
-  const handleStartLesson = (lessonId: number, subLessonId: number) => {
+  const handleStartLesson = (lessonId: string, subLessonId: string) => {
     if (isLocked) return;
     setDialogOpen(false);
-    window.location.href = `/lesson/${lessonId}/${subLessonId}`;
+    navigate(`/lesson/${lessonId}/${subLessonId}`);
   };
 
-  const handleRestartLesson = (lessonId: number, subLessonId: number) => {
+  const handleRestartLesson = (lessonId: string, subLessonId: string) => {
     if (isLocked) return;
     setDialogOpen(false);
-    window.location.href = `/lesson/${lessonId}/${subLessonId}?restart=true`;
+    navigate(`/lesson/${lessonId}/${subLessonId}?restart=true`);
   };
 
-  const toggleLock = () => {
-    setIsLocked(!isLocked);
+  const handleRetry = () => {
+    window.location.reload();
   };
-
-  const lessonRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   const setLessonRef = (index: number) => (el: HTMLDivElement | null) => {
     lessonRefs.current[index] = el;
   };
 
+  // Intersection Observer effect
   useEffect(() => {
+    if (!lessons.length) return;
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             const lessonInView = lessons.find(
-              (lesson) => lesson.id === parseInt(entry.target.id)
+              (lesson) => lesson.id === entry.target.id
             );
             if (lessonInView) {
               setSelectedLesson(lessonInView);
@@ -178,18 +433,54 @@ export function LearningPathTeacher() {
     };
   }, [lessons]);
 
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="text-center space-y-4">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+          <p className="text-muted-foreground">Loading learning path...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (fetchError) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="text-center space-y-4 p-6 bg-destructive/10 rounded-lg">
+          <Shield className="h-8 w-8 text-destructive mx-auto" />
+          <p className="text-destructive font-medium">{fetchError}</p>
+          <Button 
+            variant="outline" 
+            onClick={handleRetry}
+            className="mt-4"
+          >
+            <RotateCcw className="h-4 w-4 mr-2" />
+            Retry
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-6xl w-full relative">
       <div className="flex items-center justify-between mb-4">
-        <ClassHeader
-          classes={classesData}
-          selectedClass={selectedClass}
-          onClassChange={handleClassChange}
-        />
+        <div className="flex gap-4 overflow-x-auto pb-2">
+          {classes.map(classData => (
+            <ClassCard
+              key={classData.id}
+              classData={classData}
+              isSelected={selectedClass?.id === classData.id}
+              onClassChange={handleClassChange}
+              logError={logError}
+            />
+          ))}
+        </div>
         <Button
           variant="outline"
           size="sm"
-          onClick={toggleLock}
+          onClick={() => setIsLocked(!isLocked)}
           className={cn(
             "ml-4 transition-colors",
             isLocked && "border-primary text-primary hover:bg-primary/10"
@@ -225,23 +516,24 @@ export function LearningPathTeacher() {
               <div className="flex items-center space-x-2">
                 <Users size={16} className="text-blue-300" />
                 <span className="text-sm font-medium">
-                  {selectedClass?.studentIds?.length}/
-                  {selectedClass?.maxStudents} Students
+                  {classStudents.length} Students
                 </span>
               </div>
               <div className="flex items-center space-x-2">
                 <BookOpen size={16} className="text-green-300" />
                 <span className="text-sm font-medium">
-                  {selectedClass?.lessonIds?.length} Lessons
+                  {lessons.length} Lessons
                 </span>
               </div>
               <div className="flex items-center space-x-2">
                 <Calendar size={16} className="text-purple-300" />
                 <span className="text-sm font-medium">
-                  {selectedClass?.assignments?.length} Assignments
+                  0 Assignments
                 </span>
               </div>
-              <div className="text-sm mt-2">70% Completed</div>
+              <div className="text-sm mt-2">
+                {Math.round((lessons.filter(l => l.completed).length / lessons.length) * 100)}% Completed
+              </div>
             </div>
           </CardHeader>
         </Card>
@@ -321,12 +613,10 @@ export function LearningPathTeacher() {
                   />
                   <div className="flex-1">
                     <h3 className="font-medium">{student.name}</h3>
-                    <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
-                      <div
-                        className="bg-indigo-600 h-2 rounded-full"
-                        style={{ width: `${student.progress}%` }}
-                      />
-                    </div>
+                    <div 
+                      className={`progress-bar`}
+                      data-progress={`${student.progress}`}
+                    />
                   </div>
                   <span className="text-lg font-semibold">
                     {student.progress}%
@@ -339,44 +629,46 @@ export function LearningPathTeacher() {
       </div>
 
       <div className="sticky top-0 z-30 w-full">
-        <Card className={`${selectedLesson.color} text-white rounded-xl`}>
-          <CardHeader className="p-2 md:p-4 md:pl-6">
-            <CardTitle className="text-2xl">{selectedLesson.title}</CardTitle>
-            <div className="flex flex-row md:flex-row items-center text-white text-sm space-y-2 md:space-y-0 md:space-x-4 md:p-2">
-              <div className="flex items-center space-x-2">
-                <BookOpen className="h-5 w-5 text-white" />
-                <div className="text-sm font-medium">
-                  {selectedClass?.name}{" "}
-                </div>
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <span>Lesson {selectedLesson.lessonNumber}</span>
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <span className="flex items-center space-x-1">
-                  <Clock className="h-5 w-5 text-white" />
-                  <span>{selectedLesson.duration} minutes</span>
-                </span>
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <span className="flex items-center space-x-1">
+        {selectedLesson && (
+          <Card className={`${selectedLesson.color} text-white rounded-xl`}>
+            <CardHeader className="p-2 md:p-4 md:pl-6">
+              <CardTitle className="text-2xl">{selectedLesson.title}</CardTitle>
+              <div className="flex flex-row md:flex-row items-center text-white text-sm space-y-2 md:space-y-0 md:space-x-4 md:p-2">
+                <div className="flex items-center space-x-2">
                   <BookOpen className="h-5 w-5 text-white" />
-                  <span>{selectedLesson.totalTopics} Topics</span>
-                </span>
-              </div>
+                  <div className="text-sm font-medium">
+                    {selectedClass?.name}{" "}
+                  </div>
+                </div>
 
-              <div className="flex items-center space-x-2">
-                <div className="flex items-center space-x-1">
-                  <CheckCircle2 className="h-5 w-5 text-white" />
-                  <span>1/5 Completed</span>
+                <div className="flex items-center space-x-2">
+                  <span>Lesson {selectedLesson.lessonNumber}</span>
+                </div>
+
+                <div className="flex items-center space-x-2">
+                  <span className="flex items-center space-x-1">
+                    <Clock className="h-5 w-5 text-white" />
+                    <span>{selectedLesson.duration} minutes</span>
+                  </span>
+                </div>
+
+                <div className="flex items-center space-x-2">
+                  <span className="flex items-center space-x-1">
+                    <BookOpen className="h-5 w-5 text-white" />
+                    <span>{selectedLesson.totalTopics} Topics</span>
+                  </span>
+                </div>
+
+                <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-1">
+                    <CheckCircle2 className="h-5 w-5 text-white" />
+                    <span>1/5 Completed</span>
+                  </div>
                 </div>
               </div>
-            </div>
-          </CardHeader>
-        </Card>
+            </CardHeader>
+          </Card>
+        )}
       </div>
 
       {/* Dialog */}
@@ -400,15 +692,14 @@ export function LearningPathTeacher() {
                 {selectedSubLesson?.completed && (
                   <div className="mt-4 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
                     <span className="text-green-700 dark:text-green-300 text-sm">
-                      You&apos;ve already completed this lesson!
+                      You have completed this lesson
                     </span>
                   </div>
                 )}
               </DialogDescription>
             </div>
           </DialogHeader>
-
-          <DialogFooter className="sm:justify-start gap-2">
+          <DialogFooter>
             {!selectedSubLesson?.unlocked ? (
               <span className="text-sm text-muted-foreground">
                 Complete previous lessons to unlock this content
@@ -416,10 +707,11 @@ export function LearningPathTeacher() {
             ) : selectedSubLesson.completed ? (
               <>
                 <Button
-                  onClick={() =>
-                    currentLesson?.id && selectedSubLesson?.id &&
-                    handleStartLesson(currentLesson.id, selectedSubLesson.id)
-                  }
+                  onClick={() => {
+                    if (currentLesson?.id && selectedSubLesson?.id) {
+                      handleStartLesson(currentLesson.id, selectedSubLesson.id);
+                    }
+                  }}
                   disabled={isLocked}
                 >
                   Continue
@@ -427,10 +719,11 @@ export function LearningPathTeacher() {
                 </Button>
                 <Button
                   variant="outline"
-                  onClick={() =>
-                    currentLesson?.id && selectedSubLesson?.id &&
-                    handleRestartLesson(currentLesson.id, selectedSubLesson.id)
-                  }
+                  onClick={() => {
+                    if (currentLesson?.id && selectedSubLesson?.id) {
+                      handleRestartLesson(currentLesson.id, selectedSubLesson.id);
+                    }
+                  }}
                   disabled={isLocked}
                 >
                   Restart
@@ -439,10 +732,11 @@ export function LearningPathTeacher() {
               </>
             ) : (
               <Button
-                onClick={() =>
-                  currentLesson?.id && selectedSubLesson?.id &&
-                  handleStartLesson(currentLesson.id, selectedSubLesson.id)
-                }
+                onClick={() => {
+                  if (currentLesson?.id && selectedSubLesson?.id) {
+                    handleStartLesson(currentLesson.id, selectedSubLesson.id);
+                  }
+                }}
                 disabled={isLocked}
               >
                 Start Lesson
@@ -457,69 +751,60 @@ export function LearningPathTeacher() {
       <div className="space-y-8 -z-10 pb-[100vh]">
         {lessons.map((lesson, index) => (
           <div
-            id={lesson.id.toString()}
+            id={lesson.id}
             ref={setLessonRef(index)}
             key={lesson.id}
             className="space-y-4 mb-8"
           >
-            <div className={`pt-2 pb-2 px-4 ${index === 0 && `-mt-10`}`}>
+            <div className={`pt-2 pb-2 px-4 ${index === 0 ? '-mt-10' : ''}`}>
               <div className="flex w-full justify-center">
                 <div className="flex items-center relative max-w-lg w-full">
-                  {/* Left line */}
                   <div className="flex-grow border-t border-gray-300 dark:border-gray-700"></div>
-
-                  {/* Text with dynamic color */}
-                  <div
-                    className={`${lesson.color} z-10 text-white rounded-3xl text-xl px-4`}
-                  >
+                  <div className={`${lesson.color} z-10 text-white rounded-3xl text-xl px-4`}>
                     {lesson.title}
                   </div>
-
-                  {/* Right line */}
                   <div className="flex-grow border-t border-gray-300 dark:border-gray-700"></div>
                 </div>
               </div>
             </div>
+
             <div className="flex flex-col gap-4">
-              {lesson.subLessons.map((subLesson) => (
+              {lesson.customSubLessons.map((subLesson) => (
                 <Link
-                  href={`/lesson/${lesson.id}/${subLesson.id}`}
+                  to={`/lesson/${lesson.id}/${subLesson.id}`}
                   key={subLesson.id}
                   onClick={(e) => handleSubLessonClick(e, subLesson, lesson)}
-                  className={isLocked && !subLesson.unlocked ? "pointer-events-none" : ""}
+                  className={`${isLocked && !subLesson.unlocked ? "pointer-events-none" : ""}`}
                 >
-                  <Card
-                    className={cn(
-                      "mx-4 border border-gray-200 dark:border-gray-800 rounded-3xl bg-white dark:bg-gray-900 overflow-hidden cursor-pointer hover:shadow-md transition-shadow",
-                      !subLesson.unlocked && "opacity-50",
-                      isLocked && !subLesson.unlocked && "cursor-not-allowed"
-                    )}
-                  >
-                    <CardHeader className="pb-0">
-                      <CardTitle className="flex items-center justify-between text-lg">
-                        <span className="text-xl">{subLesson.title}</span>
-                        {subLesson.unlocked ? (
-                          <Unlock className="h-5 w-5 text-green-500" />
-                        ) : (
-                          <Lock className="h-5 w-5" />
-                        )}
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="relative">
-                      <Progress
-                        value={subLesson.completed ? 100 : 0}
-                        className="w-full absolute bottom-0 -ml-6"
-                      />
-                      <p className="mt-2 text-sm text-gray-600">
-                        {subLesson.completed
-                          ? "Completed"
-                          : subLesson.unlocked
-                          ? "Ready to start"
-                          : "Locked"}
-                      </p>
-                      <p className="mt-1 text-xs text-gray-500">
-                        Estimated time: 15 minutes
-                      </p>
+                  <Card className={cn(
+                    "hover:border-primary transition-colors",
+                    !subLesson.unlocked && "opacity-50"
+                  )}>
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          {subLesson.unlocked ? (
+                            <BookOpen className="h-5 w-5 text-primary" />
+                          ) : (
+                            <Lock className="h-5 w-5 text-muted-foreground" />
+                          )}
+                          <div>
+                            <h3 className="font-medium">{subLesson.title}</h3>
+                            <p className="text-sm text-muted-foreground">
+                              {subLesson.description}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-4">
+                          <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                            <Clock className="h-4 w-4" />
+                            {subLesson.duration} min
+                          </div>
+                          {subLesson.completed && (
+                            <CheckCircle2 className="h-5 w-5 text-green-500" />
+                          )}
+                        </div>
+                      </div>
                     </CardContent>
                   </Card>
                 </Link>

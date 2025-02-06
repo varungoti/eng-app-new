@@ -1,13 +1,26 @@
 import { ROLE_PERMISSIONS } from '../types/roles';
-//import { LayoutDashboard } from '@lucide-react';
-import { APP_ICONS } from '@/lib/constants/icons';
+import { 
+  LayoutDashboard,
+  Settings,
+  Users,
+  BookOpen,
+  FolderPlus,
+  GraduationCap,
+  FileText,
+  BarChart,
+  type LucideIcon 
+} from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
+import {   Home,   DollarSign, Eye, Code, Server, Calendar, AlertTriangle, FileBarChart, CalendarDays, Building,} from 'lucide-react';
+import { TEACHER_ROUTES } from './content/routes';
+  // ... import other icons you need
+
 
 // Add type for sidebar consumption
 export interface SidebarItem {
   label: string;
   href: string;
-  icon: keyof typeof APP_ICONS;
+  icon: LucideIcon;
   isActive: boolean;
 }
 
@@ -29,7 +42,7 @@ export const getNavigationItems = (role: string, pathname: string = ''): Sidebar
   navigationItems.push({
     label: 'Dashboard',
     href: '/dashboard',
-    icon: 'LAYOUT_DASHBOARD',
+    icon: LayoutDashboard,
     isActive: pathname === '/dashboard'
   });
 
@@ -42,7 +55,7 @@ export const getNavigationItems = (role: string, pathname: string = ''): Sidebar
     navigationItems.push({
       label: 'Content Management',
       href: '/content-management/index',
-      icon: 'CONTENT_MANAGEMENT',
+      icon: FolderPlus,
       isActive: pathname === '/content-management/index'
     });
 
@@ -61,8 +74,25 @@ export const getNavigationItems = (role: string, pathname: string = ''): Sidebar
     navigationItems.push({
       label: 'Schools',
       href: '/schools',
-      icon: 'BUILDING',
+      icon: Building,
       isActive: pathname === '/schools'
+    });
+  }
+  if (permissions.staff) {
+    navigationItems.push({
+      label: 'Staff',
+      href: '/staff',
+      icon: Users,
+      isActive: pathname === '/staff'
+    });
+  } 
+  
+  if (permissions.myclasses) {
+    navigationItems.push({
+      label: 'My Classes',
+      href: TEACHER_ROUTES.LESSONS,
+      icon: Users,
+      isActive: pathname === TEACHER_ROUTES.LESSONS
     });
   }
 
@@ -71,7 +101,7 @@ export const getNavigationItems = (role: string, pathname: string = ''): Sidebar
     navigationItems.push({
       label: 'Students',
       href: '/students',
-      icon: 'USERS',
+      icon: Users,
       isActive: pathname === '/students'
     });
   }
@@ -80,7 +110,7 @@ export const getNavigationItems = (role: string, pathname: string = ''): Sidebar
     navigationItems.push({
       label: 'Sales',
       href: '/sales',
-      icon: 'DOLLAR_SIGN',
+      icon: DollarSign,
       isActive: pathname === '/sales'
     });
   }
@@ -89,14 +119,14 @@ export const getNavigationItems = (role: string, pathname: string = ''): Sidebar
     navigationItems.push({
       label: 'Content',
       href: '/content/view',
-      icon: 'EYE',
+      icon: Eye,
       isActive: pathname === '/content/view'
     });
   } else if (permissions.content_editor) {
     navigationItems.push({
       label: 'Lessons',
       href: '/content/lessons',
-      icon: 'FILE_TEXT',
+      icon: FileText,
       isActive: pathname === '/content/lessons'
     });
   }
@@ -105,7 +135,7 @@ export const getNavigationItems = (role: string, pathname: string = ''): Sidebar
     navigationItems.push({
       label: 'Development',
       href: '/development',
-      icon: 'CODE',
+      icon: Code,
       isActive: pathname === '/development'
     });
   }
@@ -114,7 +144,7 @@ export const getNavigationItems = (role: string, pathname: string = ''): Sidebar
     navigationItems.push({
       label: 'Infrastructure',
       href: '/infrastructure',
-      icon: 'SERVER',
+      icon: Server,
       isActive: pathname === '/infrastructure'
     });
   }
@@ -123,7 +153,7 @@ export const getNavigationItems = (role: string, pathname: string = ''): Sidebar
     navigationItems.push({
       label: 'Finance',
       href: '/finance',
-      icon: 'DOLLAR_SIGN',
+      icon: DollarSign,
       isActive: pathname === '/finance'
     });
   }
@@ -132,7 +162,7 @@ export const getNavigationItems = (role: string, pathname: string = ''): Sidebar
     navigationItems.push({
       label: 'Staff',
       href: '/staff',
-      icon: 'FILE_TEXT',
+      icon: FileText,
       isActive: pathname === '/staff'
     });
   }
@@ -141,7 +171,7 @@ export const getNavigationItems = (role: string, pathname: string = ''): Sidebar
     navigationItems.push({
       label: 'Schedule',
       href: '/schedule',
-      icon: 'CALENDAR',
+      icon: Calendar,
       isActive: pathname === '/schedule'
     });
   }
@@ -150,7 +180,7 @@ export const getNavigationItems = (role: string, pathname: string = ''): Sidebar
     navigationItems.push({
       label: 'Reports',
       href: '/reports',
-      icon: 'FILE_BAR_CHART',
+      icon: BarChart,
       isActive: pathname === '/reports'
     });
   }
@@ -158,7 +188,7 @@ export const getNavigationItems = (role: string, pathname: string = ''): Sidebar
   navigationItems.push({
     label: 'Events',
     href: '/events',
-    icon: 'CALENDAR_DAYS',
+    icon: CalendarDays,
     isActive: pathname === '/events'
   });
 
@@ -166,7 +196,7 @@ export const getNavigationItems = (role: string, pathname: string = ''): Sidebar
     navigationItems.push({
       label: 'Error Test',
       href: '/error-test',
-      icon: 'ALERT_TRIANGLE',
+      icon: AlertTriangle,
       isActive: pathname === '/error-test'
     });
   }
@@ -175,7 +205,7 @@ export const getNavigationItems = (role: string, pathname: string = ''): Sidebar
     navigationItems.push({
       label: 'Settings',
       href: '/settings',
-      icon: 'SETTINGS',
+      icon: Settings,
       isActive: pathname === '/settings'
     });
   }

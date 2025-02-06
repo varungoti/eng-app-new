@@ -1,6 +1,7 @@
 import { useContext } from 'react';
 import { AuthContext } from '../contexts/AuthContext';
-import { ROLE_PERMISSIONS, Permissions } from '../types/roles';
+import { ROLE_PERMISSIONS } from '../types/roles';
+import type { Permissions } from '../types/roles';
 
 export const usePermissions = () => {
   const { user } = useContext(AuthContext);
@@ -12,3 +13,9 @@ export const usePermissions = () => {
 
   return { can };
 };
+
+export interface IPermissions {
+  analytics: boolean;
+  query: boolean;
+  // ... other permissions
+}

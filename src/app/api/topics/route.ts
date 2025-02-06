@@ -28,4 +28,47 @@ export async function GET(request: Request) {
       { status: 500 }
     );
   }
+}
+
+export async function POST(request: Request) {
+  try {
+    const body = await request.json();
+    const { title, description, courseId, gradeId } = body;
+
+    if (!title || !courseId || !gradeId) {
+      return NextResponse.json(
+        { error: 'Title, course ID, and grade ID are required' },
+        { status: 400 }
+      );
+    }
+
+    const { data, error } = await supabase
+      .from('topics')
+      .insert([{
+        title,
+        description,
+        course_id: courseId,
+        grade_id: gradeId,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      }])
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Supabase error:', error);
+      return NextResponse.json(
+        { error: error.message },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({ success: true, data });
+  } catch (error) {
+    console.error('Error creating topic:', error);
+    return NextResponse.json(
+      { error: 'Failed to create topic' },
+      { status: 500 }
+    );
+  }
 } 

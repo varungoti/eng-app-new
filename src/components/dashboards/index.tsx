@@ -1,9 +1,8 @@
 import React from 'react';
 import type { RoleSettings } from '../../types/dashboard';
-
-interface DashboardProps {
-  settings: RoleSettings;
-}
+import { FileText, CheckCircle, Clock, Edit, Badge } from 'lucide-react';
+import { Badge as ShadcnBadge } from "@/components/ui/badge";
+import { DashboardProps } from '@/types/dashboard';
 
 export const ContentHeadDashboard: React.FC<DashboardProps> = ({ settings }) => {
   return (
@@ -110,7 +109,108 @@ export const ContentHeadDashboard: React.FC<DashboardProps> = ({ settings }) => 
 
 export const ContentEditorDashboard: React.FC<DashboardProps> = ({ settings }) => {
   return (
-    // ... implementation
+    <div className="p-6">
+      <div className="grid gap-6 mb-8 md:grid-cols-2 xl:grid-cols-4">
+        <div className="flex items-center p-4 bg-white rounded-lg shadow">
+          <div className="p-3 mr-4 bg-blue-100 rounded-full">
+            <FileText className="w-5 h-5 text-blue-500" />
+          </div>
+          <div>
+            <p className="mb-2 text-sm font-medium text-gray-600">
+              Content Pieces
+            </p>
+            <p className="text-lg font-semibold text-gray-700">
+              {settings.stats?.totalContent || 0}
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center p-4 bg-white rounded-lg shadow">
+          <div className="p-3 mr-4 bg-green-100 rounded-full">
+            <CheckCircle className="w-5 h-5 text-green-500" />
+          </div>
+          <div>
+            <p className="mb-2 text-sm font-medium text-gray-600">
+              Approved Content
+            </p>
+            <p className="text-lg font-semibold text-gray-700">
+              {settings.stats?.approvedContent || 0}
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center p-4 bg-white rounded-lg shadow">
+          <div className="p-3 mr-4 bg-yellow-100 rounded-full">
+            <Clock className="w-5 h-5 text-yellow-500" />
+          </div>
+          <div>
+            <p className="mb-2 text-sm font-medium text-gray-600">
+              Pending Review
+            </p>
+            <p className="text-lg font-semibold text-gray-700">
+              {settings.stats?.pendingReviews || 0}
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center p-4 bg-white rounded-lg shadow">
+          <div className="p-3 mr-4 bg-purple-100 rounded-full">
+            <Edit className="w-5 h-5 text-purple-500" />
+          </div>
+          <div>
+            <p className="mb-2 text-sm font-medium text-gray-600">
+              Draft Content
+            </p>
+            <p className="text-lg font-semibold text-gray-700">
+              {settings.stats?.draftContent || 0}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid gap-6 mb-8 md:grid-cols-2">
+        <div className="min-w-0 p-4 bg-white rounded-lg shadow">
+          <h4 className="mb-4 font-semibold text-gray-800">Recent Content</h4>
+          <div className="w-full overflow-hidden">
+            {settings.recentContent?.map((content, i) => (
+              <div key={i} className="mb-4 p-3 bg-gray-50 rounded">
+                <div className="flex items-center justify-between">
+                  <p className="font-medium text-gray-700">{content.title}</p>
+                  <ShadcnBadge variant={content.status === 'approved' ? 'success' : 'warning'}>
+                    {content.status}
+                  </ShadcnBadge>
+                </div>
+                <p className="text-sm text-gray-600 mt-1">{content.lastModified}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="min-w-0 p-4 bg-white rounded-lg shadow">
+          <h4 className="mb-4 font-semibold text-gray-800">Content Categories</h4>
+          <div className="w-full">
+            {settings.contentCategories?.map((category, i) => (
+              <div key={i} className="mb-4">
+                <div className="flex justify-between mb-1">
+                  <span className="text-sm font-medium text-gray-700">
+                    {category.name}
+                  </span>
+                  <span className="text-sm font-medium text-gray-700">
+                    {category.count}
+                  </span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div
+                    className="bg-blue-600 h-2 rounded-full"
+                    style={{ width: `${category.percentage}%` }}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 

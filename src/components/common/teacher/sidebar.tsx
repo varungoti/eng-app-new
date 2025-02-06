@@ -18,7 +18,7 @@ export function Sidebar({ course, onSelectExercise }: SidebarProps) {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
   const { data: lessonData } = useLesson(selectedLesson as string);
-  // const { data: teacherData } = useTeacherData('mrmftgf6ooqptvw7hu8ki8uy');
+  // const { data: teacherData } = useTeacherData('');
 
   // const toggleLesson = (lessonId: string) => {
   //   setExpandedLessons((prev) =>

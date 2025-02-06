@@ -1,7 +1,9 @@
+"use client";
+
 'use client';
 
 import React from 'react';
-import { useTheme } from '@/contexts/ThemeContext';
+import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icons';
 
