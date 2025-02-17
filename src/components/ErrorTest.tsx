@@ -7,11 +7,8 @@ import { DEBUG_CONFIG } from '../lib/config';
 
 // Component that throws an error
 const BuggyComponent: React.FC = () => {
-  logger.warn('BuggyComponent will throw a test error', {
-    source: 'ErrorTest'
-  });
+  logger.warn('BuggyComponent will throw a test error', 'ErrorTest');
   throw new Error('This is a simulated component error');
-  return null;
 };
 
 const ErrorTest: React.FC = () => {

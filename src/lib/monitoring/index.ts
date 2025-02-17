@@ -4,19 +4,21 @@ import { DataLoadMonitor } from './DataLoadMonitor';
 import { LoadingMonitor } from './LoadingMonitor';
 import { supabase } from '../supabase';
 import type { MonitoringConfig as Config } from './types';
+import { logger } from '../logger';
 
-const config = {
+
+export const config = {
   supabase,
   enableLogging: true,
   logLevel: 'info' as const,
   sampleRate: import.meta.env.DEV ? 1 : 0.1
 };
-
 const monitors = {
-  databaseMonitor: new DatabaseMonitor(supabase, config),
-  dataFlowMonitor: new DataFlowMonitor(supabase, config),
-  dataLoadMonitor: new DataLoadMonitor(supabase, config),
-  loadingMonitor: new LoadingMonitor(supabase)
+  databaseMonitor: new DatabaseMonitor(config),
+  dataFlowMonitor: new DataFlowMonitor(supabase, config, logger), 
+  dataLoadMonitor: new DataLoadMonitor(config),
+  loadingMonitor: new LoadingMonitor(supabase, config)
+
 } as const;
 
 export { monitors };

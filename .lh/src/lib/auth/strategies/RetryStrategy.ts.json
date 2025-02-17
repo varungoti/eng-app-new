@@ -1,0 +1,22 @@
+{
+    "sourceFile": "src/lib/auth/strategies/RetryStrategy.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1739025423703,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1739025441145,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,5 +1,6 @@\n import { logger } from '../../logger';\r\n+import { FallbackStrategy } from './FallbackStrategy';\r\n \r\n export interface RetryConfig {\r\n   maxAttempts: number;\r\n   baseDelay: number;\r\n"
+                }
+            ],
+            "date": 1739025423703,
+            "name": "Commit-0",
+            "content": "import { logger } from '../../logger';\r\n\r\nexport interface RetryConfig {\r\n  maxAttempts: number;\r\n  baseDelay: number;\r\n  maxDelay: number;\r\n  timeout: number;\r\n}\r\n\r\nconst DEFAULT_CONFIG: RetryConfig = {\r\n  maxAttempts: 2, // Reduced from 3\r\n  baseDelay: 300, // Reduced from 500\r\n  maxDelay: 1000, // Reduced from 2000\r\n  timeout: 2000 // Reduced from 3000\r\n};\r\n\r\nexport class RetryStrategy {\r\n  private config: RetryConfig;\r\n\r\n  constructor(config: Partial<RetryConfig> = {}) {\r\n    this.config = { ...DEFAULT_CONFIG, ...config };\r\n  }\r\n\r\n  async execute<T>(operation: () => Promise<T>): Promise<T> {\r\n    let attempt = 0;\r\n    let lastError: Error | null = null;\r\n\r\n    while (attempt < this.config.maxAttempts) {\r\n      try {\r\n        // Add session recovery before each attempt\r\n        if (attempt > 0) {\r\n          await this.attemptSessionRecovery();\r\n        }\r\n\r\n        const controller = new AbortController();\r\n        const timeoutId = setTimeout(() => controller.abort(), this.config.timeout);\r\n\r\n        try {\r\n          const result = await Promise.race([\r\n            operation(),\r\n            new Promise<never>((_, reject) => {\r\n              controller.signal.addEventListener('abort', () => {\r\n                reject(new Error(`Operation timeout after ${this.config.timeout}ms`));\r\n              });\r\n            })\r\n          ]);\r\n\r\n          clearTimeout(timeoutId);\r\n          return result;\r\n        } catch (err) {\r\n          clearTimeout(timeoutId);\r\n          throw err;\r\n        }\r\n      } catch (err) {\r\n        lastError = err instanceof Error ? err : new Error(String(err));\r\n        attempt++;\r\n\r\n        if (attempt < this.config.maxAttempts) {\r\n          const delay = Math.min(\r\n            this.config.baseDelay * Math.pow(1.5, attempt),\r\n            this.config.maxDelay\r\n          );\r\n\r\n          logger.debug(`Retrying operation (attempt ${attempt + 1}/${this.config.maxAttempts}) - delay: ${delay}ms`, 'RetryStrategy');\r\n\r\n          await new Promise(resolve => setTimeout(resolve, delay));\r\n          continue;\r\n        }\r\n      }\r\n    }\r\n\r\n    throw lastError;\r\n  }\r\n\r\n  private async attemptSessionRecovery() {\r\n    try {\r\n      const { data } = await FallbackStrategy.refreshSession();\r\n      if (data.session) {\r\n        logger.info('Session recovered successfully', 'RetryStrategy');\r\n        return true;\r\n      }\r\n    } catch {\r\n      return false;\r\n    }\r\n  }\r\n}"
+        }
+    ]
+}

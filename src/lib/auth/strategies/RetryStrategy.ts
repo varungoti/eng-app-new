@@ -1,4 +1,5 @@
 import { logger } from '../../logger';
+import { FallbackStrategy } from './FallbackStrategy';
 
 export interface RetryConfig {
   maxAttempts: number;
@@ -27,6 +28,11 @@ export class RetryStrategy {
 
     while (attempt < this.config.maxAttempts) {
       try {
+        // Add session recovery before each attempt
+        if (attempt > 0) {
+          await this.attemptSessionRecovery();
+        }
+
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), this.config.timeout);
 
@@ -56,10 +62,7 @@ export class RetryStrategy {
             this.config.maxDelay
           );
 
-          logger.debug(`Retrying operation (attempt ${attempt + 1}/${this.config.maxAttempts})`, {
-            context: { delay },
-            source: 'RetryStrategy'
-          });
+          logger.debug(`Retrying operation (attempt ${attempt + 1}/${this.config.maxAttempts}) - delay: ${delay}ms`, 'RetryStrategy');
 
           await new Promise(resolve => setTimeout(resolve, delay));
           continue;
@@ -68,5 +71,17 @@ export class RetryStrategy {
     }
 
     throw lastError;
+  }
+
+  private async attemptSessionRecovery() {
+    try {
+      const { data } = await FallbackStrategy.refreshSession();
+      if (data.session) {
+        logger.info('Session recovered successfully', 'RetryStrategy');
+        return true;
+      }
+    } catch {
+      return false;
+    }
   }
 }

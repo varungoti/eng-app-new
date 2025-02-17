@@ -204,10 +204,7 @@ class DataCache {
         timestamp: Date.now()
       });
     } catch (err) {
-      logger.error('Failed to cache data', {
-        context: { error: err, key },
-        source: 'DataCache'
-      });
+      logger.error(`Failed to cache data for key ${key}: ${err}`, 'DataCache');
     }
   }
 
@@ -223,10 +220,7 @@ class DataCache {
 
       return cached.data;
     } catch (err) {
-      logger.error('Failed to retrieve cached data', {
-        context: { error: err, key },
-        source: 'DataCache'
-      });
+      logger.error(`Failed to retrieve cached data for key ${key}: ${err}`, 'DataCache');
       return null;
     }
   }

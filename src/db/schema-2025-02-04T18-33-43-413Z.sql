@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS exercise_prompts (
   updated_at timestamp with time zone NOT NULL DEFAULT timezone('utc'::text, now()),
   user_id uuid,
   order_index bigint NOT NULL,
+  voice_id uuid REFERENCES voices(id),
   CONSTRAINT exercise_prompts_pkey PRIMARY KEY,
   CONSTRAINT exercise_prompts_question_id_fkey FOREIGN KEY,
   CONSTRAINT exercise_prompts_type_check CHECK,
@@ -374,6 +375,7 @@ CREATE TABLE IF NOT EXISTS lessons (
   prerequisites ARRAY DEFAULT '{}'::uuid[],
   total_topics integer DEFAULT 0,
   difficulty character varying DEFAULT 'beginner'::character varying,
+  voice_id uuid REFERENCES voices(id),
   CONSTRAINT lessons_grade_id_fkey FOREIGN KEY,
   CONSTRAINT lessons_pkey PRIMARY KEY,
   CONSTRAINT lessons_subtopic_id_fkey FOREIGN KEY,
@@ -436,6 +438,7 @@ CREATE TABLE IF NOT EXISTS questions (
   correct_answer text,
   user_id uuid,
   exercise_prompts ARRAY DEFAULT ARRAY[]::jsonb[],
+  voice_id uuid REFERENCES voices(id),
   CONSTRAINT questions_lesson_id_fkey FOREIGN KEY,
   CONSTRAINT questions_pkey PRIMARY KEY,
   CONSTRAINT questions_user_id_fkey FOREIGN KEY,
@@ -754,6 +757,7 @@ CREATE TABLE IF NOT EXISTS activities (
   data jsonb DEFAULT jsonb_build_object('prompt', '', 'teacherScript', '', 'media', ARRAY[]::text[]),
   media ARRAY DEFAULT ARRAY[]::jsonb[],
   order_index bigint NOT NULL,
+  voice_id uuid REFERENCES voices(id),
   CONSTRAINT activities_lesson_id_fkey FOREIGN KEY,
   CONSTRAINT activities_pkey PRIMARY KEY,
   CONSTRAINT activities_type_check CHECK,
@@ -1053,6 +1057,61 @@ CREATE TABLE IF NOT EXISTS calendar_events (
   CONSTRAINT 2200_36877_8_not_null CHECK,
   CONSTRAINT 2200_36877_9_not_null CHECK
 );
+
+-- Table: voices
+CREATE TABLE IF NOT EXISTS voices (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  name text NOT NULL,
+  description text,
+  language text NOT NULL,
+  gender text NOT NULL CHECK (gender IN ('male', 'female')),
+  sample_url text NOT NULL,
+  is_default boolean DEFAULT false,
+  school_id uuid NOT NULL,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT voices_pkey PRIMARY KEY (id),
+  CONSTRAINT voices_school_id_fkey FOREIGN KEY (school_id) REFERENCES schools(id),
+  CONSTRAINT voices_school_id_is_default_key UNIQUE (school_id, is_default) 
+    WHERE is_default = true -- Only one default voice per school
+);
+
+-- Create indexes for voices
+CREATE INDEX IF NOT EXISTS idx_voices_school_id ON voices(school_id);
+CREATE INDEX IF NOT EXISTS idx_voices_is_default ON voices(is_default);
+
+-- Add voice_id to lessons table
+ALTER TABLE lessons ADD COLUMN IF NOT EXISTS voice_id uuid REFERENCES voices(id);
+
+-- Add voice_id to activities table
+ALTER TABLE activities ADD COLUMN IF NOT EXISTS voice_id uuid REFERENCES voices(id);
+
+-- Add voice_id to questions table
+ALTER TABLE questions ADD COLUMN IF NOT EXISTS voice_id uuid REFERENCES voices(id);
+
+-- Add voice_id to exercise_prompts table
+ALTER TABLE exercise_prompts ADD COLUMN IF NOT EXISTS voice_id uuid REFERENCES voices(id);
+
+-- Create function to ensure only one default voice per school
+CREATE OR REPLACE FUNCTION ensure_single_default_voice()
+RETURNS TRIGGER AS $$
+BEGIN
+  IF NEW.is_default THEN
+    UPDATE voices
+    SET is_default = false
+    WHERE school_id = NEW.school_id
+      AND id != NEW.id
+      AND is_default = true;
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Create trigger for voices table
+CREATE TRIGGER ensure_single_default_voice_trigger
+BEFORE INSERT OR UPDATE ON voices
+FOR EACH ROW
+EXECUTE FUNCTION ensure_single_default_voice();
 
 -- New Tables for AI Integration
 

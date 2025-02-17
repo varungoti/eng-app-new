@@ -46,12 +46,10 @@ class ConnectionManager {
         throw new Error('Failed to establish initial connection');
       }
     } catch (err) {
-      logger.error('Failed to initialize connection manager', {
-        context: { error: err },
-        source: 'ConnectionManager'
-      });
+      logger.error('Failed to initialize connection manager', 'ConnectionManager', err);
       throw err;
     }
+
   }
 
   public startMonitoring() {
@@ -70,9 +68,9 @@ class ConnectionManager {
 
   private startHealthChecks() {
     if (this.healthCheckTimer) {
-      window.clearInterval(this.healthCheckTimer);
+      clearInterval(this.healthCheckTimer);
     }
-    this.healthCheckTimer = window.setInterval(
+    this.healthCheckTimer = setInterval(
       () => this.checkConnection(),
       this.HEALTH_CHECK_INTERVAL
     );
@@ -91,38 +89,34 @@ class ConnectionManager {
           lastConnected: new Date(),
           reconnectAttempts: 0
         });
-        logger.info('Connection check successful', {
-          source: 'ConnectionManager'
-        });
+        logger.info('Connection check successful', 'ConnectionManager');
+
       }
 
       return isConnected;
     } catch (err) {
       this.updateState({ isConnected: false });
-      logger.error('Connection check failed', {
-        context: { error: err },
-        source: 'ConnectionManager'
-      });
+      logger.error('Connection check failed', 'ConnectionManager', err);
       return false;
+
     }
   }
 
   private async handleOnline() {
-    logger.info('Device came online', { source: 'ConnectionManager' });
+    logger.info('Device came online', 'ConnectionManager');
     await this.attemptReconnect();
   }
 
+
   private handleOffline() {
-    logger.warn('Device went offline', { source: 'ConnectionManager' });
+    logger.warn('Device went offline', 'ConnectionManager');
     this.updateState({ isConnected: false });
   }
 
+
   private async attemptReconnect(): Promise<boolean> {
     if (this.state.reconnectAttempts >= this.MAX_RECONNECT_ATTEMPTS) {
-      logger.error('Max reconnection attempts reached', {
-        context: { attempts: this.state.reconnectAttempts },
-        source: 'ConnectionManager'
-      });
+      logger.error(`Max reconnection attempts reached: ${this.state.reconnectAttempts}`, 'ConnectionManager');
       return false;
     }
 
@@ -173,7 +167,7 @@ class ConnectionManager {
 
   public cleanup() {
     if (this.healthCheckTimer) {
-      window.clearInterval(this.healthCheckTimer);
+      clearInterval(this.healthCheckTimer);
     }
     this.listeners.clear();
     this.initialized = false;

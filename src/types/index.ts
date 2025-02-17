@@ -261,8 +261,11 @@ export interface Lesson {
     activities?: Record<string, any>;
   };
   completed_at?: string;
-  difficulty_level?: string;
+  difficulty?: 'beginner' | 'intermediate' | 'advanced';
+  voice_id?: string;
+  total_questions?: number;
 }
+
 
 export interface LessonProgress {
   id: string;

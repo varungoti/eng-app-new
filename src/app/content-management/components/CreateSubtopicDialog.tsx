@@ -20,7 +20,7 @@ export function CreateSubtopicDialog({ open, onOpenChange, topicId }: CreateSubt
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  const { mutate: createSubtopic, isLoading } = useMutation({
+  const { mutate: createSubtopic, isPending: isLoading } = useMutation({
     mutationFn: async () => {
       return contentService.createSubtopic({
         title,
@@ -32,19 +32,19 @@ export function CreateSubtopicDialog({ open, onOpenChange, topicId }: CreateSubt
       toast({
         title: 'Subtopic created successfully',
         description: 'The subtopic has been created and is now available in the content hierarchy.',
-        variant: 'default'
       });
       onOpenChange(false);
       setTitle('');
+
     },
     onError: (error) => {
       toast({
         title: 'Failed to create subtopic',
         description: error instanceof Error ? error.message : 'Failed to create subtopic',
-        variant: 'destructive'
       });
     },
   });
+
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,10 +52,10 @@ export function CreateSubtopicDialog({ open, onOpenChange, topicId }: CreateSubt
       toast({
         title: 'Title is required',
         description: 'Please enter a title for the subtopic.',
-        variant: 'destructive'
       });
       return;
     }
+
     createSubtopic();
   };
 

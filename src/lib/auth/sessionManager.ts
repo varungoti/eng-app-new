@@ -47,16 +47,11 @@ class SessionManager {
         throw new Error('Session validation failed after role update');
       }
 
-      logger.info('Role updated successfully', {
-        context: { newRole },
-        source: 'SessionManager'
-      });
+      logger.info(`Role updated successfully to ${newRole}`, 'SessionManager');
     } catch (err) {
-      logger.error('Failed to update role', {
-        context: { error: err, newRole },
-        source: 'SessionManager'
-      });
+      logger.error(`Failed to update role: ${err instanceof Error ? err.message : String(err)}`, 'SessionManager');
       throw err;
+
     }
   }
 
@@ -93,21 +88,15 @@ class SessionManager {
 
       localStorage.setItem('sb-auth-token', JSON.stringify(sessionData));
 
-      logger.info('Session refreshed successfully', {
-        context: { 
-          expiresAt: expiryDate.toISOString()
-        },
-        source: 'SessionManager'
-      });
+      logger.info(`Session refreshed successfully with expiry ${expiryDate.toISOString()}`, 'SessionManager');
+
 
       return session;
     } catch (err) {
-      logger.error('Failed to refresh session', {
-        context: { error: err },
-        source: 'SessionManager'
-      });
+      logger.error(`Failed to refresh session: ${err instanceof Error ? err.message : String(err)}`, 'SessionManager');
       throw err;
     }
+
   }
 }
 

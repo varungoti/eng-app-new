@@ -49,24 +49,19 @@ export class InitializationStrategy {
           setTimeout(() => reject(new Error('Auth timeout')), AUTH_TIMEOUT)
         )
       ]).catch(err => {
-        logger.debug('Auth initialization timed out, continuing with null session', {
-          context: { error: err },
-          source: 'InitializationStrategy'
-        });
+        logger.debug(`Auth initialization timed out: ${err instanceof Error ? err.message : String(err)}`, 'InitializationStrategy');
         return { data: { session: null }, error: null };
       });
 
-      if (result.data.session) {
-        this.cacheStrategy.set(AUTH_CACHE_KEY, result.data.session);
+      if ((result as { data: { session: any } }).data.session) {
+        this.cacheStrategy.set(AUTH_CACHE_KEY, (result as { data: { session: any } }).data.session);
       }
 
       loader.complete();
     } catch (err) {
       loader.error(err instanceof Error ? err : new Error(String(err)));
-      logger.debug('Auth initialization failed, continuing with null session', {
-        context: { error: err },
-        source: 'InitializationStrategy' 
-      });
+      logger.debug(`Auth initialization failed: ${err instanceof Error ? err.message : String(err)}`, 'InitializationStrategy');
     }
+
   }
 }

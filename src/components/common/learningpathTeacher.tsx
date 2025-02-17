@@ -3,12 +3,14 @@
 import { useEffect, useRef, useState, memo, useCallback, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import {  ArrowRight, BookOpen, Calendar, CheckCircle2, Clock, Lock, Plus, RotateCcw, Unlock, Users, Shield, GraduationCap, } from "lucide-react";
-import { useNavigate, Link } from "react-router-dom";
+import { ArrowRight, BookOpen, Calendar, CheckCircle2, Clock, Lock, Plus, RotateCcw, Unlock, Users, Shield, GraduationCap } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { useNavigate as useRouterNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import ClassHeader from "./ClassHeader";
 import {  Dialog,  DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, } from "@/components/ui/dialog";
 import { Button } from "../ui/button";
-import { Class, ExtendedLesson, SubLesson, ClassStudent, Student } from "@/types";
+import { Class, ExtendedLesson, SubLesson, ClassStudent, Student, Question, Activity, ExercisePrompt, Lesson, Topic, Subtopic, Grade } from "@/types";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/lib/supabase";
 import type { Database } from "@/types/supabase";
@@ -55,7 +57,26 @@ async function fetchWithRetry<T>(
   throw lastError || new Error('Failed to fetch data after retries');
 }
 
-type Tables = Database['public']['Tables'];
+type Tables = Database['public']['Tables'] & {
+  topics: {
+    Row: {
+      id: string;
+      title: string;
+      grade_id: string;
+      order_index?: number;
+      subtopics?: SubtopicWithHierarchy[];
+    };
+  };
+  subtopics: {
+    Row: {
+      id: string;
+      title: string;
+      topic_id: string;
+      order_index?: number;
+      lessons?: LessonWithContent[];
+    };
+  };
+};
 type DbClass = Tables['classes']['Row'];
 type DbLesson = Tables['lessons']['Row'] & {
   topic?: { title: string };
@@ -71,8 +92,9 @@ interface ExtendedClass extends Omit<DbClass, 'id'> {
   students: number;
 }
 
-interface CustomLesson extends Omit<DbLesson, 'id' | 'status'> {
+interface CustomLesson extends Partial<DbLesson> {
   id: string;
+  title: string;
   status?: 'draft' | 'published';
   color: string;
   unlocked: boolean;
@@ -81,6 +103,9 @@ interface CustomLesson extends Omit<DbLesson, 'id' | 'status'> {
   totalTopics: string;
   difficulty: string;
   customSubLessons: CustomSubLesson[];
+  questions?: Question[];
+  activities?: Activity[];
+  exercise_prompts?: ExercisePrompt[];
 }
 
 interface CustomSubLesson {
@@ -151,8 +176,130 @@ const ClassCard = memo(({
 
 ClassCard.displayName = 'ClassCard';
 
+// Add these interfaces to match the database schema
+interface SchoolClass {
+  id: string;
+  name: string;
+  grade_id: string;
+  section?: string;
+  description?: string;
+}
+
+interface GradeWithHierarchy {
+  id: string;
+  name: string;
+  level: number;
+  topics: TopicWithHierarchy[];
+  classes: SchoolClass[];
+}
+
+type DbTopic = Tables['topics']['Row'] & {
+  subtopics?: {
+    id: string;
+    title: string;
+    topic_id: string;
+    order_index?: number;
+    lessons: LessonWithContent[];
+  }[];
+};
+
+interface TopicWithHierarchy extends DbTopic {
+  subtopics: SubtopicWithHierarchy[];
+}
+
+// Add with other type definitions at the top
+type DbSubtopic = Tables['subtopics']['Row'];
+
+// Then update the interface to use it
+interface SubtopicWithHierarchy extends DbSubtopic {
+  lessons: LessonWithContent[];
+  id: string;
+  title: string;
+  topic_id: string;
+  order_index?: number; 
+}
+
+interface LessonWithContent {
+  id: string;
+  title: string;
+  content: string;
+  questions: Question[];
+  activities: Activity[];
+  exercise_prompts: ExercisePrompt[];
+  duration?: number;
+  description?: string;
+  subtopic_id: string;
+  order_index?: number;
+  metadata?: {
+    difficulty?: string;
+    [key: string]: any;
+  };
+}
+
+interface LessonCardProps {
+  lesson: CustomLesson;
+  isSelected: boolean;
+  onSelect: (lesson: CustomLesson) => void;
+}
+
+const LessonCard = memo(({ lesson, isSelected, onSelect }: LessonCardProps) => {
+  return (
+    <Card 
+      className={cn(
+        "cursor-pointer transition-all duration-200",
+        "hover:shadow-md hover:translate-y-[-2px]",
+        "hover:bg-accent/50 hover:border-primary/50",
+        "active:translate-y-[0px]",
+        isSelected && "border-primary bg-accent/50 shadow-md",
+        "group"
+      )}
+      onClick={() => onSelect(lesson)}
+    >
+      <CardHeader className="p-4">
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <BookOpen className="h-4 w-4 text-primary" />
+              <span className="font-medium">{lesson.title}</span>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <Badge variant="outline" className="bg-primary/5">
+              {lesson.questions?.length || 0} Questions
+            </Badge>
+            <Badge variant="outline" className="bg-primary/5">
+              {lesson.activities?.length || 0} Activities
+            </Badge>
+          </div>
+        </div>
+      </CardHeader>
+    </Card>
+  );
+});
+
+LessonCard.displayName = 'LessonCard';
+
+interface GradeData {
+  grade_id: string;
+  grades: {
+    id: string;
+    name: string;
+    level: number;
+  };
+}
+
+interface TeacherClassData {
+  classes: {
+    id: string;
+    name: string;
+    grade_id: string;
+    section?: string;
+    description?: string;
+  }[];
+}
+
 export function LearningPathTeacher() {
-  const navigate = useNavigate();
+  const navigate = useRouterNavigate();
   const { logError } = useComponentLogger('LearningPathTeacher');
   const lessonRefs = useRef<(HTMLDivElement | null)[]>([]);
   
@@ -167,6 +314,12 @@ export function LearningPathTeacher() {
   const [classStudents, setClassStudents] = useState<DbStudent[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
+  const [grades, setGrades] = useState<GradeWithHierarchy[]>([]);
+  const [topics, setTopics] = useState<TopicWithHierarchy[]>([]);
+  const [subtopics, setSubtopics] = useState<SubtopicWithHierarchy[]>([]);
+  const [selectedGrade, setSelectedGrade] = useState<GradeWithHierarchy | null>(null);
+  const [selectedTopic, setSelectedTopic] = useState<TopicWithHierarchy | null>(null);
+  const [selectedSubtopic, setSelectedSubtopic] = useState<SubtopicWithHierarchy | null>(null);
 
   // Load lock state from localStorage
   useEffect(() => {
@@ -196,101 +349,141 @@ export function LearningPathTeacher() {
         setIsLoading(true);
         setFetchError(null);
 
-        const { data: classesData, error: classesError } = await supabase
-          .from('classes')
-          .select('*')
-          .order('created_at', { ascending: false });
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.user) throw new Error('No authenticated user');
 
-        if (classesError) {
-          throw new Error('Error fetching classes: ' + classesError.message);
+        // 1. First get user's assigned schools
+        const { data: userSchoolsData, error: schoolsError } = await supabase
+          .from('user_schools')
+          .select('school_id')
+          .eq('user_id', session.user.id);
+
+        if (schoolsError) throw schoolsError;
+
+        if (!userSchoolsData?.length) {
+          throw new Error('No schools assigned to user');
         }
 
-        if (!classesData || classesData.length === 0) {
-          throw new Error('No classes found');
-        }
-
-        const extendedClasses: ExtendedClass[] = classesData.map(cls => ({
-          ...cls,
-          id: String(cls.id),
-          students: 0 // Will be updated with actual count
-        }));
-
-        setClasses(extendedClasses);
-        setSelectedClass(extendedClasses[0]);
-
-        const { data: lessonsData, error: lessonsError } = await supabase
-          .from('lessons')
+        // 2. Get school grades and associated data
+        const { data: schoolGradesData, error: gradesError } = await supabase
+          .from('school_grades')
           .select(`
-            *,
-            topic:topics(title),
-            subtopic:subtopics(title)
-          `)
-          .eq('grade_id', classesData[0].grade_id)
-          .order('order_index', { ascending: true });
-
-        if (lessonsError) {
-          throw new Error('Error fetching lessons: ' + lessonsError.message);
-        }
-
-        const customLessons: CustomLesson[] = lessonsData.map((lesson, index) => ({
-          ...lesson,
-          id: String(lesson.id),
-          status: lesson.status as 'draft' | 'published' | undefined,
-          color: getColorForIndex(index),
-          unlocked: index === 0,
-          completed: false,
-          lessonNumber: `${index + 1}`,
-          totalTopics: '5',
-          difficulty: 'Beginner',
-          customSubLessons: [
-            {
-              id: String(lesson.id),
-              title: lesson.title,
-              unlocked: index === 0,
-              completed: false,
-              duration: lesson.duration || 15,
-              description: lesson.description || ''
-            }
-          ]
-        }));
-
-        setLessons(customLessons);
-        if (customLessons.length > 0) {
-          setSelectedLesson(customLessons[0]);
-        }
-
-        const { data: studentsData, error: studentsError } = await supabase
-          .from('class_students')
-          .select(`
-            *,
-            student:students!class_students_student_id_fkey (
+            grade_id,
+            grades:grades (
               id,
-              first_name,
-              last_name,
-              roll_number,
-              email,
-              grade_id
+              name,
+              level
             )
-          `)
-          .eq('class_id', classesData[0].id);
+          ` as '*')
+          .in('school_id', userSchoolsData.map(us => us.school_id))
+          .order('grades(level)', { ascending: true });
 
-        if (studentsError) {
-          throw new Error('Error fetching students: ' + studentsError.message);
-        }
+        if (gradesError) throw gradesError;
 
-        if (studentsData) {
-          const students = studentsData.map(data => data.student);
-          setClassStudents(students);
-          
-          // Update the selected class with the correct student count
-          setSelectedClass(prev => prev ? { ...prev, students: students.length } : null);
-          
-          // Update all classes with their student counts
-          setClasses(prev => prev.map(cls => 
-            cls.id === extendedClasses[0].id 
-              ? { ...cls, students: students.length }
-              : cls
-          ));
+        // 3. Get teacher's classes
+        const { data: teacherClasses, error: classesError } = await supabase
+          .from('class_teachers')
+          .select(`
+            classes (
+              id,
+              name,
+              grade_id,
+              section,
+              description
+            )
+          ` as '*')
+          .eq('teacher_id', session.user.id);
+
+        if (classesError) throw classesError;
+
+        // 4. For each grade, fetch the complete hierarchy
+        const gradesWithHierarchy = await Promise.all(
+          schoolGradesData.map(async ({ grades: grade }) => {
+            const { data: topics } = await supabase
+              .from('topics')
+              .select(`
+                *,
+                subtopics (
+                  *,
+                  lessons (
+                    *,
+                    questions (
+                      *,
+                      exercise_prompts (*)
+                    ),
+                    activities (*)
+                  )
+                )
+              `)
+              .eq('grade_id', grade.id)
+              .order('order_index');
+
+            return {
+              ...grade,
+              topics: topics || [],
+              classes: teacherClasses?.map(tc => tc.classes).flat() || []
+            };
+          })
+        );
+
+        // Update states while maintaining existing functionality
+        setGrades(gradesWithHierarchy);
+        
+        // Set initial selections
+        if (gradesWithHierarchy.length > 0) {
+          const firstGrade = gradesWithHierarchy[0];
+          setSelectedGrade(firstGrade);
+
+          // Update existing class-based state
+          const gradeClasses = firstGrade.classes.map((cls: SchoolClass) => ({
+            ...cls,
+            id: String(cls.id),
+            students: 0 // Will be updated with actual count
+          }));
+          setClasses(gradeClasses);
+          if (gradeClasses.length > 0) {
+            setSelectedClass(gradeClasses[0]);
+          }
+
+          // Set topics and lessons
+          if (firstGrade.topics.length > 0) {
+            const firstTopic = firstGrade.topics[0];
+            setSelectedTopic(firstTopic);
+            setTopics(firstGrade.topics);
+
+            if (firstTopic.subtopics.length > 0) {
+              const firstSubtopic = firstTopic.subtopics[0];
+              setSelectedSubtopic(firstSubtopic);
+              setSubtopics(firstGrade.topics.flatMap((t: TopicWithHierarchy) => t.subtopics));
+
+              // Transform lessons to match existing format
+              const transformedLessons = firstSubtopic.lessons.map((lesson: LessonWithContent, index: number) => ({
+                ...lesson,
+                id: String(lesson.id),
+                color: getColorForIndex(index),
+                unlocked: index === 0,
+                completed: false,
+                lessonNumber: `${index + 1}`,
+                totalTopics: String(firstGrade.topics.length),
+                difficulty: 'Beginner',
+                customSubLessons: [
+                  {
+                    id: String(lesson.id),
+                    title: lesson.title,
+                    unlocked: index === 0,
+                    completed: false,
+                    duration: lesson.duration || 15,
+                    description: lesson.description || ''
+                  }
+                ]
+              }));
+
+              setLessons(transformedLessons);
+              if (transformedLessons.length > 0) {
+                setSelectedLesson(transformedLessons[0]);
+              }
+            }
+          }
         }
 
       } catch (error) {
@@ -462,50 +655,38 @@ export function LearningPathTeacher() {
       </div>
     );
   }
+const toggleLock = () => {
+    setIsLocked(!isLocked);
+  };
+
 
   return (
     <div className="max-w-6xl w-full relative">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex gap-4 overflow-x-auto pb-2">
-          {classes.map(classData => (
-            <ClassCard
-              key={classData.id}
-              classData={classData}
-              isSelected={selectedClass?.id === classData.id}
-              onClassChange={handleClassChange}
-              logError={logError}
-            />
+      {/* Grade Selection */}
+      <div className="flex gap-4 overflow-x-auto pb-2">
+        {grades
+          .sort((a, b) => a.level - b.level)
+          .map(grade => (
+            <Card
+              key={grade.id}
+              className={cn(
+                "cursor-pointer transition-all duration-200",
+                selectedGrade?.id === grade.id && "border-primary border-l-4 border-l-primary hover:border-primary/50 bg-accent/55 bg-color-secondary"
+              )}
+              onClick={() => setSelectedGrade(grade)}
+            >
+               llllllll
+              <CardHeader className="p-4">
+                <div className="flex items-center gap-3">
+                  <GraduationCap className="h-5 w-5 text-primary" />
+                  <span className="font-medium">{grade.name}</span>
+                </div>
+              </CardHeader>
+            </Card>
           ))}
-        </div>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setIsLocked(!isLocked)}
-          className={cn(
-            "ml-4 transition-colors",
-            isLocked && "border-primary text-primary hover:bg-primary/10"
-          )}
-        >
-          {isLocked ? (
-            <>
-              <Lock className="h-4 w-4 mr-2" />
-              Locked
-            </>
-          ) : (
-            <>
-              <Unlock className="h-4 w-4 mr-2" />
-              Unlocked
-            </>
-          )}
-        </Button>
       </div>
 
-      {isLocked && (
-        <div className="mb-4 p-3 bg-primary/10 border border-primary/20 rounded-lg flex items-center gap-2 text-sm text-primary">
-          <Shield className="h-4 w-4" />
-          This course is currently locked to prevent unintended changes. Unlock to make modifications.
-        </div>
-      )}
+      
 
       {/* Overview Section */}
       <div className="mb-6">
@@ -539,7 +720,7 @@ export function LearningPathTeacher() {
         </Card>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Upcoming Classes */}
+          {/* Upcoming Classes
           <Card className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-6">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-semibold">Upcoming Classes</h2>
@@ -582,10 +763,10 @@ export function LearningPathTeacher() {
                 </div>
               ))}
             </div>
-          </Card>
+          </Card> */}
 
           {/* Top Performing Students */}
-          <Card className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-6">
+          {/* <Card className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-6">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-semibold">Top Performing Students</h2>
               <Users className="h-5 w-5 text-gray-500" />
@@ -624,9 +805,133 @@ export function LearningPathTeacher() {
                 </div>
               ))}
             </div>
-          </Card>
+          </Card> */}
         </div>
       </div>
+
+      {/* Topics and their content
+      <div className="mt-6 space-y-6">
+        {topics
+          .filter(topic => topic.grade_id === selectedGrade?.id)
+          .map(topic => (
+            <Card key={topic.id} className="border-l-4 border-l-primary">
+              <CardHeader>
+                <CardTitle>{topic.title}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {subtopics
+                    .filter(subtopic => subtopic.topic_id === topic.id)
+                    .map(subtopic => (
+                      <div key={subtopic.id} className="space-y-4">
+                        <h3 className="text-lg font-semibold">{subtopic.title}</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                          {lessons
+                            .filter(lesson => lesson.subtopic_id === subtopic.id)
+                            .map(lesson => (
+                              <LessonCard 
+                                key={lesson.id}
+                                lesson={lesson}
+                                isSelected={selectedLesson?.id === lesson.id}
+                                onSelect={setSelectedLesson}
+                              />
+                            ))}
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+      </div> */}
+
+
+<div className="mt-6 space-y-6">
+  {selectedGrade?.topics
+    .sort((a, b) => (a.order_index || 0) - (b.order_index || 0))
+    .map(topic => (
+      <Card 
+        key={topic.id} 
+        className={cn(
+          "border-l-4 border-l-primary transition-all duration-200",
+          "hover:shadow-md"
+        )}
+      >
+        <CardHeader className="cursor-pointer" onClick={() => setSelectedTopic(topic)}>
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-2">
+              <BookOpen className="h-5 w-5 text-primary" />
+              {topic.title}
+            </CardTitle>
+            <Badge variant="outline" className="bg-primary/5">
+              {topic.subtopics?.length || 0} Subtopics
+            </Badge>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-6">
+            {topic.subtopics
+              ?.sort((a, b) => (a.order_index || 0) - (b.order_index || 0))
+              .map(subtopic => (
+                <div 
+                  key={subtopic.id} 
+                  className={cn(
+                    "space-y-4 p-4 rounded-lg",
+                    "border border-border/50",
+                    "hover:border-primary/50 transition-colors",
+                    selectedSubtopic?.id === subtopic.id && "border-primary/50 bg-accent/5"
+                  )}
+                >
+                  <div 
+                    className="flex items-center justify-between cursor-pointer"
+                    onClick={() => setSelectedSubtopic(subtopic)}
+                  >
+                    <h3 className="text-lg font-semibold flex items-center gap-2">
+                      <div className={cn(
+                        "w-2 h-2 rounded-full",
+                        selectedSubtopic?.id === subtopic.id ? "bg-primary" : "bg-muted"
+                      )} />
+                      {subtopic.title}
+                    </h3>
+                    <Badge variant="outline">
+                      {subtopic.lessons?.length || 0} Lessons
+                    </Badge>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {subtopic.lessons
+                      ?.sort((a, b) => (a.order_index || 0) - (b.order_index || 0))
+                      .map(lesson => (
+                        <LessonCard 
+                          key={lesson.id}
+                          lesson={{
+                            ...lesson,
+                            color: getColorForIndex(subtopic.lessons.indexOf(lesson)),
+                            unlocked: true, // You can add your unlock logic here
+                            completed: false, // Add completion logic
+                            lessonNumber: `${subtopic.lessons.indexOf(lesson) + 1}`,
+                            totalTopics: String(topic.subtopics?.length || 0),
+                            difficulty: lesson.metadata?.difficulty || 'Beginner',
+                            customSubLessons: [{
+                              id: lesson.id,
+                              title: lesson.title,
+                              unlocked: true,
+                              completed: false,
+                              duration: lesson.duration || 15,
+                              description: lesson.description || ''
+                            }]
+                          }}
+                          isSelected={selectedLesson?.id === lesson.id}
+                          onSelect={setSelectedLesson}
+                        />
+                    ))}
+                  </div>
+                </div>
+              ))}
+          </div>
+        </CardContent>
+      </Card>
+    ))}
+</div>
 
       <div className="sticky top-0 z-30 w-full">
         {selectedLesson && (

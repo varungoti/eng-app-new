@@ -58,13 +58,7 @@ function createSupabaseClient(): SupabaseClient<Database> {
   const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
   if (DEBUG_CONFIG.enabled) {
-    logger.info('Creating Supabase client', {
-      context: {
-        url: supabaseUrl,
-        hasKey: !!supabaseAnonKey
-      },
-      source: 'supabase'
-    });
+    logger.info(`Creating Supabase client with URL: ${supabaseUrl}`, 'supabase');
   }
 
   const client = createBrowserClient<Database>(
@@ -74,10 +68,9 @@ function createSupabaseClient(): SupabaseClient<Database> {
   );
 
   if (DEBUG_CONFIG.enabled) {
-    logger.info('Supabase client initialized', {
-      source: 'supabase'
-    });
+    logger.info('Supabase client initialized', 'supabase');
   }
+
 
   return client;
 }
@@ -115,12 +108,11 @@ export type TypedSupabaseClient = SupabaseClient<Database>;
 if (import.meta.hot) {
   import.meta.hot.dispose(() => {
     if (DEBUG_CONFIG.enabled) {
-      logger.info('Cleaning up Supabase client', {
-        source: 'supabase'
-      });
+      logger.info('Cleaning up Supabase client', 'supabase');
     }
     supabaseInstance = null;
   });
+
 }
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
@@ -130,4 +122,25 @@ if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('Missing Supabase environment variables');
 }
 
-export const supabaseClient = createClient<Database>(supabaseUrl, supabaseAnonKey);
+// Create a single instance of the Supabase client
+export const supabaseClient = createClient<Database>(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    persistSession: true,
+    storageKey: 'sb-auth-token',
+    storage: localStorage,
+    autoRefreshToken: true,
+    detectSessionInUrl: true
+  }
+});
+
+// Add auth state check helper
+export const ensureAuthenticated = async () => {
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  if (!session) {
+    throw new Error('Authentication required');
+  }
+  return session;
+};
+
+// Add this export
+export const getSupabaseAuth = () => supabaseClient.auth;

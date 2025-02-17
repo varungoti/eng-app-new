@@ -1,0 +1,42 @@
+{
+    "sourceFile": "src/components/ErrorToast.tsx",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 6,
+            "patches": [
+                {
+                    "date": 1739050506392,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1739050572981,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -21,12 +21,12 @@\n \r\n   return (\r\n     <Toast\r\n       message={error}\r\n-      type=\"error\"\r\n+      type=\"foreground\"\r\n       onClose={clearError}\r\n       position={position}\r\n     />\r\n   );\r\n };\r\n \r\n\\ No newline at end of file\n-export default ErrorToast;\n+export default ErrorToast;\r\n"
+                },
+                {
+                    "date": 1739050617868,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -20,13 +20,13 @@\n   if (!error) return null;\r\n \r\n   return (\r\n     <Toast\r\n-      message={error}\r\n-      type=\"foreground\"\r\n-      onClose={clearError}\r\n+      title={error}\r\n+      variant=\"destructive\"\r\n+      onDismiss={clearError}\r\n       position={position}\r\n     />\r\n   );\r\n\\ No newline at end of file\n };\r\n \r\n-export default ErrorToast;\n+export default ErrorToast;\r\n"
+                },
+                {
+                    "date": 1739050631349,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -22,11 +22,11 @@\n   return (\r\n     <Toast\r\n       title={error}\r\n       variant=\"destructive\"\r\n-      onDismiss={clearError}\r\n+      onOpenChange={() => clearError()}\r\n       position={position}\r\n     />\r\n   );\r\n };\r\n \r\n\\ No newline at end of file\n-export default ErrorToast;\n+export default ErrorToast;\r\n"
+                },
+                {
+                    "date": 1739050647690,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -23,10 +23,9 @@\n     <Toast\r\n       title={error}\r\n       variant=\"destructive\"\r\n       onOpenChange={() => clearError()}\r\n-      position={position}\r\n     />\r\n   );\r\n };\r\n \r\n-export default ErrorToast;\n\\ No newline at end of file\n+export default ErrorToast;\r\n"
+                },
+                {
+                    "date": 1739050695220,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -23,8 +23,9 @@\n     <Toast\r\n       title={error}\r\n       variant=\"destructive\"\r\n       onOpenChange={() => clearError()}\r\n+      \r\n     />\r\n   );\r\n };\r\n \r\n"
+                },
+                {
+                    "date": 1739050701538,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -23,9 +23,10 @@\n     <Toast\r\n       title={error}\r\n       variant=\"destructive\"\r\n       onOpenChange={() => clearError()}\r\n-      \r\n+      position={position}\r\n+\r\n     />\r\n   );\r\n };\r\n \r\n"
+                }
+            ],
+            "date": 1739050506392,
+            "name": "Commit-0",
+            "content": "import React, { useEffect } from 'react';\r\nimport { Toast } from './ui/toast';\r\nimport { useError } from '../hooks/useError';\r\n\r\ninterface ToastProps {\r\n  timeout?: number; \r\n  position?: 'top' | 'bottom';\r\n}\r\n\r\nconst ErrorToast: React.FC<ToastProps> = ({ timeout = 3000, position = 'top' }) => {\r\n  const { error, clearError } = useError();\r\n\r\n  useEffect(() => {\r\n    if (error) {\r\n      const timer = setTimeout(clearError, timeout);\r\n      return () => clearTimeout(timer);\r\n    }\r\n  }, [error, clearError, timeout]);\r\n\r\n  if (!error) return null;\r\n\r\n  return (\r\n    <Toast\r\n      message={error}\r\n      type=\"error\"\r\n      onClose={clearError}\r\n      position={position}\r\n    />\r\n  );\r\n};\r\n\r\nexport default ErrorToast;"
+        }
+    ]
+}

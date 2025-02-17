@@ -39,7 +39,6 @@ export function CreateTopicForm() {
       toast({
         title: 'Error',
         description: error instanceof Error ? error.message : 'Failed to create topic',
-        variant: 'destructive'
       })
       setFormState('idle')
     }

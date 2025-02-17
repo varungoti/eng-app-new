@@ -1,0 +1,26 @@
+{
+    "sourceFile": "src/lib/auth/strategies/ProgressiveLoader.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 2,
+            "patches": [
+                {
+                    "date": 1739025365066,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1739025382959,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -42,12 +42,9 @@\n   public error(err: Error): void {\r\n     if (this.isCancelled) return;\r\n     if (this.loadingId) {\r\n       this.loadingMonitor.endLoading(this.loadingId);\r\n-      logger.error('Loading error', { \r\n-        context: { error: err },\r\n-        source: 'ProgressiveLoader'\r\n-      });\r\n+      logger.error(`Loading error: ${err instanceof Error ? err.message : String(err)}`, 'ProgressiveLoader');\r\n       this.loadingId = undefined;\r\n     }\r\n   }\r\n \r\n"
+                },
+                {
+                    "date": 1739025396882,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -57,14 +57,7 @@\n   }\r\n \r\n   private updateProgress(percent: number): void {\r\n     if (this.isCancelled) return;\r\n-    logger.debug(`Loading progress: ${percent}%`, {\r\n-      context: {\r\n-        component: this.component,\r\n-        stage: ProgressiveLoader.STAGES[this.currentStage],\r\n-        progress: percent\r\n-      },\r\n-      source: 'ProgressiveLoader'\r\n-    });\r\n+    logger.debug(`Loading progress: ${percent}% (Stage: ${ProgressiveLoader.STAGES[this.currentStage]})`, this.component);\r\n   }\r\n }\n\\ No newline at end of file\n"
+                }
+            ],
+            "date": 1739025365066,
+            "name": "Commit-0",
+            "content": "import { supabase } from '../../supabase';\r\nimport { LoadingMonitor, type MonitorConfig } from '../../monitoring';\r\nimport { logger } from '../../logger';\r\n\r\nexport class ProgressiveLoader {\r\n  private static STAGES = ['init', 'session', 'profile', 'complete'];\r\n  private currentStage = 0;\r\n  private loadingId?: string;\r\n  private isCancelled = false;\r\n  private loadingMonitor: LoadingMonitor;\r\n\r\n  constructor(private component: string) {\r\n    this.loadingMonitor = new LoadingMonitor(supabase, {\r\n      maxTries: 3,\r\n      intervalMs: 1000,\r\n      timeoutMs: 5000\r\n    } as MonitorConfig);\r\n  }\r\n\r\n  public async start(): Promise<void> {\r\n    if (this.isCancelled) return;\r\n    this.loadingId = await this.loadingMonitor.startLoading(this.component);\r\n    this.updateProgress(0);\r\n  }\r\n\r\n  public async nextStage(): Promise<void> {\r\n    if (this.isCancelled) return;\r\n    this.currentStage++;\r\n    this.updateProgress(\r\n      (this.currentStage / ProgressiveLoader.STAGES.length) * 100\r\n    );\r\n  }\r\n\r\n  public complete(): void {\r\n    if (this.isCancelled) return;\r\n    if (this.loadingId) {\r\n      this.loadingMonitor.endLoading(this.loadingId);\r\n      this.loadingId = undefined;\r\n    }\r\n  }\r\n\r\n  public error(err: Error): void {\r\n    if (this.isCancelled) return;\r\n    if (this.loadingId) {\r\n      this.loadingMonitor.endLoading(this.loadingId);\r\n      logger.error('Loading error', { \r\n        context: { error: err },\r\n        source: 'ProgressiveLoader'\r\n      });\r\n      this.loadingId = undefined;\r\n    }\r\n  }\r\n\r\n  public cancel(): void {\r\n    this.isCancelled = true;\r\n    if (this.loadingId) {\r\n      this.loadingMonitor.endLoading(this.loadingId);\r\n      this.loadingId = undefined;\r\n    }\r\n  }\r\n\r\n  private updateProgress(percent: number): void {\r\n    if (this.isCancelled) return;\r\n    logger.debug(`Loading progress: ${percent}%`, {\r\n      context: {\r\n        component: this.component,\r\n        stage: ProgressiveLoader.STAGES[this.currentStage],\r\n        progress: percent\r\n      },\r\n      source: 'ProgressiveLoader'\r\n    });\r\n  }\r\n}"
+        }
+    ]
+}

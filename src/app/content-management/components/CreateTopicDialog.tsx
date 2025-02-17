@@ -19,7 +19,7 @@ export function CreateTopicDialog({ open, onOpenChange, gradeId }: CreateTopicDi
   const { toast } = useToast()
   const queryClient = useQueryClient()
 
-  const { mutate: createTopic, isLoading } = useMutation({
+  const { mutate: createTopic, isPending: isLoading } = useMutation({
     mutationFn: async () => {
       // Implementation here
     },

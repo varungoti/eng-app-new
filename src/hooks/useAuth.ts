@@ -23,10 +23,7 @@ interface SignUpCredentials extends LoginCredentials {
 
 interface ResetPasswordCredentials {
   email: string;
-  newPassword: string;
-  accessToken: string;
 }
-
 
 export const useAuth = () => {
   const context = useContext(AuthContext);

@@ -20,7 +20,7 @@ export function CreateLessonDialog({ open, onOpenChange, subtopicId }: CreateLes
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  const { mutate, isLoading } = useMutation({
+  const { mutate, isPending: isLoading } = useMutation({
     mutationFn: async () => {
       return contentService.createLesson({ title, subtopicId });
     },
@@ -37,10 +37,10 @@ export function CreateLessonDialog({ open, onOpenChange, subtopicId }: CreateLes
       toast({
         title: "Error",
         description: "Failed to create lesson",
-        variant: "destructive"
       });
     }
   });
+
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,9 +48,9 @@ export function CreateLessonDialog({ open, onOpenChange, subtopicId }: CreateLes
       toast({
         title: "Error",
         description: "Title is required",
-        variant: "destructive"
       });
       return;
+
     }
     mutate();
   };

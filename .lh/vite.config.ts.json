@@ -1,0 +1,18 @@
+{
+    "sourceFile": "vite.config.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1739006660995,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1739006660995,
+            "name": "Commit-0",
+            "content": "import { defineConfig } from 'vite';\r\nimport react from '@vitejs/plugin-react';\r\nimport path from 'path';\r\nimport viteExpress from 'vite-express';\r\n\r\n\r\nexport default defineConfig({\r\n  plugins: [\r\n    react(),\r\n    {\r\n      name: 'vite-express-custom',\r\n      configureServer(server) {\r\n        server.middlewares.use('/api/process-image', (req, res) => {\r\n          require('./src/api/process-image').default(req, res);\r\n        });\r\n      }\r\n    }\r\n  ],\r\n  resolve: {\r\n    alias: [\r\n      { find: '@', replacement: path.resolve(__dirname, './src') },\r\n      { find: '@components', replacement: path.resolve(__dirname, './src/components') },\r\n      { find: '@lib', replacement: path.resolve(__dirname, './src/lib') },\r\n      { find: '@hooks', replacement: path.resolve(__dirname, './src/hooks') },\r\n      { find: '@pages', replacement: path.resolve(__dirname, './src/pages') },\r\n      { find: '@types', replacement: path.resolve(__dirname, './src/types') }\r\n    ]\r\n  },\r\n  server: {\r\n    port: 5173,\r\n    hmr: {\r\n      overlay: true,\r\n    },\r\n    headers: {\r\n      'Access-Control-Allow-Origin': '*',\r\n      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',\r\n      'Access-Control-Allow-Headers': 'X-Requested-With, content-type, Authorization',\r\n      'Cross-Origin-Resource-Policy': 'cross-origin'\r\n    },\r\n    proxy: {\r\n      '/maps/api': {\r\n        target: 'https://maps.googleapis.com',\r\n        changeOrigin: true,\r\n        secure: true,\r\n        headers: {\r\n          'Cross-Origin-Resource-Policy': 'cross-origin'\r\n        },\r\n        rewrite: (path) => path.replace(/^\\/maps/, '')\r\n      },\r\n      '/maps/place': {\r\n        target: 'https://maps.googleapis.com',\r\n        changeOrigin: true,\r\n        secure: true,\r\n        headers: {\r\n          'Cross-Origin-Resource-Policy': 'cross-origin'\r\n        },\r\n        rewrite: (path) => path.replace(/^\\/maps/, '')\r\n      },\r\n      '/api': {\r\n        target: 'http://localhost:5173',\r\n        changeOrigin: true,\r\n        secure: false,\r\n        ws: true,\r\n        rewrite: (path) => path.replace(/^\\/api/, '')\r\n      }\r\n    }\r\n  },\r\n  build: {\r\n    rollupOptions: {\r\n      output: {\r\n        manualChunks: {\r\n          'react-vendor': ['react', 'react-dom'],\r\n          'ui-vendor': ['@tanstack/react-query', 'lucide-react'],\r\n        }\r\n      }\r\n    },\r\n    chunkSizeWarningLimit: 1000\r\n  },\r\n  optimizeDeps: {\r\n    include: [\r\n      'lucide-react',\r\n      'react',\r\n      'react-dom',\r\n      'react-router-dom',\r\n      '@tanstack/react-query',\r\n      '@supabase/ssr',\r\n      '@supabase/supabase-js',\r\n      '@supabase/gotrue-js'\r\n    ]\r\n  },\r\n  envDir: './',\r\n  envPrefix: 'VITE_',\r\n  define: {\r\n    'process.env': process.env,\r\n    //'process.env': {},\r\n    __GOOGLE_MAPS_API_KEY__: JSON.stringify(process.env.VITE_GOOGLE_MAPS_API_KEY),\r\n    'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),\r\n    'process.browser': true,\r\n    'import.meta.env.DEV': JSON.stringify(process.env.NODE_ENV === 'development'),\r\n    \r\n  }\r\n});"
+        }
+    ]
+}

@@ -13,15 +13,17 @@ export class APIError extends Error {
 const cache = DataCache.getInstance();
 
 const handleQueryError = (error: any, path: string) => {
-  logger.error(`Failed to fetch ${path}`, {
-    context: { error },
-    source: 'api.get'
-  });
+  logger.error(`Failed to fetch ${path}: ${error}`, 'api.get');
   throw new APIError(`Failed to fetch ${path}`, 500);
 };
 
 export const api = {
   async get<T>(path: string, options: { where?: any; include?: any; orderBy?: any } = {}): Promise<T[]> {
+    const loadId = `GET_${path}_${Date.now()}`;
+    await dataFlowMonitor.trackDataLoad(loadId, { 
+      source: path,
+      recordCount: 0 // Will be updated when data is received
+    });
     const cacheKey = `${path}-${JSON.stringify(options)}`;
     
     const opId = dataFlowMonitor.startOperation('query', `GET ${path}`, { options });
@@ -83,12 +85,10 @@ export const api = {
 
       return result as T;
     } catch (err) {
-      logger.error(`Failed to create ${path}`, {
-        context: { error: err, data },
-        source: 'api.post'
-      });
+      logger.error(`Failed to create ${path}`, 'api.post', err);
       throw new APIError(`Failed to create ${path}`, 500);
     }
+
   },
 
   async put<T>(path: string, id: string, data: any): Promise<T> {
@@ -107,12 +107,10 @@ export const api = {
 
       return result as T;
     } catch (err) {
-      logger.error(`Failed to update ${path}`, {
-        context: { error: err, id, data },
-        source: 'api.put'
-      });
+      logger.error(`Failed to update ${path}`, 'api.put', err);
       throw new APIError(`Failed to update ${path}`, 500);
     }
+
   },
 
   async delete(path: string, id: string): Promise<boolean> {
@@ -129,11 +127,9 @@ export const api = {
 
       return true;
     } catch (err) {
-      logger.error(`Failed to delete ${path}`, {
-        context: { error: err, id },
-        source: 'api.delete'
-      });
+      logger.error(`Failed to delete ${path}`, 'api.delete', err);
       throw new APIError(`Failed to delete ${path}`, 500);
+
     }
   },
 
@@ -144,21 +140,17 @@ export const api = {
       
       const failures = results.filter(r => r.status === 'rejected');
       if (failures.length > 0) {
-        logger.error('Batch operation partially failed', {
-          context: { failures },
-          source: 'api.batch'
-        });
+        logger.error('Batch operation partially failed', 'api.batch', failures);
+
       }
 
       return results
         .filter((r): r is PromiseFulfilledResult<Awaited<T>> => r.status === 'fulfilled')
         .map(r => r.value);
     } catch (err) {
-      logger.error('Batch operation failed', {
-        context: { error: err },
-        source: 'api.batch'
-      });
+      logger.error('Batch operation failed', 'api.batch', err);
       throw new APIError('Batch operation failed', 500);
+
     }
   }
 };

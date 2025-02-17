@@ -20,10 +20,7 @@ export const useRoleStore = create<RoleState>()(
       previousRole: null,
       isTransitioning: false,
       setRole: (role) => set((state) => {
-        logger.info('Role state update', {
-          context: { from: state.currentRole, to: role },
-          source: 'RoleStore'
-        });
+        logger.info(`Role state update: ${state.currentRole || 'none'} -> ${role || 'none'}`, 'RoleStore');
         return {
           currentRole: role,
           previousRole: state.currentRole,

@@ -1,0 +1,22 @@
+{
+    "sourceFile": "src/app/content-management/components/activity-editor.tsx",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1739016984505,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1739016996728,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -44,9 +44,13 @@\n           <Textarea\r\n             value={activity.data?.teacherScript}\r\n             onChange={(e) => onUpdate({\r\n               ...activity,\r\n-              data: { ...(activity.data || {}), teacherScript: e.target.value }\r\n+              data: { \r\n+                prompt: activity.data?.prompt || '',\r\n+                teacherScript: e.target.value,\r\n+                media: activity.data?.media || []\r\n+              }\r\n             })}\r\n             placeholder=\"Teacher script...\"\r\n           />\r\n         </div>\r\n"
+                }
+            ],
+            "date": 1739016984505,
+            "name": "Commit-0",
+            "content": "\"use client\";\r\n\r\nimport { Activity } from \"@/app/content-management/types\";\r\nimport { Card, CardContent, CardHeader, CardTitle } from \"@/components/ui/card\";\r\nimport { Input } from \"@/components/ui/input\";\r\nimport { Label } from \"@/components/ui/label\";\r\nimport { Textarea } from \"@/components/ui/textarea\";\r\nimport { Button } from \"@/components/ui/button\";\r\nimport { Trash } from \"lucide-react\";\r\n\r\ninterface ActivityEditorProps {\r\n  activity: Activity;\r\n  onUpdate: (activity: Activity) => void;\r\n  onDelete: () => void;\r\n}\r\n\r\nexport function ActivityEditor({ activity, onUpdate, onDelete }: ActivityEditorProps) {\r\n  return (\r\n    <Card className=\"mb-4\">\r\n      <CardHeader>\r\n        <CardTitle className=\"flex justify-between items-center\">\r\n          <Input\r\n            value={activity.title}\r\n            onChange={(e) => onUpdate({ ...activity, title: e.target.value })}\r\n            placeholder=\"Activity Title\"\r\n            className=\"max-w-md\"\r\n          />\r\n          <Button variant=\"ghost\" size=\"icon\" onClick={onDelete}>\r\n            <Trash className=\"h-4 w-4\" />\r\n          </Button>\r\n        </CardTitle>\r\n      </CardHeader>\r\n      <CardContent className=\"space-y-4\">\r\n        <div>\r\n          <Label>Instructions</Label>\r\n          <Textarea\r\n            value={activity.instructions}\r\n            onChange={(e) => onUpdate({ ...activity, instructions: e.target.value })}\r\n            placeholder=\"Activity instructions...\"\r\n          />\r\n        </div>\r\n        <div>\r\n          <Label>Teacher Script</Label>\r\n          <Textarea\r\n            value={activity.data?.teacherScript}\r\n            onChange={(e) => onUpdate({\r\n              ...activity,\r\n              data: { ...(activity.data || {}), teacherScript: e.target.value }\r\n            })}\r\n            placeholder=\"Teacher script...\"\r\n          />\r\n        </div>\r\n      </CardContent>\r\n    </Card>\r\n  );\r\n} \r\nexport default ActivityEditor;"
+        }
+    ]
+}

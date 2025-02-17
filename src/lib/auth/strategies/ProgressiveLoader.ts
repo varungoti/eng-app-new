@@ -1,5 +1,5 @@
 import { supabase } from '../../supabase';
-import { LoadingMonitor, type MonitoringConfig } from '../../monitoring';
+import { LoadingMonitor, type MonitorConfig } from '../../monitoring';
 import { logger } from '../../logger';
 
 export class ProgressiveLoader {
@@ -14,7 +14,7 @@ export class ProgressiveLoader {
       maxTries: 3,
       intervalMs: 1000,
       timeoutMs: 5000
-    } as MonitoringConfig);
+    } as MonitorConfig);
   }
 
   public async start(): Promise<void> {
@@ -43,10 +43,7 @@ export class ProgressiveLoader {
     if (this.isCancelled) return;
     if (this.loadingId) {
       this.loadingMonitor.endLoading(this.loadingId);
-      logger.error('Loading error', { 
-        context: { error: err },
-        source: 'ProgressiveLoader'
-      });
+      logger.error(`Loading error: ${err instanceof Error ? err.message : String(err)}`, 'ProgressiveLoader');
       this.loadingId = undefined;
     }
   }
@@ -61,13 +58,6 @@ export class ProgressiveLoader {
 
   private updateProgress(percent: number): void {
     if (this.isCancelled) return;
-    logger.debug(`Loading progress: ${percent}%`, {
-      context: {
-        component: this.component,
-        stage: ProgressiveLoader.STAGES[this.currentStage],
-        progress: percent
-      },
-      source: 'ProgressiveLoader'
-    });
+    logger.debug(`Loading progress: ${percent}% (Stage: ${ProgressiveLoader.STAGES[this.currentStage]})`, this.component);
   }
 }

@@ -1,0 +1,22 @@
+{
+    "sourceFile": "src/lib/errorTracker/index.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1739009362470,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1739009713061,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -3,6 +3,7 @@\n export * from './types';\r\n export * from './consoleHandler';\r\n export * from './networkHandler';\r\n \r\n-export * from './ErrorBoundary';\r\n-export * from './ErrorMonitor';\n\\ No newline at end of file\n+\r\n+export * from \"@/components/ErrorBoundary\";\r\n+export * from './ErrorTracker';\n\\ No newline at end of file\n"
+                }
+            ],
+            "date": 1739009362470,
+            "name": "Commit-0",
+            "content": "export * from './ErrorWatcher';\r\nexport * from './ErrorResolver';\r\nexport * from './types';\r\nexport * from './consoleHandler';\r\nexport * from './networkHandler';\r\n\r\nexport * from './ErrorBoundary';\r\nexport * from './ErrorMonitor';"
+        }
+    ]
+}

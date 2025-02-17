@@ -1,0 +1,30 @@
+{
+    "sourceFile": "src/lib/supabaseClient.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 3,
+            "patches": [
+                {
+                    "date": 1739017110926,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1739017134282,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -17,20 +17,9 @@\n logger.info(`Supabase client initialized at ${supabaseUrl}`, 'supabase');\r\n \r\n // Check session on initialization\r\n supabaseClient.auth.getSession().then(({ data: { session }, error }) => {\r\n-  logger.info('Initial session check', {\r\n-    context: {\r\n-      hasSession: !!session,\r\n-      error: error?.message || null,\r\n-      user: session?.user ? {\r\n-        id: session.user.id,\r\n-        email: session.user.email,\r\n-        role: session.user.user_metadata?.role\r\n-      } : null\r\n-    },\r\n-    source: 'supabase'\r\n-  });\r\n+  logger.info(`Session check: ${session ? 'authenticated' : 'unauthenticated'}${error ? `, error: ${error.message}` : ''}`, 'supabase');\r\n }).catch(error => {\r\n   logger.error('Failed to check initial session', {\r\n     context: { error },\r\n     source: 'supabase'\r\n"
+                },
+                {
+                    "date": 1739017145497,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -19,9 +19,6 @@\n // Check session on initialization\r\n supabaseClient.auth.getSession().then(({ data: { session }, error }) => {\r\n   logger.info(`Session check: ${session ? 'authenticated' : 'unauthenticated'}${error ? `, error: ${error.message}` : ''}`, 'supabase');\r\n }).catch(error => {\r\n-  logger.error('Failed to check initial session', {\r\n-    context: { error },\r\n-    source: 'supabase'\r\n-  });\r\n+  logger.error(`Failed to check initial session: ${error.message}`, 'supabase');\r\n }); \n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1739044207980,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,21 +1,15 @@\n-import { createClient, SupabaseClient } from '@supabase/supabase-js';\r\n+import { supabase } from './supabase';\r\n import { logger } from './logger';\r\n \r\n-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;\r\n-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;\r\n+// Re-export the singleton instance\r\n+export const supabaseClient = supabase;\r\n \r\n-if (!supabaseUrl || !supabaseAnonKey) {\r\n-  throw new Error(\r\n-    'Missing Supabase environment variables. Please ensure VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY are set in your .env file.'\r\n-  );\r\n-}\r\n+// Export a function to get the auth instance\r\n+export const getSupabaseAuth = () => supabaseClient.auth;\r\n \r\n-// Create a single instance of the Supabase client\r\n-export const supabaseClient: SupabaseClient = createClient(supabaseUrl, supabaseAnonKey);\r\n-\r\n // Log initialization\r\n-logger.info(`Supabase client initialized at ${supabaseUrl}`, 'supabase');\r\n+logger.info(`Supabase client initialized`, 'supabase');\r\n \r\n // Check session on initialization\r\n supabaseClient.auth.getSession().then(({ data: { session }, error }) => {\r\n   logger.info(`Session check: ${session ? 'authenticated' : 'unauthenticated'}${error ? `, error: ${error.message}` : ''}`, 'supabase');\r\n"
+                }
+            ],
+            "date": 1739017110926,
+            "name": "Commit-0",
+            "content": "import { createClient, SupabaseClient } from '@supabase/supabase-js';\r\nimport { logger } from './logger';\r\n\r\nconst supabaseUrl = import.meta.env.VITE_SUPABASE_URL;\r\nconst supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;\r\n\r\nif (!supabaseUrl || !supabaseAnonKey) {\r\n  throw new Error(\r\n    'Missing Supabase environment variables. Please ensure VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY are set in your .env file.'\r\n  );\r\n}\r\n\r\n// Create a single instance of the Supabase client\r\nexport const supabaseClient: SupabaseClient = createClient(supabaseUrl, supabaseAnonKey);\r\n\r\n// Log initialization\r\nlogger.info(`Supabase client initialized at ${supabaseUrl}`, 'supabase');\r\n\r\n// Check session on initialization\r\nsupabaseClient.auth.getSession().then(({ data: { session }, error }) => {\r\n  logger.info('Initial session check', {\r\n    context: {\r\n      hasSession: !!session,\r\n      error: error?.message || null,\r\n      user: session?.user ? {\r\n        id: session.user.id,\r\n        email: session.user.email,\r\n        role: session.user.user_metadata?.role\r\n      } : null\r\n    },\r\n    source: 'supabase'\r\n  });\r\n}).catch(error => {\r\n  logger.error('Failed to check initial session', {\r\n    context: { error },\r\n    source: 'supabase'\r\n  });\r\n}); "
+        }
+    ]
+}

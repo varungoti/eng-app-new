@@ -3,7 +3,6 @@ import { useAuth } from '../hooks/useAuth';
 import { usePermissions } from '../hooks/usePermissions';
 import { canAccessDashboard } from '../lib/permissions';
 import { useRoleSettings } from '../hooks/useRoleSettings';
-import { useError } from '@/hooks/useError';
 //import { APP_ICONS } from '../lib/constants/icons';
 import { QueryClient } from '@tanstack/react-query';
 //import type { RoleSettings } from '../hooks/useRoleSettings';
@@ -27,7 +26,6 @@ const RoleDashboard: React.FC<RoleDashboardProps> = ({ selectedRole, onError }) 
   const queryClient = new QueryClient();
   const { user } = useAuth();
   const { can } = usePermissions();
-  const { setError } = useError();
 
   // Handle session timeout
   useEffect(() => {
@@ -36,13 +34,6 @@ const RoleDashboard: React.FC<RoleDashboardProps> = ({ selectedRole, onError }) 
       window.location.href = '/login';
     }
   }, [error, queryClient]);
-
-  // Handle error effect separately from render
-  useEffect(() => {
-    if (error) {
-      setError(error.toString());
-    }
-  }, [error, setError]);
 
   // Check access permissions first
   if (!user || !canAccessDashboard(user.role, selectedRole)) {

@@ -1,6 +1,6 @@
 import { DEBUG_CONFIG } from './config';
 
-type LogLevel = 'debug' | 'info' | 'warn' | 'error';
+type LogLevel = 'info' | 'warn' | 'error' | 'debug';
 
 interface LogOptions {
   context?: Record<string, any>;
@@ -66,7 +66,7 @@ class Logger {
     
     if (DEBUG_CONFIG.enabled) {
       if (level === 'error') {
-        console.group(`${logPrefix} 🔴 Error`);
+        console.group(`${logPrefix} 🔴👎 Error`);
         console.error(message);
         if (context?.error) {
           console.error('Error details:', this.safeStringify(context.error));
@@ -80,12 +80,12 @@ class Logger {
         }
         console.groupEnd();
       } else if (level === 'warn') {
-        console.group(`${logPrefix} ⚠️ Warning`);
+        console.group(`${logPrefix} ⚠️☢️ Warning`);
         console.warn(message);
         if (context) console.log('Context:', this.safeStringify(context));
         console.groupEnd();
       } else if (level === 'info' || level === 'debug') {
-        console.group(`${logPrefix} ℹ️ ${level}`);
+        console.group(`${logPrefix} ℹ🥸 ${level}`);
         console.log(message);
         if (context) console.log('Context:', this.safeStringify(context));
         console.groupEnd();
@@ -110,4 +110,31 @@ class Logger {
   }
 }
 
-export const logger = Logger.getInstance();
+const getTimeStamp = () => new Date().toISOString();
+
+const formatMessage = (level: LogLevel, componentName: string, message: string, error?: any) => {
+  const timestamp = getTimeStamp();
+  const baseMessage = `[${timestamp}] [${componentName}] [${level.toUpperCase()}] ${message}`;
+  
+  if (error) {
+    console.group(baseMessage);
+    console.error('Error details:', error);
+    console.groupEnd();
+  } else {
+    console.log(baseMessage);
+  }
+};
+
+export const logger = {
+  info: (componentName: string, message: string) => 
+    formatMessage('info', componentName, `✅👍🏻 ${message}`),
+    
+  error: (componentName: string, message: string, error?: any) => 
+    formatMessage('error', componentName, `🔴👎 ${message}`, error),
+    
+  warn: (componentName: string, message: string) => 
+    formatMessage('warn', componentName, `⚠️☢️ ${message}`),
+    
+  debug: (componentName: string, message: string) => 
+    formatMessage('debug', componentName, `🔍🐞 ${message}`)
+};

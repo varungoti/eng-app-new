@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/lib/hooks/useLocalStorage.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1739015386184,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1739015386184,
+            "name": "Commit-0",
+            "content": "import { useState, useEffect } from 'react';\r\nimport { logger } from '../logger';\r\n\r\nexport function useLocalStorage<T>(key: string, initialValue: T) {\r\n  const [storedValue, setStoredValue] = useState<T>(() => {\r\n    try {\r\n      const item = window.localStorage.getItem(key);\r\n      return item ? JSON.parse(item) : initialValue;\r\n    } catch (error) {\r\n      logger.error(`Failed to read from localStorage for key ${key}: ${error}`, 'useLocalStorage');\r\n      return initialValue;\r\n    }\r\n  });\r\n\r\n  useEffect(() => {\r\n    try {\r\n      window.localStorage.setItem(key, JSON.stringify(storedValue));\r\n    } catch (error) {\r\n      logger.error('Failed to write to localStorage', {\r\n        context: { key, error },\r\n        source: 'useLocalStorage'\r\n      });\r\n    }\r\n  }, [key, storedValue]);\r\n\r\n  return [storedValue, setStoredValue] as const;\r\n}"
+        }
+    ]
+}

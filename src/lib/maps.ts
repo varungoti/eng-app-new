@@ -1,3 +1,5 @@
+"use client";
+
 import { Libraries } from '@react-google-maps/api';
 import { useLoadScript } from '@react-google-maps/api';
 import { useMemo, useEffect } from 'react';

@@ -17,16 +17,17 @@ export default defineConfig({
     }
   ],
   resolve: {
-    alias: {
-      '@': path.resolve(__dirname, 'src'),
-      '@components': path.resolve(__dirname, 'src/components'),
-      '@lib': path.resolve(__dirname, 'src/lib'),
-      '@hooks': path.resolve(__dirname, 'src/hooks'),
-      '@pages': path.resolve(__dirname, 'src/pages'),
-      '@types': path.resolve(__dirname, 'src/types')
-    }
+    alias: [
+      { find: '@', replacement: path.resolve(__dirname, './src') },
+      { find: '@components', replacement: path.resolve(__dirname, './src/components') },
+      { find: '@lib', replacement: path.resolve(__dirname, './src/lib') },
+      { find: '@hooks', replacement: path.resolve(__dirname, './src/hooks') },
+      { find: '@pages', replacement: path.resolve(__dirname, './src/pages') },
+      { find: '@types', replacement: path.resolve(__dirname, './src/types') }
+    ]
   },
   server: {
+    port: 5173,
     hmr: {
       overlay: true,
     },
@@ -90,10 +91,12 @@ export default defineConfig({
   envDir: './',
   envPrefix: 'VITE_',
   define: {
-    //'process.env': process.env,
-    'process.env': {},
+    'process.env': process.env,
+    //'process.env': {},
     __GOOGLE_MAPS_API_KEY__: JSON.stringify(process.env.VITE_GOOGLE_MAPS_API_KEY),
     'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
-    'process.browser': true
+    'process.browser': true,
+    'import.meta.env.DEV': JSON.stringify(process.env.NODE_ENV === 'development'),
+    
   }
 });

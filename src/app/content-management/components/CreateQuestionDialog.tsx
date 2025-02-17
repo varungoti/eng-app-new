@@ -56,7 +56,6 @@ export function CreateQuestionDialog({ open, onOpenChange, lessonId }: CreateQue
       toast({ 
         title: "Error", 
         description: "Failed to create question",
-        variant: "destructive"
       });
     }
   };

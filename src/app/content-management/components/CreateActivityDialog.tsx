@@ -35,7 +35,6 @@ export function CreateActivityDialog({ open, onOpenChange, lessonId }: CreateAct
       toast({ 
         title: "Error", 
         description: "Failed to create activity",
-        variant: "destructive"
       });
     }
   };

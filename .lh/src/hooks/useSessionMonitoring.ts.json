@@ -1,0 +1,26 @@
+{
+    "sourceFile": "src/hooks/useSessionMonitoring.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 2,
+            "patches": [
+                {
+                    "date": 1739020101526,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1739020120798,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -13,12 +13,9 @@\n       setSessionErrors(sessionMonitor.getSessionErrors());\r\n \r\n       // Log state changes in development\r\n       if (import.meta.env.DEV) {\r\n-        logger.debug('Session state updated', {\r\n-          context: { state },\r\n-          source: 'useSessionMonitoring'\r\n-        });\r\n+        logger.debug(`Session state updated - Auth: ${state.isAuthenticated}, Role: ${state.currentRole || 'none'}`, 'useSessionMonitoring');\r\n       }\r\n     });\r\n \r\n     return () => unsubscribe();\r\n"
+                },
+                {
+                    "date": 1739043634431,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -11,21 +11,25 @@\n     const unsubscribe = sessionMonitor.addListener((state) => {\r\n       setSessionState(state);\r\n       setSessionErrors(sessionMonitor.getSessionErrors());\r\n \r\n-      // Log state changes in development\r\n+      // Enhanced logging\r\n       if (import.meta.env.DEV) {\r\n-        logger.debug(`Session state updated - Auth: ${state.isAuthenticated}, Role: ${state.currentRole || 'none'}`, 'useSessionMonitoring');\r\n+        logger.debug(\r\n+          `Session state updated - Auth: ${state.isAuthenticated}, ` +\r\n+          `Role: ${state.currentRole || 'none'}, ` +\r\n+          `Last refresh: ${state.lastRefresh?.toLocaleTimeString() || 'never'}, ` +\r\n+          `Attempts: ${state.refreshAttempts}`,\r\n+          'useSessionMonitoring'\r\n+        );\r\n       }\r\n     });\r\n \r\n     return () => unsubscribe();\r\n   }, []);\r\n \r\n   return {\r\n-    isAuthenticated: sessionState.isAuthenticated,\r\n-    currentRole: sessionState.currentRole,\r\n-    lastActivity: sessionState.lastActivity,\r\n+    ...sessionState,\r\n     sessionErrors,\r\n     hasErrors: sessionErrors.length > 0\r\n   };\r\n } \n\\ No newline at end of file\n"
+                }
+            ],
+            "date": 1739020101526,
+            "name": "Commit-0",
+            "content": "import { useState, useEffect } from 'react';\r\nimport { sessionMonitor } from '../lib/auth/SessionMonitor';\r\nimport { logger } from '../lib/logger';\r\n\r\nexport function useSessionMonitoring() {\r\n  const [sessionState, setSessionState] = useState(sessionMonitor.getState());\r\n  const [sessionErrors, setSessionErrors] = useState<string[]>([]);\r\n\r\n  useEffect(() => {\r\n    // Subscribe to session state changes\r\n    const unsubscribe = sessionMonitor.addListener((state) => {\r\n      setSessionState(state);\r\n      setSessionErrors(sessionMonitor.getSessionErrors());\r\n\r\n      // Log state changes in development\r\n      if (import.meta.env.DEV) {\r\n        logger.debug('Session state updated', {\r\n          context: { state },\r\n          source: 'useSessionMonitoring'\r\n        });\r\n      }\r\n    });\r\n\r\n    return () => unsubscribe();\r\n  }, []);\r\n\r\n  return {\r\n    isAuthenticated: sessionState.isAuthenticated,\r\n    currentRole: sessionState.currentRole,\r\n    lastActivity: sessionState.lastActivity,\r\n    sessionErrors,\r\n    hasErrors: sessionErrors.length > 0\r\n  };\r\n} "
+        }
+    ]
+}

@@ -33,10 +33,7 @@ class RoleSyncService {
     const currentRole = store.currentRole;
 
     if (currentRole !== role) {
-      logger.info('Syncing role state', {
-        context: { from: currentRole, to: role },
-        source: 'RoleSyncService'
-      });
+      logger.info(`Syncing role state from ${currentRole || 'none'} to ${role}`, 'RoleSyncService');
       store.setRole(role);
     }
   }
@@ -61,20 +58,16 @@ class RoleSyncService {
       this.syncRole(newRole);
       store.completeTransition();
 
-      logger.info('Role updated successfully', {
-        context: { role: newRole },
-        source: 'RoleSyncService'
-      });
+      logger.info(`Role updated successfully to ${newRole}`, 'RoleSyncService');
+
 
       // Force page reload to ensure clean state
       window.location.reload();
     } catch (err) {
       useRoleStore.getState().resetTransition();
-      logger.error('Failed to update role', {
-        context: { error: err },
-        source: 'RoleSyncService'
-      });
+      logger.error(`Failed to update role: ${err instanceof Error ? err.message : String(err)}`, 'RoleSyncService');
       throw err;
+
     }
   }
 }

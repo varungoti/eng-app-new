@@ -1,5 +1,5 @@
 import { ErrorTracker } from './ErrorTracker';
-import type { ErrorSeverity } from './types';
+import { ErrorSeverity } from './types';
 
 interface NetworkError {
   message: string;
@@ -7,6 +7,10 @@ interface NetworkError {
   statusCode?: number;
   timestamp: number;
   retryCount: number;
+}
+
+interface ExtendedRequestInit extends RequestInit {
+  throwOnError?: boolean;
 }
 
 class NetworkHandler {
@@ -31,8 +35,9 @@ class NetworkHandler {
   private setupFetchInterceptor() {
     const originalFetch = window.fetch;
     window.fetch = async (...args) => {
-      const url = typeof args[0] === 'string' ? args[0] : args[0].url;
-      const options = args[1] || {};
+      const url = typeof args[0] === 'string' ? args[0] : 
+        args[0] instanceof Request ? args[0].url : args[0].toString();
+      const options = (args[1] || {}) as ExtendedRequestInit;
 
       try {
         const response = await originalFetch(...args);
@@ -89,7 +94,7 @@ class NetworkHandler {
 
     this.errorTracker.trackError({
       message: `Failed to fetch data from API`,
-      severity,
+      severity: ErrorSeverity.HIGH,
       source: 'NetworkRequest',
       context: {
         endpoint: error.endpoint,

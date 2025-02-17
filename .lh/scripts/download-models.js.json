@@ -1,0 +1,22 @@
+{
+    "sourceFile": "scripts/download-models.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1739014927733,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1739014976999,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,1 +1,27 @@\n- \n\\ No newline at end of file\n+import { execSync } from 'child_process';\n+import { fileURLToPath } from 'url';\n+import { dirname, join } from 'path';\n+import { existsSync, mkdirSync } from 'fs';\n+\n+// Get __dirname equivalent in ES modules\n+const __filename = fileURLToPath(import.meta.url);\n+const __dirname = dirname(__filename);\n+\n+// Create models directory if it doesn't exist\n+const modelsDir = join(__dirname, '../fish-speech/models');\n+if (!existsSync(modelsDir)) {\n+  mkdirSync(modelsDir, { recursive: true });\n+}\n+\n+// Download models\n+console.log('Downloading Fish Speech models...');\n+try {\n+  execSync('python -m fish_speech.cli.download_models', {\n+    cwd: join(__dirname, '../fish-speech'),\n+    stdio: 'inherit'\n+  });\n+  console.log('Models downloaded successfully!');\n+} catch (error) {\n+  console.error('Error downloading models:', error);\n+  process.exit(1);\n+} \n\\ No newline at end of file\n"
+                }
+            ],
+            "date": 1739014927733,
+            "name": "Commit-0",
+            "content": " "
+        }
+    ]
+}

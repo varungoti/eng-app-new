@@ -113,15 +113,29 @@ export class ContentService {
   }
 
   async createTopic(data: { title: string; description?: string; gradeId: string }) {
+    if (!data.title || !data.gradeId) {
+      throw new Error('Title and grade ID are required');
+    }
+
     try {
-      const response = await fetch(API_ENDPOINTS.TOPICS, {
-        method: 'POST',
-        headers: API_CONFIG.headers,
-        body: JSON.stringify(data)
-      });
-      return this.handleResponse(response);
+      const { data: newTopic, error } = await supabase
+        .from('topics')
+        .insert({
+          title: data.title.trim(),
+          description: data.description?.trim() || '',
+          grade_id: data.gradeId,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      return newTopic;
+
     } catch (error) {
-      throw new Error('Failed to create topic');
+      console.error('Error creating topic:', error);
+      throw error;
     }
   }
 

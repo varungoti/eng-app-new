@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Toast } from './ui/Toast';
+import { Toast } from './ui/toast';
 import { useError } from '../hooks/useError';
 
 interface ToastProps {
@@ -21,10 +21,11 @@ const ErrorToast: React.FC<ToastProps> = ({ timeout = 3000, position = 'top' }) 
 
   return (
     <Toast
-      message={error}
-      type="error"
-      onClose={clearError}
+      title={error}
+      variant="destructive"
+      onOpenChange={() => clearError()}
       position={position}
+
     />
   );
 };

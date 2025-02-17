@@ -1,0 +1,22 @@
+{
+    "sourceFile": "src/lib/auth/strategies/InitializationStrategy.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1739024731089,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1739024749141,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -52,18 +52,16 @@\n         logger.debug(`Auth initialization timed out: ${err instanceof Error ? err.message : String(err)}`, 'InitializationStrategy');\r\n         return { data: { session: null }, error: null };\r\n       });\r\n \r\n-      if (result.data.session) {\r\n-        this.cacheStrategy.set(AUTH_CACHE_KEY, result.data.session);\r\n+      if ((result as { data: { session: any } }).data.session) {\r\n+        this.cacheStrategy.set(AUTH_CACHE_KEY, (result as { data: { session: any } }).data.session);\r\n       }\r\n \r\n       loader.complete();\r\n     } catch (err) {\r\n       loader.error(err instanceof Error ? err : new Error(String(err)));\r\n-      logger.debug('Auth initialization failed, continuing with null session', {\r\n-        context: { error: err },\r\n-        source: 'InitializationStrategy' \r\n-      });\r\n+      logger.debug(`Auth initialization failed: ${err instanceof Error ? err.message : String(err)}`, 'InitializationStrategy');\r\n     }\r\n+\r\n   }\r\n }\n\\ No newline at end of file\n"
+                }
+            ],
+            "date": 1739024731089,
+            "name": "Commit-0",
+            "content": "import { logger } from '../../logger';\r\nimport { RetryStrategy } from './RetryStrategy';\r\nimport { FallbackStrategy } from './FallbackStrategy';\r\nimport { LoadingStrategy } from './LoadingStrategy';\r\nimport { CacheStrategy } from './CacheStrategy';\r\nimport { ProgressiveLoader } from './ProgressiveLoader';\r\n\r\nconst AUTH_CACHE_KEY = 'auth_session';\r\nconst AUTH_TIMEOUT = 1500; // Reduced from 2000ms\r\n\r\nexport class InitializationStrategy {\r\n  private static retryStrategy = new RetryStrategy({\r\n    maxAttempts: 1, // Single attempt for faster response\r\n    baseDelay: 200,\r\n    maxDelay: 500,\r\n    timeout: AUTH_TIMEOUT\r\n  });\r\n\r\n  private static loadingStrategy = new LoadingStrategy('AuthInitializer');\r\n  private static cacheStrategy = new CacheStrategy();\r\n\r\n  public static async initialize(): Promise<void> {\r\n    const loader = new ProgressiveLoader('AuthInitializer');\r\n    \r\n    try {\r\n      // Try cache first - synchronously\r\n      const cachedSession = this.cacheStrategy.get(AUTH_CACHE_KEY, true);\r\n      if (cachedSession) {\r\n        return;\r\n      }\r\n\r\n      // Start loading indicator\r\n      loader.start();\r\n\r\n      // Try localStorage first since it's fastest\r\n      const localSession = FallbackStrategy.getLocalStorageSession();\r\n      if (localSession) {\r\n        this.cacheStrategy.set(AUTH_CACHE_KEY, localSession);\r\n        loader.complete();\r\n        return;\r\n      }\r\n\r\n      // Try fast initialization with timeout\r\n      const result = await Promise.race([\r\n        this.retryStrategy.execute(async () => {\r\n          return await FallbackStrategy.getSession();\r\n        }),\r\n        new Promise((_, reject) => \r\n          setTimeout(() => reject(new Error('Auth timeout')), AUTH_TIMEOUT)\r\n        )\r\n      ]).catch(err => {\r\n        logger.debug(`Auth initialization timed out: ${err instanceof Error ? err.message : String(err)}`, 'InitializationStrategy');\r\n        return { data: { session: null }, error: null };\r\n      });\r\n\r\n      if (result.data.session) {\r\n        this.cacheStrategy.set(AUTH_CACHE_KEY, result.data.session);\r\n      }\r\n\r\n      loader.complete();\r\n    } catch (err) {\r\n      loader.error(err instanceof Error ? err : new Error(String(err)));\r\n      logger.debug('Auth initialization failed, continuing with null session', {\r\n        context: { error: err },\r\n        source: 'InitializationStrategy' \r\n      });\r\n    }\r\n  }\r\n}"
+        }
+    ]
+}

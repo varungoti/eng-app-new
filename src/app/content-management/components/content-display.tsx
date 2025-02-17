@@ -79,7 +79,6 @@ export function ContentDisplay() {
       toast({
         title: "Error",
         description: error instanceof Error ? error.message : "Failed to save lesson content",
-        variant: "destructive",
       });
     }
   };

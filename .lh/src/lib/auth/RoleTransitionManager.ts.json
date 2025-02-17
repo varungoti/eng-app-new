@@ -1,0 +1,22 @@
+{
+    "sourceFile": "src/lib/auth/RoleTransitionManager.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1738871072855,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1739025655583,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -53,28 +53,15 @@\n \r\n       store.setRole(newRole);\r\n       store.completeTransition();\r\n \r\n-      logger.info('Role transition completed successfully', {\r\n-        context: { \r\n-          from: store.currentRole,\r\n-          to: newRole,\r\n-          userId: session.user.id\r\n-        },\r\n-        source: 'RoleTransitionManager'\r\n-      });\r\n+      logger.info(`Role transition completed successfully from ${store.currentRole || 'none'} to ${newRole}`, 'RoleTransitionManager');\r\n \r\n+\r\n     } catch (err) {\r\n       store.resetTransition();\r\n \r\n-      logger.error('Role transition failed', {\r\n-        context: {\r\n-          error: err,\r\n-          from: store.currentRole,\r\n-          to: newRole\r\n-        },\r\n-        source: 'RoleTransitionManager'\r\n-      });\r\n+      logger.error(`Role transition failed: ${err instanceof Error ? err.message : String(err)}`, 'RoleTransitionManager');\r\n \r\n       throw err;\r\n     } finally {\r\n       this.isTransitioning = false;\r\n"
+                }
+            ],
+            "date": 1738871072855,
+            "name": "Commit-0",
+            "content": "import { supabase } from '../supabase';\r\nimport { useRoleStore } from './store';\r\nimport { logger } from '../logger';\r\nimport type { UserRole } from '../../types/roles';\r\n\r\nclass RoleTransitionManager {\r\n  private static instance: RoleTransitionManager;\r\n  private isTransitioning = false;\r\n\r\n  private constructor() {}\r\n\r\n  public static getInstance(): RoleTransitionManager {\r\n    if (!RoleTransitionManager.instance) {\r\n      RoleTransitionManager.instance = new RoleTransitionManager();\r\n    }\r\n    return RoleTransitionManager.instance;\r\n  }\r\n\r\n  public async transitionRole(newRole: UserRole): Promise<void> {\r\n    const store = useRoleStore.getState();\r\n    \r\n    if (store.isTransitioning) {\r\n      return;\r\n    }\r\n\r\n    if (newRole === store.currentRole) {\r\n      return;\r\n    }\r\n\r\n    if (this.isTransitioning) {\r\n      return;\r\n    }\r\n\r\n    this.isTransitioning = true;\r\n    store.startTransition();\r\n    \r\n    try {\r\n      const { data: { session }, error: sessionError } = await supabase.auth.getSession();\r\n      \r\n      if (sessionError || !session) {\r\n        throw new Error('No active session');\r\n      }\r\n\r\n      // Use stored procedure for role change\r\n      await supabase.rpc('handle_role_change', {\r\n        p_user_id: session.user.id,\r\n        p_new_role: newRole,\r\n        p_old_role: store.currentRole\r\n      });\r\n\r\n      const { error: refreshError } = await supabase.auth.refreshSession();\r\n      if (refreshError) throw refreshError;\r\n\r\n      store.setRole(newRole);\r\n      store.completeTransition();\r\n\r\n      logger.info('Role transition completed successfully', {\r\n        context: { \r\n          from: store.currentRole,\r\n          to: newRole,\r\n          userId: session.user.id\r\n        },\r\n        source: 'RoleTransitionManager'\r\n      });\r\n\r\n    } catch (err) {\r\n      store.resetTransition();\r\n\r\n      logger.error('Role transition failed', {\r\n        context: {\r\n          error: err,\r\n          from: store.currentRole,\r\n          to: newRole\r\n        },\r\n        source: 'RoleTransitionManager'\r\n      });\r\n\r\n      throw err;\r\n    } finally {\r\n      this.isTransitioning = false;\r\n    }\r\n  }\r\n}\r\n\r\nexport const roleTransitionManager = RoleTransitionManager.getInstance();"
+        }
+    ]
+}

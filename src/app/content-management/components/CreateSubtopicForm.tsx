@@ -36,9 +36,9 @@ export function CreateSubtopicForm() {
       toast({
         title: 'Error',
         description: error instanceof Error ? error.message : 'Failed to create subtopic',
-        variant: 'destructive'
       })
       setFormState('idle')
+
     }
   }
 

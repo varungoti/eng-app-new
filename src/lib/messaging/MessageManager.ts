@@ -71,11 +71,9 @@ class MessageManager {
       this.notifySubscribers(messages);
       return messages;
     } catch (err) {
-      logger.error('Failed to fetch messages', {
-        context: { error: err },
-        source: 'MessageManager'
-      });
+      logger.error('Failed to fetch messages', 'MessageManager', err);
       return [];
+
     }
   }
 
@@ -106,11 +104,9 @@ class MessageManager {
         createdAt: new Date(data.created_at)
       };
     } catch (err) {
-      logger.error('Failed to send message', {
-        context: { error: err, message },
-        source: 'MessageManager'
-      });
+      logger.error('Failed to send message', 'MessageManager', err);
       return null;
+
     }
   }
 
@@ -124,10 +120,8 @@ class MessageManager {
       if (error) throw error;
       await this.fetchMessages();
     } catch (err) {
-      logger.error('Failed to mark message as read', {
-        context: { error: err, messageId },
-        source: 'MessageManager'
-      });
+      logger.error('Failed to mark message as read', 'MessageManager', err);
+
     }
   }
 
@@ -151,11 +145,9 @@ class MessageManager {
         unreadCount: t.messages.filter((m: any) => !m.read).length
       }));
     } catch (err) {
-      logger.error('Failed to get threads', {
-        context: { error: err },
-        source: 'MessageManager'
-      });
+      logger.error('Failed to get threads', 'MessageManager', err);
       return [];
+
     }
   }
 

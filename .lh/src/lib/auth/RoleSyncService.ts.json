@@ -1,0 +1,22 @@
+{
+    "sourceFile": "src/lib/auth/RoleSyncService.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1739025611422,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1739025632744,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -57,22 +57,18 @@\n       // Update store state\r\n       this.syncRole(newRole);\r\n       store.completeTransition();\r\n \r\n-      logger.info('Role updated successfully', {\r\n-        context: { role: newRole },\r\n-        source: 'RoleSyncService'\r\n-      });\r\n+      logger.info(`Role updated successfully to ${newRole}`, 'RoleSyncService');\r\n \r\n+\r\n       // Force page reload to ensure clean state\r\n       window.location.reload();\r\n     } catch (err) {\r\n       useRoleStore.getState().resetTransition();\r\n-      logger.error('Failed to update role', {\r\n-        context: { error: err },\r\n-        source: 'RoleSyncService'\r\n-      });\r\n+      logger.error(`Failed to update role: ${err instanceof Error ? err.message : String(err)}`, 'RoleSyncService');\r\n       throw err;\r\n+\r\n     }\r\n   }\r\n }\r\n \r\n"
+                }
+            ],
+            "date": 1739025611422,
+            "name": "Commit-0",
+            "content": "import { supabase } from '../supabase';\r\nimport { useRoleStore } from './store';\r\nimport { logger } from '../logger';\r\nimport type { UserRole } from '../../types/roles';\r\n\r\nclass RoleSyncService {\r\n  private static instance: RoleSyncService;\r\n\r\n  private constructor() {\r\n    this.setupAuthListener();\r\n  }\r\n\r\n  public static getInstance(): RoleSyncService {\r\n    if (!RoleSyncService.instance) {\r\n      RoleSyncService.instance = new RoleSyncService();\r\n    }\r\n    return RoleSyncService.instance;\r\n  }\r\n\r\n  private setupAuthListener() {\r\n    supabase.auth.onAuthStateChange((event, session) => {\r\n      if (event === 'SIGNED_IN' || event === 'USER_UPDATED') {\r\n        const role = session?.user?.user_metadata?.role as UserRole;\r\n        if (role) {\r\n          this.syncRole(role);\r\n        }\r\n      }\r\n    });\r\n  }\r\n\r\n  private syncRole(role: UserRole) {\r\n    const store = useRoleStore.getState();\r\n    const currentRole = store.currentRole;\r\n\r\n    if (currentRole !== role) {\r\n      logger.info(`Syncing role state from ${currentRole || 'none'} to ${role}`, 'RoleSyncService');\r\n      store.setRole(role);\r\n    }\r\n  }\r\n\r\n  public async updateRole(newRole: UserRole): Promise<void> {\r\n    try {\r\n      const store = useRoleStore.getState();\r\n      store.startTransition();\r\n\r\n      // Update user metadata\r\n      const { error: updateError } = await supabase.auth.updateUser({\r\n        data: { role: newRole }\r\n      });\r\n\r\n      if (updateError) throw updateError;\r\n\r\n      // Force session refresh\r\n      const { error: refreshError } = await supabase.auth.refreshSession();\r\n      if (refreshError) throw refreshError;\r\n\r\n      // Update store state\r\n      this.syncRole(newRole);\r\n      store.completeTransition();\r\n\r\n      logger.info('Role updated successfully', {\r\n        context: { role: newRole },\r\n        source: 'RoleSyncService'\r\n      });\r\n\r\n      // Force page reload to ensure clean state\r\n      window.location.reload();\r\n    } catch (err) {\r\n      useRoleStore.getState().resetTransition();\r\n      logger.error('Failed to update role', {\r\n        context: { error: err },\r\n        source: 'RoleSyncService'\r\n      });\r\n      throw err;\r\n    }\r\n  }\r\n}\r\n\r\nexport const roleSyncService = RoleSyncService.getInstance();"
+        }
+    ]
+}

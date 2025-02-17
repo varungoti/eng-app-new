@@ -22,8 +22,9 @@ export class DataFlowMonitor {
   private config: MonitorConfig;
   private metrics: DataFlowMetrics;
   private activeOperations: Map<string, Operation>;
+  private loggerInstance: typeof logger;
 
-  constructor(supabase: SupabaseClient, config: MonitorConfig) {
+  constructor(supabase: SupabaseClient, config: MonitorConfig, loggerInstance: typeof logger) {
     this.supabase = supabase;
     this.config = config;
     this.metrics = {
@@ -33,68 +34,32 @@ export class DataFlowMonitor {
       activeConnections: 0
     };
     this.activeOperations = new Map();
+    this.loggerInstance = loggerInstance;
   }
 
-  public startOperation(type: string, name: string, metadata?: Record<string, any>): string {
-    const id = crypto.randomUUID();
+  public startOperation(type: string, name: string, metadata: any = {}): string {
+    const opId = `${type}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     const operation: Operation = {
-      id,
+      id: opId,
       type,
       name,
       startTime: performance.now(),
       metadata
     };
 
-    this.activeOperations.set(id, operation);
+    this.activeOperations.set(opId, operation);
     
-    logger.debug(`Started operation: ${name}`, {
-      source: 'DataFlowMonitor',
-      context: {
-        operationId: id,
-        type,
-        metadata
-      }
-    });
+    this.loggerInstance.info(`Starting operation: ${name} (${opId}) - Type: ${type}`, 'DataFlowMonitor');
 
-    return id;
+    return opId;
   }
 
-  public endOperation(id: string, error?: Error) {
-    const operation = this.activeOperations.get(id);
-    if (!operation) {
-      logger.warn(`Attempted to end unknown operation: ${id}`, {
-        source: 'DataFlowMonitor'
-      });
-      return;
-    }
-
-    const duration = performance.now() - operation.startTime;
-    const success = !error;
-
-    this.recordOperation(operation.name, duration, success);
-    this.activeOperations.delete(id);
-
-    if (error) {
-      logger.error(`Operation failed: ${operation.name}`, {
-        source: 'DataFlowMonitor',
-        context: {
-          operationId: id,
-          duration,
-          error,
-          metadata: operation.metadata
-        }
-      });
-    } else {
-      logger.debug(`Completed operation: ${operation.name}`, {
-        source: 'DataFlowMonitor',
-        context: {
-          operationId: id,
-          duration,
-          metadata: operation.metadata
-        }
-      });
-    }
+  public endOperation(opId: string): void {
+    this.loggerInstance.info(`Ending operation: ${opId}`, 'DataFlowMonitor');
   }
+
+
+
 
   public async recordOperation(operation: string, duration: number, success: boolean) {
     if (Math.random() > this.config.sampleRate!) return;
@@ -112,17 +77,11 @@ export class DataFlowMonitor {
 
       this.updateMetrics(duration, success);
     } catch (error) {
-      logger.error('Failed to record data flow operation', {
-        source: 'DataFlowMonitor',
-        context: {
-          operation,
-          duration,
-          success,
-          error
-        }
-      });
+      logger.error('Failed to record data flow operation', 'DataFlowMonitor', error);
+        
     }
   }
+
 
   private updateMetrics(duration: number, success: boolean) {
     this.metrics.averageResponseTime = 
@@ -131,13 +90,8 @@ export class DataFlowMonitor {
     if (!success) this.metrics.errorRate++;
 
     if (this.metrics.averageResponseTime > 1000) {
-      logger.warn('High average response time detected', {
-        source: 'DataFlowMonitor',
-        context: {
-          averageResponseTime: this.metrics.averageResponseTime,
-          threshold: 1000
-        }
-      });
+      logger.warn('High average response time detected', 'DataFlowMonitor');
+
     }
   }
 

@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/lib/maps.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1739013018035,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1739013018035,
+            "name": "Commit-0",
+            "content": "import { Libraries } from '@react-google-maps/api';\r\nimport { useLoadScript } from '@react-google-maps/api';\r\nimport { useMemo, useEffect } from 'react';\r\nimport { logger } from './logger';\r\n\r\nexport const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;\r\n\r\n// India bounds for restricting map view\r\nexport const INDIA_BOUNDS = {\r\n  north: 35.513327,  // Northern India\r\n  south: 6.4626999,  // Southern India\r\n  east: 97.395561,   // Eastern India\r\n  west: 68.7917517,  // Western India\r\n};\r\n\r\nexport const GOOGLE_MAPS_CONFIG = {\r\n  libraries: ['places', 'geometry'] as Libraries,\r\n  defaultCenter: { lat: 17.2313, lng: 78.2930  }, // Hyderabad\r\n  defaultZoom: 13,\r\n  mapOptions: {\r\n    disableDefaultUI: false,\r\n    mapTypeControl: false,\r\n    streetViewControl: false,\r\n    fullscreenControl: false,\r\n    zoomControl: true,\r\n    gestureHandling: 'cooperative',\r\n    mapTypeId: 'roadmap',\r\n    restriction: {\r\n      latLngBounds: INDIA_BOUNDS,\r\n      strictBounds: false\r\n    },\r\n    styles: [\r\n      {\r\n        featureType: 'poi',\r\n        elementType: 'labels',\r\n        stylers: [{ visibility: 'off' }]\r\n      }\r\n    ]\r\n  },\r\n  autocompleteOptions: {\r\n    componentRestrictions: { country: 'IN' },\r\n    types: ['geocode', 'establishment'],\r\n    fields: ['formatted_address', 'geometry', 'name']\r\n  },\r\n};\r\n\r\nexport const useGoogleMaps = () => {\r\n  const apiKey = useMemo(() => GOOGLE_MAPS_API_KEY, []);\r\n  \r\n  const { isLoaded, loadError } = useLoadScript({\r\n    googleMapsApiKey: apiKey || '',\r\n    libraries: GOOGLE_MAPS_CONFIG.libraries\r\n  });\r\n\r\n  // Log after load check\r\n  useEffect(() => {\r\n    if (isLoaded) {\r\n      logger.info('Google Maps loaded successfully', {\r\n        source: 'GoogleMaps'\r\n      });\r\n    }\r\n  }, [isLoaded]);\r\n\r\n  const error = useMemo(() => {\r\n    if (!apiKey) {\r\n      return {\r\n        message: 'Google Maps API key is not configured',\r\n        details: 'Please add VITE_GOOGLE_MAPS_API_KEY to your environment variables'\r\n      };\r\n    }\r\n    if (loadError) {\r\n      return {\r\n        message: 'Failed to load Google Maps',\r\n        details: loadError.message,\r\n      };\r\n    }\r\n    return null;\r\n  }, [apiKey, loadError]);\r\n\r\n  return {\r\n    isLoaded,\r\n    loadError: error,\r\n    config: GOOGLE_MAPS_CONFIG,\r\n  };\r\n};"
+        }
+    ]
+}

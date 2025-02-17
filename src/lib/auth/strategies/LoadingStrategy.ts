@@ -1,5 +1,5 @@
 import { logger } from '../../logger';
-import { loadingMonitor } from '../../monitoring/LoadingMonitor';
+import { monitors } from '../../monitoring';
 import { WarningCache } from '../../monitoring/WarningCache';
 
 const warningCache = new WarningCache(5000); // Reduced to 5 seconds
@@ -12,9 +12,9 @@ export class LoadingStrategy {
 
   constructor(private component: string) {}
 
-  public start(): void {
+  public async start(): Promise<void> {
     this.startTime = performance.now();
-    this.loadingId = loadingMonitor.startLoading(this.component);
+    this.loadingId = await monitors.loadingMonitor.startLoading(this.component);
   }
 
   public updateProgress(percent: number): void {
@@ -22,14 +22,7 @@ export class LoadingStrategy {
     
     if (!this.warned && duration > this.SLOW_THRESHOLD) {
       if (warningCache.shouldLog(`slow:${this.component}`)) {
-        logger.debug(`Loading progress: ${percent}%`, {
-          context: { 
-            component: this.component,
-            duration,
-            threshold: this.SLOW_THRESHOLD
-          },
-          source: this.component
-        });
+        logger.debug(`Loading progress: ${percent}% - Duration: ${duration}ms (threshold: ${this.SLOW_THRESHOLD}ms)`, this.component);
       }
       this.warned = true;
     }
@@ -37,8 +30,10 @@ export class LoadingStrategy {
 
   public end(error?: Error): void {
     if (this.loadingId) {
-      loadingMonitor.endLoading(this.loadingId, error);
+      monitors.loadingMonitor.endLoading(this.loadingId);
       this.loadingId = undefined;
+
     }
+
   }
 }

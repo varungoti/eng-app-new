@@ -14,9 +14,7 @@ const UserProfileMenu: React.FC = () => {
       setIsOpen(false);
       await logout();
       navigate('/login');
-      logger.info('User logged out successfully', {
-        source: 'UserProfileMenu'
-      });
+      logger?.info('User logged out successfully', 'UserProfileMenu');
     } catch (err) {
       logger.error('Failed to logout', {
         context: { error: err },

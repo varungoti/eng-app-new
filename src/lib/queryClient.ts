@@ -22,15 +22,15 @@ export const queryClient = new QueryClient({
     mutations: {
       onSuccess: (data: unknown, variables: unknown, context: unknown) => {
         if (DEBUG_CONFIG.enabled) {
-          logger.debug('Query succeeded', {
-            source: (context as { meta?: { source: string } })?.meta?.source || 'unknown'
-          });
+          logger.debug('Query succeeded', 
+            (context as { meta?: { source: string } })?.meta?.source || 'unknown'
+          );
         }
       },
       onError: (error: Error, variables: unknown, context: unknown) => {
-        logger.error(`Query error: ${error.message}`, {
-          source: (context as { meta?: { source: string } })?.meta?.source || 'unknown'
-        });
+        logger.error(`Query error: ${error.message}`, 
+          (context as { meta?: { source: string } })?.meta?.source || 'unknown'
+        );
       }
     }
   }

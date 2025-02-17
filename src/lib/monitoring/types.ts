@@ -33,3 +33,10 @@ export interface DatabaseMetrics {
   count: number;
   errorCount: number;
 }
+
+export interface DataFlowMonitor {
+  trackDataLoad: (loadId: string, metadata: { source: string; recordCount: number }) => Promise<void>;
+  getFlowMetrics: (flowId: string) => Promise<any[]>;
+  startOperation: (type: string, name: string, metadata?: any) => string;
+  endOperation: (opId: string) => void;
+}

@@ -2,11 +2,17 @@
 
 //import React from 'react';
 import { Card } from '@/components/ui/card';
+import { RoleSettings } from '@/hooks/useRoleSettings';
 import { useRouter } from 'next/navigation';
 
 
-const ContentEditorDashboard = () => {
+interface ContentEditorDashboardProps {
+  settings: RoleSettings;
+}
+
+const ContentEditorDashboard: React.FC<ContentEditorDashboardProps> = ({ settings }) => {
   const router = useRouter();
+
 
   return (
     <div className="container mx-auto p-6">

@@ -75,6 +75,7 @@ import AIConversationPage from './app/teacher/ai-conversation/page';
 const TeacherMyClassPage = React.lazy(() => import('./app/teacher/my-class/page'));
 
 import { ResetPassword } from "@/components/auth/ResetPassword";
+import { SessionDebugger } from './components/SessionDebugger';
 
 // Create a new QueryClient instance
 const queryClient = new QueryClient({
@@ -262,6 +263,7 @@ function App() {
                   </div>
                 </div>
                 <Toaster />
+                {import.meta.env.DEV && <SessionDebugger />}
               </ToastProvider>
             </ThemeContextProvider>
             </NextThemesProvider>

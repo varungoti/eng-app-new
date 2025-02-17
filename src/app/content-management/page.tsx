@@ -36,7 +36,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { debounce } from 'lodash';
+import { debounce, isNull } from 'lodash';
 import { PostgrestError } from '@supabase/supabase-js';
 import { Question as ContentQuestion } from './types';  // Import the specific type
 
@@ -220,9 +220,13 @@ interface Question {
   isDraft?: boolean;
 }
 
+// Add at the top of the file with other type definitions
+type QuestionType = keyof typeof QUESTION_TYPES;
 
-
-
+// Add this type guard function
+const isValidQuestionType = (type: string): type is QuestionType => {
+  return type in QUESTION_TYPES;
+};
 
 // Update handleAddQuestion
 
@@ -320,7 +324,7 @@ export default function LessonManagementPage() {
   // Add new state for tracking save status
   interface SaveStatus {
     id: string;
-    status: 'draft' | 'saved' | 'saving' | 'error';
+    status: 'draft' | 'saved' | 'saving' | 'error' | 'draft';
     lastSaved?: string;
   }
 
@@ -329,6 +333,9 @@ export default function LessonManagementPage() {
     status: 'idle' | 'saving' | 'saved' | 'error' | 'draft';
   }>>([]);
   const [promptSaveStatuses, setPromptSaveStatuses] = useState<SaveStatus[]>([]);
+
+  // Add this state to track dropdown state
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   // Event handlers
   const handleQuestionTypeChange = useCallback((type: string) => {
@@ -540,45 +547,61 @@ export default function LessonManagementPage() {
         return;
       }
 
-      const { data: { session } } = await supabase.auth.getSession();
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError) throw sessionError;
+      
       if (!session?.user) {
         toast.error('Please sign in to save lessons');
         return;
       }
 
-      // First check if we own this lesson
-      const { data: existingLesson, error: checkError } = await supabase
-        .from('lessons')
-        .select('user_id')
-        .eq('id', currentLessonId)
-        .single();
+      // Get user's role from session
+      const userRole = session.user.user_metadata?.role;
+      console.log('Current user role:', userRole);
+      console.log('📝 Saving content heading:', {
+        contentHeading,
+        currentLessonId,
+        selectedSubtopicId,
+        timestamp: new Date().toISOString()
+      });
 
-      if (checkError) {
-        console.error('Error checking lesson ownership:', checkError);
-        toast.error('Failed to verify lesson ownership');
-        return;
-      }
+      // Create metadata object
+      const lessonMetadata = {
+        lastEdited: new Date().toISOString(),
+        version: 1,
+        status: 'draft' 
+      };
 
-      // If lesson exists but we don't own it
-      if (existingLesson && existingLesson.user_id !== session.user.id) {
-        toast.error('You do not have permission to edit this lesson');
-        return;
-      }
-
+      // Complete lesson data with all fields
       const lessonData = {
         id: currentLessonId,
         title: lessonTitle,
+        content: lessonContent,
+        metadata: lessonMetadata, // Supabase will automatically handle JSON conversion
+        content_type: 'html',
+        lesson_type: 'lesson',
+        grade_id: selectedGradeId,
+        topic_id: selectedTopicId,
         subtopic_id: selectedSubtopicId,
-        //user_id: session.user.id,
+        user_id: session.user.id,
         updated_at: new Date().toISOString(),
-        ...((!existingLesson ? { subtopic_id: selectedSubtopicId } : {}))
+        role: userRole, // Include role in the payload
+        description: '',
+        prerequisites: [],
+        media_type: 'image',
+        media_url: '',
+        contentheading: contentHeading || ''
       };
-      
+
       console.log('📦 Data being sent to Supabase:', lessonData);
 
-      const { error: lessonError } = await supabase
+      // Save lesson with all fields
+      const { data, error: lessonError } = await supabase
         .from('lessons')
-        .upsert(lessonData, { onConflict: 'id' });
+        .upsert(lessonData, { 
+          onConflict: 'id'
+        })
+        .select();
 
       if (lessonError) throw lessonError;
 
@@ -589,16 +612,20 @@ export default function LessonManagementPage() {
         .eq('lesson_id', currentLessonId)
         .single();
 
+      const contentMetadata = {
+        lastEdited: new Date().toISOString(),
+        version: 1,
+        status: 'draft'
+      };
+
       const contentUpdate = {
         id: existingContent?.id || crypto.randomUUID(),
         lesson_id: currentLessonId,
         content: [lessonContent],
-        metadata: JSON.stringify({
-          lastEdited: new Date().toISOString(),
-          version: 1,
-          status: 'draft'
-        }),
+        metadata: contentMetadata, // Supabase will automatically handle JSON conversion
         content_type: 'html',
+        user_id: session.user.id,
+        updated_at: new Date().toISOString(),
         created_at: new Date().toISOString()
       };
 
@@ -672,10 +699,26 @@ export default function LessonManagementPage() {
         if (activitiesError) throw activitiesError;
       }
 
+      // After successful save
+      console.log('✅ Content heading saved successfully:', {
+        contentHeading,
+        lessonId: currentLessonId,
+        timestamp: new Date().toISOString()
+      });
+
       toast.success('Lesson saved successfully');
-    } catch (error) {
-      console.error('Save error:', error);
-      toast.error('Failed to save lesson');
+    } catch (err) {
+      const error = err as PostgrestError;
+      console.error('❌ Error saving content heading:', {
+        error: error.message,
+        contentHeading,
+        lessonContent,
+        lessonId: currentLessonId,
+        timestamp: new Date().toISOString()
+      });
+      toast.error(`Failed to save lesson: ${error.message}`);
+
+
     }
   };
 
@@ -1202,34 +1245,29 @@ export default function LessonManagementPage() {
   const handleCreateTopic = async () => {
     if (!selectedGradeId) {
       toast.error('Please select a grade first');
-        return;
-      }
+      return;
+    }
 
     try {
-      const response = await fetch(`${API_ENDPOINT}/topics`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: newItemData.name,
-          gradeId: selectedGradeId
-        })
+      const newTopic = await contentService.createTopic({
+        title: newItemData.name, // Map from newItemData.name to title
+        description: newItemData.description,
+        gradeId: selectedGradeId
       });
 
-      if (!response.ok) throw new Error('Failed to create topic');
-      const data = await response.json();
-      
-      if (!data.success) throw new Error(data.message || 'Failed to create topic');
-      
-      // Update topics list
-      setTopics([...topics, data.data.topic]);
+      setTopics(prev => [...prev, newTopic]);
+      toast.success('Topic created successfully');
       setModalState({ ...modalState, showAddTopic: false });
       setNewItemData({ name: '', description: '' });
-      toast.success('Topic created successfully');
-    } catch (error) {
+    } catch (err) {
+      const error = err instanceof Error ? err.message : String(err);
       console.error('Error creating topic:', error);
       toast.error('Failed to create topic');
     }
   };
+    
+  
+
 
   const handleCreateSubtopic = async (data: { title: string; description?: string }) => {
     try {
@@ -1734,7 +1772,56 @@ export default function LessonManagementPage() {
     }
   };
 
-  // Render
+  // Update the sidebar hover mechanism
+  const handleSidebarHover = useCallback(
+    debounce((isHovering: boolean) => {
+      if (!isSidebarLocked && !isNavigating && !isDropdownOpen) {
+        if (isHovering || document.activeElement?.closest('.sidebar-content')) {
+          setIsSidebarCollapsed(false);
+        } else {
+          setTimeout(() => {
+            if (!isDropdownOpen) { // Only collapse if dropdown is closed
+              setIsSidebarCollapsed(true);
+            }
+          }, 300);
+        }
+      }
+    }, 100),
+    [isSidebarLocked, isNavigating, isDropdownOpen]
+  );
+
+  // Update the sidebar JSX
+  <div 
+    className={cn(
+      "transition-all duration-300 ease-in-out relative",
+      isSidebarCollapsed ? "w-20" : "w-80",
+      "flex-shrink-0 group"
+    )}
+    onMouseEnter={() => {
+      handleSidebarHover(true);
+      // Immediately expand on mouse enter
+      if (!isSidebarLocked) {
+        setIsSidebarCollapsed(false);
+      }
+    }}
+    onMouseLeave={() => {
+      // Only collapse if not interacting with content
+      if (!document.activeElement?.closest('.sidebar-content')) {
+        handleSidebarHover(false);
+      }
+    }}
+    onFocus={() => setIsSidebarCollapsed(false)}
+  >
+    <Card className={cn(
+      "h-full relative sidebar-content", // Added sidebar-content class
+      "transition-shadow duration-300",
+      "hover:shadow-lg"
+    )}>
+      {/* Rest of sidebar content */}
+    </Card>
+  </div>
+
+  // Update the sidebar and card styles
   return (
       <div className="container mx-auto py-8">
         {/* Header */}
@@ -1776,17 +1863,33 @@ export default function LessonManagementPage() {
         
         {/* Main content wrapper - Fix the layout here */}
         <div className="flex gap-6 h-[calc(100vh-200px)]">
-          {/* Left Sidebar with collapse/expand functionality */}
+          {/* Improved sidebar */}
           <div 
             className={cn(
               "transition-all duration-300 ease-in-out relative",
               isSidebarCollapsed ? "w-20" : "w-80",
-              "flex-shrink-0"
+              "flex-shrink-0 group"
             )}
-            onMouseEnter={() => !isSidebarLocked && setIsSidebarCollapsed(false)}
-            onMouseLeave={() => !isSidebarLocked && setIsSidebarCollapsed(true)}
+            onMouseEnter={() => {
+              handleSidebarHover(true);
+              // Immediately expand on mouse enter
+              if (!isSidebarLocked) {
+                setIsSidebarCollapsed(false);
+              }
+            }}
+            onMouseLeave={() => {
+              // Only collapse if not interacting with content
+              if (!document.activeElement?.closest('.sidebar-content')) {
+                handleSidebarHover(false);
+              }
+            }}
+            onFocus={() => setIsSidebarCollapsed(false)}
           >
-            <Card className="h-full relative">
+            <Card className={cn(
+              "h-full relative sidebar-content", // Added sidebar-content class
+              "transition-shadow duration-300",
+              "hover:shadow-lg"
+            )}>
               {/* Lock button - only show after lesson selection */}
               {currentLessonId && (
                 <Button
@@ -2076,8 +2179,28 @@ export default function LessonManagementPage() {
                           <Select 
                             value={currentLessonId || ''} 
                             onValueChange={handleLessonSelect}
+                            onOpenChange={(open) => {
+                              setIsDropdownOpen(open);
+                              if (open) {
+                                setIsSidebarCollapsed(false);
+                                setIsSidebarLocked(true);
+                              } else {
+                                // Small delay before unlocking to prevent immediate collapse
+                                setTimeout(() => {
+                                  setIsSidebarLocked(false);
+                                }, 100);
+                              }
+                            }}
                           >
-                            <SelectTrigger id="lesson-select" className="w-full">
+                            <SelectTrigger 
+                              id="lesson-select" 
+                              className="w-full"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setIsSidebarCollapsed(false);
+                                setIsSidebarLocked(true);
+                              }}
+                            >
                               <SelectValue placeholder="Select Lesson" />
                             </SelectTrigger>
                             <SelectContent>
@@ -2265,25 +2388,57 @@ export default function LessonManagementPage() {
                                           .map((lesson) => (
                                             <Card 
                                               key={lesson.id} 
-                                              className="cursor-pointer hover:bg-accent transition-colors duration-200"
-                                              onClick={() => {
-                                                setCurrentLessonId(lesson.id || '');
-                                                setSelectedTopicId(topic.id || '');
-                                                setSelectedSubtopicId(subtopic.id || '');
-                                                setIsViewMode(false);
-                                              }}
+                                              className={cn(
+                                                "cursor-pointer transition-all duration-200",
+                                                "hover:shadow-md hover:translate-y-[-2px]",
+                                                "hover:bg-accent/50 hover:border-primary/50",
+                                                "active:translate-y-[0px]",
+                                                currentLessonId === lesson.id && "border-primary bg-accent/50 shadow-md",
+                                                "group" // Enable group hover effects
+                                              )}
+                                              onClick={() => handleLessonSelect(lesson.id || '')}
                                             >
-                                              <CardHeader className="py-3">
+                                              <CardHeader className="p-4">
                                                 <div className="flex flex-col gap-2">
-                                                  <div className="flex items-center gap-2">
-                                                    <BookOpen className="h-4 w-4 text-primary" />
-                                                    <span className="font-medium">{lesson.title}</span>
+                                                  <div className="flex items-center justify-between">
+                                                    <div className="flex items-center gap-2">
+                                                      <BookOpen className={cn(
+                                                        "h-4 w-4 text-primary",
+                                                        "transition-transform duration-200",
+                                                        "group-hover:scale-110"
+                                                      )} />
+                                                      <span className="font-medium">{lesson.title}</span>
+                                                    </div>
+                                                    <Button
+                                                      variant="outline"
+                                                      size="sm"
+                                                      className={cn(
+                                                        "opacity-0 group-hover:opacity-100",
+                                                        "transition-all duration-200",
+                                                        "hover:bg-primary hover:text-primary-foreground"
+                                                      )}
+                                                      disabled={!lesson.content || currentLessonId !== lesson.id}
+                                                      onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        window.location.href = `/teacher/lessons/${lesson.id}`;
+                                                      }}
+                                                    >
+                                                      Start Lesson
+                                                    </Button>
                                                   </div>
                                                   <div className="flex items-center gap-2">
-                                                    <Badge variant="outline" className="bg-primary/5">
+                                                    <Badge variant="outline" className={cn(
+                                                      "bg-primary/5",
+                                                      "transition-colors duration-200",
+                                                      "group-hover:bg-primary/10"
+                                                    )}>
                                                       {lesson.questions?.length || 0} Questions
                                                     </Badge>
-                                                    <Badge variant="outline" className="bg-primary/5">
+                                                    <Badge variant="outline" className={cn(
+                                                      "bg-primary/5",
+                                                      "transition-colors duration-200",
+                                                      "group-hover:bg-primary/10"
+                                                    )}>
                                                       {lesson.activities?.length || 0} Activities
                                                     </Badge>
                                                   </div>
@@ -2317,9 +2472,9 @@ export default function LessonManagementPage() {
                       <CardHeader>
                         <div className="flex items-center justify-between mb-4">
                           <h2 className="text-2xl font-bold">Lesson Content</h2>
-                          <Button 
-                            variant="outline" 
-                            size="sm"
+                                                    <Button
+                                                      variant="outline"
+                                                      size="sm"
                             onClick={() => setIsContentEditorOpen(true)}
                           >
                             <Pencil className="h-4 w-4 mr-2" />
@@ -2455,7 +2610,14 @@ export default function LessonManagementPage() {
                                       question={{ 
                                         ...question, 
                                         lesson_id: currentLessonId || '',
-                                        type: (question.type || 'speaking') as Question['type']  // Default to 'speaking' if undefined
+                                        type: isValidQuestionType(question.type) ? question.type : 'speaking',
+                                        data: {
+                                          prompt: question.data?.prompt || '',
+                                          teacherScript: question.data?.teacherScript || '',
+                                          followup_prompt: question.data?.followup_prompt || [],
+                                          sampleAnswer: question.data?.sampleAnswer,
+                                          answer: question.data?.answer
+                                        }
                                       }}
                                       index={index}
                                       onUpdate={async (index: number, updatedQuestion: ContentQuestion) => {
@@ -2486,7 +2648,7 @@ export default function LessonManagementPage() {
                                       <Save className="h-4 w-4 mr-2" />
                                     )}
                                     Save Question
-                                  </Button>
+                                                    </Button>
                                     {/* Exercise Prompts with Save Buttons */}
                                     {question.exercisePrompts?.map((prompt, promptIndex) => (
                                       <div key={`${question.id}-prompt-${promptIndex}`} className="mt-4"> {/* Updated key */}
@@ -2524,7 +2686,7 @@ export default function LessonManagementPage() {
                                             }>
                                               {promptSaveStatuses.find(s => s.id === prompt.id)?.status || 'draft'}
                                             </Badge>
-                                          </div>
+                                                  </div>
                                         </div>
                                         <ExercisePromptCard
                                           key={prompt.id} // Add a unique key here
