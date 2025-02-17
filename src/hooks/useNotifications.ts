@@ -3,9 +3,10 @@ import { supabase } from '../lib/supabase';
 import { useCache } from './useCache';
 import { useAuth } from './useAuth';
 import { measurePerformance } from '../lib/utils/performance';
+import type { CustomNotification } from '../types/notifications';
 
 export const useNotifications = () => {
-  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [notifications, setNotifications] = useState<CustomNotification[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { user } = useAuth();
@@ -22,7 +23,7 @@ export const useNotifications = () => {
       setLoading(true);
       
       // Check cache first
-      const cachedNotifications = cache.get<Notification[]>(CACHE_KEY);
+      const cachedNotifications = cache.get<CustomNotification[]>(CACHE_KEY);
       if (cachedNotifications) {
         setNotifications(cachedNotifications);
         endMetric();
@@ -48,7 +49,7 @@ export const useNotifications = () => {
         createdAt: new Date(n.created_at)
       }));
 
-      setNotifications(mappedNotifications);
+      setNotifications(mappedNotifications as CustomNotification[]);
       cache.set(CACHE_KEY, mappedNotifications, CACHE_TTL);
       endMetric();
       setError(null);

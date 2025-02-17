@@ -1,0 +1,34 @@
+{
+    "sourceFile": "src/components/learning/Question.tsx",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 4,
+            "patches": [
+                {
+                    "date": 1739453246030,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1739453255563,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -2,9 +2,9 @@\n import { Card, CardContent, CardHeader, CardTitle } from \"@/components/ui/card\";\r\n import { ExercisePrompt } from './ExercisePrompt';\r\n import { Button } from \"@/components/ui/button\";\r\n import { Progress } from \"@/components/ui/progress\";\r\n-import type { Question, ExercisePrompt as ExercisePromptType } from '../types/learning';\r\n+import type { Question, ExercisePrompt as ExercisePromptType } from '..types/learning';\r\n \r\n interface QuestionProps {\r\n   question: Question & {\r\n     exercise_prompts: ExercisePromptType[];\r\n"
+                },
+                {
+                    "date": 1739453263064,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -2,9 +2,9 @@\n import { Card, CardContent, CardHeader, CardTitle } from \"@/components/ui/card\";\r\n import { ExercisePrompt } from './ExercisePrompt';\r\n import { Button } from \"@/components/ui/button\";\r\n import { Progress } from \"@/components/ui/progress\";\r\n-import type { Question, ExercisePrompt as ExercisePromptType } from '..types/learning';\r\n+import type { Question, ExercisePrompt as ExercisePromptType } from 'types/learning';\r\n \r\n interface QuestionProps {\r\n   question: Question & {\r\n     exercise_prompts: ExercisePromptType[];\r\n"
+                },
+                {
+                    "date": 1739453269598,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -2,9 +2,9 @@\n import { Card, CardContent, CardHeader, CardTitle } from \"@/components/ui/card\";\r\n import { ExercisePrompt } from './ExercisePrompt';\r\n import { Button } from \"@/components/ui/button\";\r\n import { Progress } from \"@/components/ui/progress\";\r\n-import type { Question, ExercisePrompt as ExercisePromptType } from 'types/learning';\r\n+import type { Question, ExercisePrompt as ExercisePromptType } from '../types/learning';\r\n \r\n interface QuestionProps {\r\n   question: Question & {\r\n     exercise_prompts: ExercisePromptType[];\r\n"
+                },
+                {
+                    "date": 1739453280750,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -2,9 +2,9 @@\n import { Card, CardContent, CardHeader, CardTitle } from \"@/components/ui/card\";\r\n import { ExercisePrompt } from './ExercisePrompt';\r\n import { Button } from \"@/components/ui/button\";\r\n import { Progress } from \"@/components/ui/progress\";\r\n-import type { Question, ExercisePrompt as ExercisePromptType } from '../types/learning';\r\n+import type { Question, ExercisePrompt as ExercisePromptType } from '@/types/learning';\r\n \r\n interface QuestionProps {\r\n   question: Question & {\r\n     exercise_prompts: ExercisePromptType[];\r\n"
+                }
+            ],
+            "date": 1739453246030,
+            "name": "Commit-0",
+            "content": "import { useState } from 'react';\r\nimport { Card, CardContent, CardHeader, CardTitle } from \"@/components/ui/card\";\r\nimport { ExercisePrompt } from './ExercisePrompt';\r\nimport { Button } from \"@/components/ui/button\";\r\nimport { Progress } from \"@/components/ui/progress\";\r\nimport type { Question, ExercisePrompt as ExercisePromptType } from '../types/learning';\r\n\r\ninterface QuestionProps {\r\n  question: Question & {\r\n    exercise_prompts: ExercisePromptType[];\r\n  };\r\n  onComplete: (results: any) => Promise<void>;\r\n}\r\n\r\nexport function QuestionComponent({ question, onComplete }: QuestionProps) {\r\n  const [currentPromptIndex, setCurrentPromptIndex] = useState(0);\r\n  const [answers, setAnswers] = useState<Record<string, any>>({});\r\n\r\n  const handlePromptComplete = async (promptAnswer: any) => {\r\n    const updatedAnswers = {\r\n      ...answers,\r\n      [question.exercise_prompts[currentPromptIndex].id]: promptAnswer\r\n    };\r\n    setAnswers(updatedAnswers);\r\n\r\n    if (currentPromptIndex + 1 < question.exercise_prompts.length) {\r\n      setCurrentPromptIndex(currentPromptIndex + 1);\r\n    } else {\r\n      await onComplete(updatedAnswers);\r\n    }\r\n  };\r\n\r\n  return (\r\n    <Card className=\"w-full max-w-3xl mx-auto\">\r\n      <CardHeader>\r\n        <CardTitle>{question.text}</CardTitle>\r\n        <Progress \r\n          value={(currentPromptIndex / question.exercise_prompts.length) * 100} \r\n          className=\"w-full\"\r\n        />\r\n      </CardHeader>\r\n      <CardContent>\r\n        {question.exercise_prompts[currentPromptIndex] && (\r\n          <ExercisePrompt\r\n            prompt={question.exercise_prompts[currentPromptIndex]}\r\n            onComplete={handlePromptComplete}\r\n          />\r\n        )}\r\n      </CardContent>\r\n    </Card>\r\n  );\r\n} "
+        }
+    ]
+}

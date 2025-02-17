@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/mongodb';
-import { Lesson } from '@/models/Lesson';
+import { Lesson } from '@/app//models/Lesson';
 import { Types } from 'mongoose';
 import { z } from 'zod';
 import mongoose from 'mongoose';
@@ -14,7 +14,7 @@ export async function GET(
   { params }: { params: { lessonId: string } }
 ) {
   try {
-    console.log('GET /api/admin/lessons/[lessonId] - Starting');
+    console.log('GET /api/admin/lessons/lesson - Starting');
     const { lessonId } = params;
 
     if (!lessonId) {
@@ -27,7 +27,7 @@ export async function GET(
       return errorResponse('Lesson not found', 'NOT_FOUND_ERROR', 404);
     }
 
-    console.log('GET /api/admin/lessons/[lessonId] - Success');
+    console.log('GET /api/admin/lessons/lesson - Success');
     return successResponse(lesson);
   } catch (error) {
     console.error('Error fetching lesson:', error);

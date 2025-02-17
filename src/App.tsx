@@ -1,7 +1,13 @@
 "use client";
 
-import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import React, { useEffect, memo } from 'react';
+import { 
+  Routes, 
+  Route, 
+  Navigate, 
+  useLocation, 
+  useNavigate
+} from 'react-router-dom';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { QueryClient  } from '@tanstack/query-core';
 import { AuthProvider } from './contexts/AuthContext';
@@ -13,6 +19,7 @@ import PrivateRoute from './components/PrivateRoute';
 import ErrorToast from './components/ErrorToast';
 //import { queryClient } from '@/providers/query-provider';
 import ErrorBoundary from './components/ErrorBoundary';
+import LessonErrorBoundary from './components/LessonErrorBoundary';
 import LoadingSpinner from './components/LoadingSpinner';
 import ThemeSelector from './components/ThemeSelector';
 import ContentManagementPage from './app/content-management/page' ;
@@ -23,11 +30,11 @@ import { themes } from "@/lib/themes"
 import { ThemeContextProvider } from './contexts/ThemeContext';
 import { Toaster } from "@/components/ui/toaster";
 import { ToastProvider } from "@/components/ui/toast";
-import { BrowserRouter } from 'react-router-dom';
 
 // Import Dashboard page directly to avoid dynamic import issues
 import DashboardPage from './pages/Dashboard';
 import MyClassesPage from './app/teacher/lessons/page';
+import LessonPage from './app/teacher/lessons/lesson';
 
 // Lazy load pages with proper error boundaries
 const Login = React.lazy(() => import('./pages/Login'));
@@ -87,12 +94,28 @@ const queryClient = new QueryClient({
   },
 });
 
-function App() {
+import { ConsoleMonitor } from '@/utils/consoleMonitor';
+
+function MyApp({ Component, pageProps }: { Component: React.ComponentType; pageProps: any }) {
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      ConsoleMonitor.getInstance();
+    }
+  }, []);
+
+  return <Component {...pageProps} />;
+}
+
+
+function AppContent() {
   const { theme, resolvedTheme } = useTheme()
   const currentTheme = themes[theme as keyof typeof themes] || themes[resolvedTheme as keyof typeof themes] || themes.light
+  const location = useLocation();
+  const navigate = useNavigate();
 
+  // Log initialization
   console.log('[App] Rendering...');
-  logger.info('App initializing', 'App');
+  logger.info('App initializing', { source: 'App', context: { route: location.pathname } });
 
   return (
     <ErrorBoundary source="App">
@@ -113,7 +136,7 @@ function App() {
                 <ToastProvider>
                 <div className={`relative min-h-screen w-full ${currentTheme.background} ${currentTheme.text}`}>
                   <ThemeToggle />
-                  <div className={`w-full ${currentTheme.background} ${currentTheme.text}`}>
+                  <div className={`w-full h-full flex flex-col ${currentTheme.background} ${currentTheme.text}`}>
                     <Routes>
                       <Route 
                         path="/login" 
@@ -132,7 +155,6 @@ function App() {
                           </PrivateRoute>
                         </div>
                       }>
-                        <Route index element={<Navigate to="/dashboard" replace />} />
                         <Route path="/dashboard" element={<DashboardPage />} />
                         <Route 
                           path="app/learning/*" 
@@ -228,31 +250,30 @@ function App() {
                             </React.Suspense>
                           } 
                         />
+                        <Route path="/teacher" element={<TeacherLayout />}>
+                          <Route path="dashboard" element={<TeacherDashboard />} />
+                          <Route path="classes" element={<Classes />} />
+                          <Route path="lessons" element={<Classes />} />
+                          <Route path="lessons/lesson" element={
+                            <PrivateRoute>
+                              <React.Suspense fallback={<LoadingSpinner message="Loading lesson..." />}>
+                                <LessonErrorBoundary source="LessonRoute">
+                                  <LessonPage />
+                                </LessonErrorBoundary>
+                              </React.Suspense>
+                            </PrivateRoute>
+                          } />
+                          <Route path="my-class" element={
+                            <React.Suspense fallback={<LoadingSpinner message="Loading My Class..." />}>
+                              <TeacherMyClassPage />
+                            </React.Suspense>
+                          } />
+                          <Route path="AI-Conversation" element={<AIConversationPage />} />
+                        </Route>
+                        <Route path="/reset-password/*" element={<ResetPassword />} />
+                        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                        <Route path="*" element={<Navigate to="/dashboard" replace />} />
                       </Route>
-                      <Route 
-                        path="/teacher/*" 
-                        element={
-                          <TeacherLayout>
-                            <Routes>
-                              <Route path="/" element={<Navigate to="dashboard" replace />} />
-                              <Route path="dashboard" element={<TeacherDashboard />} />
-                              <Route path="classes" element={<Classes />} />
-                              <Route path="lessons" element={<Classes />} />
-                              <Route path="my-class" element={
-                                <React.Suspense fallback={<LoadingSpinner message="Loading My Class..." />}>
-                                  <TeacherMyClassPage />
-                                </React.Suspense>
-                              } />
-                              <Route path="AI-Conversation" element={<AIConversationPage />} />
-                            </Routes>
-                          </TeacherLayout>
-                        } 
-                      />
-                      <Route 
-                        path="/reset-password/*" 
-                        element={<ResetPassword />} 
-                      />
-                      <Route path="*" element={<Navigate to="/dashboard" replace />} />
                     </Routes>
                     <ErrorToast />
                     {process.env.NODE_ENV === 'development' && (
@@ -273,4 +294,12 @@ function App() {
     </ErrorBoundary>
   );
 }
+
+// Main App component
+function App() {
+  return (
+    <AppContent />
+  );
+}
+
 export default App;

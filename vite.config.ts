@@ -1,35 +1,34 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
-import viteExpress from 'vite-express';
-
 
 export default defineConfig({
-  plugins: [
-    react(),
-    {
-      name: 'vite-express-custom',
-      configureServer(server) {
-        server.middlewares.use('/api/process-image', (req, res) => {
-          require('./src/api/process-image').default(req, res);
-        });
-      }
-    }
-  ],
+  plugins: [react()],
   resolve: {
-    alias: [
-      { find: '@', replacement: path.resolve(__dirname, './src') },
-      { find: '@components', replacement: path.resolve(__dirname, './src/components') },
-      { find: '@lib', replacement: path.resolve(__dirname, './src/lib') },
-      { find: '@hooks', replacement: path.resolve(__dirname, './src/hooks') },
-      { find: '@pages', replacement: path.resolve(__dirname, './src/pages') },
-      { find: '@types', replacement: path.resolve(__dirname, './src/types') }
-    ]
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+      '@components': path.resolve(__dirname, './src/components'),
+      '@lib': path.resolve(__dirname, './src/lib'),
+      '@types': path.resolve(__dirname, './src/types'),
+      '@hooks': path.resolve(__dirname, './src/hooks'),
+      '@utils': path.resolve(__dirname, './src/utils')
+    }
   },
   server: {
     port: 5173,
     hmr: {
-      overlay: true,
+      protocol: 'ws',
+      host: 'localhost',
+      port: 5173,
+      clientPort: 5173,
+      timeout: 120000,
+      overlay: false
+    },
+    strictPort: true,
+    open: true,
+    host: true,
+    watch: {
+      usePolling: true
     },
     headers: {
       'Access-Control-Allow-Origin': '*',
@@ -77,6 +76,7 @@ export default defineConfig({
     chunkSizeWarningLimit: 1000
   },
   optimizeDeps: {
+    //exclude: ['react-dom/client'],
     include: [
       'lucide-react',
       'react',

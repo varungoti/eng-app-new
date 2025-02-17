@@ -1,0 +1,30 @@
+{
+    "sourceFile": "src/lib/errorHandler/ErrorMetrics.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 3,
+            "patches": [
+                {
+                    "date": 1739389498727,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1739389525887,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -6,8 +6,13 @@\n   handled: number;\r\n   unhandled: number;\r\n   bySource: Record<string, number>;\r\n   byType: Record<string, number>;\r\n+  errorsBySource: Record<string, number>;\r\n+  retryAttempts: number;\r\n+  averageRetryCount: number;\r\n+  errorRate: number;\r\n+  timeWindow: number;\r\n }\r\n \r\n class ErrorMetricsCollector {\r\n   private static instance: ErrorMetricsCollector;\r\n"
+                },
+                {
+                    "date": 1739389549866,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -50,8 +50,9 @@\n     const metrics: ErrorMetrics = {\r\n       total: recentErrors.length,\r\n       handled: recentErrors.filter(e => e.handled).length,\r\n       unhandled: recentErrors.filter(e => !e.handled).length,\r\n+      \r\n       bySource: errorsBySource,\r\n       byType: {}\r\n     };\r\n \r\n"
+                },
+                {
+                    "date": 1739389561954,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -50,9 +50,13 @@\n     const metrics: ErrorMetrics = {\r\n       total: recentErrors.length,\r\n       handled: recentErrors.filter(e => e.handled).length,\r\n       unhandled: recentErrors.filter(e => !e.handled).length,\r\n-      \r\n+      errorsBySource,\r\n+      retryAttempts: totalRetries,\r\n+      averageRetryCount: recentErrors.length ? totalRetries / recentErrors.length : 0,\r\n+      errorRate: recentErrors.length / (this.metricsWindow / 1000), // errors per second\r\n+      timeWindow: this.metricsWindow,\r\n       bySource: errorsBySource,\r\n       byType: {}\r\n     };\r\n \r\n"
+                }
+            ],
+            "date": 1739389498727,
+            "name": "Commit-0",
+            "content": "import { logger } from '../logger';\r\nimport { errorRegistry } from './ErrorRegistry';\r\n\r\nexport interface ErrorMetrics {\r\n  total: number;\r\n  handled: number;\r\n  unhandled: number;\r\n  bySource: Record<string, number>;\r\n  byType: Record<string, number>;\r\n}\r\n\r\nclass ErrorMetricsCollector {\r\n  private static instance: ErrorMetricsCollector;\r\n  private metricsWindow = 5 * 60 * 1000; // 5 minutes\r\n  private lastCalculation: number = 0;\r\n  private cachedMetrics: ErrorMetrics | null = null;\r\n\r\n  private constructor() {}\r\n\r\n  public static getInstance(): ErrorMetricsCollector {\r\n    if (!ErrorMetricsCollector.instance) {\r\n      ErrorMetricsCollector.instance = new ErrorMetricsCollector();\r\n    }\r\n    return ErrorMetricsCollector.instance;\r\n  }\r\n\r\n  public getMetrics(): ErrorMetrics {\r\n    const now = Date.now();\r\n    \r\n    // Return cached metrics if within 10 seconds\r\n    if (this.cachedMetrics && now - this.lastCalculation < 10000) {\r\n      return this.cachedMetrics;\r\n    }\r\n\r\n    const errors = Array.from(errorRegistry.getUnhandledErrors());\r\n    const recentErrors = errors.filter(e => now - e.timestamp < this.metricsWindow);\r\n    \r\n    const errorsBySource = recentErrors.reduce((acc, error) => {\r\n      acc[error.source] = (acc[error.source] || 0) + 1;\r\n      return acc;\r\n    }, {} as Record<string, number>);\r\n\r\n    const totalRetries = recentErrors.reduce((sum, error) => sum + error.retryCount, 0);\r\n\r\n    const metrics: ErrorMetrics = {\r\n      total: recentErrors.length,\r\n      handled: recentErrors.filter(e => e.handled).length,\r\n      unhandled: recentErrors.filter(e => !e.handled).length,\r\n      bySource: errorsBySource,\r\n      byType: {}\r\n    };\r\n\r\n    // Cache the metrics\r\n    this.cachedMetrics = metrics;\r\n    this.lastCalculation = now;\r\n\r\n    // Log metrics if significant changes\r\n    if (metrics.unhandled > 10) {\r\n      logger.warn('High error rate detected', {\r\n        context: metrics,\r\n        source: 'ErrorMetrics'\r\n      });\r\n    }\r\n\r\n    return metrics;\r\n  }\r\n\r\n  public setMetricsWindow(milliseconds: number): void {\r\n    this.metricsWindow = milliseconds;\r\n    this.cachedMetrics = null; // Invalidate cache\r\n  }\r\n}\r\n\r\nexport const errorMetrics = ErrorMetricsCollector.getInstance();"
+        }
+    ]
+}

@@ -58,13 +58,13 @@ export class DatabaseMonitor {
         responseTime: duration
       };
 
-      logger.info('Database health check successful', 'DatabaseMonitor');
+      logger.info('Database health check successful', { source: 'DatabaseMonitor' });
 
     } catch (error) {
       this.metrics.errorCount++;
       this.metrics.connectionStatus = this.metrics.errorCount > 3 ? 'error' : 'degraded';
 
-      logger.error('Database health check failed', 'DatabaseMonitor', error);
+      logger.error('Database health check failed', { source: 'DatabaseMonitor', error });
 
     }
   }
@@ -88,7 +88,7 @@ export class DatabaseMonitor {
   updateConnectionStatus(status: boolean) {
     this.isConnected = status;
     if (this.config.enableLogging) {
-      logger.info(`Database connection status: ${status ? 'connected' : 'disconnected'}`, 'DatabaseMonitor');
+      logger.info(`Database connection status: ${status ? 'connected' : 'disconnected'}`, { source: 'DatabaseMonitor' });
     }
   }
 }

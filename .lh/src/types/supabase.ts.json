@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/types/supabase.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1739441981044,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1739441981044,
+            "name": "Commit-0",
+            "content": "export interface Database {\r\n  public: {\r\n    Tables: {\r\n      classes: {\r\n        Row: {\r\n          id: string;\r\n          name: string;\r\n          grade_id: string;\r\n          section?: string;\r\n          description?: string;\r\n          created_at: string;\r\n          updated_at: string;\r\n        };\r\n      };\r\n      topics: {\r\n        Row: {\r\n          id: string;\r\n          title: string;\r\n          description: string | null;\r\n          grade_id: string;\r\n          order_index: number | null;\r\n          created_at: string;\r\n          updated_at: string;\r\n        };\r\n      };\r\n      subtopics: {\r\n        Row: {\r\n          id: string;\r\n          title: string;\r\n          description: string | null;\r\n          topic_id: string;\r\n          order_index: number | null;\r\n          created_at: string;\r\n          updated_at: string;\r\n        };\r\n      };\r\n      lessons: {\r\n        Row: {\r\n          id: string;\r\n          title: string;\r\n          content: string | null;\r\n          description: string | null;\r\n          topic_id: string | null;\r\n          subtopic_id: string;\r\n          order_index: number | null;\r\n          duration: number | null;\r\n          status: 'draft' | 'published';\r\n          created_at: string;\r\n          updated_at: string;\r\n          contentheading: string | null;\r\n          user_id: string | null;\r\n          voice_id: string | null;\r\n        };\r\n      };\r\n      students: {\r\n        Row: {\r\n          id: string;\r\n          user_id: string;\r\n          name: string;\r\n          email: string;\r\n          created_at: string;\r\n          updated_at: string;\r\n        };\r\n      };\r\n      class_students: {\r\n        Row: {\r\n          id: string;\r\n          class_id: string;\r\n          student_id: string;\r\n          created_at: string;\r\n          updated_at: string;\r\n        };\r\n      };\r\n    };\r\n  };\r\n}\r\n\r\nexport type Tables = Database['public']['Tables'];\r\nexport type DbClass = Tables['classes']['Row'];\r\nexport type DbTopic = Tables['topics']['Row'];\r\nexport type DbSubtopic = Tables['subtopics']['Row'];\r\nexport type DbLesson = Tables['lessons']['Row'];\r\nexport type DbStudent = Tables['students']['Row'];\r\nexport type DbClassStudent = Tables['class_students']['Row'];\r\n"
+        }
+    ]
+}

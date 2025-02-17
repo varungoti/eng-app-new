@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 2,
+            "activePatchIndex": 13,
             "patches": [
                 {
                     "date": 1739020101526,
@@ -16,6 +16,50 @@
                 {
                     "date": 1739043634431,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -11,21 +11,25 @@\n     const unsubscribe = sessionMonitor.addListener((state) => {\r\n       setSessionState(state);\r\n       setSessionErrors(sessionMonitor.getSessionErrors());\r\n \r\n-      // Log state changes in development\r\n+      // Enhanced logging\r\n       if (import.meta.env.DEV) {\r\n-        logger.debug(`Session state updated - Auth: ${state.isAuthenticated}, Role: ${state.currentRole || 'none'}`, 'useSessionMonitoring');\r\n+        logger.debug(\r\n+          `Session state updated - Auth: ${state.isAuthenticated}, ` +\r\n+          `Role: ${state.currentRole || 'none'}, ` +\r\n+          `Last refresh: ${state.lastRefresh?.toLocaleTimeString() || 'never'}, ` +\r\n+          `Attempts: ${state.refreshAttempts}`,\r\n+          'useSessionMonitoring'\r\n+        );\r\n       }\r\n     });\r\n \r\n     return () => unsubscribe();\r\n   }, []);\r\n \r\n   return {\r\n-    isAuthenticated: sessionState.isAuthenticated,\r\n-    currentRole: sessionState.currentRole,\r\n-    lastActivity: sessionState.lastActivity,\r\n+    ...sessionState,\r\n     sessionErrors,\r\n     hasErrors: sessionErrors.length > 0\r\n   };\r\n } \n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1739388611225,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -7,9 +7,9 @@\n   const [sessionErrors, setSessionErrors] = useState<string[]>([]);\r\n \r\n   useEffect(() => {\r\n     // Subscribe to session state changes\r\n-    const unsubscribe = sessionMonitor.addListener((state) => {\r\n+    const unsubscribe = sessionMonitor.addListen`er((state) => {\r\n       setSessionState(state);\r\n       setSessionErrors(sessionMonitor.getSessionErrors());\r\n \r\n       // Enhanced logging\r\n"
+                },
+                {
+                    "date": 1739388616978,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -7,9 +7,9 @@\n   const [sessionErrors, setSessionErrors] = useState<string[]>([]);\r\n \r\n   useEffect(() => {\r\n     // Subscribe to session state changes\r\n-    const unsubscribe = sessionMonitor.addListen`er((state) => {\r\n+    const unsubscribe = sessionMonitor.subscribeToStateUpdates((state: SessionState) => {\r\n       setSessionState(state);\r\n       setSessionErrors(sessionMonitor.getSessionErrors());\r\n \r\n       // Enhanced logging\r\n"
+                },
+                {
+                    "date": 1739388646231,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,6 @@\n import { useState, useEffect } from 'react';\r\n-import { sessionMonitor } from '../lib/auth/SessionMonitor';\r\n+import { sessionMonitor, type SessionState } from '../lib/auth/SessionMonitor';\r\n import { logger } from '../lib/logger';\r\n \r\n export function useSessionMonitoring() {\r\n   const [sessionState, setSessionState] = useState(sessionMonitor.getState());\r\n"
+                },
+                {
+                    "date": 1739388656269,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,7 +1,8 @@\n import { useState, useEffect } from 'react';\r\n import { sessionMonitor, type SessionState } from '../lib/auth/SessionMonitor';\r\n import { logger } from '../lib/logger';\r\n+import { SessionState } from '@/lib/auth/sessionManager';\r\n \r\n export function useSessionMonitoring() {\r\n   const [sessionState, setSessionState] = useState(sessionMonitor.getState());\r\n   const [sessionErrors, setSessionErrors] = useState<string[]>([]);\r\n"
+                },
+                {
+                    "date": 1739388675513,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,8 +1,8 @@\n import { useState, useEffect } from 'react';\r\n import { sessionMonitor, type SessionState } from '../lib/auth/SessionMonitor';\r\n import { logger } from '../lib/logger';\r\n-import { SessionState } from '@/lib/auth/sessionManager';\r\n+//import { SessionState } from '@/lib/auth/sessionManager';\r\n \r\n export function useSessionMonitoring() {\r\n   const [sessionState, setSessionState] = useState(sessionMonitor.getState());\r\n   const [sessionErrors, setSessionErrors] = useState<string[]>([]);\r\n"
+                },
+                {
+                    "date": 1739388690961,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,8 +1,8 @@\n import { useState, useEffect } from 'react';\r\n-import { sessionMonitor, type SessionState } from '../lib/auth/SessionMonitor';\r\n+import { sessionMonitor } from '../lib/auth/SessionMonitor';\r\n import { logger } from '../lib/logger';\r\n-//import { SessionState } from '@/lib/auth/sessionManager';\r\n+import type { SessionState } from '@/lib/auth/sessionManager';\r\n \r\n export function useSessionMonitoring() {\r\n   const [sessionState, setSessionState] = useState(sessionMonitor.getState());\r\n   const [sessionErrors, setSessionErrors] = useState<string[]>([]);\r\n"
+                },
+                {
+                    "date": 1739388710632,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,8 +1,8 @@\n import { useState, useEffect } from 'react';\r\n-import { sessionMonitor } from '../lib/auth/SessionMonitor';\r\n+import { sessionMonitor, type SessionState } from '../lib/auth/SessionMonitor';\r\n import { logger } from '../lib/logger';\r\n-import type { SessionState } from '@/lib/auth/sessionManager';\r\n+//import { SessionState } from '@/lib/auth/sessionManager';\r\n \r\n export function useSessionMonitoring() {\r\n   const [sessionState, setSessionState] = useState(sessionMonitor.getState());\r\n   const [sessionErrors, setSessionErrors] = useState<string[]>([]);\r\n"
+                },
+                {
+                    "date": 1739388734878,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,6 @@\n import { useState, useEffect } from 'react';\r\n-import { sessionMonitor, type SessionState } from '../lib/auth/SessionMonitor';\r\n+import { sessionMonitor } from '../lib/auth/SessionMonitor';\r\n import { logger } from '../lib/logger';\r\n //import { SessionState } from '@/lib/auth/sessionManager';\r\n \r\n export function useSessionMonitoring() {\r\n"
+                },
+                {
+                    "date": 1739388748994,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,8 +1,8 @@\n import { useState, useEffect } from 'react';\r\n import { sessionMonitor } from '../lib/auth/SessionMonitor';\r\n import { logger } from '../lib/logger';\r\n-//import { SessionState } from '@/lib/auth/sessionManager';\r\n+import { type SessionState } from '@/lib/auth/sessionManager';\r\n \r\n export function useSessionMonitoring() {\r\n   const [sessionState, setSessionState] = useState(sessionMonitor.getState());\r\n   const [sessionErrors, setSessionErrors] = useState<string[]>([]);\r\n"
+                },
+                {
+                    "date": 1739388787308,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,8 +1,8 @@\n import { useState, useEffect } from 'react';\r\n import { sessionMonitor } from '../lib/auth/SessionMonitor';\r\n import { logger } from '../lib/logger';\r\n-import { type SessionState } from '@/lib/auth/sessionManager';\r\n+import type { SessionState } from '../lib/auth/sessionManager';\r\n \r\n export function useSessionMonitoring() {\r\n   const [sessionState, setSessionState] = useState(sessionMonitor.getState());\r\n   const [sessionErrors, setSessionErrors] = useState<string[]>([]);\r\n"
+                },
+                {
+                    "date": 1739389166271,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -19,9 +19,9 @@\n           `Session state updated - Auth: ${state.isAuthenticated}, ` +\r\n           `Role: ${state.currentRole || 'none'}, ` +\r\n           `Last refresh: ${state.lastRefresh?.toLocaleTimeString() || 'never'}, ` +\r\n           `Attempts: ${state.refreshAttempts}`,\r\n-          'useSessionMonitoring'\r\n+          { source: 'useSessionMonitoring', context: {} }\r\n         );\r\n       }\r\n     });\r\n \r\n"
                 }
             ],
             "date": 1739020101526,

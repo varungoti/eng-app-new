@@ -40,6 +40,7 @@ export interface Question {
     followup_prompt: string[];
     sampleAnswer?: string;
     answer?: string;
+    sub_type?: string;
   };
   metadata: {
     prompt?: string;
@@ -211,6 +212,7 @@ export interface Question {
   updated_at?: string;
   status?: 'draft' | 'published';
   isDraft?: boolean;
+  sampleAnswer?: string;
    //data: Record<string, any>;
 }
 

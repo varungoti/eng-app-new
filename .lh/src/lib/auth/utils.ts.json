@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 6,
+            "activePatchIndex": 8,
             "patches": [
                 {
                     "date": 1739020168333,
@@ -32,6 +32,14 @@
                 {
                     "date": 1739024587930,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -158,5 +158,5 @@\n     });\r\n     throw err;\r\n   }\r\n }\r\n-export { getpersistSession };\n\\ No newline at end of file\n+export { getPersistedSession,  persistSession };\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1739279412238,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -22,9 +22,9 @@\n         session\r\n       }));\r\n     }\r\n   } catch (err) {\r\n-    logger.error('Failed to persist session', 'Auth');\r\n+    logger.error('Failed to persist session', { source: 'AuthUtils' });\r\n   }\r\n };\r\n \r\n const getPersistedSession = () => {\r\n@@ -41,9 +41,9 @@\n       }\r\n     }\r\n     return null;\r\n   } catch (err) {\r\n-    logger.error('Failed to get persisted session', 'Auth');\r\n+    logger.error('Failed to get persisted session', { source: 'AuthUtils' });\r\n     return null;\r\n   }\r\n };\r\n \r\n@@ -68,13 +68,13 @@\n \r\n     // Persist session\r\n     await persistSession(session);\r\n \r\n-    logger.info(`Sign in successful for ${email} with role ${role}`, 'Auth');\r\n+    logger.info(`Sign in successful for ${email} with role ${role}`, { source: 'AuthUtils' });\r\n     return { session };\r\n \r\n   } catch (err) {\r\n-    logger.error(`Sign in failed: ${err instanceof Error ? err.message : String(err)}`, 'Auth');\r\n+    logger.error(`Sign in failed: ${err instanceof Error ? err.message : String(err)}`, { source: 'AuthUtils' });\r\n     throw err;\r\n   }\r\n };\r\n \r\n@@ -85,12 +85,12 @@\n     \r\n     // Clear persisted session\r\n     localStorage.removeItem(STORAGE_KEY);\r\n     \r\n-    logger.info('Sign out successful', 'Auth');\r\n+    logger.info('Sign out successful', { source: 'AuthUtils' });\r\n \r\n   } catch (err) {\r\n-    logger.error('Sign out failed', 'Auth', err);\r\n+    logger.error(`Sign out failed: ${err instanceof Error ? err.message : String(err)}`, { source: 'Auth' });\r\n     throw err;\r\n   }\r\n };\r\n \r\n"
+                },
+                {
+                    "date": 1739279441956,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -120,17 +120,17 @@\n     }\r\n \r\n     return null;\r\n   } catch (err) {\r\n-    logger.error(`Failed to get current session: ${err instanceof Error ? err.message : String(err)}`, 'Auth');\r\n+    logger.error(`Failed to get current session: ${err instanceof Error ? err.message : String(err)}`, { source: 'AuthUtils' });\r\n     return null;\r\n   }\r\n };\r\n \r\n export async function updateUserRole(userId: string, newRole: string) {\r\n   try {\r\n     // Log the attempt\r\n-    logger.info(`Attempting role update for user ${userId} to ${newRole}`, 'auth.utils');\r\n+    logger.info(`Attempting role update for user ${userId} to ${newRole}`, { source: 'auth.utils' });\r\n \r\n     const { error } = await supabase.auth.admin.updateUserById(\r\n       userId,\r\n       { user_metadata: { role: newRole } }\r\n"
                 }
             ],
             "date": 1739020168333,

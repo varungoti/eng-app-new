@@ -3,11 +3,19 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 0,
+            "activePatchIndex": 2,
             "patches": [
                 {
                     "date": 1739016961889,
                     "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1739689667658,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -196,9 +196,21 @@\n                   {lesson.description && (\r\n                     <p className=\"text-sm text-muted-foreground mt-1\">{lesson.description}</p>\r\n                   )}\r\n                 </motion.div>\r\n-              ))}\r\n+              ))},\r\n+              {questions?.map((question) => (\r\n+  <Card key={question.id} className=\"p-4\">\r\n+    <div className=\"space-y-2\">\r\n+      <h4 className=\"font-medium\">{question.content}</h4>\r\n+      {question.sampleAnswer && ( // Only render if sampleAnswer exists\r\n+        <p className=\"text-sm text-gray-500\">\r\n+          Sample Answer: {question.sampleAnswer}\r\n+        </p>\r\n+      )}\r\n+    </div>\r\n+  </Card>\r\n+))}\r\n             </AnimatePresence>\r\n           </ScrollArea>\r\n         </div>\r\n       </Card>\r\n"
+                },
+                {
+                    "date": 1739689769952,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -197,20 +197,9 @@\n                     <p className=\"text-sm text-muted-foreground mt-1\">{lesson.description}</p>\r\n                   )}\r\n                 </motion.div>\r\n               ))},\r\n-              {questions?.map((question) => (\r\n-  <Card key={question.id} className=\"p-4\">\r\n-    <div className=\"space-y-2\">\r\n-      <h4 className=\"font-medium\">{question.content}</h4>\r\n-      {question.sampleAnswer && ( // Only render if sampleAnswer exists\r\n-        <p className=\"text-sm text-gray-500\">\r\n-          Sample Answer: {question.sampleAnswer}\r\n-        </p>\r\n-      )}\r\n-    </div>\r\n-  </Card>\r\n-))}\r\n+              \r\n             </AnimatePresence>\r\n           </ScrollArea>\r\n         </div>\r\n       </Card>\r\n"
                 }
             ],
             "date": 1739016961889,

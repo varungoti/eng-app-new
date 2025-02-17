@@ -44,27 +44,38 @@ if (!existsSync(VENV_DIR)) {
 }
 
 // Install the package in development mode
-console.log('\nInstalling Fish Speech package...');
-const activateCmd = process.platform === 'win32' 
-    ? 'venv\\Scripts\\activate' 
-    : 'source venv/bin/activate';
+try {
+  console.log('Installing Fish Speech package...');
+  execSync('pip install -e .', { 
+    cwd: './fish-speech',
+    stdio: 'inherit'
+  });
 
-runCommand(`${activateCmd} && pip install -e .`, { 
-    cwd: FISH_SPEECH_DIR,
-    shell: true 
-});
+  console.log('Downloading Fish Speech models...');
+  // Add error handling and verification
+  try {
+    execSync('python -c "from fish_speech.cli import download_models"', {
+      cwd: './fish-speech',
+      stdio: 'inherit'
+    });
+    
+    execSync('python -m fish_speech.cli.download_models', {
+      cwd: './fish-speech', 
+      stdio: 'inherit'
+    });
+  } catch (err) {
+    console.warn('Warning: Could not download models automatically.');
+    console.log('Please run: cd fish-speech && python -m fish_speech.cli.download_models');
+  }
+} catch (err) {
+  console.error('Error:', err.message);
+  process.exit(1);
+}
 
 // Create models directory
 if (!existsSync(MODELS_DIR)) {
     mkdirSync(MODELS_DIR, { recursive: true });
 }
-
-// Download models using the correct module path
-console.log('\nDownloading Fish Speech models...');
-runCommand(`${activateCmd} && python -m fish_speech.cli.download_models`, {
-    cwd: FISH_SPEECH_DIR,
-    shell: true
-});
 
 console.log('\nSetup completed successfully!');
 console.log('\nNext steps:');

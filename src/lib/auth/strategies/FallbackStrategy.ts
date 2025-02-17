@@ -16,7 +16,7 @@ export class FallbackStrategy {
         timestamp: Date.now()
       }));
     } catch (err) {
-      logger.error('Failed to persist session', 'FallbackStrategy');
+      logger.error('Failed to persist session', { source: 'FallbackStrategy' });
     }
   }
 
@@ -41,7 +41,7 @@ export class FallbackStrategy {
 
       return { data: { session: null }, error: null };
     } catch (err) {
-      logger.error('Session retrieval failed', 'FallbackStrategy');
+      logger.error('Session retrieval failed', { source: 'FallbackStrategy' });
       return { data: { session: null }, error: err as Error };
     }
   }
@@ -63,7 +63,7 @@ export class FallbackStrategy {
 
   private static logFallbackUsage(method: string) {
     if (!sessionStorage.getItem(this.SESSION_STORAGE_KEY)) {
-      logger.info(`Using ${method} fallback for auth session`, 'FallbackStrategy'); 
+      logger.info(`Using ${method} fallback for auth session`, { source: 'FallbackStrategy' }); 
       sessionStorage.setItem(this.SESSION_STORAGE_KEY, 'true');
     }
 
@@ -74,7 +74,7 @@ export class FallbackStrategy {
       const { data, error } = await supabase.auth.refreshSession();
       return { data: { session: data.session }, error };
     } catch (err) {
-      logger.warn(`Session refresh failed: ${err instanceof Error ? err.message : String(err)}`, 'FallbackStrategy');
+      logger.warn(`Session refresh failed: ${err instanceof Error ? err.message : String(err)}`, { source: 'FallbackStrategy' });
       return { data: { session: null }, error: err as Error };
     }
   }

@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/hooks/usePermissions.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1739440379527,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1739440379527,
+            "name": "Commit-0",
+            "content": "import { useContext } from 'react';\r\nimport { AuthContext } from '../contexts/AuthContext';\r\nimport { ROLE_PERMISSIONS } from '../types/roles';\r\n\r\ntype Permissions = {\r\n  staff: boolean;\r\n  // ... other permissions\r\n};\r\n\r\nexport const usePermissions = () => {\r\n  const { user } = useContext(AuthContext);\r\n\r\n  const can = (permission: keyof Permissions) => {\r\n    if (!user?.role) return false;\r\n    return ROLE_PERMISSIONS[user.role]?.permissions[permission] || false;\r\n  };\r\n\r\n  return { can };\r\n};\r\n\r\nexport interface IPermissions {\r\n  analytics: boolean;\r\n  query: boolean;\r\n  // ... other permissions\r\n}"
+        }
+    ]
+}

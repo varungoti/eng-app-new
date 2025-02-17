@@ -14,6 +14,20 @@ import { logger } from '@/lib/logger';
 import { ImageIcon, PlayCircle, FileText } from 'lucide-react';
 import { Icon } from '@/components/ui/icons';
 
+type ExercisePromptType = 'text' | 'image' | 'video' | 'audio' | 'practice' | 'exercise';
+
+// Add interface for the prompt structure
+interface ExercisePrompt {
+  id?: string;
+  text: string;
+  type: ExercisePromptType;
+  media?: string | null;
+  narration?: string | null;
+  saytext?: string | null;
+  question_id?: string | null;
+  order_index: number;
+}
+
 export const ExercisePromptCard: React.FC<ExercisePromptCardProps> = ({
   prompt,
   promptIndex,
@@ -32,6 +46,11 @@ export const ExercisePromptCard: React.FC<ExercisePromptCardProps> = ({
   }, []);
 
   const handleFieldChange = async (field: string, value: string) => {
+    if (field === 'type' && !['text', 'image', 'video', 'audio', 'practice', 'exercise'].includes(value)) {
+      console.error('Invalid type value:', value);
+      return;
+    }
+    
     setIsSaving(true);
     setLastSaved(null);
     try {
@@ -111,14 +130,17 @@ export const ExercisePromptCard: React.FC<ExercisePromptCardProps> = ({
     return null;
   };
 
-  // Ensure default values for all fields
-  const safePrompt = {
+  // Update the safePrompt initialization with more thorough defaults
+  const safePrompt: ExercisePrompt = {
     ...prompt,
-    text: prompt.text || '',
-    type: prompt.type || 'text',
-    narration: prompt.narration || '',
-    saytext: prompt.saytext || '',
-    media: prompt.media || ''
+    id: prompt?.id || undefined,
+    text: prompt?.text || '',
+    type: (prompt?.type as ExercisePromptType) || 'practice',
+    media: prompt?.media || '',
+    narration: prompt?.narration || '',
+    saytext: prompt?.saytext || '',
+    question_id: prompt?.question_id || null,
+    order_index: promptIndex
   };
 
   return (
@@ -197,7 +219,7 @@ export const ExercisePromptCard: React.FC<ExercisePromptCardProps> = ({
                     </div>
                   </div>
                   <Input
-                    value={safePrompt.media}
+                    value={safePrompt.media || ''}
                     onChange={(e) => handleFieldChange('media', e.target.value)}
                     placeholder="Enter media URL"
                   />
@@ -214,7 +236,7 @@ export const ExercisePromptCard: React.FC<ExercisePromptCardProps> = ({
                     </div>
                   </div>
                   <Input
-                    value={safePrompt.narration}
+                    value={safePrompt.narration || ''}
                     onChange={(e) => handleFieldChange('narration', e.target.value)}
                     placeholder="Enter narration text"
                   />
@@ -230,7 +252,7 @@ export const ExercisePromptCard: React.FC<ExercisePromptCardProps> = ({
                     </div>
                   </div>
                   <Input
-                    value={safePrompt.saytext}
+                    value={safePrompt.saytext || ''}
                     onChange={(e) => handleFieldChange('saytext', e.target.value)}
                     placeholder="Enter text to say"
                   />

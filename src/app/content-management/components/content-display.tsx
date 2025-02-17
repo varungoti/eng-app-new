@@ -197,7 +197,8 @@ export function ContentDisplay() {
                     <p className="text-sm text-muted-foreground mt-1">{lesson.description}</p>
                   )}
                 </motion.div>
-              ))}
+              ))},
+              
             </AnimatePresence>
           </ScrollArea>
         </div>

@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/lib/monitoring/monitors.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1739389678344,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1739389678344,
+            "name": "Commit-0",
+            "content": "import { supabase } from '../supabase';\r\nimport { DataFlowMonitor } from './DataFlowMonitor';\r\nimport { DataLoadMonitor } from './DataLoadMonitor';\r\nimport { LoadingMonitor } from './LoadingMonitor';\r\nimport { DatabaseMonitor } from './DatabaseMonitor';\r\n\r\n// Create a single config object\r\nconst config = {\r\n  supabase,\r\n  enableLogging: true,\r\n  logLevel: 'info' as const,\r\n  sampleRate: import.meta.env.DEV ? 1 : 0.1\r\n};\r\n\r\n// Create monitor instances\r\nexport const monitors = {\r\n  databaseMonitor: new DatabaseMonitor(config),\r\n  dataFlowMonitor: new DataFlowMonitor(supabase, config, logger),\r\n  dataLoadMonitor: new DataLoadMonitor(config),\r\n  loadingMonitor: new LoadingMonitor(supabase, config)\r\n} as const; \r\nexport default monitors;"
+        }
+    ]
+}

@@ -1,6 +1,7 @@
 import { ErrorEvent, ErrorResolution, ErrorWatcherConfig } from './types';
 import { ErrorResolver } from './ErrorResolver';
 import { logger } from '../logger';
+import { NextRouter } from 'next/router';
 
 export class ErrorWatcher {
   private static instance: ErrorWatcher;
@@ -14,7 +15,7 @@ export class ErrorWatcher {
     retryAttempts: 3,
     retryDelay: 1000,
     logToConsole: import.meta.env.DEV,
-    router: null,
+    router: undefined as unknown as NextRouter,
   };
 
   private constructor(config: ErrorWatcherConfig = {}) {

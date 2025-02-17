@@ -43,7 +43,7 @@ export class ProgressiveLoader {
     if (this.isCancelled) return;
     if (this.loadingId) {
       this.loadingMonitor.endLoading(this.loadingId);
-      logger.error(`Loading error: ${err instanceof Error ? err.message : String(err)}`, 'ProgressiveLoader');
+      logger.error(`Loading error: ${err instanceof Error ? err.message : String(err)}`, { source: 'ProgressiveLoader' });
       this.loadingId = undefined;
     }
   }
@@ -58,6 +58,6 @@ export class ProgressiveLoader {
 
   private updateProgress(percent: number): void {
     if (this.isCancelled) return;
-    logger.debug(`Loading progress: ${percent}% (Stage: ${ProgressiveLoader.STAGES[this.currentStage]})`, this.component);
+    logger.debug(`Loading progress: ${percent}% (Stage: ${ProgressiveLoader.STAGES[this.currentStage]})`, { source: 'ProgressiveLoader' });
   }
 }

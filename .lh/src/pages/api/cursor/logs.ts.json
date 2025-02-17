@@ -1,0 +1,26 @@
+{
+    "sourceFile": "src/pages/api/cursor/logs.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 2,
+            "patches": [
+                {
+                    "date": 1739383131730,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1739383187925,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -7,9 +7,37 @@\n \r\n   try {\r\n     const log = req.body;\r\n     // Process individual log\r\n-    // Send to your Cursor integration\r\n+    // Validate log data\r\n+    if (!log || typeof log !== 'object') {\r\n+      throw new Error('Invalid log data');\r\n+    }\r\n+\r\n+    // Format log for Cursor\r\n+    const cursorLog = {\r\n+      type: log.type || 'log',\r\n+      message: log.message,\r\n+      timestamp: log.timestamp || new Date().toISOString(),\r\n+      metadata: {\r\n+        ...log.metadata,\r\n+        source: 'console-monitor'\r\n+      }\r\n+    };\r\n+\r\n+    // Send to Cursor API endpoint\r\n+    const response = await fetch(process.env.CURSOR_API_URL as string, {\r\n+      method: 'POST',\r\n+      headers: {\r\n+        'Content-Type': 'application/json',\r\n+        'Authorization': `Bearer ${process.env.CURSOR_API_KEY}`\r\n+      },\r\n+      body: JSON.stringify(cursorLog)\r\n+    });\r\n+\r\n+    if (!response.ok) {\r\n+      throw new Error('Failed to send log to Cursor');\r\n+    }\r\n     res.status(200).json({ success: true });\r\n   } catch (error) {\r\n     res.status(500).json({ error: 'Failed to process log' });\r\n   }\r\n"
+                },
+                {
+                    "date": 1739383252894,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -7,37 +7,9 @@\n \r\n   try {\r\n     const log = req.body;\r\n     // Process individual log\r\n-    // Validate log data\r\n-    if (!log || typeof log !== 'object') {\r\n-      throw new Error('Invalid log data');\r\n-    }\r\n-\r\n-    // Format log for Cursor\r\n-    const cursorLog = {\r\n-      type: log.type || 'log',\r\n-      message: log.message,\r\n-      timestamp: log.timestamp || new Date().toISOString(),\r\n-      metadata: {\r\n-        ...log.metadata,\r\n-        source: 'console-monitor'\r\n-      }\r\n-    };\r\n-\r\n-    // Send to Cursor API endpoint\r\n-    const response = await fetch(process.env.CURSOR_API_URL as string, {\r\n-      method: 'POST',\r\n-      headers: {\r\n-        'Content-Type': 'application/json',\r\n-        'Authorization': `Bearer ${process.env.CURSOR_API_KEY}`\r\n-      },\r\n-      body: JSON.stringify(cursorLog)\r\n-    });\r\n-\r\n-    if (!response.ok) {\r\n-      throw new Error('Failed to send log to Cursor');\r\n-    }\r\n+    // Send to your Cursor integration\r\n     res.status(200).json({ success: true });\r\n   } catch (error) {\r\n     res.status(500).json({ error: 'Failed to process log' });\r\n   }\r\n"
+                }
+            ],
+            "date": 1739383131730,
+            "name": "Commit-0",
+            "content": "import { NextApiRequest, NextApiResponse } from 'next';\r\n\r\nexport default async function handler(req: NextApiRequest, res: NextApiResponse) {\r\n  if (req.method !== 'POST') {\r\n    return res.status(405).json({ message: 'Method not allowed' });\r\n  }\r\n\r\n  try {\r\n    const log = req.body;\r\n    // Process individual log\r\n    // Send to your Cursor integration\r\n    res.status(200).json({ success: true });\r\n  } catch (error) {\r\n    res.status(500).json({ error: 'Failed to process log' });\r\n  }\r\n} "
+        }
+    ]
+}

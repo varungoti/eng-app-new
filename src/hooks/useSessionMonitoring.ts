@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { sessionMonitor } from '../lib/auth/SessionMonitor';
 import { logger } from '../lib/logger';
+import type { SessionState } from '../lib/auth/sessionManager';
 
 export function useSessionMonitoring() {
   const [sessionState, setSessionState] = useState(sessionMonitor.getState());
@@ -8,7 +9,7 @@ export function useSessionMonitoring() {
 
   useEffect(() => {
     // Subscribe to session state changes
-    const unsubscribe = sessionMonitor.addListener((state) => {
+    const unsubscribe = sessionMonitor.subscribeToStateUpdates((state: SessionState) => {
       setSessionState(state);
       setSessionErrors(sessionMonitor.getSessionErrors());
 
@@ -19,7 +20,7 @@ export function useSessionMonitoring() {
           `Role: ${state.currentRole || 'none'}, ` +
           `Last refresh: ${state.lastRefresh?.toLocaleTimeString() || 'never'}, ` +
           `Attempts: ${state.refreshAttempts}`,
-          'useSessionMonitoring'
+          { source: 'useSessionMonitoring', context: {} }
         );
       }
     });

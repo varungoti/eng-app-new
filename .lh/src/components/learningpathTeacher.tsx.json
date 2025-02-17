@@ -1,0 +1,26 @@
+{
+    "sourceFile": "src/components/learningpathTeacher.tsx",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 2,
+            "patches": [
+                {
+                    "date": 1739308221309,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1739308230744,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,13 +1,1 @@\n-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from \"@/components/ui/dialog\";\r\n-\r\n-<Dialog>\r\n-  <DialogContent>\r\n-    <DialogHeader>\r\n-      <DialogTitle>Title</DialogTitle>\r\n-      <DialogDescription>\r\n-        Add a description of the dialog's purpose here\r\n-      </DialogDescription>\r\n-    </DialogHeader>\r\n-    {/* rest of your dialog content */}\r\n-  </DialogContent>\r\n-</Dialog> \n\\ No newline at end of file\n+ \n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1739308247848,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,1 +1,14 @@\n- \n\\ No newline at end of file\n+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from \"@/components/ui/dialog\";\r\n+\r\n+// ... in your component\r\n+<Dialog>\r\n+  <DialogContent>\r\n+    <DialogHeader>\r\n+      <DialogTitle>Title</DialogTitle>\r\n+      <DialogDescription>\r\n+        This dialog is used to guide teachers through the process of creating a learning path. It provides a step-by-step interface for adding and organizing learning resources.\r\n+      </DialogDescription>\r\n+    </DialogHeader>\r\n+    {/* rest of your dialog content */}\r\n+  </DialogContent>\r\n+</Dialog>\n\\ No newline at end of file\n"
+                }
+            ],
+            "date": 1739308221309,
+            "name": "Commit-0",
+            "content": "import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from \"@/components/ui/dialog\";\r\n\r\n<Dialog>\r\n  <DialogContent>\r\n    <DialogHeader>\r\n      <DialogTitle>Title</DialogTitle>\r\n      <DialogDescription>\r\n        Add a description of the dialog's purpose here\r\n      </DialogDescription>\r\n    </DialogHeader>\r\n    {/* rest of your dialog content */}\r\n  </DialogContent>\r\n</Dialog> "
+        }
+    ]
+}

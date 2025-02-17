@@ -3,11 +3,15 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 0,
+            "activePatchIndex": 1,
             "patches": [
                 {
                     "date": 1739024932303,
                     "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1739279374357,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -19,9 +19,9 @@\n       currentRole: null,\r\n       previousRole: null,\r\n       isTransitioning: false,\r\n       setRole: (role) => set((state) => {\r\n-        logger.info(`Role state update: ${state.currentRole || 'none'} -> ${role || 'none'}`, 'RoleStore');\r\n+        logger.info(`Role state update: ${state.currentRole || 'none'} -> ${role || 'none'}`, { source: 'RoleStore' });\r\n         return {\r\n           currentRole: role,\r\n           previousRole: state.currentRole,\r\n           isTransitioning: false\r\n"
                 }
             ],
             "date": 1739024932303,

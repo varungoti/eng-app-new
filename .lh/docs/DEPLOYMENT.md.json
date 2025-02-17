@@ -1,0 +1,18 @@
+{
+    "sourceFile": "docs/DEPLOYMENT.md",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1739211683566,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1739211683566,
+            "name": "Commit-0",
+            "content": "# Deployment Guide\r\n\r\n## Prerequisites\r\n- Node.js 18+\r\n- Supabase account\r\n- Vite\r\n- Google Maps API key\r\n\r\n## Environment Setup\r\n1. Clone repository\r\n2. Install dependencies\r\n3. Configure environment variables\r\n4. Setup database\r\n5. Run migrations\r\n\r\n## Deployment Steps\r\n1. Build application\r\n2. Run tests\r\n3. Deploy to Vercel\r\n4. Configure domains\r\n5. Setup monitoring\r\n\r\n## Environment Variables\r\n- DATABASE_URL\r\n- SUPABASE_URL\r\n- SUPABASE_ANON_KEY\r\n- GOOGLE_MAPS_API_KEY\r\n\r\n## Monitoring Setup\r\n1. Error tracking\r\n2. Performance monitoring\r\n3. Usage analytics\r\n4. Health checks"
+        }
+    ]
+}

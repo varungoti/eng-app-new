@@ -1,0 +1,26 @@
+{
+    "sourceFile": "src/main.tsx",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 2,
+            "patches": [
+                {
+                    "date": 1739310396214,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1739346600354,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,34 +1,34 @@\n-import React from 'react';\r\n-import ReactDOM from 'react-dom/client';\r\n-import { BrowserRouter } from 'react-router-dom';\r\n-import { QueryClientProvider } from '@tanstack/react-query';\r\n-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';\r\n-import App from './App';\r\n-import { queryClient } from './lib/queryClient';\r\n-import { dbConnection } from './lib/db/connection';\r\n-import { logger } from './lib/logger';\r\n-import './index.css';\r\n-\r\n-// Initialize database connection\r\n-dbConnection.initialize().catch(err => {\r\n-  logger.error('Failed to initialize database', {\r\n-    context: { error: err },\r\n-    source: 'main'\r\n-  });\r\n-});\r\n-\r\n-ReactDOM.createRoot(document.getElementById('root')!).render(\r\n-  <React.StrictMode>\r\n-    <QueryClientProvider client={queryClient}>\r\n-      {/* @ts-ignore - future flag for React Router v7 */}\r\n-      <BrowserRouter future={{ v7_startTransition: true }}>\r\n-        <App />\r\n-        {process.env.NODE_ENV === 'development' && (\r\n-          <React.Suspense fallback={null}>\r\n-            <ReactQueryDevtools />\r\n-          </React.Suspense>\r\n-        )}\r\n-      </BrowserRouter>\r\n-    </QueryClientProvider>\r\n-  </React.StrictMode>\r\n+import React from 'react';\n+import ReactDOM from 'react-dom/client';\n+import { BrowserRouter } from 'react-router-dom';\n+import { QueryClientProvider } from '@tanstack/react-query';\n+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';\n+import App from './App';\n+import { queryClient } from './lib/queryClient';\n+import { dbConnection } from './lib/db/connection';\n+import { logger } from './lib/logger';\n+import './index.css';\n+\n+// Initialize database connection\n+dbConnection.initialize().catch(err => {\n+  logger.error('Failed to initialize database', {\n+    context: { error: err },\n+    source: 'main'\n+  });\n+});\n+\n+ReactDOM.createRoot(document.getElementById('root')!).render(\n+  <React.StrictMode>\n+    <QueryClientProvider client={queryClient}>\n+      {/* @ts-ignore - future flag for React Router v7 */}\n+      <BrowserRouter future={{ v7_startTransition: true }}>\n+        <App />\n+        {process.env.NODE_ENV === 'development' && (\n+          <React.Suspense fallback={null}>\n+            <ReactQueryDevtools />\n+          </React.Suspense>\n+        )}\n+      </BrowserRouter>\n+    </QueryClientProvider>\n+  </React.StrictMode>\n );\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1739349570327,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -19,10 +19,9 @@\n \n ReactDOM.createRoot(document.getElementById('root')!).render(\n   <React.StrictMode>\n     <QueryClientProvider client={queryClient}>\n-      {/* @ts-ignore - future flag for React Router v7 */}\n-      <BrowserRouter future={{ v7_startTransition: true }}>\n+      <BrowserRouter>\n         <App />\n         {process.env.NODE_ENV === 'development' && (\n           <React.Suspense fallback={null}>\n             <ReactQueryDevtools />\n"
+                }
+            ],
+            "date": 1739310396214,
+            "name": "Commit-0",
+            "content": "import React from 'react';\r\nimport ReactDOM from 'react-dom/client';\r\nimport { BrowserRouter } from 'react-router-dom';\r\nimport { QueryClientProvider } from '@tanstack/react-query';\r\nimport { ReactQueryDevtools } from '@tanstack/react-query-devtools';\r\nimport App from './App';\r\nimport { queryClient } from './lib/queryClient';\r\nimport { dbConnection } from './lib/db/connection';\r\nimport { logger } from './lib/logger';\r\nimport './index.css';\r\n\r\n// Initialize database connection\r\ndbConnection.initialize().catch(err => {\r\n  logger.error('Failed to initialize database', {\r\n    context: { error: err },\r\n    source: 'main'\r\n  });\r\n});\r\n\r\nReactDOM.createRoot(document.getElementById('root')!).render(\r\n  <React.StrictMode>\r\n    <QueryClientProvider client={queryClient}>\r\n      {/* @ts-ignore - future flag for React Router v7 */}\r\n      <BrowserRouter future={{ v7_startTransition: true }}>\r\n        <App />\r\n        {process.env.NODE_ENV === 'development' && (\r\n          <React.Suspense fallback={null}>\r\n            <ReactQueryDevtools />\r\n          </React.Suspense>\r\n        )}\r\n      </BrowserRouter>\r\n    </QueryClientProvider>\r\n  </React.StrictMode>\r\n);"
+        }
+    ]
+}

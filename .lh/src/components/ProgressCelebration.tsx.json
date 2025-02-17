@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/components/ProgressCelebration.tsx",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1739446342827,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1739446342827,
+            "name": "Commit-0",
+            "content": "import React from 'react';\r\nimport { motion } from 'framer-motion';\r\nimport { Button } from \"@/components/ui/button\";\r\nimport { CheckCircle2 } from 'lucide-react';\r\n\r\ninterface ProgressCelebrationProps {\r\n  onClose: () => void;\r\n}\r\n\r\nexport const ProgressCelebration: React.FC<ProgressCelebrationProps> = ({ onClose }) => (\r\n  <motion.div\r\n    initial={{ opacity: 0, scale: 0.8 }}\r\n    animate={{ opacity: 1, scale: 1 }}\r\n    exit={{ opacity: 0, scale: 0.8 }}\r\n    className=\"fixed inset-0 flex items-center justify-center bg-black/50 z-50\"\r\n    onClick={onClose}\r\n  >\r\n    <motion.div\r\n      className=\"bg-white dark:bg-gray-800 rounded-lg p-6 text-center space-y-4\"\r\n      onClick={e => e.stopPropagation()}\r\n    >\r\n      <motion.div\r\n        initial={{ scale: 0 }}\r\n        animate={{ scale: [0, 1.2, 1] }}\r\n        transition={{ duration: 0.5 }}\r\n      >\r\n        <CheckCircle2 className=\"h-16 w-16 text-green-500 mx-auto\" />\r\n      </motion.div>\r\n      <h2 className=\"text-2xl font-bold\">Congratulations!</h2>\r\n      <p className=\"text-gray-600 dark:text-gray-300\">\r\n        You've completed all questions in this lesson.\r\n      </p>\r\n      <Button\r\n        onClick={onClose}\r\n        className=\"mt-4\"\r\n      >\r\n        Continue Learning\r\n      </Button>\r\n    </motion.div>\r\n  </motion.div>\r\n); "
+        }
+    ]
+}

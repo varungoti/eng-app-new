@@ -27,7 +27,11 @@ import {
   FileBarChart,
   AlertTriangle,
   LucideCloudHail,
-  CloudHailIcon
+  CloudHailIcon,
+  Activity,
+  Award,
+  MessageSquare,
+  Layout
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
@@ -81,27 +85,101 @@ export const getNavigationItems = (role: string): NavigationItem[] => {
     icon: Bookmark 
   });
 
-  if (permissions.content) {
-    items.push({ 
-      name: 'Learning Management', 
-      href: '/app/learning', 
-      icon: BookOpen
-    });
+  if (role === 'teacher' || role === 'teacher_head') {
+    // For teachers, keep the original structure
+    items.push(
+      { 
+        name: 'Dashboard', 
+        href: '/teacher/dashboard',
+        icon: Layout 
+      },
+      { 
+        name: 'My Classes', 
+        href: '/teacher/my-class',
+        icon: Users 
+      },
+      { 
+        name: 'Lessons', 
+        href: '/teacher/lessons',
+        icon: BookOpen 
+      },
+      { 
+        name: 'Assessments', 
+        href: '/teacher/assessments',
+        icon: Activity 
+      },
+      { 
+        name: 'Progress', 
+        href: '/teacher/progress',
+        icon: Award 
+      },
+      { 
+        name: 'AI Assistant', 
+        href: '/teacher/ai-assistant',
+        icon: MessageSquare 
+      },
+      { 
+        name: 'Schedule', 
+        href: '/teacher/schedule',
+        icon: Calendar 
+      },
+      { 
+        name: 'Settings', 
+        href: '/teacher/settings',
+        icon: Settings 
+      }
+    );
+
+    return items;
   }
 
-  if (permissions.content_management) {
-    items.push({ 
-      name: 'Content Management', 
-      href: '/content-management', 
-      icon: FolderPlus
-    });
-  }
-
+  // For non-teacher roles, nest everything under My Classes
   if (permissions.myclasses) {
     items.push({ 
-      name: 'My Classes', 
-      href: TEACHER_ROUTES.LESSONS,
-      icon: CloudHailIcon
+      name: 'My Classes',
+      icon: CloudHailIcon,
+      submenu: [
+        { 
+          name: 'Dashboard', 
+          href: '/teacher/dashboard',
+          icon: Layout 
+        },
+        { 
+          name: 'Class Overview', 
+          href: '/teacher/my-class',
+          icon: Users 
+        },
+        { 
+          name: 'Lessons', 
+          href: '/teacher/lessons',
+          icon: BookOpen 
+        },
+        { 
+          name: 'Assessments', 
+          href: '/teacher/assessments',
+          icon: Activity 
+        },
+        { 
+          name: 'Progress', 
+          href: '/teacher/progress',
+          icon: Award 
+        },
+        { 
+          name: 'AI Assistant', 
+          href: '/teacher/ai-assistant',
+          icon: MessageSquare 
+        },
+        { 
+          name: 'Schedule', 
+          href: '/teacher/schedule',
+          icon: Calendar 
+        },
+        { 
+          name: 'Settings', 
+          href: '/teacher/settings',
+          icon: Settings 
+        }
+      ]
     });
   }
 
@@ -151,6 +229,11 @@ export const getNavigationItems = (role: string): NavigationItem[] => {
           icon: BookOpen 
         }
       ]
+    });
+    items.push({
+      name: 'Content Management',
+      href: '/content-management',
+      icon: FolderPlus
     });
   }
 

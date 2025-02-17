@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 8,
+            "activePatchIndex": 11,
             "patches": [
                 {
                     "date": 1738875876979,
@@ -40,6 +40,18 @@
                 {
                     "date": 1739014094919,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -54,16 +54,14 @@\n     return opId;\r\n   }\r\n \r\n   public endOperation(opId: string): void {\r\n-    this.loggerInstance.info(`Ending operation: ${opId}`, {\r\n-      context: { opId },\r\n-      source: 'DataFlowMonitor'\r\n-    });\r\n+    this.loggerInstance.info(`Ending operation: ${opId}`, 'DataFlowMonitor');\r\n   }\r\n \r\n \r\n \r\n+\r\n   public async recordOperation(operation: string, duration: number, success: boolean) {\r\n     if (Math.random() > this.config.sampleRate!) return;\r\n \r\n     try {\r\n@@ -78,34 +76,23 @@\n       });\r\n \r\n       this.updateMetrics(duration, success);\r\n     } catch (error) {\r\n-      logger.error('Failed to record data flow operation', {\r\n-        source: 'DataFlowMonitor',\r\n-        context: {\r\n-          operation,\r\n-          duration,\r\n-          success,\r\n-          error\r\n-        }\r\n-      });\r\n+      logger.error('Failed to record data flow operation', 'DataFlowMonitor', error);\r\n+        \r\n     }\r\n   }\r\n \r\n+\r\n   private updateMetrics(duration: number, success: boolean) {\r\n     this.metrics.averageResponseTime = \r\n       (this.metrics.averageResponseTime * 0.9) + (duration * 0.1);\r\n     this.metrics.operationsPerSecond++;\r\n     if (!success) this.metrics.errorRate++;\r\n \r\n     if (this.metrics.averageResponseTime > 1000) {\r\n-      logger.warn('High average response time detected', {\r\n-        source: 'DataFlowMonitor',\r\n-        context: {\r\n-          averageResponseTime: this.metrics.averageResponseTime,\r\n-          threshold: 1000\r\n-        }\r\n-      });\r\n+      logger.warn('High average response time detected', 'DataFlowMonitor');\r\n+\r\n     }\r\n   }\r\n \r\n   public getMetrics(): DataFlowMetrics {\r\n"
+                },
+                {
+                    "date": 1739389626054,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -48,9 +48,9 @@\n     };\r\n \r\n     this.activeOperations.set(opId, operation);\r\n     \r\n-    this.loggerInstance.info(`Starting operation: ${name} (${opId}) - Type: ${type}`, 'DataFlowMonitor');\r\n+    this.loggerInstance.info(`Starting operation: ${name} (${opId}) - Type: ${type}`, { source: 'DataFlowMonitor' });\r\n \r\n     return opId;\r\n   }\r\n \r\n"
+                },
+                {
+                    "date": 1739389632277,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -54,9 +54,9 @@\n     return opId;\r\n   }\r\n \r\n   public endOperation(opId: string): void {\r\n-    this.loggerInstance.info(`Ending operation: ${opId}`, 'DataFlowMonitor');\r\n+    this.loggerInstance.info(`Ending operation: ${opId}`, { source: 'DataFlowMonitor' });\r\n   }\r\n \r\n \r\n \r\n"
+                },
+                {
+                    "date": 1739389638543,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -76,9 +76,9 @@\n       });\r\n \r\n       this.updateMetrics(duration, success);\r\n     } catch (error) {\r\n-      logger.error('Failed to record data flow operation', 'DataFlowMonitor', error);\r\n+      logger.error('Failed to record data flow operation', { source: 'DataFlowMonitor', error });\r\n         \r\n     }\r\n   }\r\n \r\n@@ -89,9 +89,9 @@\n     this.metrics.operationsPerSecond++;\r\n     if (!success) this.metrics.errorRate++;\r\n \r\n     if (this.metrics.averageResponseTime > 1000) {\r\n-      logger.warn('High average response time detected', 'DataFlowMonitor');\r\n+      logger.warn('High average response time detected', { source: 'DataFlowMonitor' });\r\n \r\n     }\r\n   }\r\n \r\n"
                 }
             ],
             "date": 1738875876979,

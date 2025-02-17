@@ -1,0 +1,26 @@
+{
+    "sourceFile": "src/hooks/use-toast.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 2,
+            "patches": [
+                {
+                    "date": 1739446493869,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1739447781188,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -0,0 +1,20 @@\n+import { create } from 'zustand'\n+\n+export interface Toast {\n+  id: string\n+  title?: string\n+  description?: string\n+  action?: React.ReactNode\n+}\n+\n+export interface ToastStore {\n+  toasts: Toast[]\n+  toast: (toast: Omit<Toast, 'id'>) => void\n+}\n+\n+export const useToast = create<ToastStore>((set) => ({\n+  toasts: [],\n+  toast: (toast) => set((state) => ({\n+    toasts: [...state.toasts, { ...toast, id: Math.random().toString() }]\n+  }))\n+})) \n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1739447781559,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -16,25 +16,5 @@\n   toasts: [],\n   toast: (toast) => set((state) => ({\n     toasts: [...state.toasts, { ...toast, id: Math.random().toString() }]\n   }))\n-})) \n-import { create } from 'zustand'\r\n-\r\n-export interface Toast {\r\n-  id: string\r\n-  title?: string\r\n-  description?: string\r\n-  action?: React.ReactNode\r\n-}\r\n-\r\n-export interface ToastStore {\r\n-  toasts: Toast[]\r\n-  toast: (toast: Omit<Toast, 'id'>) => void\r\n-}\r\n-\r\n-export const useToast = create<ToastStore>((set) => ({\r\n-  toasts: [],\r\n-  toast: (toast) => set((state) => ({\r\n-    toasts: [...state.toasts, { ...toast, id: Math.random().toString() }]\r\n-  }))\r\n })) \n\\ No newline at end of file\n"
+                }
+            ],
+            "date": 1739446493869,
+            "name": "Commit-0",
+            "content": "import { create } from 'zustand'\r\n\r\nexport interface Toast {\r\n  id: string\r\n  title?: string\r\n  description?: string\r\n  action?: React.ReactNode\r\n}\r\n\r\nexport interface ToastStore {\r\n  toasts: Toast[]\r\n  toast: (toast: Omit<Toast, 'id'>) => void\r\n}\r\n\r\nexport const useToast = create<ToastStore>((set) => ({\r\n  toasts: [],\r\n  toast: (toast) => set((state) => ({\r\n    toasts: [...state.toasts, { ...toast, id: Math.random().toString() }]\r\n  }))\r\n})) "
+        }
+    ]
+}

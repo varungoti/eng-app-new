@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 3,
+            "activePatchIndex": 4,
             "patches": [
                 {
                     "date": 1739006193038,
@@ -20,6 +20,10 @@
                 {
                     "date": 1739025460122,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -67,5 +67,15 @@\n       sessionStorage.setItem(this.SESSION_STORAGE_KEY, 'true');\r\n     }\r\n \r\n   }\r\n+\r\n+  public static async refreshSession() {\r\n+    try {\r\n+      const { data, error } = await supabase.auth.refreshSession();\r\n+      return { data: { session: data.session }, error };\r\n+    } catch (err) {\r\n+      logger.warn(`Session refresh failed: ${err instanceof Error ? err.message : String(err)}`, 'FallbackStrategy');\r\n+      return { data: { session: null }, error: err as Error };\r\n+    }\r\n+  }\r\n }\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1739279186517,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -15,9 +15,9 @@\n         expiresAt: session.expires_at,\r\n         timestamp: Date.now()\r\n       }));\r\n     } catch (err) {\r\n-      logger.error('Failed to persist session', 'FallbackStrategy');\r\n+      logger.error('Failed to persist session', { source: 'FallbackStrategy' });\r\n     }\r\n   }\r\n \r\n   public static async getSession() {\r\n@@ -40,9 +40,9 @@\n       }\r\n \r\n       return { data: { session: null }, error: null };\r\n     } catch (err) {\r\n-      logger.error('Session retrieval failed', 'FallbackStrategy');\r\n+      logger.error('Session retrieval failed', { source: 'FallbackStrategy' });\r\n       return { data: { session: null }, error: err as Error };\r\n     }\r\n   }\r\n \r\n@@ -62,9 +62,9 @@\n   }\r\n \r\n   private static logFallbackUsage(method: string) {\r\n     if (!sessionStorage.getItem(this.SESSION_STORAGE_KEY)) {\r\n-      logger.info(`Using ${method} fallback for auth session`, 'FallbackStrategy'); \r\n+      logger.info(`Using ${method} fallback for auth session`, { source: 'FallbackStrategy' }); \r\n       sessionStorage.setItem(this.SESSION_STORAGE_KEY, 'true');\r\n     }\r\n \r\n   }\r\n@@ -73,9 +73,9 @@\n     try {\r\n       const { data, error } = await supabase.auth.refreshSession();\r\n       return { data: { session: data.session }, error };\r\n     } catch (err) {\r\n-      logger.warn(`Session refresh failed: ${err instanceof Error ? err.message : String(err)}`, 'FallbackStrategy');\r\n+      logger.warn(`Session refresh failed: ${err instanceof Error ? err.message : String(err)}`, { source: 'FallbackStrategy' });\r\n       return { data: { session: null }, error: err as Error };\r\n     }\r\n   }\r\n }\n\\ No newline at end of file\n"
                 }
             ],
             "date": 1739006193038,

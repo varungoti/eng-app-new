@@ -6,18 +6,21 @@ import { useTheme } from 'next-themes';
 import { Button } from '../ui/button';
 import { cn } from '@/lib/utils';
 import { usePathname } from "next/navigation";
-import { LucideIcon, FileText, Lock, Sun, Moon } from "lucide-react";
+import { LucideIcon, FileText, Lock, Sun, Moon, ChevronDown } from "lucide-react";
 import { useComponentLogger } from "@/hooks/useComponentLogger";
+
+interface SidebarItem {
+  href: string;
+  label: string;
+  icon: LucideIcon;
+  isActive?: boolean;
+  children?: SidebarItem[];
+}
 
 interface SidebarProps {
   className?: string;
   currentPath: string;
-  sidebarItems: Array<{
-    href: string;
-    label: string;
-    icon: LucideIcon;
-    isActive?: boolean;
-  }>;
+  sidebarItems: SidebarItem[];
 }
 
 export default function Sidebar({ className = "", sidebarItems, currentPath }: SidebarProps) {
@@ -138,6 +141,8 @@ export default function Sidebar({ className = "", sidebarItems, currentPath }: S
                 href={item.href}
                 isActive={currentPath === item.href}
                 isCollapsed={isCollapsed}
+                children={item.children}
+                currentPath={currentPath}
               />
             ))}
           </nav>
@@ -176,36 +181,75 @@ function SidebarItem({
   label, 
   href, 
   isActive, 
-  isCollapsed 
+  isCollapsed,
+  children,
+  currentPath 
 }: { 
   icon: LucideIcon;
   label: string; 
   href: string; 
   isActive: boolean;
   isCollapsed: boolean;
+  children?: SidebarItem[];
+  currentPath: string;
 }) {
   const { logError } = useComponentLogger('SidebarItem');
   const IconComponent = icon || FileText;
+  const [isOpen, setIsOpen] = useState(false);
 
   try {
     return (
-      <Link
-        href={href}
-        className={cn(
-          "flex items-center px-2 py-2 rounded-md transition-colors",
-          "hover:bg-accent hover:text-accent-foreground",
-          isActive && "bg-primary/10 text-primary",
-          isCollapsed ? "justify-center" : "justify-start"
-        )}
-      >
-        <IconComponent 
+      <div>
+        <Link
+          href={href}
           className={cn(
-            "flex-shrink-0",
-            isCollapsed ? "h-5 w-5" : "h-5 w-5 mr-3"
-          )} 
-        />
-        {!isCollapsed && <span className="text-sm">{label}</span>}
-      </Link>
+            "flex items-center px-2 py-2 rounded-md transition-colors",
+            "hover:bg-accent hover:text-accent-foreground",
+            isActive && "bg-primary/10 text-primary",
+            isCollapsed ? "justify-center" : "justify-start"
+          )}
+          onClick={(e) => {
+            if (children && children.length > 0) {
+              e.preventDefault();
+              setIsOpen(!isOpen);
+            }
+          }}
+        >
+          <IconComponent 
+            className={cn(
+              "flex-shrink-0",
+              isCollapsed ? "h-5 w-5" : "h-5 w-5 mr-3"
+            )} 
+          />
+          {!isCollapsed && (
+            <>
+              <span className="text-sm flex-1">{label}</span>
+              {children && children.length > 0 && (
+                <ChevronDown 
+                  className={cn(
+                    "h-4 w-4 transition-transform",
+                    isOpen && "transform rotate-180"
+                  )} 
+                />
+              )}
+            </>
+          )}
+        </Link>
+        
+        {!isCollapsed && isOpen && children && children.length > 0 && (
+          <div className="ml-4 mt-1 space-y-1">
+            {children.map((child, index) => (
+              <SidebarItem
+                key={`${child.href}-${index}`}
+                {...child}
+                isCollapsed={isCollapsed}
+                isActive={currentPath === child.href}
+                currentPath={currentPath}
+              />
+            ))}
+          </div>
+        )}
+      </div>
     );
   } catch (error) {
     logError(error);

@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { performanceMonitor } from '../lib/monitoring/PerformanceMonitor';
+import { performanceMonitor, type PerformanceMetric } from '../lib/monitoring/PerformanceMonitor';
 
 export const usePerformanceMonitor = (source?: string) => {
-  const [metrics, setMetrics] = useState(performanceMonitor.getAllMetrics());
+  const [metrics, setMetrics] = useState<PerformanceMetric[]>(performanceMonitor.getAllMetrics());
 
   useEffect(() => {
     return performanceMonitor.subscribe(allMetrics => {

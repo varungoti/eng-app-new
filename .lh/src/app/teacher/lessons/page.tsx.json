@@ -1,0 +1,38 @@
+{
+    "sourceFile": "src/app/teacher/lessons/page.tsx",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 5,
+            "patches": [
+                {
+                    "date": 1739305417254,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1739305423464,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -38,9 +38,9 @@\n   //   );\r\n   // }\r\n \r\n   return (\r\n-    <div className=\"max flex flex-col md:flex-row bg-gray-100 dark:bg-gray-900\">\r\n+    <div className=\"max-w-8x1 flex flex-col md:flex-row bg-gray-100 dark:bg-gray-900\">\r\n       {/* Main content area */}\r\n       <main className=\"w-full flex-grow p-4 md:p-6\">\r\n         <Suspense fallback={<LoadingComponent />}>\r\n           <LearningPathTeacher />\r\n"
+                },
+                {
+                    "date": 1739305430296,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -38,9 +38,9 @@\n   //   );\r\n   // }\r\n \r\n   return (\r\n-    <div className=\"max-w-8x1 flex flex-col md:flex-row bg-gray-100 dark:bg-gray-900\">\r\n+    <div className=\"max-w-9xl mx-auto px-4 sm:px-6 md:px-2 flex flex-col md:flex-row bg-gray-100 dark:bg-gray-900\">\r\n       {/* Main content area */}\r\n       <main className=\"w-full flex-grow p-4 md:p-6\">\r\n         <Suspense fallback={<LoadingComponent />}>\r\n           <LearningPathTeacher />\r\n"
+                },
+                {
+                    "date": 1739305455358,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -38,9 +38,9 @@\n   //   );\r\n   // }\r\n \r\n   return (\r\n-    <div className=\"max-w-9xl mx-auto px-4 sm:px-6 md:px-2 flex flex-col md:flex-row bg-gray-100 dark:bg-gray-900\">\r\n+    <div className=\"max-w-8x1 flex flex-col md:flex-row bg-gray-100 dark:bg-gray-900\">\r\n       {/* Main content area */}\r\n       <main className=\"w-full flex-grow p-4 md:p-6\">\r\n         <Suspense fallback={<LoadingComponent />}>\r\n           <LearningPathTeacher />\r\n"
+                },
+                {
+                    "date": 1739305461933,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -38,9 +38,9 @@\n   //   );\r\n   // }\r\n \r\n   return (\r\n-    <div className=\"max-w-8x1 flex flex-col md:flex-row bg-gray-100 dark:bg-gray-900\">\r\n+    <div className=\"w-full flex flex-col md:flex-row bg-gray-100 dark:bg-gray-900\">\r\n       {/* Main content area */}\r\n       <main className=\"w-full flex-grow p-4 md:p-6\">\r\n         <Suspense fallback={<LoadingComponent />}>\r\n           <LearningPathTeacher />\r\n"
+                },
+                {
+                    "date": 1739305519677,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -40,9 +40,9 @@\n \r\n   return (\r\n     <div className=\"w-full flex flex-col md:flex-row bg-gray-100 dark:bg-gray-900\">\r\n       {/* Main content area */}\r\n-      <main className=\"w-full flex-grow p-4 md:p-6\">\r\n+      <main className=\"w-full flex-grow p-1 md:p-2\">\r\n         <Suspense fallback={<LoadingComponent />}>\r\n           <LearningPathTeacher />\r\n         </Suspense>\r\n       </main>\r\n"
+                }
+            ],
+            "date": 1739305417254,
+            "name": "Commit-0",
+            "content": "\"use client\";\r\n\r\nimport { Suspense } from \"react\";\r\nimport { LearningPathTeacher } from \"@/components/common/learningpathTeacher\";\r\nimport StudentProgress from \"@/components/teacher/StudentProgress\";\r\nimport UpcomingClasses from \"@/components/teacher/UpcomingClasses\";\r\n// import { useLockStore } from \"@/lib/store/lockStore\";\r\n// import { Lock } from \"lucide-react\";\r\nimport { Button } from \"@/components/ui/button\";\r\n\r\nfunction LoadingComponent() {\r\n  return (\r\n    <div className=\"w-full h-full flex items-center justify-center p-8\">\r\n      <div className=\"text-center space-y-4\">\r\n        <div className=\"animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto\"></div>\r\n        <p className=\"text-gray-600\">Loading...</p>\r\n      </div>\r\n    </div>\r\n  );\r\n}\r\n\r\nexport default function TeacherLessonsPage() {\r\n  // const isCoursesLocked = useLockStore((state) => state.isCoursesLocked);\r\n  // const unlockCourses = useLockStore((state) => state.unlockCourses);\r\n\r\n  // if (isCoursesLocked) {\r\n  //   return (\r\n  //     <div className=\"w-full h-full flex items-center justify-center bg-gray-100 dark:bg-gray-900\">\r\n  //       <div className=\"text-center space-y-4 p-8 rounded-lg bg-white dark:bg-gray-800 shadow-lg\">\r\n  //         <Lock className=\"w-16 h-16 mx-auto text-gray-400\" />\r\n  //         <h1 className=\"text-2xl font-bold\">This Section is Locked</h1>\r\n  //         <p className=\"text-gray-500\">This section is currently locked for maintenance or updates.</p>\r\n  //         <Button onClick={unlockCourses} variant=\"outline\">\r\n  //           Unlock Section\r\n  //         </Button>\r\n  //       </div>\r\n  //     </div>\r\n  //   );\r\n  // }\r\n\r\n  return (\r\n    <div className=\"max flex flex-col md:flex-row bg-gray-100 dark:bg-gray-900\">\r\n      {/* Main content area */}\r\n      <main className=\"w-full flex-grow p-4 md:p-6\">\r\n        <Suspense fallback={<LoadingComponent />}>\r\n          <LearningPathTeacher />\r\n        </Suspense>\r\n      </main>\r\n \r\n      <aside className=\"w-full max-w-lg\"> \r\n        <div className=\"sticky top-0 p-4 md:p-6 space-y-4\">\r\n          <Suspense fallback={<LoadingComponent />}>\r\n            <UpcomingClasses />\r\n          </Suspense>\r\n          <Suspense fallback={<LoadingComponent />}>\r\n            <StudentProgress />\r\n          </Suspense>\r\n        </div>\r\n      </aside>\r\n    </div>\r\n  );\r\n}\r\n"
+        }
+    ]
+}

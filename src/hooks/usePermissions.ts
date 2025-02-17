@@ -1,7 +1,11 @@
 import { useContext } from 'react';
 import { AuthContext } from '../contexts/AuthContext';
 import { ROLE_PERMISSIONS } from '../types/roles';
-import type { Permissions } from '../types/roles';
+
+type Permissions = {
+  staff: boolean;
+  // ... other permissions
+};
 
 export const usePermissions = () => {
   const { user } = useContext(AuthContext);

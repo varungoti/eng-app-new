@@ -55,6 +55,7 @@ const Dashboard: React.FC = () => {
   const queryClient = useQueryClient();
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [loadProgress, setLoadProgress] = useState<number>(0);
 
   // Memoized role update handler
   const handleRoleChange = useCallback((newRole: string) => {
@@ -91,7 +92,6 @@ const Dashboard: React.FC = () => {
           showProgress={true}
           progress={loadProgress}
           timeout={15000}
-
           onRetry={() => {
             queryClient.invalidateQueries();
             window.location.reload();

@@ -1,0 +1,18 @@
+{
+    "sourceFile": "server.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1739303543719,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1739303543719,
+            "name": "Commit-0",
+            "content": "import express from 'express';\r\nimport cors from 'cors';\r\nimport { createServer as createViteServer } from 'vite';\r\nimport { fileURLToPath } from 'url';\r\nimport { dirname } from 'path';\r\nimport path from 'path';\r\n\r\nconst __filename = fileURLToPath(import.meta.url);\r\nconst __dirname = dirname(__filename);\r\n\r\nasync function createServer() {\r\n  const app = express();\r\n  \r\n  // Enable CORS\r\n  app.use(cors());\r\n  \r\n  // Body parser middleware\r\n  app.use(express.json());\r\n  app.use(express.urlencoded({ extended: true }));\r\n\r\n  // Create Vite server in middleware mode\r\n  const vite = await createViteServer({\r\n    server: { middlewareMode: true },\r\n    appType: 'custom'\r\n  });\r\n\r\n  // Use vite's connect instance as middleware\r\n  app.use(vite.middlewares);\r\n\r\n  // Serve static files from the dist directory\r\n  app.use(express.static(path.resolve(__dirname, 'dist')));\r\n\r\n  // API routes\r\n  app.use('/api/process-image', (req, res) => {\r\n    // Your image processing logic here\r\n    res.json({ message: 'Image processing endpoint' });\r\n  });\r\n\r\n  // All other routes should serve the index.html\r\n  app.get('*', (req, res) => {\r\n    res.sendFile(path.resolve(__dirname, 'dist', 'index.html'));\r\n  });\r\n\r\n  const port = process.env.PORT || 3000;\r\n  app.listen(port, () => {\r\n    console.log(`Server running at http://localhost:${port}`);\r\n  });\r\n}\r\n\r\ncreateServer().catch((err) => {\r\n  console.error('Error starting server:', err);\r\n  process.exit(1);\r\n}); "
+        }
+    ]
+}

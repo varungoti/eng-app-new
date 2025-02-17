@@ -31,19 +31,19 @@ export class SessionLoader {
 
       if (session) {
         await this.persistSession(session);
-        logger.info(`Session loaded successfully for user ${session.user?.id}`, 'SessionLoader');
+        logger.info(`Session loaded successfully for user ${session.user?.id}`, { source: 'SessionLoader' });
         this.loadingStrategy.end();
         return session;
       }
 
       if (error) {
-        logger.warn(`Failed to get current session: ${error.message}`, 'SessionLoader');
+        logger.warn(`Failed to get current session: ${error.message}`, { source: 'SessionLoader' });
       }
 
       // Try to recover from storage if no current session
       const storedSession = await this.getStoredSession();
       if (storedSession) {
-        logger.info('Session recovered from storage', 'SessionLoader');
+        logger.info('Session recovered from storage', { source: 'SessionLoader' });
         this.loadingStrategy.end();
         return storedSession;
       }
@@ -52,7 +52,7 @@ export class SessionLoader {
       return null;
     } catch (err) {
       const error = err instanceof Error ? err : new Error(String(err));
-      logger.error(`Session loading failed: ${error.message}`, 'SessionLoader');
+      logger.error(`Session loading failed: ${error.message}`, { source: 'SessionLoader' });
       this.loadingStrategy.end(error);
       throw error;
     }
@@ -72,7 +72,7 @@ export class SessionLoader {
 
       // Check if session is expired
       if (expiresAt && new Date(expiresAt).getTime() < Date.now()) {
-        logger.debug('Stored session expired, attempting refresh', 'SessionLoader');
+        logger.debug('Stored session expired, attempting refresh', { source: 'SessionLoader' });
       }
 
       // Try to refresh the session
@@ -81,7 +81,7 @@ export class SessionLoader {
       });
 
       if (error) {
-        logger.warn(`Session refresh failed: ${error.message}`, 'SessionLoader');
+        logger.warn(`Session refresh failed: ${error.message}`, { source: 'SessionLoader' });
         localStorage.removeItem(this.STORAGE_KEY);
         return null;
       }
@@ -93,7 +93,7 @@ export class SessionLoader {
 
       return null;
     } catch (err) {
-      logger.error(`Failed to get stored session: ${err instanceof Error ? err.message : String(err)}`, 'SessionLoader');
+      logger.error(`Failed to get stored session: ${err instanceof Error ? err.message : String(err)}`, { source: 'SessionLoader' });
       localStorage.removeItem(this.STORAGE_KEY);
       return null;
     }
@@ -113,7 +113,7 @@ export class SessionLoader {
 
       localStorage.setItem(this.STORAGE_KEY, JSON.stringify(sessionData));
     } catch (err) {
-      logger.error(`Failed to persist session: ${err instanceof Error ? err.message : String(err)}`, 'SessionLoader');
+      logger.error(`Failed to persist session: ${err instanceof Error ? err.message : String(err)}`, { source: 'SessionLoader' });
     }
   }
 
@@ -137,7 +137,7 @@ export class SessionLoader {
 
       return null;
     } catch (err) {
-      logger.error(`Session refresh failed: ${err instanceof Error ? err.message : String(err)}`, 'SessionLoader');
+      logger.error(`Session refresh failed: ${err instanceof Error ? err.message : String(err)}`, { source: 'SessionLoader' });
       throw err;
     }
   }

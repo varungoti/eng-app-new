@@ -251,6 +251,40 @@ const validateQuestion = (question: Question): QuestionValidation => {
   return { isValid: true, message: '' };
 };
 
+// Add proper type for question data
+interface QuestionData {
+  id?: string;
+  content?: string;
+  type?: string;
+  sampleAnswer?: string | null;
+  data?: {
+    prompt?: string;
+    teacherScript?: string;
+    followup_prompt?: string[];
+    sampleAnswer?: string;
+    answer?: string;
+  } | null;
+  prompt: string;
+  teacherScript: string;
+  followup_prompt: string[];
+  answer?: string;
+}
+
+// In your component where you handle questions
+const handleQuestionData = (question: QuestionData) => {
+  return {
+    ...question,
+    data: {
+      prompt: question?.data?.prompt || '',
+      teacherScript: question?.data?.teacherScript || '',
+      followup_prompt: question?.data?.followup_prompt || [],
+      sampleAnswer: question?.data?.sampleAnswer || undefined,  // Convert null to undefined
+      answer: question?.data?.answer || undefined  // Convert null to undefined
+    } as const,
+    sampleAnswer: question?.sampleAnswer || ''
+  };
+};
+
 export default function LessonManagementPage() {
   // State declarations
   
@@ -739,7 +773,13 @@ export default function LessonManagementPage() {
         type: question.type,
         title: question.title,
         metadata: question.metadata,
-        data: question.data,
+        data: {
+          prompt: question.data?.prompt ?? '',
+          teacherScript: question.data?.teacherScript ?? '',
+          followup_prompt: question.data?.followup_prompt ?? [],
+          sampleAnswer: question.data?.sampleAnswer || undefined,  // Convert null to undefined
+          answer: question.data?.answer || undefined  // Convert null to undefined
+        } as const,
         user_id: session.user.id,
         updated_at: new Date().toISOString()
       };
@@ -2418,7 +2458,7 @@ export default function LessonManagementPage() {
                                                         "hover:bg-primary hover:text-primary-foreground"
                                                       )}
                                                       disabled={!lesson.content || currentLessonId !== lesson.id}
-                                                      onClick={(e) => {
+                                                      onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                                                         e.stopPropagation();
                                                         window.location.href = `/teacher/lessons/${lesson.id}`;
                                                       }}
@@ -2612,23 +2652,23 @@ export default function LessonManagementPage() {
                                         lesson_id: currentLessonId || '',
                                         type: isValidQuestionType(question.type) ? question.type : 'speaking',
                                         data: {
-                                          prompt: question.data?.prompt || '',
-                                          teacherScript: question.data?.teacherScript || '',
-                                          followup_prompt: question.data?.followup_prompt || [],
-                                          sampleAnswer: question.data?.sampleAnswer,
-                                          answer: question.data?.answer
-                                        }
+                                          prompt: question.data?.prompt ?? '',
+                                          teacherScript: question.data?.teacherScript ?? '',
+                                          followup_prompt: question.data?.followup_prompt ?? [],
+                                          sampleAnswer: question.data?.sampleAnswer ?? '',
+                                          answer: question.data?.answer ?? ''
+                                        } 
                                       }}
                                       index={index}
                                       onUpdate={async (index: number, updatedQuestion: ContentQuestion) => {
                                         await handleUpdateQuestion(index, {
                                           ...updatedQuestion,
                                           data: {
-                                            prompt: updatedQuestion.data?.prompt || '',
-                                            teacherScript: updatedQuestion.data?.teacherScript || '',
-                                            followup_prompt: updatedQuestion.data?.followup_prompt || [],
-                                            sampleAnswer: updatedQuestion.data?.sampleAnswer,
-                                            answer: updatedQuestion.data?.answer
+                                            prompt: updatedQuestion.data?.prompt ?? '',
+                                            teacherScript: updatedQuestion.data?.teacherScript ?? '',
+                                            followup_prompt: updatedQuestion.data?.followup_prompt ?? [],
+                                            sampleAnswer: updatedQuestion.data?.sampleAnswer ?? '',
+                                            answer: updatedQuestion.data?.answer ?? ''
                                           }
                                         });
                                       }}

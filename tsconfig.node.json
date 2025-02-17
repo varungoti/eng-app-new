@@ -3,8 +3,9 @@
     "composite": true,
     "skipLibCheck": true,
     "target": "ES2022",
-    "lib": ["ES2023"],
+    "lib": ["ES2022", "DOM"],
     "module": "ESNext",
+    "forceConsistentCasingInFileNames": true,
 
     /* Bundler mode */
     "allowImportingTsExtensions": true,
@@ -24,7 +25,8 @@
       "@/*": [
         "./src/*"
       ]
-    }
+    },
+    "outDir": "dist"
   },
   "include": ["vite.config.ts"]
 }

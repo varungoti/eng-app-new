@@ -1,6 +1,6 @@
 "use client";
 
-import { useContext, useEffect } from 'react';
+import { useContext, useEffect, useState, useCallback, useRef } from 'react';
 import { AuthContext } from '../contexts/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { QueryClient } from '@tanstack/query-core';
@@ -11,6 +11,11 @@ import { ROLE_PERMISSIONS } from '../types/roles';
 import { sessionManager } from '../lib/auth/sessionManager';
 import type { UserRole } from '../types/roles';
 import { supabaseClient } from '../lib/supabaseClient';
+import { supabase } from '../lib/supabase';
+import { AuthLoader } from '../lib/auth/AuthLoader';
+import type { AuthError } from '@supabase/supabase-js';
+import { sessionMonitor } from '@/lib/auth/SessionMonitor';
+import type { SessionState } from '@/lib/auth/sessionManager';
 
 interface LoginCredentials {
   email: string;
@@ -25,7 +30,7 @@ interface ResetPasswordCredentials {
   email: string;
 }
 
-export const useAuth = () => {
+export function useAuth() {
   const context = useContext(AuthContext);
   
   if (!context) {
@@ -53,7 +58,8 @@ export const useAuth = () => {
   useEffect(() => {
     if (loading) {
       logger.info('Auth loading state active', {
-        source: 'useAuth'
+        source: 'useAuth',
+        context: { loading }
       });
     }
   }, [loading]);
@@ -66,8 +72,8 @@ export const useAuth = () => {
         await sessionManager.refreshSession();
       } catch (err) {
         logger.error('Failed to refresh session', {
-          context: { error: err },
-          source: 'useAuth'
+          source: 'useAuth',
+          context: { error: err }
         });
       }
     }, 4 * 60 * 1000); // Check every 4 minutes
@@ -82,12 +88,12 @@ export const useAuth = () => {
   useEffect(() => {
     if (user) {
       logger.debug('Auth state check on route change', {
+        source: 'useAuth',
         context: {
           role: user.role,
           path: location.pathname,
           permissions: ROLE_PERMISSIONS[user.role]?.permissions
-        },
-        source: 'useAuth'
+        }
       });
     }
   }, [user, location.pathname]);
@@ -112,8 +118,8 @@ export const useAuth = () => {
       navigate('/', { replace: true });
     } catch (err) {
       logger.error('Failed to change role', {
-        context: { error: err },
-        source: 'useAuth'
+        source: 'useAuth',
+        context: { error: err }
       });
       throw err;
     }
@@ -375,6 +381,24 @@ export const useAuth = () => {
     }
   };
 
+  const [authState, setAuthState] = useState(sessionMonitor.getState());
+
+  useEffect(() => {
+    const unsubscribe = sessionMonitor.subscribeToStateUpdates(setAuthState);
+    return () => unsubscribe();
+  }, []);
+
+  const checkAndRefreshSession = async (): Promise<void> => {
+    try {
+      await sessionManager.checkAndRefreshSession();
+    } catch (error) {
+      logger.error('Failed to check and refresh session', {
+        context: { error },
+        source: 'useAuth'
+      });
+    }
+  };
+
   return {
     user: user ? {
       ...user,
@@ -386,6 +410,7 @@ export const useAuth = () => {
     login,
     logout,
     signUp,
-    resetPassword
+    resetPassword,
+    sessionManager
   };
-};
+}

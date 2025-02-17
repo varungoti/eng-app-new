@@ -5,7 +5,7 @@ import { AlertTriangle, BarChart2, RefreshCw } from 'lucide-react';
 export const ErrorMetricsDisplay: React.FC = () => {
   const metrics = useErrorMetrics();
 
-  if (metrics.totalErrors === 0) {
+  if (metrics.total === 0) {
     return null;
   }
 
@@ -24,11 +24,11 @@ export const ErrorMetricsDisplay: React.FC = () => {
             <div>
               <p className="text-sm font-medium text-gray-600">Total Errors</p>
               <p className="text-2xl font-semibold text-gray-900">
-                {metrics.totalErrors}
+                {metrics.total}
               </p>
             </div>
             <AlertTriangle className={`h-8 w-8 ${
-              metrics.totalErrors > 10 ? 'text-red-500' : 'text-yellow-500'
+              metrics.total > 10 ? 'text-red-500' : 'text-yellow-500'
             }`} />
           </div>
         </div>

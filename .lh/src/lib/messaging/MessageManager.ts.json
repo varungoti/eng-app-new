@@ -3,11 +3,43 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 0,
+            "activePatchIndex": 8,
             "patches": [
                 {
                     "date": 1739015420624,
                     "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1739442996513,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -70,9 +70,9 @@\n \r\n       this.notifySubscribers(messages);\r\n       return messages;\r\n     } catch (err) {\r\n-      logger.error('Failed to fetch messages', 'MessageManager', err);\r\n+      logger.error('Failed to fetch messages', 'MessageManager', { serr);\r\n       return [];\r\n \r\n     }\r\n   }\r\n"
+                },
+                {
+                    "date": 1739443004109,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -70,9 +70,9 @@\n \r\n       this.notifySubscribers(messages);\r\n       return messages;\r\n     } catch (err) {\r\n-      logger.error('Failed to fetch messages', 'MessageManager', { serr);\r\n+      logger.error('Failed to fetch messages', 'MessageManager', err);\r\n       return [];\r\n \r\n     }\r\n   }\r\n"
+                },
+                {
+                    "date": 1739443010811,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -70,9 +70,9 @@\n \r\n       this.notifySubscribers(messages);\r\n       return messages;\r\n     } catch (err) {\r\n-      logger.error('Failed to fetch messages', 'MessageManager', err);\r\n+      logger.error('Failed to fetch messages', err);\r\n       return [];\r\n \r\n     }\r\n   }\r\n"
+                },
+                {
+                    "date": 1739443016661,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -70,9 +70,9 @@\n \r\n       this.notifySubscribers(messages);\r\n       return messages;\r\n     } catch (err) {\r\n-      logger.error('Failed to fetch messages', err);\r\n+      logger.error('Failed to fetch messages', 'MessageManager', err as LogContext);\r\n       return [];\r\n \r\n     }\r\n   }\r\n"
+                },
+                {
+                    "date": 1739443022911,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -70,9 +70,13 @@\n \r\n       this.notifySubscribers(messages);\r\n       return messages;\r\n     } catch (err) {\r\n-      logger.error('Failed to fetch messages', 'MessageManager', err as LogContext);\r\n+      logger.error('Failed to fetch messages', {\r\n+        source: 'MessageManager',\r\n+        error: err,\r\n+        timestamp: new Date().toISOString()\r\n+      });\r\n       return [];\r\n \r\n     }\r\n   }\r\n"
+                },
+                {
+                    "date": 1739443063844,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -107,9 +107,13 @@\n         read: data.read,\r\n         createdAt: new Date(data.created_at)\r\n       };\r\n     } catch (err) {\r\n-      logger.error('Failed to send message', 'MessageManager', err);\r\n+      logger.error('Failed to send message', {\r\n+        source: 'MessageManager',\r\n+        error: err,\r\n+        timestamp: new Date().toISOString()\r\n+      });\r\n       return null;\r\n \r\n     }\r\n   }\r\n"
+                },
+                {
+                    "date": 1739443071423,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -127,9 +127,13 @@\n \r\n       if (error) throw error;\r\n       await this.fetchMessages();\r\n     } catch (err) {\r\n-      logger.error('Failed to mark message as read', 'MessageManager', err);\r\n+      logger.error('Failed to mark message as read', {\r\n+        source: 'MessageManager',\r\n+        error: err,\r\n+        timestamp: new Date().toISOString()\r\n+      });\r\n \r\n     }\r\n   }\r\n \r\n"
+                },
+                {
+                    "date": 1739443079381,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -156,9 +156,13 @@\n         lastMessage: this.mapMessage(t.messages[0]),\r\n         unreadCount: t.messages.filter((m: any) => !m.read).length\r\n       }));\r\n     } catch (err) {\r\n-      logger.error('Failed to get threads', 'MessageManager', err);\r\n+      logger.error('Failed to get threads', {\r\n+        source: 'MessageManager',\r\n+        error: err,\r\n+        timestamp: new Date().toISOString()\r\n+      });\r\n       return [];\r\n \r\n     }\r\n   }\r\n"
                 }
             ],
             "date": 1739015420624,

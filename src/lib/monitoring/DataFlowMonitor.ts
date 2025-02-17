@@ -49,13 +49,13 @@ export class DataFlowMonitor {
 
     this.activeOperations.set(opId, operation);
     
-    this.loggerInstance.info(`Starting operation: ${name} (${opId}) - Type: ${type}`, 'DataFlowMonitor');
+    this.loggerInstance.info(`Starting operation: ${name} (${opId}) - Type: ${type}`, { source: 'DataFlowMonitor' });
 
     return opId;
   }
 
   public endOperation(opId: string): void {
-    this.loggerInstance.info(`Ending operation: ${opId}`, 'DataFlowMonitor');
+    this.loggerInstance.info(`Ending operation: ${opId}`, { source: 'DataFlowMonitor' });
   }
 
 
@@ -77,7 +77,7 @@ export class DataFlowMonitor {
 
       this.updateMetrics(duration, success);
     } catch (error) {
-      logger.error('Failed to record data flow operation', 'DataFlowMonitor', error);
+      logger.error('Failed to record data flow operation', { source: 'DataFlowMonitor', error });
         
     }
   }
@@ -90,7 +90,7 @@ export class DataFlowMonitor {
     if (!success) this.metrics.errorRate++;
 
     if (this.metrics.averageResponseTime > 1000) {
-      logger.warn('High average response time detected', 'DataFlowMonitor');
+      logger.warn('High average response time detected', { source: 'DataFlowMonitor' });
 
     }
   }

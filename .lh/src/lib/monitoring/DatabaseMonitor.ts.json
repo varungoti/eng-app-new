@@ -3,11 +3,19 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 0,
+            "activePatchIndex": 2,
             "patches": [
                 {
                     "date": 1739014143582,
                     "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1739389649180,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -57,9 +57,9 @@\n         lastCheckTime: new Date(),\r\n         responseTime: duration\r\n       };\r\n \r\n-      logger.info('Database health check successful', 'DatabaseMonitor');\r\n+      logger.info('Database health check successful', { source: 'DatabaseMonitor' });\r\n \r\n     } catch (error) {\r\n       this.metrics.errorCount++;\r\n       this.metrics.connectionStatus = this.metrics.errorCount > 3 ? 'error' : 'degraded';\r\n"
+                },
+                {
+                    "date": 1739389655646,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -63,9 +63,9 @@\n     } catch (error) {\r\n       this.metrics.errorCount++;\r\n       this.metrics.connectionStatus = this.metrics.errorCount > 3 ? 'error' : 'degraded';\r\n \r\n-      logger.error('Database health check failed', 'DatabaseMonitor', error);\r\n+      logger.error('Database health check failed', { source: 'DatabaseMonitor', error });\r\n \r\n     }\r\n   }\r\n \r\n@@ -87,9 +87,9 @@\n \r\n   updateConnectionStatus(status: boolean) {\r\n     this.isConnected = status;\r\n     if (this.config.enableLogging) {\r\n-      logger.info(`Database connection status: ${status ? 'connected' : 'disconnected'}`, 'DatabaseMonitor');\r\n+      logger.info(`Database connection status: ${status ? 'connected' : 'disconnected'}`, { source: 'DatabaseMonitor' });\r\n     }\r\n   }\r\n }\r\n \r\n"
                 }
             ],
             "date": 1739014143582,

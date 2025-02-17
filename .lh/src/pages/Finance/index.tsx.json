@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/pages/Finance/index.tsx",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1739352886647,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1739352886647,
+            "name": "Commit-0",
+            "content": "import React from 'react';\r\nimport { Routes, Route, Navigate } from 'react-router-dom';\r\nimport Finance from './Finance';\r\nimport Invoices from './Invoices';\r\nimport Payments from './Payments';\r\nimport ErrorBoundary from '../../components/ErrorBoundary';\r\nimport LoadingSpinner from '../../components/LoadingSpinner';\r\n\r\nexport const FINANCE_ROUTES = {\r\n  BASE: '/finance',\r\n  INVOICES: '/finance/invoices',\r\n  PAYMENTS: '/finance/payments'\r\n} as const;\r\n\r\nconst FinanceRoutes = () => {\r\n  return (\r\n    <ErrorBoundary source=\"Finance\">\r\n      <Routes>\r\n        <Route index element={<Finance />} />\r\n        <Route \r\n          path=\"invoices\" \r\n          element={\r\n            <React.Suspense fallback={<LoadingSpinner message=\"Loading invoices...\" />}>\r\n              <Invoices />\r\n            </React.Suspense>\r\n          } \r\n        />\r\n        <Route \r\n          path=\"payments\" \r\n          element={\r\n            <React.Suspense fallback={<LoadingSpinner message=\"Loading payments...\" />}>\r\n              <Payments />\r\n            </React.Suspense>\r\n          } \r\n        />\r\n        <Route path=\"*\" element={<Navigate to={FINANCE_ROUTES.BASE} replace />} />\r\n      </Routes>\r\n    </ErrorBoundary>\r\n  );\r\n};\r\n\r\nexport default FinanceRoutes;"
+        }
+    ]
+}

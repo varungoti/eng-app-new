@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/components/ErrorMonitor/ErrorDisplay.tsx",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1739390609083,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1739390609083,
+            "name": "Commit-0",
+            "content": "import React from 'react';\r\nimport { AlertTriangle, X, RefreshCw } from 'lucide-react';\r\nimport { useErrorMonitor } from '../../hooks/useErrorMonitor';\r\nimport { formatDistanceToNow } from '../../lib/utils/format';\r\n\r\nexport const ErrorDisplay: React.FC = () => {\r\n  const { errors, retryOperation, clearError } = useErrorMonitor();\r\n\r\n  if (errors.length === 0) return null;\r\n\r\n  return (\r\n    <div className=\"fixed bottom-4 right-4 z-50 max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto\">\r\n      <div className=\"p-4\">\r\n        <div className=\"flex items-start\">\r\n          <div className=\"flex-shrink-0\">\r\n            <AlertTriangle className=\"h-6 w-6 text-red-400\" />\r\n          </div>\r\n          <div className=\"ml-3 w-0 flex-1\">\r\n            <p className=\"text-sm font-medium text-gray-900\">\r\n              {errors.length} Error{errors.length > 1 ? 's' : ''} Detected\r\n            </p>\r\n            <div className=\"mt-1 max-h-60 overflow-y-auto\">\r\n              {errors.map((error) => (\r\n                <div\r\n                  key={error.id}\r\n                  className=\"mt-2 text-sm text-gray-500 border-l-2 border-red-200 pl-2\"\r\n                >\r\n                  <div className=\"flex justify-between items-start\">\r\n                    <div>\r\n                      <p className=\"font-medium text-red-600\">{error.source}</p>\r\n                      <p>{error.error.message}</p>\r\n                      <p className=\"text-xs text-gray-400\">\r\n                        {formatDistanceToNow(new Date(error.timestamp))} ago\r\n                      </p>\r\n                    </div>\r\n                    <div className=\"flex space-x-2\">\r\n                      <button\r\n                        onClick={() => retryOperation(error.id)}\r\n                        className=\"text-sm text-indigo-600 hover:text-indigo-500\"\r\n                        title=\"Retry operation\"\r\n                      >\r\n                        <RefreshCw className=\"h-4 w-4\" />\r\n                      </button>\r\n                      <button\r\n                        onClick={() => clearError(error.id)}\r\n                        className=\"text-sm text-gray-400 hover:text-gray-500\"\r\n                        title=\"Dismiss\"\r\n                      >\r\n                        <X className=\"h-4 w-4\" />\r\n                      </button>\r\n                    </div>\r\n                  </div>\r\n                  {error.context && (\r\n                    <div className=\"mt-1 text-xs text-gray-400\">\r\n                      {Object.entries(error.context).map(([key, value]) => (\r\n                        <div key={key}>{key}: {String(value)}</div>\r\n                      ))}\r\n                    </div>\r\n                  )}\r\n                </div>\r\n              ))}\r\n            </div>\r\n          </div>\r\n        </div>\r\n      </div>\r\n    </div>\r\n  );\r\n};"
+        }
+    ]
+}

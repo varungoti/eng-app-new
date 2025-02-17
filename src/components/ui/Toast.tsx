@@ -5,6 +5,7 @@ import * as ToastPrimitives from "@radix-ui/react-toast"
 import { cva, type VariantProps } from "class-variance-authority"
 import { X } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { ToastProps } from "@radix-ui/react-toast"
 
 const ToastProvider = ToastPrimitives.Provider
 
@@ -111,7 +112,6 @@ const ToastDescription = React.forwardRef<
 ))
 ToastDescription.displayName = ToastPrimitives.Description.displayName
 
-type ToastProps = React.ComponentPropsWithoutRef<typeof Toast>
 type ToastActionElement = React.ReactElement<typeof ToastAction>
 
 const TOAST_LIMIT = 1
@@ -119,9 +119,11 @@ const TOAST_REMOVE_DELAY = 5000
 
 type ToasterToast = ToastProps & {
   id: string
-  title?: string
+  title?: string | React.ReactNode
   description?: string
+  variant?: 'default' | 'destructive' | 'warning'
   action?: ToastActionElement
+  open?: boolean
 }
 
 const actionTypes = {
@@ -253,7 +255,7 @@ export function toast({
 }: {
   title?: string
   description?: string
-  variant?: "default" | "destructive"
+  variant?: "default" | "destructive" | "warning"
   action?: ToastActionElement
 }) {
   const id = genId()

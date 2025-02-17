@@ -1,0 +1,18 @@
+{
+    "sourceFile": "public/sounds/success.mp3",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1739445384198,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1739445384198,
+            "name": "Commit-0",
+            "content": "// This is a binary file, so we'll need to download it from a source or create it using an audio editor.\r\n// For now, you can use a placeholder sound effect or download one from a free sound library. "
+        }
+    ]
+}

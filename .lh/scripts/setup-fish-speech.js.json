@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 3,
+            "activePatchIndex": 4,
             "patches": [
                 {
                     "date": 1739014929347,
@@ -20,6 +20,10 @@
                 {
                     "date": 1739015241157,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -42,15 +42,15 @@\n if (!existsSync(VENV_DIR)) {\n     runCommand('python -m venv venv', { cwd: FISH_SPEECH_DIR });\n }\n \n-// Activate virtual environment and install dependencies\n-console.log('\\nInstalling Python dependencies...');\n+// Install the package in development mode\n+console.log('\\nInstalling Fish Speech package...');\n const activateCmd = process.platform === 'win32' \n     ? 'venv\\\\Scripts\\\\activate' \n     : 'source venv/bin/activate';\n \n-runCommand(`${activateCmd} && pip install -r requirements.txt`, { \n+runCommand(`${activateCmd} && pip install -e .`, { \n     cwd: FISH_SPEECH_DIR,\n     shell: true \n });\n \n@@ -58,9 +58,9 @@\n if (!existsSync(MODELS_DIR)) {\n     mkdirSync(MODELS_DIR, { recursive: true });\n }\n \n-// Download models\n+// Download models using the correct module path\n console.log('\\nDownloading Fish Speech models...');\n runCommand(`${activateCmd} && python -m fish_speech.cli.download_models`, {\n     cwd: FISH_SPEECH_DIR,\n     shell: true\n"
+                },
+                {
+                    "date": 1739442713592,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -43,30 +43,41 @@\n     runCommand('python -m venv venv', { cwd: FISH_SPEECH_DIR });\n }\n \n // Install the package in development mode\n-console.log('\\nInstalling Fish Speech package...');\n-const activateCmd = process.platform === 'win32' \n-    ? 'venv\\\\Scripts\\\\activate' \n-    : 'source venv/bin/activate';\n+try {\n+  console.log('Installing Fish Speech package...');\n+  execSync('pip install -e .', { \n+    cwd: './fish-speech',\n+    stdio: 'inherit'\n+  });\n \n-runCommand(`${activateCmd} && pip install -e .`, { \n-    cwd: FISH_SPEECH_DIR,\n-    shell: true \n-});\n+  console.log('Downloading Fish Speech models...');\n+  // Add error handling and verification\n+  try {\n+    execSync('python -c \"from fish_speech.cli import download_models\"', {\n+      cwd: './fish-speech',\n+      stdio: 'inherit'\n+    });\n+    \n+    execSync('python -m fish_speech.cli.download_models', {\n+      cwd: './fish-speech', \n+      stdio: 'inherit'\n+    });\n+  } catch (err) {\n+    console.warn('Warning: Could not download models automatically.');\n+    console.log('Please run: cd fish-speech && python -m fish_speech.cli.download_models');\n+  }\n+} catch (err) {\n+  console.error('Error:', err.message);\n+  process.exit(1);\n+}\n \n // Create models directory\n if (!existsSync(MODELS_DIR)) {\n     mkdirSync(MODELS_DIR, { recursive: true });\n }\n \n-// Download models using the correct module path\n-console.log('\\nDownloading Fish Speech models...');\n-runCommand(`${activateCmd} && python -m fish_speech.cli.download_models`, {\n-    cwd: FISH_SPEECH_DIR,\n-    shell: true\n-});\n-\n console.log('\\nSetup completed successfully!');\n console.log('\\nNext steps:');\n console.log('1. Make sure you have a CUDA-compatible GPU (or use CPU mode)');\n console.log('2. Update your .env file with the correct paths:');\n"
                 }
             ],
             "date": 1739014929347,

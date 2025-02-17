@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 3,
+            "activePatchIndex": 4,
             "patches": [
                 {
                     "date": 1738874706836,
@@ -20,6 +20,10 @@
                 {
                     "date": 1738874946985,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -4,19 +4,18 @@\n import { LoadingMonitor } from './LoadingMonitor';\r\n import { supabase } from '../supabase';\r\n import type { MonitoringConfig as Config } from './types';\r\n \r\n-const config = {\r\n+export const config = {\r\n   supabase,\r\n   enableLogging: true,\r\n   logLevel: 'info' as const,\r\n   sampleRate: import.meta.env.DEV ? 1 : 0.1\r\n };\r\n-\r\n const monitors = {\r\n-  databaseMonitor: new DatabaseMonitor(supabase, config),\r\n-  dataFlowMonitor: new DataFlowMonitor(supabase, config),\r\n-  dataLoadMonitor: new DataLoadMonitor(supabase, config),\r\n+  databaseMonitor: new DatabaseMonitor(config),\r\n+  dataFlowMonitor: new DataFlowMonitor(supabase, config), \r\n+  dataLoadMonitor: new DataLoadMonitor(config),\r\n   loadingMonitor: new LoadingMonitor(supabase, config)\r\n } as const;\r\n \r\n export { monitors };\r\n"
+                },
+                {
+                    "date": 1739138875955,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -3,20 +3,23 @@\n import { DataLoadMonitor } from './DataLoadMonitor';\r\n import { LoadingMonitor } from './LoadingMonitor';\r\n import { supabase } from '../supabase';\r\n import type { MonitoringConfig as Config } from './types';\r\n+import { logger } from '../logger';\r\n \r\n+\r\n export const config = {\r\n   supabase,\r\n   enableLogging: true,\r\n   logLevel: 'info' as const,\r\n   sampleRate: import.meta.env.DEV ? 1 : 0.1\r\n };\r\n const monitors = {\r\n   databaseMonitor: new DatabaseMonitor(config),\r\n-  dataFlowMonitor: new DataFlowMonitor(supabase, config), \r\n+  dataFlowMonitor: new DataFlowMonitor(supabase, config, logger), \r\n   dataLoadMonitor: new DataLoadMonitor(config),\r\n   loadingMonitor: new LoadingMonitor(supabase, config)\r\n+\r\n } as const;\r\n \r\n export { monitors };\r\n export { DatabaseMonitor, DataFlowMonitor, DataLoadMonitor, LoadingMonitor };\r\n"
                 }
             ],
             "date": 1738874706836,

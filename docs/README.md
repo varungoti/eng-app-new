@@ -1,7 +1,7 @@
 # SpeakWell Admin Platform Documentation
 
 ## Overview
-SpeakWell Admin Platform is a comprehensive school management system built with React and Supabase, featuring role-based access control and real-time updates.
+SpeakWell Admin Platform is a comprehensive school management system built with Vite, React and Supabase, featuring role-based access control and real-time updates.
 
 ## Core Features
 

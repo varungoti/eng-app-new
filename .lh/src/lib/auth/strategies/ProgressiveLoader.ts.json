@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 2,
+            "activePatchIndex": 3,
             "patches": [
                 {
                     "date": 1739025365066,
@@ -16,6 +16,10 @@
                 {
                     "date": 1739025396882,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -57,14 +57,7 @@\n   }\r\n \r\n   private updateProgress(percent: number): void {\r\n     if (this.isCancelled) return;\r\n-    logger.debug(`Loading progress: ${percent}%`, {\r\n-      context: {\r\n-        component: this.component,\r\n-        stage: ProgressiveLoader.STAGES[this.currentStage],\r\n-        progress: percent\r\n-      },\r\n-      source: 'ProgressiveLoader'\r\n-    });\r\n+    logger.debug(`Loading progress: ${percent}% (Stage: ${ProgressiveLoader.STAGES[this.currentStage]})`, this.component);\r\n   }\r\n }\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1739279035253,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -42,9 +42,9 @@\n   public error(err: Error): void {\r\n     if (this.isCancelled) return;\r\n     if (this.loadingId) {\r\n       this.loadingMonitor.endLoading(this.loadingId);\r\n-      logger.error(`Loading error: ${err instanceof Error ? err.message : String(err)}`, 'ProgressiveLoader');\r\n+      logger.error(`Loading error: ${err instanceof Error ? err.message : String(err)}`, { source: 'ProgressiveLoader' });\r\n       this.loadingId = undefined;\r\n     }\r\n   }\r\n \r\n@@ -57,7 +57,7 @@\n   }\r\n \r\n   private updateProgress(percent: number): void {\r\n     if (this.isCancelled) return;\r\n-    logger.debug(`Loading progress: ${percent}% (Stage: ${ProgressiveLoader.STAGES[this.currentStage]})`, this.component);\r\n+    logger.debug(`Loading progress: ${percent}% (Stage: ${ProgressiveLoader.STAGES[this.currentStage]})`, { source: 'ProgressiveLoader' });\r\n   }\r\n }\n\\ No newline at end of file\n"
                 }
             ],
             "date": 1739025365066,

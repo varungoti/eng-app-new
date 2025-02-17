@@ -62,7 +62,7 @@ export class RetryStrategy {
             this.config.maxDelay
           );
 
-          logger.debug(`Retrying operation (attempt ${attempt + 1}/${this.config.maxAttempts}) - delay: ${delay}ms`, 'RetryStrategy');
+          logger.debug(`Retrying operation (attempt ${attempt + 1}/${this.config.maxAttempts}) - delay: ${delay}ms`, { source: 'RetryStrategy' }  );
 
           await new Promise(resolve => setTimeout(resolve, delay));
           continue;
@@ -77,7 +77,7 @@ export class RetryStrategy {
     try {
       const { data } = await FallbackStrategy.refreshSession();
       if (data.session) {
-        logger.info('Session recovered successfully', 'RetryStrategy');
+        logger.info('Session recovered successfully', { source: 'RetryStrategy' });
         return true;
       }
     } catch {

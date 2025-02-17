@@ -30,7 +30,7 @@ export const ErrorDisplay: React.FC = () => {
                       <p className="font-medium text-red-600">{error.source}</p>
                       <p>{error.error.message}</p>
                       <p className="text-xs text-gray-400">
-                        {formatDistanceToNow(error.timestamp)} ago
+                        {formatDistanceToNow(new Date(error.timestamp))} ago
                       </p>
                     </div>
                     <div className="flex space-x-2">

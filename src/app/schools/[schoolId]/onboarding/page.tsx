@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { useOnboarding } from '@/hooks/useOnboarding';
 import OnboardingProgress from '@/components/OnboardingProgress';
-import { OnboardingSteps } from '@/components/school/OnboardingSteps';
+import OnboardingSteps from '@/components/school/OnboardingSteps';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 
 export default function SchoolOnboardingPage() {

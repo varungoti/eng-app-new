@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/pages/api/auto-fix.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1739379492263,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1739379492263,
+            "name": "Commit-0",
+            "content": "import { NextApiRequest, NextApiResponse } from 'next';\r\nimport fs from 'fs/promises';\r\nimport path from 'path';\r\n\r\nexport default async function handler(req: NextApiRequest, res: NextApiResponse) {\r\n  if (req.method !== 'POST') {\r\n    return res.status(405).json({ message: 'Method not allowed' });\r\n  }\r\n\r\n  try {\r\n    const { error, diagnosis, suggestedFix } = req.body;\r\n\r\n    // Log the fix attempt\r\n    await fs.appendFile(\r\n      path.join(process.cwd(), 'auto-fix-logs.txt'),\r\n      `${new Date().toISOString()} - ${JSON.stringify({ error, diagnosis, suggestedFix })}\\n`\r\n    );\r\n\r\n    // Here you could implement actual code fixes\r\n    // WARNING: Be very careful with automated code changes!\r\n    \r\n    res.status(200).json({ message: 'Fix logged successfully' });\r\n  } catch (err) {\r\n    res.status(500).json({ message: 'Failed to process fix' });\r\n  }\r\n} "
+        }
+    ]
+}

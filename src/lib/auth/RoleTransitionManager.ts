@@ -54,13 +54,13 @@ class RoleTransitionManager {
       store.setRole(newRole);
       store.completeTransition();
 
-      logger.info(`Role transition completed successfully from ${store.currentRole || 'none'} to ${newRole}`, 'RoleTransitionManager');
+      logger.info(`Role transition completed successfully from ${store.currentRole || 'none'} to ${newRole}`, { source: 'RoleTransitionManager' });
 
 
     } catch (err) {
       store.resetTransition();
 
-      logger.error(`Role transition failed: ${err instanceof Error ? err.message : String(err)}`, 'RoleTransitionManager');
+      logger.error(`Role transition failed: ${err instanceof Error ? err.message : String(err)}`, { source: 'RoleTransitionManager' });
 
       throw err;
     } finally {

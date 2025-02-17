@@ -20,7 +20,8 @@ dbConnection.initialize().catch(err => {
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
+      {/* @ts-ignore - future flag for React Router v7 */}
+      <BrowserRouter future={{ v7_startTransition: true }}>
         <App />
         {process.env.NODE_ENV === 'development' && (
           <React.Suspense fallback={null}>

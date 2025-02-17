@@ -234,9 +234,9 @@ const Layout: React.FC = () => {
         <div className={`flex flex-col flex-1 overflow-hidden ${currentTheme.background}`}>
           <main className="flex-1 relative overflow-y-auto focus:outline-none">
             <div className={`py-6 ${currentTheme.background} ${currentTheme.text}`}>
-              <div className={`max-w-7xl mx-auto px-4 sm:px-6 md:px-8 ${currentTheme.background}`}>
+              <div className={`max-w-9xl mx-auto px-4 sm:px-6 md:px-2 ${currentTheme.background}`}>
                 <ErrorBoundary source="MainContent">
-                  <div className={`${currentTheme.card} rounded-lg p-6`}>
+                  <div className={`${currentTheme.card} rounded-lg p-1`}>
                     <Outlet />
                   </div>
                 </ErrorBoundary>

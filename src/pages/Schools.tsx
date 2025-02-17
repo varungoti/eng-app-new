@@ -1,4 +1,3 @@
-"use client";
 
 import React, { useState } from 'react';
 import { School, Plus, Edit, Trash2, MapPin, Phone, Mail, User } from 'lucide-react';
@@ -246,6 +245,8 @@ const Schools = () => {
                           setIsAddBranchOpen(true);
                         }}
                         className="text-indigo-600 hover:text-indigo-700"
+                        aria-label="Add branch school"
+                        title="Add branch school"
                       >
                         <Plus className="h-5 w-5" />
                       </button>
@@ -407,12 +408,14 @@ const Schools = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label htmlFor="status" className="block text-sm font-medium text-gray-700">
                       Status
                     </label>
                     <select
+                      id="status"
                       name="status"
                       required
+                      aria-label="School Status"
                       className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                     >
                       <option value="active">Active</option>
@@ -420,12 +423,15 @@ const Schools = () => {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label htmlFor="capacity" className="block text-sm font-medium text-gray-700">
                       Student Capacity
                     </label>
                     <input
+                      id="capacity"
                       type="number"
                       name="capacity"
+                      placeholder="Enter total student capacity"
+                      aria-label="Student Capacity"
                       className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                       required
                     />
@@ -435,8 +441,10 @@ const Schools = () => {
                       School Type
                     </label>
                     <select
+                      id="schoolType"
                       name="schoolType"
                       required
+                      aria-label="School Type"
                       className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                     >
                       <option value="public">Public</option>
@@ -451,8 +459,10 @@ const Schools = () => {
                       School Level
                     </label>
                     <select
+                      id="schoolLevel"
                       name="schoolLevel"
                       required
+                      aria-label="School Level"
                       className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                     >
                       <option value="elementary">Elementary</option>
@@ -623,8 +633,10 @@ const Schools = () => {
                     Status
                   </label>
                   <select
+                    id="status"
                     name="status"
                     required
+                    aria-label="Branch Status"
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   >
                     <option value="active">Active</option>
@@ -636,8 +648,11 @@ const Schools = () => {
                     Student Capacity
                   </label>
                   <input
+                    id="capacity"
                     type="number"
                     name="capacity"
+                    placeholder="Enter total student capacity"
+                    aria-label="Branch Student Capacity"
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                     required
                   />

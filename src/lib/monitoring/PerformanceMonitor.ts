@@ -1,6 +1,6 @@
 import { logger } from '../logger';
 
-interface PerformanceMetric {
+export interface PerformanceMetric {
   id: string;
   operation: string;
   startTime: number;

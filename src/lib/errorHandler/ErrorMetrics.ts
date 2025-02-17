@@ -1,9 +1,12 @@
 import { logger } from '../logger';
 import { errorRegistry } from './ErrorRegistry';
 
-interface ErrorMetrics {
-  totalErrors: number;
-  unhandledErrors: number;
+export interface ErrorMetrics {
+  total: number;
+  handled: number;
+  unhandled: number;
+  bySource: Record<string, number>;
+  byType: Record<string, number>;
   errorsBySource: Record<string, number>;
   retryAttempts: number;
   averageRetryCount: number;
@@ -45,13 +48,16 @@ class ErrorMetricsCollector {
     const totalRetries = recentErrors.reduce((sum, error) => sum + error.retryCount, 0);
 
     const metrics: ErrorMetrics = {
-      totalErrors: recentErrors.length,
-      unhandledErrors: recentErrors.filter(e => !e.handled).length,
+      total: recentErrors.length,
+      handled: recentErrors.filter(e => e.handled).length,
+      unhandled: recentErrors.filter(e => !e.handled).length,
       errorsBySource,
       retryAttempts: totalRetries,
       averageRetryCount: recentErrors.length ? totalRetries / recentErrors.length : 0,
       errorRate: recentErrors.length / (this.metricsWindow / 1000), // errors per second
-      timeWindow: this.metricsWindow
+      timeWindow: this.metricsWindow,
+      bySource: errorsBySource,
+      byType: {}
     };
 
     // Cache the metrics
@@ -59,7 +65,7 @@ class ErrorMetricsCollector {
     this.lastCalculation = now;
 
     // Log metrics if significant changes
-    if (metrics.unhandledErrors > 10 || metrics.errorRate > 1) {
+    if (metrics.unhandled > 10) {
       logger.warn('High error rate detected', {
         context: metrics,
         source: 'ErrorMetrics'

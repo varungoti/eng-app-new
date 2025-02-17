@@ -311,6 +311,7 @@ export interface Question {
   title: string;
   content?: string;
   type: string;
+  sub_type?: string;
   points?: number;
   lesson_id: string;
   data?: {
@@ -492,132 +493,6 @@ export interface BaseQuestionData {
   teacherScript: string;
 }
 
-export interface Question {
-  id: string;
-  title: string;
-  content?: string;
-  type: QuestionType;
-  lesson_id: string;
-  points?: number;
-  data?: {
-    prompt: string;
-    teacherScript: string;
-    sampleAnswer?: string;
-    metadata?: {
-      prompt?: string;
-      sampleAnswer?: string;
-      storyPrompt?: string;
-      keywords?: string[];
-      hints?: string[];
-      audioContent?: string;
-      transcript?: string;
-      questions?: string[];
-      phrases?: string[];
-      translations?: string[];
-      options?: string[];
-      correctAnswer?: number | null;
-      grammarPoint?: string;
-      example?: string;
-      idiom?: string;
-      meaning?: string;
-      usageNotes?: string;
-      imageUrl?: string;
-      imageCaption?: string;
-      speakingPrompt?: string;
-      speakingPrompt2?: string;
-      helpfulVocabulary?: string[];
-      videoUrl?: string;
-      discussionPoints?: string[];
-      topic?: string;
-      position?: string;
-      keyPoints?: string[];
-      duration?: string;
-      structure?: Array<{ title: string; points: string[] }>;
-      visualAids?: Array<{ url: string; description: string }>;
-      visualAidsInstructions?: string;
-      matching?: Array<{ text: string; correct: boolean }>;
-      fillInTheBlank?: Array<{ sentence: string; blanks: string[] }>;
-      fillInTheBlankWithMultipleChoices?: Array<{
-        sentence: string;
-        blanks: string[];
-        options: string[];
-        correctAnswer: number;
-      }>;
-      trueOrFalse?: Array<{ sentence: string; correctAnswer: boolean }>;
-      readingComprehension?: Array<{ passage: string; questions: string[] }>;
-      speakingAndWriting?: Array<{ speakingPrompt: string; writingPrompt: string }>;
-      listeningAndSpeaking?: Array<{ listeningPrompt: string; speakingPrompt: string }>;
-      readingAndSpeaking?: Array<{ readingPrompt: string; speakingPrompt: string }>;
-      speakingWithAPartner?: Array<{ speakingPrompt: string; partnerPrompt: string }>;
-      actionAndReaction?: Array<{ action: string; reaction: string }>;
-      actionAndSpeaking?: Array<{ action: string; speakingPrompt: string }>;
-      vocabularyPractice?: Array<{
-        word: string;
-        spelling: string;
-        definition: string;
-        sentences: string[];
-      }>;
-      spellingPractice?: Array<{
-        word: string;
-        spelling: string;
-        sentences: string[];
-      }>;
-      items?: string[];
-    };
-  };
-  exercisePrompts: ExercisePrompt[];
-  order_index?: number;
-  created_at?: string;
-  updated_at?: string;
-  status?: 'draft' | 'published';
-  isDraft?: boolean;
-}
-
-export interface ExercisePrompt {
-  id: string;
-  text: string;
-  media?: string;
-  type: 'image' | 'gif' | 'video';
-  narration?: string;
-  saytext?: string;
-  question_id?: string;
-  correct?: boolean;
-  created_at: string;
-  updated_at: string;
-  contentId: string; // Reference to AIGeneratedContent
-  questionType: 'multiple-choice' | 'fill-blank' | 'matching' | 'drag-drop' | 'speaking' | 'listening' | 'writing' | 'translation';
-  difficulty: 'beginner' | 'intermediate' | 'advanced';
-  content: {
-    question?: string;
-    options?: string[];
-    correctAnswer?: string;
-    pairs?: Record<string, string>;
-    correctOrder?: string[];
-    imageUrl?: string;
-    audioUrl?: string;
-    instructions: string;
-    hints: string[];
-  };
-  metadata: {
-    targetSkills: string[];
-    prerequisites: string[];
-    learningObjectives: string[];
-    estimatedTime: number;
-  };
-  adaptiveSettings: {
-    progressionRules: {
-      minScore: number;
-      requiredAttempts: number;
-    };
-    difficultyAdjustment: {
-      increase: number;
-      decrease: number;
-    };
-  };
-  createdAt: Date;
-  updatedAt: Date;
-}
-
 export interface ExercisePromptCardProps {
   prompt: ExercisePrompt;
   promptIndex: number;
@@ -739,5 +614,19 @@ export interface CustomLesson {
   difficulty: string;
   duration: number;
   customSubLessons: CustomSubLesson[];
+}
+
+export type { School as SchoolType };
+
+export interface Staff {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  department: string;
+  status: 'active' | 'inactive' | 'pending';
+  school_id: string;
+  created_at?: string;
+  updated_at?: string;
 }
 

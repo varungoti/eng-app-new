@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 1,
+            "activePatchIndex": 3,
             "patches": [
                 {
                     "date": 1739025611422,
@@ -12,6 +12,14 @@
                 {
                     "date": 1739025632744,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -57,22 +57,18 @@\n       // Update store state\r\n       this.syncRole(newRole);\r\n       store.completeTransition();\r\n \r\n-      logger.info('Role updated successfully', {\r\n-        context: { role: newRole },\r\n-        source: 'RoleSyncService'\r\n-      });\r\n+      logger.info(`Role updated successfully to ${newRole}`, 'RoleSyncService');\r\n \r\n+\r\n       // Force page reload to ensure clean state\r\n       window.location.reload();\r\n     } catch (err) {\r\n       useRoleStore.getState().resetTransition();\r\n-      logger.error('Failed to update role', {\r\n-        context: { error: err },\r\n-        source: 'RoleSyncService'\r\n-      });\r\n+      logger.error(`Failed to update role: ${err instanceof Error ? err.message : String(err)}`, 'RoleSyncService');\r\n       throw err;\r\n+\r\n     }\r\n   }\r\n }\r\n \r\n"
+                },
+                {
+                    "date": 1739279250020,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -57,16 +57,16 @@\n       // Update store state\r\n       this.syncRole(newRole);\r\n       store.completeTransition();\r\n \r\n-      logger.info(`Role updated successfully to ${newRole}`, 'RoleSyncService');\r\n+      logger.info(`Role updated successfully to ${newRole}`, { source: 'RoleSyncService' });\r\n \r\n \r\n       // Force page reload to ensure clean state\r\n       window.location.reload();\r\n     } catch (err) {\r\n       useRoleStore.getState().resetTransition();\r\n-      logger.error(`Failed to update role: ${err instanceof Error ? err.message : String(err)}`, 'RoleSyncService');\r\n+      logger.error(`Failed to update role: ${err instanceof Error ? err.message : String(err)}`, { source: 'RoleSyncService' });\r\n       throw err;\r\n \r\n     }\r\n   }\r\n"
+                },
+                {
+                    "date": 1739279266305,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -32,9 +32,9 @@\n     const store = useRoleStore.getState();\r\n     const currentRole = store.currentRole;\r\n \r\n     if (currentRole !== role) {\r\n-      logger.info(`Syncing role state from ${currentRole || 'none'} to ${role}`, 'RoleSyncService');\r\n+      logger.info(`Syncing role state from ${currentRole || 'none'} to ${role}`, { source: 'RoleSyncService' });\r\n       store.setRole(role);\r\n     }\r\n   }\r\n \r\n"
                 }
             ],
             "date": 1739025611422,

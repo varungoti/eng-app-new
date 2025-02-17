@@ -19,7 +19,7 @@ export class DatabaseMonitoringService {
   async initialize() {
     if (this.isInitialized) return;
     try {
-      this.monitor = new DatabaseMonitor(supabase, {
+      this.monitor = new DatabaseMonitor({
         supabase,
         enableLogging: true,
         logLevel: 'info',

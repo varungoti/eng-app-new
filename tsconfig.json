@@ -8,14 +8,16 @@
       "DOM.Iterable"
     ],
     "module": "ESNext",
+    "composite": true,
     "skipLibCheck": true,
     "types": [
       "node",
       "react",
       "react-dom"
     ],
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
+    "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
@@ -25,16 +27,22 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "preserveSymlinks": false,
+    "outDir": "dist",
     "baseUrl": ".",
-    "paths": {
-      "@/*": [
-        "./src/*"
-      ]
-    },
+    "rootDir": ".",
     "allowJs": true,
     "incremental": true,
     "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "paths": {
+      "@/*": ["src/*"],
+      "@app/*": ["src/app"],
+      "@components/*": ["src/components/*"],
+      "@lib/*": ["src/lib/*"],
+      "@types/*": ["src/types/*"],
+      "@hooks/*": ["src/hooks/*"],
+      "@utils/*": ["src/utils/*"]
+    }
   },
   "include": [
     "src/**/*.ts",
@@ -46,5 +54,7 @@
     "node_modules",
     "dist",
     "build"
-  ]
+  ],
+  "references": [{ "path": "./tsconfig.node.json" }]
+
 }

@@ -23,7 +23,7 @@ const persistSession = async (session: any) => {
       }));
     }
   } catch (err) {
-    logger.error('Failed to persist session', 'Auth');
+    logger.error('Failed to persist session', { source: 'AuthUtils' });
   }
 };
 
@@ -42,7 +42,7 @@ const getPersistedSession = () => {
     }
     return null;
   } catch (err) {
-    logger.error('Failed to get persisted session', 'Auth');
+    logger.error('Failed to get persisted session', { source: 'AuthUtils' });
     return null;
   }
 };
@@ -69,11 +69,11 @@ export const signIn = async (email: string, password: string, role?: string) => 
     // Persist session
     await persistSession(session);
 
-    logger.info(`Sign in successful for ${email} with role ${role}`, 'Auth');
+    logger.info(`Sign in successful for ${email} with role ${role}`, { source: 'AuthUtils' });
     return { session };
 
   } catch (err) {
-    logger.error(`Sign in failed: ${err instanceof Error ? err.message : String(err)}`, 'Auth');
+    logger.error(`Sign in failed: ${err instanceof Error ? err.message : String(err)}`, { source: 'AuthUtils' });
     throw err;
   }
 };
@@ -86,10 +86,10 @@ export const signOut = async () => {
     // Clear persisted session
     localStorage.removeItem(STORAGE_KEY);
     
-    logger.info('Sign out successful', 'Auth');
+    logger.info('Sign out successful', { source: 'AuthUtils' });
 
   } catch (err) {
-    logger.error('Sign out failed', 'Auth', err);
+    logger.error(`Sign out failed: ${err instanceof Error ? err.message : String(err)}`, { source: 'Auth' });
     throw err;
   }
 };
@@ -121,7 +121,7 @@ export const getCurrentSession = async () => {
 
     return null;
   } catch (err) {
-    logger.error(`Failed to get current session: ${err instanceof Error ? err.message : String(err)}`, 'Auth');
+    logger.error(`Failed to get current session: ${err instanceof Error ? err.message : String(err)}`, { source: 'AuthUtils' });
     return null;
   }
 };
@@ -129,7 +129,7 @@ export const getCurrentSession = async () => {
 export async function updateUserRole(userId: string, newRole: string) {
   try {
     // Log the attempt
-    logger.info(`Attempting role update for user ${userId} to ${newRole}`, 'auth.utils');
+    logger.info(`Attempting role update for user ${userId} to ${newRole}`, { source: 'auth.utils' });
 
     const { error } = await supabase.auth.admin.updateUserById(
       userId,
