@@ -7,7 +7,7 @@ export interface BaseQuestionData {
   teacherScript: string;
 }
 
-interface TextBlock {
+export interface TextBlock {
   type: 'heading' | 'paragraph' | 'image';
   content: string;
   level?: 1 | 2 | 3 | 4 | 5 | 6;
@@ -32,14 +32,15 @@ export interface Question {
   title: string;
   content?: string;
   type: QuestionType;
+  sub_type?: string;
   lesson_id: string;
   points?: number;
+  correct_answer?: string;
   data?: {
     prompt: string;
-    teacherScript: string;
+    teacher_script: string;
     followup_prompt: string[];
-    sampleAnswer?: string;
-    answer?: string;
+    sample_answer?: string;
     sub_type?: string;
   };
   metadata: {
@@ -183,6 +184,25 @@ export interface Question {
       instructions: string;
     }>;
 
+    //vocabulary and speaking
+    vocabularyAndSpeaking?: Array<{
+      speakingPrompt: string;
+      vocabulary: string[];
+    }>;
+
+    //wordlist prompt
+    wordlistPrompt?: Array<{
+      word: string;
+      definition: string;
+      correctPronunciation: string;
+      phoneticGuide: string;
+      pronunciationAudio: string;
+      example: string;
+      usageNotes: string;
+      synonyms: string[];
+      antonyms: string[];
+    }>;
+
     //idiom_practice
     idiomPractice?: Array<{
       idiom: string;
@@ -191,20 +211,83 @@ export interface Question {
       usageNotes: string;
     }>; 
 
-    
-    
+    //object prompt
+    objectPrompt?:string | Array<{
+      object: string;
+      prompt: string;
+    }>;
+
+    objectAndSpeaking?: Array<{
+      speakingPrompt: string;
+      objectPrompt: string;
+    }>;
+
+    objectActionAndSpeaking?: Array<{
+      speakingPrompt: string;
+      objectPrompt: string;
+      actionPrompt: string;
+    }>;
+
+    //sentence formation
+    sentenceFormation?: Array<{
+      originalSentence: string;
+      hints: string[];
+      correctAnswer: string;
+    }>;
+
+    //sentence transformation
+    sentenceTransformation?: Array<{
+      originalSentence: string;
+      tenseToTransform: string;
+      hints: string[];
+      correctAnswer: string; 
+    }>;
+
+    //sentence completion
+    sentenceCompletion?: Array<{
+      sentence: string;
+      hints: string[];
+      correctAnswer: string;
+    }>;
+
+    //sentence transformation with multiple choices
+    sentenceTransformationWithMultipleChoices?: Array<{
+      originalSentence: string;
+      tenseToTransform: string;
+      hints: string[];
+      options: string[];
+      correctAnswer: string;
+    }>;
+
+    //sentence transformation and completion
+    sentenceTransformationAndCompletion?: Array<{
+      originalSentence?: string;
+      tenseToTransform: string;
+      hints: string[];
+      correctAnswer: string;
+    }>;
+
+    //items
     items?: string[];
+
+    //sentence
     sentence?: string;
+
+    //blanks
     blanks?: string[];
+
+    //statement
     statement?: string;
     passage?: string | { text: TextBlock[] }[];
     answer?: string;
     response?: string | { text: TextBlock[] }[];
     speakingPrompt?: string;
+    
     writingPrompt?: string;
     listeningPrompt?: string;
     partnerPrompt?: string;
     actionPrompt?: string;
+    speakingPrompt2?: string;
   };
   exercisePrompts: ExercisePrompt[];
   order_index?: number;
@@ -223,6 +306,7 @@ export interface ExercisePrompt {
   type: 'image' | 'gif' | 'video';
   narration?: string;
   saytext?: string;
+  metadata: { estimatedTime: number };
   question_id?: string;
   created_at: string;
   updated_at: string;
@@ -233,6 +317,11 @@ export interface ExercisePromptCardProps {
   promptIndex: number;
   onUpdate: (updatedPrompt: ExercisePrompt) => void;
   onRemove: () => void;
+  viewMode?: boolean;
+  onStart?: () => void;
+  onWatch?: () => void;
+  onListen?: () => void;
+  onHelp?: () => void;
 }
 
 export interface QuestionFormProps {
@@ -285,6 +374,7 @@ export interface Subtopic {
   created_at?: string;
   updated_at?: string;
   name?: string;
+  lessons?: Lesson[];
 }
 
 export type SubTopic = Subtopic; // Alias for lowercase usage
@@ -329,7 +419,7 @@ export interface Activity {
   instructions?: string;
   data?: {
     prompt: string;
-    teacherScript: string;
+    teacher_script: string;
     media: string[];
   };
   media?: Array<{

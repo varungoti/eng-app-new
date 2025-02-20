@@ -31,7 +31,7 @@
                   "title": "Say Hello",
                   "content": "Learn to say hello",
                   "prompt": "Hello children! When you meet someone, what is the first thing that you do? Let's learn to say hello!",
-                  "teacher_script": "Guide students to understand the importance of greetings. Demonstrate with enthusiasm how to say hello with a smile.",
+                  "teacher_script": "Let's practice saying hello together! Remember to speak clearly and with a friendly voice. We'll start with simple greetings and then make them more interesting.",
                   "sample_answer": "Hello! My name is [name]. Nice to meet you!",
                   "exercise_prompts": [
                     {
@@ -71,7 +71,8 @@
                   "type": "listening",
                   "title": "Listening to Greetings",
                   "content": "Practice listening to different greetings",
-                  "prompt": "Let's listen carefully to different ways people say hello. Can you hear the different greetings?",
+                  "prompt": "Let's listen carefully to different ways people say hello. Can you hear the different greetings? We'll practice saying 'Hi' in different ways!",
+                  "teacher_script": "We'll practice different ways to say hello. Listen carefully to each greeting and try to repeat it. Remember to speak clearly and with a friendly voice. Let's make our greetings sound warm and welcoming!",
                   "exercise_prompts": [
                     {
                       "text": "Say 'Hi'",
@@ -123,6 +124,8 @@
                   "type": "speaking",
                   "title": "Say Goodbye",
                   "content": "Learn to say goodbye",
+                  "prompt": "Now we're going to learn how to say goodbye! It's just as important as saying hello. Are you ready to learn different ways to say goodbye?",
+                  "teacher_script": "Let's learn different ways to say goodbye. We'll practice saying 'Goodbye' and 'Bye-bye'. Remember to wave your hand gently while saying goodbye - it's a friendly way to part!",
                   "exercise_prompts": [
                     {
                       "text": "Say 'Goodbye'",
@@ -174,6 +177,8 @@
                   "type": "speaking",
                   "title": "Morning Greetings",
                   "content": "Learn morning greetings",
+                  "prompt": "Let's learn how to say good morning! When we meet in the morning, we say 'Good morning'. Can you say 'Good morning' to me?",
+                  "teacher_script": "Let's practice saying good morning. Remember to speak clearly and with a friendly voice. We'll start with simple greetings and then make them more interesting.",
                   "exercise_prompts": [
                     {
                       "text": "Say 'Good morning'",
@@ -206,6 +211,8 @@
                   "type": "speaking",
                   "title": "Afternoon Greetings",
                   "content": "Learn afternoon greetings",
+                  "prompt": "Let's learn how to say good afternoon! When we meet in the afternoon, we say 'Good afternoon'. Can you say 'Good afternoon' to me?",
+                  "teacher_script": "Let's practice saying good afternoon. Remember to speak clearly and with a friendly voice. We'll start with simple greetings and then make them more interesting.",
                   "exercise_prompts": [
                     {
                       "text": "Say 'Good afternoon'",
@@ -232,6 +239,8 @@
                   "type": "speaking",
                   "title": "Evening Greetings",
                   "content": "Learn evening greetings",
+                  "prompt": "Let's learn how to say good evening! When we meet in the evening, we say 'Good evening'. Can you say 'Good evening' to me?",
+                  "teacher_script": "Let's practice saying good evening. Remember to speak clearly and with a friendly voice. We'll start with simple greetings and then make them more interesting.",
                   "exercise_prompts": [
                     {
                       "text": "Say 'Good evening'",
@@ -258,6 +267,8 @@
                   "type": "speaking",
                   "title": "Night Greetings",
                   "content": "Learn night greetings",
+                  "prompt": "Let's learn how to say good night! When we say goodbye at night, we say 'Good night'. Can you say 'Good night' to me?",
+                  "teacher_script": "Let's practice saying good night. Remember to speak clearly and with a friendly voice. We'll start with simple greetings and then make them more interesting.",
                   "exercise_prompts": [
                     {
                       "text": "Say 'Good night'",
@@ -284,6 +295,8 @@
                   "type": "speaking",
                   "title": "Practice All Times",
                   "content": "Practice greetings for different times",
+                  "prompt": "Let's practice saying greetings for different times of day. Can you say 'Good morning', 'Good afternoon', 'Good evening', and 'Good night'?",
+                  "teacher_script": "Let's practice saying greetings for different times of day. Remember to speak clearly and with a friendly voice. We'll start with simple greetings and then make them more interesting.",
                   "exercise_prompts": [
                     {
                       "text": "Morning scenario",
@@ -341,6 +354,8 @@
                   "type": "speaking",
                   "title": "Please and Hello",
                   "content": "Learn to say please with greetings",
+                  "prompt": "Let's learn how to say please with greetings. When we want someone to do something, we say 'Please'. Can you say 'Please' to me?",
+                  "teacher_script": "Let's practice saying please with greetings. Remember to speak clearly and with a friendly voice. We'll start with simple greetings and then make them more interesting.",
                   "exercise_prompts": [
                     {
                       "text": "Say 'Please'",
@@ -373,6 +388,8 @@
                   "type": "speaking",
                   "title": "Thank You Greetings",
                   "content": "Learn to say thank you with greetings",
+                  "prompt": "Let's learn how to say thank you with greetings. When someone helps us, we say 'Thank you'. Can you say 'Thank you' to me?",
+                  "teacher_script": "Let's practice saying thank you with greetings. Remember to speak clearly and with a friendly voice. We'll start with simple greetings and then make them more interesting.",
                   "exercise_prompts": [
                     {
                       "text": "Say 'Thank you'",
@@ -405,6 +422,8 @@
                   "type": "speaking",
                   "title": "Excuse Me",
                   "content": "Learn to say excuse me",
+                  "prompt": "Let's learn how to say excuse me with greetings. When we need to get someone's attention, we say 'Excuse me'. Can you say 'Excuse me' to me?",
+                  "teacher_script": "Let's practice saying excuse me with greetings. Remember to speak clearly and with a friendly voice. We'll start with simple greetings and then make them more interesting.",
                   "exercise_prompts": [
                     {
                       "text": "Say 'Excuse me'",
@@ -431,6 +450,8 @@
                   "type": "speaking",
                   "title": "Sorry Greetings",
                   "content": "Learn to say sorry",
+                  "prompt": "Let's learn how to say sorry with greetings. When we make a mistake, we say 'Sorry'. Can you say 'Sorry' to me?",
+                  "teacher_script": "Let's practice saying sorry with greetings. Remember to speak clearly and with a friendly voice. We'll start with simple greetings and then make them more interesting.",
                   "exercise_prompts": [
                     {
                       "text": "Say 'Sorry'",
@@ -457,6 +478,8 @@
                   "type": "speaking",
                   "title": "Combining Polite Words",
                   "content": "Practice using multiple polite words",
+                  "prompt": "Let's practice using multiple polite words. Can you say 'Please', 'Thank you', 'Excuse me', and 'Sorry'?",
+                  "teacher_script": "Let's practice using multiple polite words. Remember to speak clearly and with a friendly voice. We'll start with simple greetings and then make them more interesting.",
                   "exercise_prompts": [
                     {
                       "text": "Please and thank you",
@@ -508,6 +531,8 @@
                   "type": "speaking",
                   "title": "Hello Song",
                   "content": "Learn the hello song",
+                  "prompt": "Let's learn the hello song. Can you sing 'Hello, hello, how are you?' to me?",
+                  "teacher_script": "Let's practice the hello song. Remember to speak clearly and with a friendly voice. We'll start with simple greetings and then make them more interesting.",
                   "exercise_prompts": [
                     {
                       "text": "First line",
@@ -567,6 +592,8 @@
                   "type": "speaking",
                   "title": "Saying Your Name",
                   "content": "Learn to say 'My name is'",
+                  "prompt": "Let's learn how to say your name. When someone asks your name, you say 'My name is [your name]'. Can you say 'My name is [your name]' to me?",
+                  "teacher_script": "Let's practice saying your name. Remember to speak clearly and with a friendly voice. We'll start with simple greetings and then make them more interesting.",
                   "exercise_prompts": [
                     {
                       "text": "Say 'My name'",
@@ -599,6 +626,8 @@
                   "type": "speaking",
                   "title": "I Am",
                   "content": "Learn to say 'I am'",
+                  "prompt": "Let's learn how to say 'I am'. When someone asks your name, you say 'I am [your name]'. Can you say 'I am [your name]' to me?",
+                  "teacher_script": "Let's practice saying 'I am'. Remember to speak clearly and with a friendly voice. We'll start with simple greetings and then make them more interesting.",
                   "exercise_prompts": [
                     {
                       "text": "Say 'I am'",
@@ -625,6 +654,8 @@
                   "type": "speaking",
                   "title": "Nice to Meet You",
                   "content": "Learn to say 'Nice to meet you'",
+                  "prompt": "Let's learn how to say 'Nice to meet you'. When someone says nice to meet you, you say 'Nice to meet you too'. Can you say 'Nice to meet you too' to me?",
+                  "teacher_script": "Let's practice saying 'Nice to meet you'. Remember to speak clearly and with a friendly voice. We'll start with simple greetings and then make them more interesting.",
                   "exercise_prompts": [
                     {
                       "text": "Nice to meet",
@@ -651,6 +682,8 @@
                   "type": "speaking",
                   "title": "Introducing Age",
                   "content": "Learn to say your age",
+                  "prompt": "Let's learn how to say your age. When someone asks your age, you say 'I am [age] years old'. Can you say 'I am [age] years old' to me?",
+                  "teacher_script": "Let's practice saying your age. Remember to speak clearly and with a friendly voice. We'll start with simple greetings and then make them more interesting.",
                   "exercise_prompts": [
                     {
                       "text": "I am [age]",
@@ -677,6 +710,8 @@
                   "type": "speaking",
                   "title": "Complete Introduction",
                   "content": "Practice full introduction",
+                  "prompt": "Let's practice the full introduction. Can you say 'Hello, my name is [name]. I am [age] years old. Nice to meet you!' to me?",
+                  "teacher_script": "Let's practice the full introduction. Remember to speak clearly and with a friendly voice. We'll start with simple greetings and then make them more interesting.",
                   "exercise_prompts": [
                     {
                       "text": "Hello and name",
@@ -728,6 +763,8 @@
                   "type": "speaking",
                   "title": "What's Your Name",
                   "content": "Learn to ask someone's name",
+                  "prompt": "Let's learn how to ask someone's name. When someone asks your name, you say 'What is your name?' Can you say 'What is your name?' to me?",
+                  "teacher_script": "Let's practice asking someone's name. Remember to speak clearly and with a friendly voice. We'll start with simple greetings and then make them more interesting.",
                   "exercise_prompts": [
                     {
                       "text": "Ask name",
@@ -760,6 +797,8 @@
                   "type": "speaking",
                   "title": "How Are You",
                   "content": "Learn to ask how someone is",
+                  "prompt": "Let's learn how to ask how someone is. When someone asks how you are, you say 'How are you?' Can you say 'How are you?' to me?",
+                  "teacher_script": "Let's practice asking how someone is. Remember to speak clearly and with a friendly voice. We'll start with simple greetings and then make them more interesting.",
                   "exercise_prompts": [
                     {
                       "text": "Ask how are you",
@@ -798,6 +837,8 @@
                   "type": "speaking",
                   "title": "How Old Are You",
                   "content": "Learn to ask someone's age",
+                  "prompt": "Let's learn how to ask someone's age. When someone asks your age, you say 'How old are you?' Can you say 'How old are you?' to me?",
+                  "teacher_script": "Let's practice asking someone's age. Remember to speak clearly and with a friendly voice. We'll start with simple greetings and then make them more interesting.",
                   "exercise_prompts": [
                     {
                       "text": "Ask age",
@@ -830,6 +871,8 @@
                   "type": "speaking",
                   "title": "Where Are You From",
                   "content": "Learn to ask where someone is from",
+                  "prompt": "Let's learn how to ask where someone is from. When someone asks where you are from, you say 'Where are you from?' Can you say 'Where are you from?' to me?",
+                  "teacher_script": "Let's practice asking where someone is from. Remember to speak clearly and with a friendly voice. We'll start with simple greetings and then make them more interesting.",
                   "exercise_prompts": [
                     {
                       "text": "Ask origin",
@@ -856,6 +899,8 @@
                   "type": "speaking",
                   "title": "Complete Conversation",
                   "content": "Practice full conversation",
+                  "prompt": "Let's practice the full conversation. Can you say 'Hello! What's your name? How are you? How old are you?' to me?",
+                  "teacher_script": "Let's practice the full conversation. Remember to speak clearly and with a friendly voice. We'll start with simple greetings and then make them more interesting.",
                   "exercise_prompts": [
                     {
                       "text": "Greeting and name",
@@ -907,6 +952,8 @@
                   "type": "speaking",
                   "title": "Basic Feelings",
                   "content": "Learn to express basic feelings",
+                  "prompt": "Let's learn how to express basic feelings. When you feel happy, sad, or excited, you can say 'I am happy', 'I am sad', or 'I am excited'. Can you say 'I am happy', 'I am sad', or 'I am excited' to me?",
+                  "teacher_script": "Let's practice expressing basic feelings. Remember to speak clearly and with a friendly voice. We'll start with simple greetings and then make them more interesting.",
                   "exercise_prompts": [
                     {
                       "text": "I am happy",
@@ -939,6 +986,8 @@
                   "type": "speaking",
                   "title": "Feeling Questions",
                   "content": "Learn to ask about feelings",
+                  "prompt": "Let's learn how to ask about feelings. When someone asks how you feel, you say 'How do you feel?' Can you say 'How do you feel?' to me?",
+                  "teacher_script": "Let's practice asking about feelings. Remember to speak clearly and with a friendly voice. We'll start with simple greetings and then make them more interesting.",
                   "exercise_prompts": [
                     {
                       "text": "Ask feeling",
@@ -971,6 +1020,8 @@
                   "type": "speaking",
                   "title": "Today I Feel",
                   "content": "Express current feelings",
+                  "prompt": "Let's learn how to express current feelings. When you feel happy, sad, or excited, you can say 'Today I feel [emotion]'. Can you say 'Today I feel [emotion]' to me?",
+                  "teacher_script": "Let's practice expressing current feelings. Remember to speak clearly and with a friendly voice. We'll start with simple greetings and then make them more interesting.",
                   "exercise_prompts": [
                     {
                       "text": "Today I feel",
@@ -997,6 +1048,8 @@
                   "type": "speaking",
                   "title": "More Emotions",
                   "content": "Learn additional emotions",
+                  "prompt": "Let's learn how to express additional emotions. When you feel hungry, thirsty, sleepy, or cold/hot, you can say 'I am hungry', 'I am thirsty', 'I am sleepy', or 'I am cold/hot'. Can you say 'I am hungry', 'I am thirsty', 'I am sleepy', or 'I am cold/hot' to me?",
+                  "teacher_script": "Let's practice expressing additional emotions. Remember to speak clearly and with a friendly voice. We'll start with simple greetings and then make them more interesting.",
                   "exercise_prompts": [
                     {
                       "text": "I am hungry",
@@ -1029,6 +1082,8 @@
                   "type": "speaking",
                   "title": "Combining Feelings",
                   "content": "Express multiple feelings",
+                  "prompt": "Let's learn how to express multiple feelings. When you feel happy, sad, or excited, you can say 'I am happy and excited', 'I am tired but happy', or 'I am happy to be here but I am tired'. Can you say 'I am happy and excited', 'I am tired but happy', or 'I am happy to be here but I am tired' to me?",
+                  "teacher_script": "Let's practice expressing multiple feelings. Remember to speak clearly and with a friendly voice. We'll start with simple greetings and then make them more interesting.",
                   "exercise_prompts": [
                     {
                       "text": "Happy and excited",
@@ -1080,6 +1135,8 @@
                   "type": "speaking",
                   "title": "Full Introduction Sentences",
                   "content": "Practice complete introduction sentences",
+                  "prompt": "Let's practice complete introduction sentences. Can you say 'Good morning, my name is [name]' to me?",
+                  "teacher_script": "Let's practice complete introduction sentences. Remember to speak clearly and with a friendly voice. We'll start with simple greetings and then make them more interesting.",
                   "exercise_prompts": [
                     {
                       "text": "Complete greeting",
@@ -1106,6 +1163,8 @@
                   "type": "dialogue",
                   "title": "Two-Way Conversations",
                   "content": "Practice having complete conversations",
+                  "prompt": "Let's practice having complete conversations. Can you say 'Hello, how are you today?' to me?",
+                  "teacher_script": "Let's practice having complete conversations. Remember to speak clearly and with a friendly voice. We'll start with simple greetings and then make them more interesting.",
                   "exercise_prompts": [
                     {
                       "text": "Greeting exchange",
@@ -1132,6 +1191,8 @@
                   "type": "story_telling",
                   "title": "Tell About Yourself",
                   "content": "Practice telling a short story about yourself",
+                  "prompt": "Let's practice telling a short story about yourself. Can you say 'Hello, I want to tell you about myself. My name is [name] and I am [age] years old' to me?",
+                  "teacher_script": "Let's practice telling a short story about yourself. Remember to speak clearly and with a friendly voice. We'll start with simple greetings and then make them more interesting.",
                   "exercise_prompts": [
                     {
                       "text": "About me",
@@ -1158,6 +1219,8 @@
                   "type": "question_answer",
                   "title": "Answering Questions Fully",
                   "content": "Practice giving complete answers to questions",
+                  "prompt": "Let's practice giving complete answers to questions. Can you say 'I am [age] years old and my birthday is in [month]' to me?",
+                  "teacher_script": "Let's practice giving complete answers to questions. Remember to speak clearly and with a friendly voice. We'll start with simple greetings and then make them more interesting.",
                   "exercise_prompts": [
                     {
                       "text": "Complete age answer",
@@ -1184,6 +1247,8 @@
                   "type": "role_play",
                   "title": "Meeting New Friends",
                   "content": "Practice conversations with new friends",
+                  "prompt": "Let's practice conversations with new friends. Can you say 'Hello, my name is [name]. I am new to this class. Would you like to be my friend?' to me?",
+                  "teacher_script": "Let's practice conversations with new friends. Remember to speak clearly and with a friendly voice. We'll start with simple greetings and then make them more interesting.",
                   "exercise_prompts": [
                     {
                       "text": "First meeting",
@@ -1235,6 +1300,8 @@
                   "type": "morning_routine",
                   "title": "Morning Conversations",
                   "content": "Practice morning conversation scenarios",
+                  "prompt": "Let's practice morning conversation scenarios. Can you say 'Good morning teacher, I am ready for school today' to me?",
+                  "teacher_script": "Let's practice morning conversation scenarios. Remember to speak clearly and with a friendly voice. We'll start with simple greetings and then make them more interesting.",
                   "exercise_prompts": [
                     {
                       "text": "Morning greeting",
@@ -1261,6 +1328,8 @@
                   "type": "activity_description",
                   "title": "Talking About Activities",
                   "content": "Describe what you like to do",
+                  "prompt": "Let's practice talking about activities. Can you say 'I like to draw pictures and my favorite color to use is [color]' to me?",
+                  "teacher_script": "Let's practice talking about activities. Remember to speak clearly and with a friendly voice. We'll start with simple greetings and then make them more interesting.",
                   "exercise_prompts": [
                     {
                       "text": "Favorite activity",
@@ -1287,6 +1356,8 @@
                   "type": "asking_help",
                   "title": "Asking for Help",
                   "content": "Learn to ask for help politely",
+                  "prompt": "Let's practice asking for help politely. Can you say 'Excuse me teacher, could you please help me with my drawing?' to me?",
+                  "teacher_script": "Let's practice asking for help politely. Remember to speak clearly and with a friendly voice. We'll start with simple greetings and then make them more interesting.",
                   "exercise_prompts": [
                     {
                       "text": "Request help",
@@ -1313,6 +1384,8 @@
                   "type": "sharing_experiences",
                   "title": "Sharing with Friends",
                   "content": "Practice sharing experiences",
+                  "prompt": "Let's practice sharing experiences. Can you say 'On Saturday, I went to the park with my family and I played on the swings' to me?",
+                  "teacher_script": "Let's practice sharing experiences. Remember to speak clearly and with a friendly voice. We'll start with simple greetings and then make them more interesting.",
                   "exercise_prompts": [
                     {
                       "text": "Weekend activity",
@@ -1339,6 +1412,8 @@
                   "type": "problem_solving",
                   "title": "Solving Simple Problems",
                   "content": "Learn to express problems and solutions",
+                  "prompt": "Let's practice solving simple problems. Can you say 'I cannot find my water bottle. Please can you help me look for it?' to me?",
+                  "teacher_script": "Let's practice solving simple problems. Remember to speak clearly and with a friendly voice. We'll start with simple greetings and then make them more interesting.",
                   "exercise_prompts": [
                     {
                       "text": "Lost item",
@@ -1398,6 +1473,8 @@
                   "type": "fun_speaking",
                   "title": "Let's Play",
                   "content": "Learn to invite friends to play",
+                  "prompt": "Let's practice inviting friends to play. Can you say 'Can we play together?' to me?",
+                  "teacher_script": "Let's practice inviting friends to play. Remember to speak clearly and with a friendly voice. We'll start with simple greetings and then make them more interesting.",
                   "exercise_prompts": [
                     {
                       "text": "Play invitation",
@@ -1425,6 +1502,7 @@
                   "title": "Fun Games",
                   "content": "Learn words for games",
                   "prompt": "Practice saying words used in games and play activities",
+                  "teacher_script": "Let's practice saying words used in games and play activities. Remember to speak clearly and with a friendly voice. We'll start with simple greetings and then make them more interesting.",
                   "exercise_prompts": [
                     {
                       "text": "Building blocks",
@@ -1451,6 +1529,8 @@
                   "type": "sharing",
                   "title": "Sharing is Fun",
                   "content": "Learn words for sharing",
+                  "prompt": "Let's practice sharing words. Can you say 'We can share' to me?",
+                  "teacher_script": "Let's practice sharing words. Remember to speak clearly and with a friendly voice. We'll start with simple greetings and then make them more interesting.",
                   "exercise_prompts": [
                     {
                       "text": "Share toys",
@@ -1477,6 +1557,8 @@
                   "type": "singing",
                   "title": "Fun Songs",
                   "content": "Learn simple song phrases",
+                  "prompt": "Let's practice singing simple song phrases. Can you say 'Hello, hello, let's all play' to me?",
+                  "teacher_script": "Let's practice singing simple song phrases. Remember to speak clearly and with a friendly voice. We'll start with simple greetings and then make them more interesting.",
                   "exercise_prompts": [
                     {
                       "text": "Hello song",
@@ -1503,6 +1585,8 @@
                   "type": "happy_words",
                   "title": "Happy Words",
                   "content": "Learn words to show happiness",
+                  "prompt": "Let's practice saying happy words. Can you say 'I am happy!' to me?",
+                  "teacher_script": "Let's practice saying happy words. Remember to speak clearly and with a friendly voice. We'll start with simple greetings and then make them more interesting.",
                   "exercise_prompts": [
                     {
                       "text": "Show joy",
@@ -1554,6 +1638,8 @@
                   "type": "action_words",
                   "title": "Moving Together",
                   "content": "Learn action words with movements",
+                  "prompt": "Let's practice action words with movements. Can you say 'I can jump!' to me?",
+                  "teacher_script": "Let's practice action words with movements. Remember to speak clearly and with a friendly voice. We'll start with simple greetings and then make them more interesting.",
                   "exercise_prompts": [
                     {
                       "text": "Jump",
@@ -1580,6 +1666,8 @@
                   "type": "action_songs",
                   "title": "Action Songs",
                   "content": "Learn songs with actions",
+                  "prompt": "Let's practice songs with actions. Can you say 'Head, shoulders, knees and toes' to me?",
+                  "teacher_script": "Let's practice songs with actions. Remember to speak clearly and with a friendly voice. We'll start with simple greetings and then make them more interesting.",
                   "exercise_prompts": [
                     {
                       "text": "Head shoulders",
@@ -1606,6 +1694,8 @@
                   "type": "follow_leader",
                   "title": "Follow the Leader",
                   "content": "Learn to give simple instructions",
+                  "prompt": "Let's practice giving simple instructions. Can you say 'Please come here' to me?",
+                  "teacher_script": "Let's practice giving simple instructions. Remember to speak clearly and with a friendly voice. We'll start with simple greetings and then make them more interesting.",
                   "exercise_prompts": [
                     {
                       "text": "Come here",
@@ -1632,6 +1722,8 @@
                   "type": "animal_actions",
                   "title": "Animal Actions",
                   "content": "Learn animal movements",
+                  "prompt": "Let's practice animal movements. Can you say 'I hop like a rabbit' to me?",
+                  "teacher_script": "Let's practice animal movements. Remember to speak clearly and with a friendly voice. We'll start with simple greetings and then make them more interesting.",
                   "exercise_prompts": [
                     {
                       "text": "Hop like rabbit",
@@ -1658,6 +1750,8 @@
                   "type": "playtime_words",
                   "title": "Playtime Fun",
                   "content": "Learn playground words",
+                  "prompt": "Let's practice playground words. Can you say 'I like the swing' to me?",
+                  "teacher_script": "Let's practice playground words. Remember to speak clearly and with a friendly voice. We'll start with simple greetings and then make them more interesting.",
                   "exercise_prompts": [
                     {
                       "text": "Swing",
@@ -1709,6 +1803,8 @@
                   "type": "toy_words",
                   "title": "My Toys",
                   "content": "Learn to talk about toys",
+                  "prompt": "Let's practice talking about toys. Can you say 'This is my toy' to me?",
+                  "teacher_script": "Let's practice talking about toys. Remember to speak clearly and with a friendly voice. We'll start with simple greetings and then make them more interesting.",
                   "exercise_prompts": [
                     {
                       "text": "Show toy",
@@ -1735,6 +1831,8 @@
                   "type": "game_choices",
                   "title": "Choose Games",
                   "content": "Learn to choose games",
+                  "prompt": "Let's practice choosing games. Can you say 'I want to play this' to me?",
+                  "teacher_script": "Let's practice choosing games. Remember to speak clearly and with a friendly voice. We'll start with simple greetings and then make them more interesting.",
                   "exercise_prompts": [
                     {
                       "text": "Pick game",
@@ -1761,6 +1859,8 @@
                   "type": "play_areas",
                   "title": "Play Areas",
                   "content": "Learn about different play areas",
+                  "prompt": "Let's practice talking about play areas. Can you say 'This is my play area' to me?",
+                  "teacher_script": "Let's practice talking about play areas. Remember to speak clearly and with a friendly voice. We'll start with simple greetings and then make them more interesting.",
                   "exercise_prompts": [
                     {
                       "text": "Block area",
@@ -1787,6 +1887,8 @@
                   "type": "play_rules",
                   "title": "Playing Nice",
                   "content": "Learn words for playing nicely",
+                  "prompt": "Let's practice playing nicely. Can you say 'I play nicely' to me?",
+                  "teacher_script": "Let's practice playing nicely. Remember to speak clearly and with a friendly voice. We'll start with simple greetings and then make them more interesting.",
                   "exercise_prompts": [
                     {
                       "text": "Be gentle",
@@ -1813,6 +1915,8 @@
                   "type": "play_feelings",
                   "title": "Happy Play",
                   "content": "Express feelings during play",
+                  "prompt": "Let's practice expressing feelings during play. Can you say 'This is fun' to me?",
+                  "teacher_script": "Let's practice expressing feelings during play. Remember to speak clearly and with a friendly voice. We'll start with simple greetings and then make them more interesting.",
                   "exercise_prompts": [
                     {
                       "text": "Fun play",
@@ -1864,6 +1968,8 @@
                   "type": "play_invitations",
                   "title": "Join My Game",
                   "content": "Learn to invite friends to play",
+                  "prompt": "Let's practice inviting friends to play. Can you say 'Can we play together?' to me?",
+                  "teacher_script": "Let's practice inviting friends to play. Remember to speak clearly and with a friendly voice. We'll start with simple greetings and then make them more interesting.",
                   "exercise_prompts": [
                     {
                       "text": "Play blocks",
@@ -1890,6 +1996,8 @@
                   "type": "sharing_words",
                   "title": "Sharing Time",
                   "content": "Learn words for sharing",
+                  "prompt": "Let's practice sharing words. Can you say 'We can share' to me?",
+                  "teacher_script": "Let's practice sharing words. Remember to speak clearly and with a friendly voice. We'll start with simple greetings and then make them more interesting.",
                   "exercise_prompts": [
                     {
                       "text": "Share toy",
@@ -1916,6 +2024,8 @@
                   "type": "kind_words",
                   "title": "Being Kind",
                   "content": "Learn kind words for friends",
+                  "prompt": "Let's practice being kind. Can you say 'Please can I play?' to me?",
+                  "teacher_script": "Let's practice being kind. Remember to speak clearly and with a friendly voice. We'll start with simple greetings and then make them more interesting.",
                   "exercise_prompts": [
                     {
                       "text": "Say please",
@@ -1942,6 +2052,8 @@
                   "type": "play_help",
                   "title": "Helping Friends",
                   "content": "Learn to help during play",
+                  "prompt": "Let's practice helping friends. Can you say 'I can help you' to me?",
+                  "teacher_script": "Let's practice helping friends. Remember to speak clearly and with a friendly voice. We'll start with simple greetings and then make them more interesting.",
                   "exercise_prompts": [
                     {
                       "text": "Offer help",
@@ -1968,6 +2080,8 @@
                   "type": "cleanup_time",
                   "title": "Clean Up Time",
                   "content": "Learn words for cleaning up",
+                  "prompt": "Let's practice cleaning up. Can you say 'Time to clean up' to me?",
+                  "teacher_script": "Let's practice cleaning up. Remember to speak clearly and with a friendly voice. We'll start with simple greetings and then make them more interesting.",
                   "exercise_prompts": [
                     {
                       "text": "Time to clean",
@@ -2019,6 +2133,8 @@
                   "type": "playground_words",
                   "title": "At the Playground",
                   "content": "Learn playground words",
+                  "prompt": "Let's practice playground words. Can you say 'I like the swing' to me?",
+                  "teacher_script": "Let's practice playground words. Remember to speak clearly and with a friendly voice. We'll start with simple greetings and then make them more interesting.",
                   "exercise_prompts": [
                     {
                       "text": "Swing time",
@@ -2045,6 +2161,8 @@
                   "type": "outdoor_games",
                   "title": "Outdoor Games",
                   "content": "Learn words for outdoor games",
+                  "prompt": "Let's practice outdoor games. Can you say 'Let's play ball' to me?",
+                  "teacher_script": "Let's practice outdoor games. Remember to speak clearly and with a friendly voice. We'll start with simple greetings and then make them more interesting.",
                   "exercise_prompts": [
                     {
                       "text": "Ball game",
@@ -2071,6 +2189,8 @@
                   "type": "safety_words",
                   "title": "Playing Safe",
                   "content": "Learn words for playing safely",
+                  "prompt": "Let's practice playing safely. Can you say 'I am careful' to me?",
+                  "teacher_script": "Let's practice playing safely. Remember to speak clearly and with a friendly voice. We'll start with simple greetings and then make them more interesting.",
                   "exercise_prompts": [
                     {
                       "text": "Be careful",
@@ -2097,6 +2217,8 @@
                   "type": "weather_words",
                   "title": "Weather Play",
                   "content": "Learn words about weather and play",
+                  "prompt": "Let's practice weather words. Can you say 'It is sunny today' to me?",
+                  "teacher_script": "Let's practice weather words. Remember to speak clearly and with a friendly voice. We'll start with simple greetings and then make them more interesting.",
                   "exercise_prompts": [
                     {
                       "text": "Sunny day",
@@ -2123,6 +2245,8 @@
                   "type": "line_up",
                   "title": "Line Up Time",
                   "content": "Learn words for lining up",
+                  "prompt": "Let's practice lining up. Can you say 'Time to line up' to me?",
+                  "teacher_script": "Let's practice lining up. Remember to speak clearly and with a friendly voice. We'll start with simple greetings and then make them more interesting.",
                   "exercise_prompts": [
                     {
                       "text": "Make line",
@@ -2149,6 +2273,8 @@
                   "type": "playground_friends",
                   "title": "Friends Outside",
                   "content": "Learn to play with friends outside",
+                  "prompt": "Let's practice playing with friends outside. Can you say 'Let's play together outside' to me?",
+                  "teacher_script": "Let's practice playing with friends outside. Remember to speak clearly and with a friendly voice. We'll start with simple greetings and then make them more interesting.",
                   "exercise_prompts": [
                     {
                       "text": "Play together",
@@ -2175,6 +2301,8 @@
                   "type": "movement_words",
                   "title": "Moving Outside",
                   "content": "Learn words for outdoor movements",
+                  "prompt": "Let's practice outdoor movements. Can you say 'I run in the playground' to me?",
+                  "teacher_script": "Let's practice outdoor movements. Remember to speak clearly and with a friendly voice. We'll start with simple greetings and then make them more interesting.",
                   "exercise_prompts": [
                     {
                       "text": "Running",
@@ -2201,6 +2329,8 @@
                   "type": "playground_rules",
                   "title": "Playground Rules",
                   "content": "Learn words for playground rules",
+                  "prompt": "Let's practice playground rules. Can you say 'I listen to my teacher' to me?",
+                  "teacher_script": "Let's practice playground rules. Remember to speak clearly and with a friendly voice. We'll start with simple greetings and then make them more interesting.",
                   "exercise_prompts": [
                     {
                       "text": "Be safe",
@@ -2227,6 +2357,8 @@
                   "type": "playground_feelings",
                   "title": "Happy Outside",
                   "content": "Express feelings about outdoor play",
+                  "prompt": "Let's practice expressing feelings about outdoor play. Can you say 'I am happy outside' to me?",
+                  "teacher_script": "Let's practice expressing feelings about outdoor play. Remember to speak clearly and with a friendly voice. We'll start with simple greetings and then make them more interesting.",
                   "exercise_prompts": [
                     {
                       "text": "Happy play",
@@ -2253,6 +2385,8 @@
                   "type": "cleanup_outside",
                   "title": "Clean Up Outside",
                   "content": "Learn words for outdoor cleanup",
+                  "prompt": "Let's practice outdoor cleanup. Can you say 'I help clean up' to me?",
+                  "teacher_script": "Let's practice outdoor cleanup. Remember to speak clearly and with a friendly voice. We'll start with simple greetings and then make them more interesting.",
                   "exercise_prompts": [
                     {
                       "text": "Pick up toys",
@@ -2349,8 +2483,8 @@
                   "type": "number_two",
                   "title": "Number Two",
                   "content": "Learn to say number two",
-                  "prompt": "Now let's learn about the number two! Can you show me two fingers?",
-                  "teacher_script": "Show how to count from one to two using fingers. Point out pairs of objects in the classroom.",
+                  "prompt": "Let's learn a new number! After one comes two. Can you show me two fingers? Let's count together!",
+                  "teacher_script": "We'll learn the number two. Hold up two fingers as we count. Remember to count clearly: 'one, two'. Look around the room - can you see two of anything?",
                   "sample_answer": "One, two! I can count to two!",
                   "exercise_prompts": [
                     {
@@ -2633,6 +2767,8 @@
                   "type": "number_three",
                   "title": "Number Three",
                   "content": "Learn to say number three",
+                  "prompt": "Let's learn a new number! After two comes three. Can you show me three fingers? Let's count together!",
+                  "teacher_script": "Let's learn a new number! After two comes three. Can you show me three fingers? Let's count together!",
                   "exercise_prompts": [
                     {
                       "text": "Say three",
@@ -2659,6 +2795,8 @@
                   "type": "number_four",
                   "title": "Number Four",
                   "content": "Learn to say number four",
+                  "prompt": "Let's learn a new number! After three comes four. Can you show me four fingers? Let's count together!",
+                  "teacher_script": "Let's learn a new number! After three comes four. Can you show me four fingers? Let's count together!",
                   "exercise_prompts": [
                     {
                       "text": "Say four",
@@ -2685,6 +2823,8 @@
                   "type": "counting_toys",
                   "title": "Counting Toys",
                   "content": "Count toys up to four",
+                  "prompt": "Let's count toys up to four. Can you show me three toys? Let's count together!",
+                  "teacher_script": "Let's count toys up to four. Can you show me three toys? Let's count together!",
                   "exercise_prompts": [
                     {
                       "text": "Three toys",
@@ -2711,6 +2851,8 @@
                   "type": "counting_fingers",
                   "title": "Counting Fingers",
                   "content": "Count fingers up to four",
+                  "prompt": "Let's count fingers up to four. Can you show me three fingers? Let's count together!",
+                  "teacher_script": "Let's count fingers up to four. Can you show me three fingers? Let's count together!",
                   "exercise_prompts": [
                     {
                       "text": "Three fingers",
@@ -2737,6 +2879,8 @@
                   "type": "counting_steps",
                   "title": "Counting Steps",
                   "content": "Count steps while walking",
+                  "prompt": "Let's count steps while walking. Can you show me three steps? Let's count together!",
+                  "teacher_script": "Let's count steps while walking. Can you show me three steps? Let's count together!",
                   "exercise_prompts": [
                     {
                       "text": "Three steps",
@@ -2763,6 +2907,8 @@
                   "type": "counting_claps",
                   "title": "Counting Claps",
                   "content": "Count while clapping",
+                  "prompt": "Let's count while clapping. Can you show me three claps? Let's count together!",
+                  "teacher_script": "Let's count while clapping. Can you show me three claps? Let's count together!",
                   "exercise_prompts": [
                     {
                       "text": "Three claps",
@@ -2789,6 +2935,8 @@
                   "type": "counting_colors",
                   "title": "Counting Colors",
                   "content": "Count colored objects",
+                  "prompt": "Let's count colored objects. Can you show me three red crayons? Let's count together!",
+                  "teacher_script": "Let's count colored objects. Can you show me three red crayons? Let's count together!",
                   "exercise_prompts": [
                     {
                       "text": "Three red",
@@ -2815,6 +2963,8 @@
                   "type": "counting_animals",
                   "title": "Counting Animals",
                   "content": "Count animal pictures",
+                  "prompt": "Let's count animal pictures. Can you show me three cats? Let's count together!",
+                  "teacher_script": "Let's count animal pictures. Can you show me three cats? Let's count together!",
                   "exercise_prompts": [
                     {
                       "text": "Three cats",
@@ -2841,6 +2991,8 @@
                   "type": "counting_friends",
                   "title": "Counting Friends",
                   "content": "Count friends in groups",
+                  "prompt": "Let's count friends in groups. Can you show me three friends? Let's count together!",
+                  "teacher_script": "Let's count friends in groups. Can you show me three friends? Let's count together!",
                   "exercise_prompts": [
                     {
                       "text": "Three friends",
@@ -2867,6 +3019,8 @@
                   "type": "counting_review",
                   "title": "Review Numbers",
                   "content": "Review counting to four",
+                  "prompt": "Let's review counting to four. Can you show me one, two, three, four? Let's count together!",
+                  "teacher_script": "Let's review counting to four. Can you show me one, two, three, four? Let's count together!",
                   "exercise_prompts": [
                     {
                       "text": "Count up",
@@ -3042,6 +3196,8 @@
                   "type": "classroom_items",
                   "title": "Counting in Class",
                   "content": "Count items in classroom",
+                  "prompt": "Let's count items in classroom. Can you show me six chairs? Let's count together!",
+                  "teacher_script": "Let's count items in classroom. Can you show me six chairs? Let's count together!",
                   "exercise_prompts": [
                     {
                       "text": "Six chairs",
@@ -3068,6 +3224,8 @@
                   "type": "counting_actions",
                   "title": "Counting Actions",
                   "content": "Count while doing actions",
+                  "prompt": "Let's count while doing actions. Can you show me six claps? Let's count together!",
+                  "teacher_script": "Let's count while doing actions. Can you show me six claps? Let's count together!",
                   "exercise_prompts": [
                     {
                       "text": "Six claps",
@@ -3094,6 +3252,8 @@
                   "type": "counting_friends",
                   "title": "Counting Friends",
                   "content": "Count friends in class",
+                  "prompt": "Let's count friends in class. Can you show me six friends? Let's count together!",
+                  "teacher_script": "Let's count friends in class. Can you show me six friends? Let's count together!",
                   "exercise_prompts": [
                     {
                       "text": "Six friends",
@@ -3120,6 +3280,8 @@
                   "type": "counting_sounds",
                   "title": "Counting Sounds",
                   "content": "Count sounds you hear",
+                  "prompt": "Let's count sounds you hear. Can you show me six sounds? Let's count together!",
+                  "teacher_script": "Let's count sounds you hear. Can you show me six sounds? Let's count together!",
                   "exercise_prompts": [
                     {
                       "text": "Six sounds",
@@ -3146,6 +3308,8 @@
                   "type": "counting_colors",
                   "title": "Counting Colors",
                   "content": "Count items by color",
+                  "prompt": "Let's count items by color. Can you show me six red balls? Let's count together!",
+                  "teacher_script": "Let's count items by color. Can you show me six red balls? Let's count together!",
                   "exercise_prompts": [
                     {
                       "text": "Six red",
@@ -3172,6 +3336,8 @@
                   "type": "counting_review",
                   "title": "Counting Review",
                   "content": "Review counting six and seven",
+                  "prompt": "Let's review counting six and seven. Can you show me six fingers? Let's count together!",
+                  "teacher_script": "Let's review counting six and seven. Can you show me six fingers? Let's count together!",
                   "exercise_prompts": [
                     {
                       "text": "Show numbers",
@@ -3223,6 +3389,8 @@
                   "type": "number_eight",
                   "title": "Number Eight",
                   "content": "Learn to say number eight",
+                  "prompt": "Let's learn a new number! After seven comes eight. Can you show me eight fingers? Let's count together!",
+                  "teacher_script": "Let's learn a new number! After seven comes eight. Can you show me eight fingers? Let's count together!",
                   "exercise_prompts": [
                     {
                       "text": "Say eight",
@@ -3249,6 +3417,8 @@
                   "type": "number_nine",
                   "title": "Number Nine",
                   "content": "Learn to say number nine",
+                  "prompt": "Let's learn a new number! After eight comes nine. Can you show me nine fingers? Let's count together!",
+                  "teacher_script": "Let's learn a new number! After eight comes nine. Can you show me nine fingers? Let's count together!",
                   "exercise_prompts": [
                     {
                       "text": "Say nine",
@@ -3525,6 +3695,8 @@
                   "type": "counting_review",
                   "title": "Review Numbers",
                   "content": "Review counting to nine",
+                  "prompt": "Let's review counting to nine. Can you show me one, two, three, four, five, six, seven, eight, nine? Let's count together!",
+                  "teacher_script": "Let's review counting to nine. Can you show me one, two, three, four, five, six, seven, eight, nine? Let's count together!",
                   "exercise_prompts": [
                     {
                       "text": "Count up",
@@ -3860,6 +4032,8 @@
                   "type": "count_up",
                   "title": "Count Up",
                   "content": "Practice counting from six to ten",
+                  "prompt": "Let's practice counting from six to ten. Can you show me six to ten?",
+                  "teacher_script": "Let's practice counting from six to ten. Remember to speak clearly and with a friendly voice. We'll start with simple greetings and then make them more interesting.",
                   "exercise_prompts": [
                     {
                       "text": "Six to ten",
@@ -3886,6 +4060,8 @@
                   "type": "review_six_seven",
                   "title": "Six and Seven",
                   "content": "Review numbers six and seven",
+                  "prompt": "Let's review numbers six and seven together!",
+                  "teacher_script": "We'll count together one last time. Use your fingers to show each number as we count from six all the way to ten!",
                   "exercise_prompts": [
                     {
                       "text": "Count six",
@@ -3912,6 +4088,8 @@
                   "type": "review_eight_nine",
                   "title": "Eight and Nine",
                   "content": "Review numbers eight and nine",
+                  "prompt": "Let's review numbers eight and nine together!",
+                  "teacher_script": "We'll count together one last time. Use your fingers to show each number as we count from six all the way to ten!",
                   "exercise_prompts": [
                     {
                       "text": "Count eight",
@@ -3938,6 +4116,8 @@
                   "type": "review_ten",
                   "title": "Number Ten",
                   "content": "Review number ten",
+                  "prompt": "Let's review number ten together!",
+                  "teacher_script": "We'll count together one last time. Use your fingers to show each number as we count from six all the way to ten!",
                   "exercise_prompts": [
                     {
                       "text": "Count ten",
@@ -3964,6 +4144,8 @@
                   "type": "counting_objects",
                   "title": "Count Objects",
                   "content": "Count different amounts of objects",
+                  "prompt": "Let's count the toys, books, and pencils together!",
+                  "teacher_script": "We'll count together one last time. Use your fingers to show each number as we count from six all the way to ten!",
                   "exercise_prompts": [
                     {
                       "text": "Six toys",
@@ -3989,6 +4171,8 @@
                   "id": "pp1-t2-s2-l4-q6",
                   "type": "counting_actions",
                   "title": "Count Actions",
+                  "prompt": "Let's count while doing actions!",
+                  "teacher_script": "We'll count together one last time. Use your fingers to show each number as we count from six all the way to ten!",
                   "content": "Count while doing actions",
                   "exercise_prompts": [
                     {
@@ -4016,6 +4200,8 @@
                   "type": "counting_groups",
                   "title": "Count Groups",
                   "content": "Count groups of items",
+                  "prompt": "Let's count the friends, chairs, and stars together!",
+                  "teacher_script": "We'll count together one last time. Use your fingers to show each number as we count from six all the way to ten!",
                   "exercise_prompts": [
                     {
                       "text": "Six friends",
@@ -4042,6 +4228,8 @@
                   "type": "counting_colors",
                   "title": "Count Colors",
                   "content": "Count colored items",
+                  "prompt": "Let's count the red, blue, and green items together!",
+                  "teacher_script": "We'll count together one last time. Use your fingers to show each number as we count from six all the way to ten!",
                   "exercise_prompts": [
                     {
                       "text": "Seven red",
@@ -4068,6 +4256,8 @@
                   "type": "counting_together",
                   "title": "Count Together",
                   "content": "Count with friends",
+                  "prompt": "Let's count together with friends!",
+                  "teacher_script": "We'll count together one last time. Use your fingers to show each number as we count from six all the way to ten!",
                   "exercise_prompts": [
                     {
                       "text": "Count up",
@@ -4094,6 +4284,8 @@
                   "type": "final_review",
                   "title": "Final Review",
                   "content": "Review all numbers six to ten",
+                  "prompt": "Let's review all numbers six to ten together!",
+                  "teacher_script": "We'll count together one last time. Use your fingers to show each number as we count from six all the way to ten!",
                   "exercise_prompts": [
                     {
                       "text": "Count all",

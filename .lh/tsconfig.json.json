@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 4,
+            "activePatchIndex": 5,
             "patches": [
                 {
                     "date": 1739299747591,
@@ -24,6 +24,10 @@
                 {
                     "date": 1739484291409,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -28,9 +28,9 @@\n     \"noFallthroughCasesInSwitch\": true,\r\n     \"preserveSymlinks\": false,\r\n     \"outDir\": \"dist\",\r\n     \"baseUrl\": \".\",\r\n-    \"resolveJsonModule\": true,\r\n+    \"rootDir\": \".\",\r\n     \"allowJs\": true,\r\n     \"incremental\": true,\r\n     \"esModuleInterop\": true,\r\n     \"allowSyntheticDefaultImports\": true,\r\n"
+                },
+                {
+                    "date": 1739908596211,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -54,7 +54,11 @@\n     \"node_modules\",\r\n     \"dist\",\r\n     \"build\"\r\n   ],\r\n-  \"references\": [{ \"path\": \"./tsconfig.node.json\" }]\r\n-\r\n+  \"references\": [{ \"path\": \"./tsconfig.node.json\" }],\r\n+  \"ts-node\": {\r\n+    \"compilerOptions\": {\r\n+      \"module\": \"CommonJS\"\r\n+    }\r\n+  }\r\n }\r\n"
                 }
             ],
             "date": 1739299747591,

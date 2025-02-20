@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 11,
+            "activePatchIndex": 16,
             "patches": [
                 {
                     "date": 1739050153735,
@@ -52,6 +52,26 @@
                 {
                     "date": 1739487404100,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -310,8 +310,9 @@\n   id: string;\r\n   title: string;\r\n   content?: string;\r\n   type: string;\r\n+  sub_type?: string;\r\n   points?: number;\r\n   lesson_id: string;\r\n   data?: {\r\n     prompt: string;\r\n"
+                },
+                {
+                    "date": 1739869746163,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -300,9 +300,9 @@\n   description: string;\r\n   learningObjectives: string[];\r\n   type: 'vocabulary' | 'pronunciation' | 'conversation' | 'grammar';\r\n   content: {\r\n-    questions: Question[];\r\n+    //questions: Question[];\r\n     activities: Activity[];\r\n   };\r\n }\r\n \r\n"
+                },
+                {
+                    "date": 1739869752149,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -300,9 +300,9 @@\n   description: string;\r\n   learningObjectives: string[];\r\n   type: 'vocabulary' | 'pronunciation' | 'conversation' | 'grammar';\r\n   content: {\r\n-    //questions: Question[];\r\n+    questions: Question[];\r\n     activities: Activity[];\r\n   };\r\n }\r\n \r\n"
+                },
+                {
+                    "date": 1739869797262,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -565,12 +565,12 @@\n // Component Types\r\n export interface ExtendedLesson extends Lesson {\r\n   color: string;\r\n   unlocked: boolean;\r\n+  difficulty: 'beginner' | 'intermediate' | 'advanced';\r\n   completed: boolean;\r\n   lessonNumber: string;\r\n   totalTopics: string;\r\n-  difficulty: string;\r\n   subLessons: SubLesson[];\r\n }\r\n \r\n export interface SubLesson {\r\n"
+                },
+                {
+                    "date": 1739869870902,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -289,9 +289,9 @@\n   prompt: string;\r\n   mediaUrl?: string;\r\n   mediaType?: 'image' | 'video' | 'gif';\r\n   sayText: string;\r\n-  questions: Question[];\r\n+  \r\n }\r\n \r\n export interface ContentModule {\r\n   id: string;\r\n"
+                },
+                {
+                    "date": 1739869879836,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -289,9 +289,9 @@\n   prompt: string;\r\n   mediaUrl?: string;\r\n   mediaType?: 'image' | 'video' | 'gif';\r\n   sayText: string;\r\n-  \r\n+  questions: Question[];\r\n }\r\n \r\n export interface ContentModule {\r\n   id: string;\r\n"
                 }
             ],
             "date": 1739050153735,

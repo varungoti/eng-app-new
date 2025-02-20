@@ -14,106 +14,230 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { Icon } from '@/components/ui/icons';
 import { ImageIcon } from 'lucide-react';
-import { Question, QuestionType, QuestionFormProps } from "@/app/content-management/types";
+import { Question, QuestionType, QuestionFormProps, TextBlock } from "@/app/content-management/types";
 import { QUESTION_TYPES } from "@/app/content-management/constants";
 import { Select, SelectValue, SelectTrigger, SelectItem, SelectContent } from '@/components/ui/select';
 import { RichTextEditor, RichTextEditorProps } from '@/components/editor/RichTextEditor';
 import { QuestionTypeIcon } from "@/components/ui/question-type-icons";
 
 interface QuestionMetadata {
-  // Common fields
-  prompt?: string;
-  teacherScript?: string;
-  sampleAnswer?: string;
+    // Common fields
+    prompt?: string;
+    teacherScript?: string;
+    sampleAnswer?: string;
+        
+    // Storytelling
+    storyPrompt?: string;
+    keywords?: string[];
+    hints?: string[];
+    
+    // Listening
+    audioContent?: string;
+    transcript?: string;
+    questions?: string[];
+    
+    // Listen and Repeat
+    phrases?: string[];
+    translations?: string[];
+    
+    // Multiple Choice
+    options?: string[];
+    correctAnswer?: number | null;
+    
+    // Grammar Speaking
+    grammarPoint?: string;
+    example?: string;
   
-  // Idiom fields
-  idiom?: string;
-  meaning?: string;
-  usageNotes?: string;
-  example?: string;
+    // Debate
+    topic?: string;
+    position?: string;
+    keyPoints?: string[];
+    
+    // Presentation
+    duration?: string;
+    structure?: Array<{
+      title: string;
+      points: string[];
+    }>;
+    visualAids?: Array<{
+      url: string;
+      description: string;
+    }>;
+    visualAidsInstructions?: string;
+
+    // Matching
+    matching?: Array<{
+      text: string;
+      correct: boolean;
+    }>;
+
+    //fill in the blank
+    fillInTheBlank?: Array<{
+      sentence: string;
+      blanks: string[];
+    }>;
+      
+    //fill in the blank with multiple choices
+    fillInTheBlankWithMultipleChoices?: Array<{
+      sentence: string;
+      blanks: string[];
+      options: string[];
+      correctAnswer: number;
+      }>;
+    //True or False
+    trueOrFalse?: Array<{
+      sentence: string;
+      correctAnswer: boolean;
+    }>;
+
+    //Reading Comprehension
+    readingComprehension?: Array<{
+      passage: string;
+      questions: string[];
+    }>;
+
+    //Speaking and Writing
+    speakingAndWriting?: Array<{
+      speakingPrompt: string;
+      writingPrompt: string;
+    }>;
+
+    //Listening and Speaking
+    listeningAndSpeaking?: Array<{
+      listeningPrompt: string;
+      speakingPrompt: string;
+    }>;
+
+    //reading and speaking
+    readingAndSpeaking?: Array<{
+      readingPrompt: string;
+      speakingPrompt: string;
+    }>;
+
+    //Speaking with a partner
+    speakingWithAPartner?: Array<{
+      speakingPrompt: string;
+      partnerPrompt: string;
+    }>;
+
+    //Action and Reaction
+    actionAndReaction?: Array<{
+      action: string;
+      reaction: string;
+    }>;
+
+    // Action and Speaking
+    actionAndSpeaking?: Array<{
+      action: string;
+      speakingPrompt: string;
+    }>;
+
+    //Vocabulary Practice
+    vocabularyPractice?: Array<{
+      word: string;
+      spelling: string;
+      definition: string;
+      sentences: string[];
+    }>;
+
+    //spelling practice
+    spellingPractice?: Array<{
+      word: string;
+      spelling: string;
+      sentences: string[];
+    }>;
+
+    //Watch and Speak
+    watchAndSpeak?: Array<{
+      videoUrl: string;
+      discussionPoints: string[];
+      instructions: string;
+    }>;
+
+    //Look and Speak
+    lookAndSpeak?: Array<{
+      imageUrl: string;
+      imageCaption: string;
+      helpfulVocabulary: string[];
+      instructions: string;
+    }>;
+
+    //idiom_practice
+    idiomPractice?: Array<{
+      idiom: string;
+      meaning: string;
+      example: string;
+      usageNotes: string;
+    }>; 
+
+      
+    items?: string[];
+    sentence?: string;
+    blanks?: string[];
+    statement?: string;
+    passage?: string | { text: TextBlock[] }[];
+    answer?: string;
+    response?: string | { text: TextBlock[] }[];
+    speakingPrompt?: string;
+    
+    writingPrompt?: string;
+    listeningPrompt?: string;
+    partnerPrompt?: string;
+    actionPrompt?: string;
+    speakingPrompt2?: string;
   
-  // Story fields
-  storyPrompt?: string;
-  keywords?: string[];
-  hints?: string[];
-  
-  // Listening fields
-  audioContent?: string;
-  transcript?: string;
-  listeningPrompt?: string;
-  
-  // Multiple Choice fields
-  options?: string[];
-  correctAnswer?: string | number;
-  
-  // Matching fields
-  items?: string[];
-  descriptions?: string[];
-  
-  // Fill in the blank fields
-  sentence?: string;
-  blanks?: string[];
-  
-  // Reading fields
-  passage?: string;
-  questions?: string[];
-  
-  // Speaking fields
-  speakingPrompt?: string;
-  speakingPrompt2?: string;
-  partnerPrompt?: string;
-  
-  // Action fields
-  actionPrompt?: string;
-  objectPrompt?: string;
-  
-  // Look and Speak fields
-  imageUrl?: string;
-  imageCaption?: string;
-  helpfulVocabulary?: string[];
-  
-  // Watch and Speak fields
-  videoUrl?: string;
-  discussionPoints?: string[];
-  
-  // Debate fields
-  topic?: string;
-  position?: string;
-  keyPoints?: string[];
-  
-  // Presentation fields
-  duration?: string;
-  structure?: Array<{ title: string; points: string[] }>;
-  visualAids?: Array<{ url: string; description: string }>;
-  
-  // Vocabulary fields
-  vocabularyPrompt?: string;
-  wordlistPrompt?: Array<{
-    word: string;
-    definition: string;
-    correctPronunciation: string;
-    phoneticGuide: string;
-    pronunciationAudio: string;
-    example: string;
-    usageNotes: string;
-    synonyms: string[];
-    antonyms: string[];
-  }>;
-  
-  // Sentence fields
-  originalSentence?: string;
-  tenseToTransform?: string;
-  hint?: string[];
-  
-  // Grammar fields
-  grammarPoint?: string;
-  
-  // Writing and Speaking fields
-  writingPrompt?: string;
-  phrases?: string[];
-  statement?: string;
-  
-  // ... rest of the fields ...
+    wordlistPrompt?: Array<{
+      word: string;
+      definition: string;
+      correctPronunciation: string;
+      phoneticGuide: string;
+      pronunciationAudio: string;
+      example: string;
+      usageNotes: string;
+      synonyms: string[];
+      antonyms: string[];
+    }>;
+
+    vocabularyAndSpeaking?: Array<{
+      speakingPrompt: string;
+      vocabulary: string[];
+    }>;
+
+    sentenceFormation?: Array<{
+      originalSentence: string;
+      hints: string[];
+      correctAnswer: string;
+    }>;
+
+    vocabularyAndGrammar?: Array<{
+      grammarPoint: string;
+      vocabulary: string[];
+    }>;
+
+    sentenceTransformation?: Array<{
+      originalSentence: string;
+      tenseToTransform: string;
+      hints: string[];
+      correctAnswer: string;
+    }>;
+
+    sentenceTransformationAndCompletion?: Array<{
+      originalSentence: string;
+      tenseToTransform: string;
+      hints: string[];
+      correctAnswer: string;
+    }>;
+
+    objectAndSpeaking?: Array<{
+      speakingPrompt: string;
+      objectPrompt: string;
+    }>;
+
+    objectActionAndSpeaking?: Array<{
+      speakingPrompt: string;
+      objectPrompt: string;
+      actionPrompt: string;
+    }>;
 }
 
 interface QuestionData {
@@ -593,102 +717,178 @@ export function QuestionForm({
       case 'idiomPractice':
         return (
           <div className="space-y-4">
-            <div className="space-y-2">
-              <Label>Idiom</Label>
-              <Input
-                value={metadata.idiom || ''}
-                onChange={(e) => handleMetadataChange('idiom', e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Meaning</Label>
-              <Textarea
-                value={metadata.meaning || ''}
-                onChange={(e) => handleMetadataChange('meaning', e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Usage Notes</Label>
-              <Textarea
-                value={metadata.usageNotes || ''}
-                onChange={(e) => handleMetadataChange('usageNotes', e.target.value)}
-              />
-            </div>
+            {metadata.idiomPractice?.map((item, idx) => (
+              <div key={`idiom-${idx}`} className="space-y-2 p-4 border rounded">
+                <Label>Idiom</Label>
+                <Input
+                  value={item.idiom}
+                  onChange={(e) => {
+                    const newIdioms = [...(metadata.idiomPractice || [])];
+                    newIdioms[idx] = { ...item, idiom: e.target.value };
+                    handleMetadataChange('idiomPractice', newIdioms);
+                  }}
+                />
+                <Label>Meaning</Label>
+                <Textarea
+                  value={item.meaning}
+                  onChange={(e) => {
+                    const newIdioms = [...(metadata.idiomPractice || [])];
+                    newIdioms[idx] = { ...item, meaning: e.target.value };
+                    handleMetadataChange('idiomPractice', newIdioms);
+                  }}
+                />
+                <Label>Usage Notes</Label>
+                <Textarea
+                  value={item.usageNotes}
+                  onChange={(e) => {
+                    const newIdioms = [...(metadata.idiomPractice || [])];
+                    newIdioms[idx] = { ...item, usageNotes: e.target.value };
+                    handleMetadataChange('idiomPractice', newIdioms);
+                  }}
+                />
+              </div>
+            ))}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleMetadataChange('idiomPractice', [
+                ...(metadata.idiomPractice || []),
+                { idiom: '', meaning: '', example: '', usageNotes: '' }
+              ])}
+            >
+              Add Idiom
+            </Button>
           </div>
         );
 
       case 'lookAndSpeak':
         return (
           <div className="space-y-4">
-            <div className="space-y-2">
-              <Label>Image URL</Label>
-              <Input
-                value={metadata.imageUrl || ''}
-                onChange={(e) => handleMetadataChange('imageUrl', e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Image Caption</Label>
-              <Input
-                value={metadata.imageCaption || ''}
-                onChange={(e) => handleMetadataChange('imageCaption', e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Helpful Vocabulary</Label>
-              {metadata.helpfulVocabulary?.map((word: string, idx: number) => (
+            {metadata.lookAndSpeak?.map((item, idx) => (
+              <div key={`look-speak-${idx}`} className="space-y-2 p-4 border rounded">
+                <Label>Image URL</Label>
                 <Input
-                  key={`vocab-${idx}`}
-                  value={word}
+                  value={item.imageUrl}
                   onChange={(e) => {
-                    const newVocab = [...(metadata.helpfulVocabulary || [])];
-                    newVocab[idx] = e.target.value;
-                    handleMetadataChange('helpfulVocabulary', newVocab);
+                    const newItems = [...(metadata.lookAndSpeak || [])];
+                    newItems[idx] = { ...item, imageUrl: e.target.value };
+                    handleMetadataChange('lookAndSpeak', newItems);
                   }}
                 />
-              ))}
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handleMetadataChange('helpfulVocabulary', [...(metadata.helpfulVocabulary || []), ''])}
-              >
-                Add Vocabulary
-              </Button>
-            </div>
+                <Label>Image Caption</Label>
+                <Input
+                  value={item.imageCaption}
+                  onChange={(e) => {
+                    const newItems = [...(metadata.lookAndSpeak || [])];
+                    newItems[idx] = { ...item, imageCaption: e.target.value };
+                    handleMetadataChange('lookAndSpeak', newItems);
+                  }}
+                />
+                <Label>Instructions</Label>
+                <Input
+                  value={item.instructions}
+                  onChange={(e) => {
+                    const newItems = [...(metadata.lookAndSpeak || [])];
+                    newItems[idx] = { ...item, instructions: e.target.value };
+                    handleMetadataChange('lookAndSpeak', newItems);
+                  }}
+                />
+                <Label>Helpful Vocabulary</Label>
+                {item.helpfulVocabulary.map((word, vocabIdx) => (
+                  <Input
+                    key={`vocab-${vocabIdx}`}
+                    value={word}
+                    onChange={(e) => {
+                      const newItems = [...(metadata.lookAndSpeak || [])];
+                      newItems[idx].helpfulVocabulary[vocabIdx] = e.target.value;
+                      handleMetadataChange('lookAndSpeak', newItems);
+                    }}
+                  />
+                ))}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    const newItems = [...(metadata.lookAndSpeak || [])];
+                    newItems[idx].helpfulVocabulary.push('');
+                    handleMetadataChange('lookAndSpeak', newItems);
+                  }}
+                >
+                  Add Vocabulary
+                </Button>
+              </div>
+            ))}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleMetadataChange('lookAndSpeak', [
+                ...(metadata.lookAndSpeak || []),
+                { imageUrl: '', imageCaption: '', helpfulVocabulary: [], instructions: '' }
+              ])}
+            >
+              Add Look and Speak Item
+            </Button>
           </div>
         );
 
       case 'watchAndSpeak':
         return (
           <div className="space-y-4">
-            <div className="space-y-2">
-              <Label>Video URL</Label>
-              <Input
-                value={metadata.videoUrl || ''}
-                onChange={(e) => handleMetadataChange('videoUrl', e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Discussion Points</Label>
-              {metadata.discussionPoints?.map((point: string, idx: number) => (
+            {metadata.watchAndSpeak?.map((item, idx) => (
+              <div key={`watch-speak-${idx}`} className="space-y-2 p-4 border rounded">
+                <Label>Video URL</Label>
                 <Input
-                  key={`point-${idx}`}
-                  value={point}
+                  value={item.videoUrl}
                   onChange={(e) => {
-                    const newPoints = [...(metadata.discussionPoints || [])];
-                    newPoints[idx] = e.target.value;
-                    handleMetadataChange('discussionPoints', newPoints);
+                    const newItems = [...(metadata.watchAndSpeak || [])];
+                    newItems[idx] = { ...item, videoUrl: e.target.value };
+                    handleMetadataChange('watchAndSpeak', newItems);
                   }}
                 />
-              ))}
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handleMetadataChange('discussionPoints', [...(metadata.discussionPoints || []), ''])}
-              >
-                Add Discussion Point
-              </Button>
-            </div>
+                <Label>Instructions</Label>
+                <Input
+                  value={item.instructions}
+                  onChange={(e) => {
+                    const newItems = [...(metadata.watchAndSpeak || [])];
+                    newItems[idx] = { ...item, instructions: e.target.value };
+                    handleMetadataChange('watchAndSpeak', newItems);
+                  }}
+                />
+                <Label>Discussion Points</Label>
+                {item.discussionPoints.map((point, pointIdx) => (
+                  <Input
+                    key={`point-${pointIdx}`}
+                    value={point}
+                    onChange={(e) => {
+                      const newItems = [...(metadata.watchAndSpeak || [])];
+                      newItems[idx].discussionPoints[pointIdx] = e.target.value;
+                      handleMetadataChange('watchAndSpeak', newItems);
+                    }}
+                  />
+                ))}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    const newItems = [...(metadata.watchAndSpeak || [])];
+                    newItems[idx].discussionPoints.push('');
+                    handleMetadataChange('watchAndSpeak', newItems);
+                  }}
+                >
+                  Add Discussion Point
+                </Button>
+              </div>
+            ))}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleMetadataChange('watchAndSpeak', [
+                ...(metadata.watchAndSpeak || []),
+                { videoUrl: '', discussionPoints: [], instructions: '' }
+              ])}
+            >
+              Add Watch and Speak Item
+            </Button>
           </div>
         );
 
@@ -834,20 +1034,53 @@ export function QuestionForm({
       case 'vocabularyAndSpeaking':
         return (
           <div className="space-y-4">
-            <div className="space-y-2">
-              <Label>Speaking Prompt</Label>
-              <Textarea
-                value={metadata.speakingPrompt || ''}
-                onChange={(e) => handleMetadataChange('speakingPrompt', e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Vocabulary Prompt</Label>
-              <Textarea
-                value={metadata.vocabularyPrompt || ''}
-                onChange={(e) => handleMetadataChange('vocabularyPrompt', e.target.value)}
-              />
-            </div>
+            {metadata.vocabularyAndSpeaking?.map((item, idx) => (
+              <div key={`vocab-speak-${idx}`} className="space-y-2 p-4 border rounded">
+                <Label>Speaking Prompt</Label>
+                <Textarea
+                  value={item.speakingPrompt}
+                  onChange={(e) => {
+                    const newItems = [...(metadata.vocabularyAndSpeaking || [])];
+                    newItems[idx] = { ...item, speakingPrompt: e.target.value };
+                    handleMetadataChange('vocabularyAndSpeaking', newItems);
+                  }}
+                />
+                <Label>Vocabulary</Label>
+                {item.vocabulary?.map((word, vocabIdx) => (
+                  <Input
+                    key={`vocab-${vocabIdx}`}
+                    value={word}
+                    onChange={(e) => {
+                      const newItems = [...(metadata.vocabularyAndSpeaking || [])];
+                      newItems[idx].vocabulary[vocabIdx] = e.target.value;
+                      handleMetadataChange('vocabularyAndSpeaking', newItems);
+                    }}
+                  />
+                ))}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    const newItems = [...(metadata.vocabularyAndSpeaking || [])];
+                    if (!newItems[idx].vocabulary) newItems[idx].vocabulary = [];
+                    newItems[idx].vocabulary.push('');
+                    handleMetadataChange('vocabularyAndSpeaking', newItems);
+                  }}
+                >
+                  Add Vocabulary
+                </Button>
+              </div>
+            ))}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleMetadataChange('vocabularyAndSpeaking', [
+                ...(metadata.vocabularyAndSpeaking || []),
+                { speakingPrompt: '', vocabulary: [] }
+              ])}
+            >
+              Add Vocabulary and Speaking Item
+            </Button>
           </div>
         );
 
@@ -1007,136 +1240,235 @@ export function QuestionForm({
       case 'objectAndSpeaking':
         return (
           <div className="space-y-4">
-            <div className="space-y-2">
-              <Label>Speaking Prompt</Label>
-              <Textarea
-                value={metadata.speakingPrompt || ''}
-                onChange={(e) => handleMetadataChange('speakingPrompt', e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Object Prompt</Label>
-              <Textarea
-                value={metadata.objectPrompt || ''}
-                onChange={(e) => handleMetadataChange('objectPrompt', e.target.value)}
-              />
-            </div>
+            {(metadata.objectAndSpeaking || []).map((item, idx) => (
+              <div key={idx} className="space-y-4 p-4 border rounded-lg">
+                <div className="space-y-2">
+                  <Label>Speaking Prompt</Label>
+                  <Textarea
+                    value={item.speakingPrompt || ''}
+                    onChange={(e) => {
+                      const newItems = [...(metadata.objectAndSpeaking || [])];
+                      newItems[idx] = { ...newItems[idx], speakingPrompt: e.target.value };
+                      handleMetadataChange('objectAndSpeaking', newItems);
+                    }}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Object Prompt</Label>
+                  <Textarea
+                    value={item.objectPrompt || ''}
+                    onChange={(e) => {
+                      const newItems = [...(metadata.objectAndSpeaking || [])];
+                      newItems[idx] = { ...newItems[idx], objectPrompt: e.target.value };
+                      handleMetadataChange('objectAndSpeaking', newItems);
+                    }}
+                  />
+                </div>
+              </div>
+            ))}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleMetadataChange('objectAndSpeaking', [...(metadata.objectAndSpeaking || []), {
+                speakingPrompt: '',
+                objectPrompt: ''
+              }])}
+            >
+              Add Object and Speaking
+            </Button>
           </div>
         );
 
       case 'objectActionAndSpeaking':
         return (
           <div className="space-y-4">
-            <div className="space-y-2">
-              <Label>Speaking Prompt</Label>
-              <Textarea
-                value={metadata.speakingPrompt || ''}
-                onChange={(e) => handleMetadataChange('speakingPrompt', e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Object Prompt</Label>
-              <Textarea
-                value={metadata.objectPrompt || ''}
-                onChange={(e) => handleMetadataChange('objectPrompt', e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Action Prompt</Label>
-              <Textarea
-                value={metadata.actionPrompt || ''}
-                onChange={(e) => handleMetadataChange('actionPrompt', e.target.value)}
-              />
-            </div>
+            {(metadata.objectActionAndSpeaking || []).map((item, idx) => (
+              <div key={idx} className="space-y-4 p-4 border rounded-lg">
+                <div className="space-y-2">
+                  <Label>Speaking Prompt</Label>
+                  <Textarea
+                    value={item.speakingPrompt || ''}
+                    onChange={(e) => {
+                      const newItems = [...(metadata.objectActionAndSpeaking || [])];
+                      newItems[idx] = { ...newItems[idx], speakingPrompt: e.target.value };
+                      handleMetadataChange('objectActionAndSpeaking', newItems);
+                    }}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Object Prompt</Label>
+                  <Textarea
+                    value={item.objectPrompt || ''}
+                    onChange={(e) => {
+                      const newItems = [...(metadata.objectActionAndSpeaking || [])];
+                      newItems[idx] = { ...newItems[idx], objectPrompt: e.target.value };
+                      handleMetadataChange('objectActionAndSpeaking', newItems);
+                    }}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Action Prompt</Label>
+                  <Textarea
+                    value={item.actionPrompt || ''}
+                    onChange={(e) => {
+                      const newItems = [...(metadata.objectActionAndSpeaking || [])];
+                      newItems[idx] = { ...newItems[idx], actionPrompt: e.target.value };
+                      handleMetadataChange('objectActionAndSpeaking', newItems);
+                    }}
+                  />
+                </div>
+              </div>
+            ))}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleMetadataChange('objectActionAndSpeaking', [...(metadata.objectActionAndSpeaking || []), {
+                speakingPrompt: '',
+                objectPrompt: '',
+                actionPrompt: ''
+              }])}
+            >
+              Add Object Action and Speaking
+            </Button>
           </div>
         );
 
       case 'sentenceFormation':
         return (
           <div className="space-y-4">
-            <div className="space-y-2">
-              <Label>Original Sentence</Label>
-              <Input
-                value={metadata.originalSentence || ''}
-                onChange={(e) => handleMetadataChange('originalSentence', e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Hints</Label>
-              {metadata.hint?.map((hint: string, idx: number) => (
+            {metadata.sentenceFormation?.map((item: {
+              originalSentence: string;
+              hints: string[];
+              correctAnswer: string;
+            }, idx: number) => (
+              <div key={`sentence-${idx}`} className="space-y-2 p-4 border rounded">
+                <Label>Original Sentence</Label>
                 <Input
-                  key={`hint-${idx}`}
-                  value={hint}
+                  value={item.originalSentence}
                   onChange={(e) => {
-                    const newHints = [...(metadata.hint || [])];
-                    newHints[idx] = e.target.value;
-                    handleMetadataChange('hint', newHints);
+                    const newItems = [...(metadata.sentenceFormation || [])];
+                    newItems[idx] = { ...item, originalSentence: e.target.value };
+                    handleMetadataChange('sentenceFormation', newItems);
                   }}
                 />
-              ))}
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handleMetadataChange('hint', [...(metadata.hint || []), ''])}
-              >
-                Add Hint
-              </Button>
-            </div>
-            <div className="space-y-2">
-              <Label>Correct Answer</Label>
-              <Input
-                value={metadata.correctAnswer || ''}
-                onChange={(e) => handleMetadataChange('correctAnswer', e.target.value)}
-              />
-            </div>
+                <Label>Hints</Label>
+                {item.hints?.map((hint, hintIdx) => (
+                  <Input
+                    key={`hint-${hintIdx}`}
+                    value={hint}
+                    onChange={(e) => {
+                      const newItems = [...(metadata.sentenceFormation || [])];
+                      if (!newItems[idx].hints) newItems[idx].hints = [];
+                      newItems[idx].hints[hintIdx] = e.target.value;
+                      handleMetadataChange('sentenceFormation', newItems);
+                    }}
+                  />
+                ))}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    const newItems = [...(metadata.sentenceFormation || [])];
+                    if (!newItems[idx].hints) newItems[idx].hints = [];
+                    newItems[idx].hints.push('');
+                    handleMetadataChange('sentenceFormation', newItems);
+                  }}
+                >
+                  Add Hint
+                </Button>
+                <Label>Correct Answer</Label>
+                <Input
+                  value={item.correctAnswer}
+                  onChange={(e) => {
+                    const newItems = [...(metadata.sentenceFormation || [])];
+                    newItems[idx] = { ...item, correctAnswer: e.target.value };
+                    handleMetadataChange('sentenceFormation', newItems);
+                  }}
+                />
+              </div>
+            ))}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleMetadataChange('sentenceFormation', [
+                ...(metadata.sentenceFormation || []),
+                { originalSentence: '', hints: [], correctAnswer: '' }
+              ])}
+            >
+              Add Sentence Formation
+            </Button>
           </div>
         );
 
       case 'sentenceTransformation':
         return (
           <div className="space-y-4">
-            <div className="space-y-2">
-              <Label>Original Sentence</Label>
-              <Input
-                value={metadata.originalSentence || ''}
-                onChange={(e) => handleMetadataChange('originalSentence', e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Tense to Transform</Label>
-              <Input
-                value={metadata.tenseToTransform || ''}
-                onChange={(e) => handleMetadataChange('tenseToTransform', e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Hints</Label>
-              {metadata.hint?.map((hint: string, idx: number) => (
+            {metadata.sentenceTransformation?.map((item, idx) => (
+              <div key={`transform-${idx}`} className="space-y-2 p-4 border rounded">
+                <Label>Original Sentence</Label>
                 <Input
-                  key={`hint-${idx}`}
-                  value={hint}
+                  value={item.originalSentence}
                   onChange={(e) => {
-                    const newHints = [...(metadata.hint || [])];
-                    newHints[idx] = e.target.value;
-                    handleMetadataChange('hint', newHints);
+                    const newItems = [...(metadata.sentenceTransformation || [])];
+                    newItems[idx] = { ...item, originalSentence: e.target.value };
+                    handleMetadataChange('sentenceTransformation', newItems);
                   }}
                 />
-              ))}
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handleMetadataChange('hint', [...(metadata.hint || []), ''])}
-              >
-                Add Hint
-              </Button>
-            </div>
-            <div className="space-y-2">
-              <Label>Correct Answer</Label>
-              <Input
-                value={metadata.correctAnswer || ''}
-                onChange={(e) => handleMetadataChange('correctAnswer', e.target.value)}
-              />
-            </div>
+                <Label>Tense to Transform</Label>
+                <Input
+                  value={item.tenseToTransform}
+                  onChange={(e) => {
+                    const newItems = [...(metadata.sentenceTransformation || [])];
+                    newItems[idx] = { ...item, tenseToTransform: e.target.value };
+                    handleMetadataChange('sentenceTransformation', newItems);
+                  }}
+                />
+                <Label>Hints</Label>
+                {item.hints?.map((hint, hintIdx) => (
+                  <Input
+                    key={`hint-${hintIdx}`}
+                    value={hint}
+                    onChange={(e) => {
+                      const newItems = [...(metadata.sentenceTransformation || [])];
+                      if (!newItems[idx].hints) newItems[idx].hints = [];
+                      newItems[idx].hints[hintIdx] = e.target.value;
+                      handleMetadataChange('sentenceTransformation', newItems);
+                    }}
+                  />
+                ))}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    const newItems = [...(metadata.sentenceTransformation || [])];
+                    if (!newItems[idx].hints) newItems[idx].hints = [];
+                    newItems[idx].hints.push('');
+                    handleMetadataChange('sentenceTransformation', newItems);
+                  }}
+                >
+                  Add Hint
+                </Button>
+                <Label>Correct Answer</Label>
+                <Input
+                  value={item.correctAnswer}
+                  onChange={(e) => {
+                    const newItems = [...(metadata.sentenceTransformation || [])];
+                    newItems[idx] = { ...item, correctAnswer: e.target.value };
+                    handleMetadataChange('sentenceTransformation', newItems);
+                  }}
+                />
+              </div>
+            ))}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleMetadataChange('sentenceTransformation', [
+                ...(metadata.sentenceTransformation || []),
+                { originalSentence: '', tenseToTransform: '', hints: [], correctAnswer: '' }
+              ])}
+            >
+              Add Sentence Transformation
+            </Button>
           </div>
         );
 
@@ -1152,21 +1484,21 @@ export function QuestionForm({
             </div>
             <div className="space-y-2">
               <Label>Hints</Label>
-              {metadata.hint?.map((hint: string, idx: number) => (
+              {metadata.hints?.map((hint: string, idx: number) => (
                 <Input
                   key={`hint-${idx}`}
                   value={hint}
                   onChange={(e) => {
-                    const newHints = [...(metadata.hint || [])];
+                    const newHints = [...(metadata.hints || [])];
                     newHints[idx] = e.target.value;
-                    handleMetadataChange('hint', newHints);
+                    handleMetadataChange('hints', newHints);
                   }}
                 />
               ))}
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => handleMetadataChange('hint', [...(metadata.hint || []), ''])}
+                onClick={() => handleMetadataChange('hints', [...(metadata.hints || []), ''])}
               >
                 Add Hint
               </Button>
@@ -1184,48 +1516,86 @@ export function QuestionForm({
       case 'sentenceTransformationAndCompletion':
         return (
           <div className="space-y-4">
-            <div className="space-y-2">
-              <Label>Original Sentence</Label>
-              <Input
-                value={metadata.originalSentence || ''}
-                onChange={(e) => handleMetadataChange('originalSentence', e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Tense to Transform</Label>
-              <Input
-                value={metadata.tenseToTransform || ''}
-                onChange={(e) => handleMetadataChange('tenseToTransform', e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Hints</Label>
-              {metadata.hint?.map((hint: string, idx: number) => (
-                <Input
-                  key={`hint-${idx}`}
-                  value={hint}
-                  onChange={(e) => {
-                    const newHints = [...(metadata.hint || [])];
-                    newHints[idx] = e.target.value;
-                    handleMetadataChange('hint', newHints);
-                  }}
-                />
-              ))}
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handleMetadataChange('hint', [...(metadata.hint || []), ''])}
-              >
-                Add Hint
-              </Button>
-            </div>
-            <div className="space-y-2">
-              <Label>Correct Answer</Label>
-              <Input
-                value={metadata.correctAnswer || ''}
-                onChange={(e) => handleMetadataChange('correctAnswer', e.target.value)}
-              />
-            </div>
+            {(metadata.sentenceTransformationAndCompletion || []).map((item, idx) => (
+              <div key={idx} className="space-y-4 p-4 border rounded-lg">
+                <div className="space-y-2">
+                  <Label>Original Sentence</Label>
+                  <Input
+                    value={item.originalSentence || ''}
+                    onChange={(e) => {
+                      const newItems = [...(metadata.sentenceTransformationAndCompletion || [])];
+                      newItems[idx] = { ...newItems[idx], originalSentence: e.target.value };
+                      handleMetadataChange('sentenceTransformationAndCompletion', newItems);
+                    }}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Tense to Transform</Label>
+                  <Input
+                    value={item.tenseToTransform || ''}
+                    onChange={(e) => {
+                      const newItems = [...(metadata.sentenceTransformationAndCompletion || [])];
+                      newItems[idx] = { ...newItems[idx], tenseToTransform: e.target.value };
+                      handleMetadataChange('sentenceTransformationAndCompletion', newItems);
+                    }}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Hints</Label>
+                  {(item.hints || []).map((hint, hintIdx) => (
+                    <Input
+                      key={`hint-${hintIdx}`}
+                      value={hint}
+                      onChange={(e) => {
+                        const newItems = [...(metadata.sentenceTransformationAndCompletion || [])];
+                        const newHints = [...(newItems[idx].hints || [])];
+                        newHints[hintIdx] = e.target.value;
+                        newItems[idx] = { ...newItems[idx], hints: newHints };
+                        handleMetadataChange('sentenceTransformationAndCompletion', newItems);
+                      }}
+                    />
+                  ))}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      const newItems = [...(metadata.sentenceTransformationAndCompletion || [])];
+                      const newHints = [...(newItems[idx].hints || []), ''];
+                      newItems[idx] = { ...newItems[idx], hints: newHints };
+                      handleMetadataChange('sentenceTransformationAndCompletion', newItems);
+                    }}
+                  >
+                    Add Hint
+                  </Button>
+                </div>
+                <div className="space-y-2">
+                  <Label>Correct Answer</Label>
+                  <Input
+                    value={item.correctAnswer || ''}
+                    onChange={(e) => {
+                      const newItems = [...(metadata.sentenceTransformationAndCompletion || [])];
+                      newItems[idx] = { ...newItems[idx], correctAnswer: e.target.value };
+                      handleMetadataChange('sentenceTransformationAndCompletion', newItems);
+                    }}
+                  />
+                </div>
+              </div>
+            ))}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                const newItems = [...(metadata.sentenceTransformationAndCompletion || []), {
+                  originalSentence: '',
+                  tenseToTransform: '',
+                  hints: [],
+                  correctAnswer: ''
+                }];
+                handleMetadataChange('sentenceTransformationAndCompletion', newItems);
+              }}
+            >
+              Add Sentence Transformation and Completion
+            </Button>
           </div>
         );
 

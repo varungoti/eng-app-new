@@ -31,6 +31,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+//import { ExercisePromptCard } from "@/app/content-management/components/exercise-prompt-card";
+import { ExercisePromptView } from "@/components/exercise-prompt-view";
 
 // Question Types from question-form.tsx
 interface QuestionMetadata {
@@ -87,22 +89,46 @@ interface Question {
   title: string;
   content: string;
   type: string;
-  metadata: QuestionMetadata & {
-    exercise_prompts?: Array<{
-      id: string;
-      text: string;
-      type?: string;
-      media?: string;
-      content?: {
-        instructions?: string;
-        writingPrompt?: string;
-        speakingPrompt?: string;
-      };
-      difficulty?: 'beginner' | 'intermediate' | 'advanced';
-    }>;
+  data: {
+    prompt: string;
+    teacherScript: string;
+    sampleAnswer?: string;
+    followupPrompt?: string[];
   };
-  points?: number;
-  data?: any;
+  metadata?: {
+    difficulty?: string;
+    timeLimit?: number;
+    points?: number;
+    imageUrl?: string;
+    videoUrl?: string;
+    audioUrl?: string;
+    options?: string[];
+    correctAnswer?: string;
+    passage?: string;
+    grammarPoint?: string;
+    example?: string;
+    speakingPrompt?: string;
+    listeningPrompt?: string;
+  };
+  exercise_prompts: ExercisePrompt[];
+}
+
+interface ExercisePrompt {
+  id: string;
+  text: string;
+  type: 'image' | 'video' | 'gif';
+  media: string | null;
+  narration: string | null;
+  saytext: string | null;
+  content?: {
+    instructions?: string;
+    writingPrompt?: string;
+    speakingPrompt?: string;
+  };
+  metadata?: {
+    difficulty?: 'beginner' | 'intermediate' | 'advanced';
+    estimatedTime?: number;
+  };
 }
 
 interface LessonDialogProps {
@@ -274,8 +300,18 @@ export function LessonDialog({
     if (lessonContent.content) {
       // Build audio queue from content
       const queue = [
-        lessonContent.content.audioUrl, // Main content audio
-        ...(lessonContent.content.questions?.map((q: Question) => q.metadata?.audioContent) || []).filter(Boolean)
+        lessonContent.content.audioUrl, // Main content audio 
+        ...(lessonContent.content.questions?.map((q: Question) => q.metadata?.audioUrl) || []).filter(Boolean)
+      //  
+      //   audioRef.current.currentTime = 0;
+      //   audioRef.current.play();
+      //   setPlaying(true);
+      //   setPlaying(false);
+        
+        //   console.log("Playing audio");
+        //   audioRef.current.play();
+        //   setPlaying(true);
+        //   setPlaying(false);ata?.audioUrl) || []).filter(Boolean)
       ];
       setAudioQueue(queue);
     }
@@ -979,7 +1015,7 @@ function ExercisesTab({ exercises }: { exercises: any[] }) {
                   </Badge>
                 )}
               </div>
-              <CardTitle className="text-lg mt-2">{exercise.text}</CardTitle>
+              <CardTitle className="text-base mt-2">{exercise.text}</CardTitle>
               {exercise.content?.instructions && (
                 <CardDescription className="mt-2 flex items-center gap-2">
                   <Lightbulb className="h-4 w-4 text-primary" />
@@ -1003,7 +1039,6 @@ function ExercisesTab({ exercises }: { exercises: any[] }) {
                         src={exercise.media}
                         controls
                         className="w-full"
-                        preload="metadata"
                       />
                     )}
                   </div>
@@ -1124,430 +1159,115 @@ function QuestionCard({
   };
 
   const renderQuestionContent = () => {
-    // Early return if metadata is missing
-    if (!question.metadata) {
-      return (
-        <div className="flex flex-col items-center justify-center p-8 text-muted-foreground">
-          <HelpCircle className="h-12 w-12 mb-4 opacity-50" />
-          <p>Question metadata is missing.</p>
+    if (!question.data) return null;
+
+    return (
+      <div className="space-y-6">
+        {/* Main Question Content - Always show these first */}
+        <div className="space-y-4">
+          {/* Prompt - Always required */}
+          <Card className="bg-background/50 backdrop-blur-sm">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-2 mb-2 text-primary">
+                <MessageCircle className="h-4 w-4" />
+                <h4 className="font-medium">Prompt</h4>
+              </div>
+              <p className="text-muted-foreground">{question.data.prompt}</p>
+            </CardContent>
+          </Card>
+
+          {/* Teacher Script - Always required */}
+          <Card className="bg-muted/50 backdrop-blur-sm">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-2 mb-2 text-primary">
+                <PenTool className="h-4 w-4" />
+                <h4 className="font-medium">Teacher Script</h4>
+              </div>
+              <p className="text-muted-foreground">{question.data.teacherScript}</p>
+            </CardContent>
+          </Card>
+
+          {/* Sample Answer - Optional */}
+          {question.data.sampleAnswer && (
+            <Card className="bg-primary/5">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-2 mb-2 text-primary">
+                  <CheckCircle className="h-4 w-4" />
+                  <h4 className="font-medium">Sample Answer</h4>
+                </div>
+                <p className="text-muted-foreground">{question.data.sampleAnswer}</p>
+              </CardContent>
+            </Card>
+          )}
         </div>
-      );
-    }
+
+        {/* Question Type Specific Content */}
+        {question.metadata && (
+          <Card className="border-primary/10">
+            <CardContent className="p-4">
+              {renderQuestionTypeContent(question)}
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Exercise Prompts - If available */}
+        {question.exercise_prompts?.length > 0 && (
+          <div className="mt-6 space-y-4">
+            <div className="flex items-center gap-2 text-primary">
+              <Award className="h-5 w-5" />
+              <h3 className="font-medium">Practice Exercises</h3>
+            </div>
+            <div className="grid gap-4">
+              {question.exercise_prompts.map((prompt, idx) => (
+                <ExercisePromptView
+                  key={prompt.id}
+                  prompt={prompt}
+                  index={idx}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  // Helper function to render type-specific content
+  const renderQuestionTypeContent = (question: Question) => {
+    if (!question.metadata) return null;
 
     switch (question.type.toLowerCase()) {
       case 'multiplechoice':
-        if (!Array.isArray(question.metadata.options)) {
-          return (
-            <div className="flex flex-col items-center justify-center p-8 text-muted-foreground">
-              <Layers className="h-12 w-12 mb-4 opacity-50" />
-              <p>Multiple choice options are missing.</p>
-            </div>
-          );
-        }
         return (
-          <RadioGroup
-            onValueChange={(value) => onAnswer(100)}
-            className="space-y-3"
-          >
-            {question.metadata.options.map((option, idx) => (
-              <motion.div
+          <div className="space-y-4">
+            {question.metadata.options?.map((option, idx) => (
+              <RadioGroupItem
                 key={idx}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: idx * 0.1 }}
+                value={option}
+                className="w-full p-4 rounded-lg border hover:bg-accent"
               >
-                <Label
-                  htmlFor={`option-${idx}`}
-                  className={cn(
-                    "flex items-center gap-4 p-4 rounded-lg",
-                    "border border-primary/10 bg-card",
-                    "cursor-pointer transition-all",
-                    "hover:bg-primary/5 hover:border-primary/20",
-                    "data-[state=checked]:border-primary data-[state=checked]:bg-primary/10"
-                  )}
-                >
-                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary font-medium">
-                    {String.fromCharCode(65 + idx)}
-                  </div>
-                  <RadioGroupItem value={option} id={`option-${idx}`} className="sr-only" />
-                  <span className="flex-1 text-sm">{option}</span>
-                </Label>
-              </motion.div>
+                {option}
+              </RadioGroupItem>
             ))}
-          </RadioGroup>
-        );
-
-      case 'fill_blanks':
-      case 'fillintheblank':
-        return (
-          <div className="space-y-6">
-            <Card className="bg-primary/5 border-primary/10">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2 mb-4 text-primary">
-                  <Type className="h-5 w-5" />
-                  <p className="font-medium">Fill in the Blanks</p>
-                </div>
-                <p className="text-sm mb-4">{question.metadata.sentence || question.content}</p>
-                {question.metadata.blanks?.map((blank: string, idx: number) => (
-                  <div key={idx} className="space-y-2 mb-4">
-                    <Label className="text-sm">Blank {idx + 1}</Label>
-                    <Input
-                      placeholder="Type your answer..."
-                      onChange={() => onAnswer(Math.min(100, progress + (100 / (question.metadata.blanks?.length || 1))))}
-                      className="bg-card border-primary/10"
-                    />
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-          </div>
-        );
-
-      case 'matching':
-        return (
-          <div className="space-y-6">
-            <Card className="bg-primary/5 border-primary/10">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2 mb-4 text-primary">
-                  <Layers className="h-5 w-5" />
-                  <p className="font-medium">Match the Following</p>
-                </div>
-                {question.metadata.items?.map((item: string, idx: number) => (
-                  <div key={idx} className="flex items-center gap-4 mb-4">
-                    <div className="flex-1 p-3 bg-card rounded-lg border border-primary/10">
-                      {item}
-                    </div>
-                    <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                    <Select>
-                      <SelectTrigger className="flex-1">
-                        <SelectValue placeholder="Select match..." />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {question.metadata.descriptions?.map((desc: string, descIdx: number) => (
-                          <SelectItem key={descIdx} value={desc}>
-                            {desc}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-          </div>
-        );
-
-      case 'writing':
-      case 'writingandspeaking':
-        return (
-          <div className="space-y-6">
-            <div className="bg-card rounded-lg border border-primary/10 p-4">
-              <RichTextEditor
-                value=""
-                onChange={() => onAnswer(50)}
-                placeholder="Write your answer here..."
-                className="min-h-[200px] prose prose-sm max-w-none"
-              />
-            </div>
-            {question.metadata.sampleAnswer && (
-              <Collapsible>
-                <CollapsibleTrigger asChild>
-                  <Button variant="outline" size="sm" className="gap-2 w-full justify-center">
-                    <Lightbulb className="h-4 w-4" />
-                    View Sample Answer
-                  </Button>
-                </CollapsibleTrigger>
-                <CollapsibleContent className="mt-4">
-                  <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                  >
-                    <Card className="bg-primary/5 border-primary/10">
-                      <CardContent className="p-4">
-                        <div className="flex items-center gap-2 mb-2 text-primary">
-                          <Star className="h-4 w-4" />
-                          <span className="text-sm font-medium">Sample Answer</span>
-                        </div>
-                        <p className="text-sm">{question.metadata.sampleAnswer}</p>
-                      </CardContent>
-                    </Card>
-                  </motion.div>
-                </CollapsibleContent>
-              </Collapsible>
-            )}
           </div>
         );
 
       case 'speaking':
-      case 'speakingandwriting':
-      case 'speakingandlistening':
-      case 'speakingwithpartner':
         return (
-          <div className="space-y-6">
-            <Card className="bg-primary/5 border-primary/10">
-              <CardContent className="p-4 space-y-4">
-                <div className="flex items-center gap-2 text-primary">
-                  <Mic className="h-5 w-5" />
-                  <p className="font-medium">Speaking Prompt</p>
-                </div>
-                <p className="text-sm">{question.metadata.speakingPrompt || 'No speaking prompt available.'}</p>
-              </CardContent>
-            </Card>
-            <div className="flex flex-col items-center gap-4">
-              <Button 
-                variant="outline" 
-                size="lg"
-                className="gap-3 rounded-full hover:bg-primary/10 px-8"
-                onClick={() => onAnswer(75)}
-              >
-                <Mic className="h-5 w-5" />
-                Start Speaking
-              </Button>
-              <p className="text-xs text-muted-foreground">
-                Click to start recording your answer
-              </p>
-            </div>
-          </div>
-        );
-
-      case 'listening':
-      case 'listenandrepeat':
-        return (
-          <div className="space-y-6">
-            {question.metadata.audioContent ? (
-              <Card className="bg-primary/5 border-primary/10">
-                <CardContent className="p-4 space-y-4">
-                  <div className="flex items-center gap-2 text-primary">
-                    <Headphones className="h-5 w-5" />
-                    <p className="font-medium">Audio Content</p>
-                  </div>
-                  <audio
-                    controls
-                    src={question.metadata.audioContent}
-                    className="w-full"
-                  />
-                </CardContent>
-              </Card>
-            ) : (
-              <div className="flex flex-col items-center justify-center p-8 text-muted-foreground">
-                <Headphones className="h-12 w-12 mb-4 opacity-50" />
-                <p>No audio content available.</p>
+          <div className="space-y-4">
+            {question.metadata.speakingPrompt && (
+              <div className="bg-accent/5 p-4 rounded-lg">
+                <h4 className="font-medium mb-2">Speaking Prompt</h4>
+                <p>{question.metadata.speakingPrompt}</p>
               </div>
             )}
-            <div className="space-y-3">
-              <Label className="text-sm font-medium">Your Response</Label>
-              <Textarea
-                placeholder="Write what you heard..."
-                onChange={() => onAnswer(60)}
-                className="min-h-[100px] bg-card border-primary/10"
-              />
-            </div>
           </div>
         );
 
-      case 'reading':
-      case 'readingandspeaking':
-        return (
-          <div className="space-y-6">
-            {question.metadata.passage ? (
-              <Card className="prose prose-sm max-w-none dark:prose-invert border-primary/10">
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-2 text-primary mb-4">
-                    <Book className="h-5 w-5" />
-                    <p className="font-medium">Reading Passage</p>
-                  </div>
-                  <div 
-                    className="bg-card rounded-lg p-4"
-                    dangerouslySetInnerHTML={{ 
-                      __html: question.metadata.passage
-                    }}
-                  />
-                </CardContent>
-              </Card>
-            ) : (
-              <div className="flex flex-col items-center justify-center p-8 text-muted-foreground">
-                <Book className="h-12 w-12 mb-4 opacity-50" />
-                <p>No reading passage available.</p>
-              </div>
-            )}
-            <div className="space-y-4">
-              {Array.isArray(question.metadata.questions) && question.metadata.questions.map((q, idx) => (
-                <Card key={idx} className="border-primary/10 bg-card">
-                  <CardContent className="p-4 space-y-3">
-                    <Label className="flex items-center gap-2">
-                      <div className="flex items-center justify-center w-6 h-6 rounded-full bg-primary/10 text-primary text-sm">
-                        {idx + 1}
-                      </div>
-                      <span>{q}</span>
-                    </Label>
-                    <Textarea
-                      placeholder="Write your answer..."
-                      onChange={() => onAnswer(Math.min(100, progress + 20))}
-                      className="min-h-[80px] bg-background/50"
-                    />
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        );
-
-      case 'grammarspeaking':
-      case 'sentenceformation':
-        return (
-          <div className="space-y-6">
-            <Card className="bg-primary/5 border-primary/10">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2 mb-4 text-primary">
-                  <Type className="h-5 w-5" />
-                  <p className="font-medium">Grammar Exercise</p>
-                </div>
-                <div className="space-y-4">
-                  <div>
-                    <Label className="text-sm font-medium">Grammar Point</Label>
-                    <p className="text-sm mt-1">{question.metadata.grammarPoint}</p>
-                  </div>
-                  <div>
-                    <Label className="text-sm font-medium">Example</Label>
-                    <p className="text-sm mt-1">{question.metadata.example}</p>
-                  </div>
-                  <Textarea
-                    placeholder="Write your answer using the grammar point..."
-                    onChange={() => onAnswer(75)}
-                    className="min-h-[100px] bg-card border-primary/10"
-                  />
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        );
-
-      case 'vocabularyandspeaking':
-      case 'vocabularyandwordlist':
-        return (
-          <div className="space-y-6">
-            <Card className="bg-primary/5 border-primary/10">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2 mb-4 text-primary">
-                  <Brain className="h-5 w-5" />
-                  <p className="font-medium">Vocabulary Exercise</p>
-                </div>
-                {question.metadata.wordlistPrompt?.map((word: any, idx: number) => (
-                  <div key={idx} className="mb-6 p-4 bg-card rounded-lg border border-primary/10">
-                    <h4 className="font-medium mb-2">{word.word}</h4>
-                    <div className="grid gap-2 text-sm">
-                      <p><span className="text-muted-foreground">Definition:</span> {word.definition}</p>
-                      <p><span className="text-muted-foreground">Example:</span> {word.example}</p>
-                      <p><span className="text-muted-foreground">Usage:</span> {word.usageNotes}</p>
-                    </div>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-          </div>
-        );
-
-      case 'presentation':
-      case 'debate':
-        return (
-          <div className="space-y-6">
-            <Card className="bg-primary/5 border-primary/10">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2 mb-4 text-primary">
-                  <Presentation className="h-5 w-5" />
-                  <p className="font-medium">{question.type === 'presentation' ? 'Presentation' : 'Debate'} Task</p>
-                </div>
-                <div className="space-y-4">
-                  <div>
-                    <Label className="text-sm font-medium">Topic</Label>
-                    <p className="text-sm mt-1">{question.metadata.topic}</p>
-                  </div>
-                  {question.type === 'debate' && (
-                    <div>
-                      <Label className="text-sm font-medium">Position</Label>
-                      <p className="text-sm mt-1">{question.metadata.position}</p>
-                    </div>
-                  )}
-                  <div>
-                    <Label className="text-sm font-medium">Key Points</Label>
-                    <ul className="list-disc list-inside text-sm mt-1">
-                      {question.metadata.keyPoints?.map((point: string, idx: number) => (
-                        <li key={idx}>{point}</li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        );
-
-      case 'storytelling':
-      case 'idiompractice':
-        return (
-          <div className="space-y-6">
-            <Card className="bg-primary/5 border-primary/10">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2 mb-4 text-primary">
-                  {question.type === 'storytelling' ? (
-                    <BookOpen className="h-5 w-5" />
-                  ) : (
-                    <Sparkles className="h-5 w-5" />
-                  )}
-                  <p className="font-medium">{question.type === 'storytelling' ? 'Storytelling' : 'Idiom Practice'}</p>
-                </div>
-                <div className="space-y-4">
-                  {question.type === 'idiompractice' ? (
-                    <>
-                      <div>
-                        <Label className="text-sm font-medium">Idiom</Label>
-                        <p className="text-sm mt-1">{question.metadata.idiom}</p>
-                      </div>
-                      <div>
-                        <Label className="text-sm font-medium">Meaning</Label>
-                        <p className="text-sm mt-1">{question.metadata.meaning}</p>
-                      </div>
-                      <div>
-                        <Label className="text-sm font-medium">Usage Notes</Label>
-                        <p className="text-sm mt-1">{question.metadata.usageNotes}</p>
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      <div>
-                        <Label className="text-sm font-medium">Story Prompt</Label>
-                        <p className="text-sm mt-1">{question.metadata.storyPrompt}</p>
-                      </div>
-                      <div>
-                        <Label className="text-sm font-medium">Keywords</Label>
-                        <div className="flex flex-wrap gap-2 mt-1">
-                          {question.metadata.keywords?.map((keyword: string, idx: number) => (
-                            <Badge key={idx} variant="outline" className="bg-primary/5">
-                              {keyword}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
-                    </>
-                  )}
-                  <Textarea
-                    placeholder={question.type === 'storytelling' ? "Write your story here..." : "Write a sentence using this idiom..."}
-                    onChange={() => onAnswer(75)}
-                    className="min-h-[150px] bg-card border-primary/10"
-                  />
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        );
+      // Add more cases for other question types...
 
       default:
-        return (
-          <div className="flex flex-col items-center justify-center p-8 text-muted-foreground">
-            <Target className="h-12 w-12 mb-4 opacity-50" />
-            <p>This question type ({question.type}) is not implemented yet.</p>
-          </div>
-        );
+        return null;
     }
   };
 
@@ -1605,109 +1325,6 @@ function QuestionCard({
       default:
         return 'from-gray-500/10 to-slate-500/10 hover:from-gray-500/20 hover:to-slate-500/20';
     }
-  };
-
-  const renderExercisePrompts = () => {
-    if (!question.metadata?.exercise_prompts?.length) return null;
-
-    return (
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
-        className="mt-6 space-y-4"
-      >
-        <div className="flex items-center gap-2 text-primary">
-          <Award className="h-5 w-5" />
-          <h3 className="font-medium">Related Exercises</h3>
-        </div>
-        <div className="grid gap-4">
-          {question.metadata.exercise_prompts.map((prompt, idx) => (
-            <Card 
-              key={idx}
-              className={cn(
-                "border-primary/10 transition-all duration-200",
-                "hover:shadow-md hover:border-primary/20",
-                "bg-background/50 backdrop-blur-sm"
-              )}
-            >
-              <CardHeader>
-                <div className="flex items-center gap-3">
-                  <Badge variant="outline" className="bg-primary/5">
-                    Exercise {idx + 1}
-                  </Badge>
-                  {prompt.type && (
-                    <Badge variant="outline" className="bg-primary/5">
-                      {prompt.type}
-                    </Badge>
-                  )}
-                  {prompt.difficulty && (
-                    <Badge 
-                      variant="outline" 
-                      className={cn(
-                        "capitalize",
-                        prompt.difficulty === 'beginner' && "bg-green-500/10 text-green-500",
-                        prompt.difficulty === 'intermediate' && "bg-yellow-500/10 text-yellow-500",
-                        prompt.difficulty === 'advanced' && "bg-red-500/10 text-red-500"
-                      )}
-                    >
-                      {prompt.difficulty}
-                    </Badge>
-                  )}
-                </div>
-                <CardTitle className="text-base mt-2">{prompt.text}</CardTitle>
-                {prompt.content?.instructions && (
-                  <CardDescription className="mt-2 flex items-center gap-2">
-                    <Lightbulb className="h-4 w-4 text-primary" />
-                    {prompt.content.instructions}
-                  </CardDescription>
-                )}
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {prompt.media && (
-                    <div className="rounded-lg overflow-hidden border border-primary/10">
-                      {prompt.type === 'image' ? (
-                        <img 
-                          src={prompt.media} 
-                          alt={prompt.text}
-                          className="w-full h-auto object-cover"
-                        />
-                      ) : (
-                        <video 
-                          src={prompt.media}
-                          controls
-                          className="w-full"
-                        />
-                      )}
-                    </div>
-                  )}
-                  <div className="space-y-2">
-                    {prompt.content?.writingPrompt && (
-                      <div className="mb-4">
-                        <Label className="text-sm font-medium">Writing Prompt</Label>
-                        <p className="text-sm mt-1 text-muted-foreground">{prompt.content.writingPrompt}</p>
-                      </div>
-                    )}
-                    {prompt.content?.speakingPrompt && (
-                      <div className="mb-4">
-                        <Label className="text-sm font-medium">Speaking Prompt</Label>
-                        <p className="text-sm mt-1 text-muted-foreground">{prompt.content.speakingPrompt}</p>
-                      </div>
-                    )}
-                    <Textarea
-                      placeholder="Write your response..."
-                      className="min-h-[100px] bg-card border-primary/10"
-                      onChange={() => onAnswer(Math.min(100, progress + 10))}
-                    />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </motion.div>
-    );
   };
 
   return (
@@ -1851,7 +1468,6 @@ function QuestionCard({
                   >
                     {renderQuestionContent()}
                   </motion.div>
-                  {renderExercisePrompts()}
                 </div>
               </CardContent>
             </motion.div>

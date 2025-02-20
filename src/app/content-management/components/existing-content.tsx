@@ -78,8 +78,7 @@ export function ExistingContent() {
     } catch (error) {
       toast({
         title: 'Error',
-        description: error instanceof Error ? error.message : 'Failed to delete item',
-        variant: 'destructive'
+        description: error instanceof Error ? error.message : 'Failed to delete item'
       });
     } finally {
       setDeleteDialogOpen(false);
@@ -204,7 +203,7 @@ export function ExistingContent() {
                       {questions?.map((question) => (
                         <Card key={question.id} className="p-4">
                           <div className="flex items-center justify-between">
-                            <p>{question.text}</p>
+                            <p>{question.title}</p>
                             <div className="flex gap-2">
                               <Button variant="outline" size="sm">
                                 <Icon type="phosphor" name="PENCIL_SIMPLE" className="mr-2 h-3 w-3" />

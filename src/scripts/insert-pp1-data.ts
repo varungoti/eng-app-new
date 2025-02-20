@@ -59,6 +59,12 @@ interface Question {
   prompt: string
   teacher_script?: string
   sample_answer?: string
+  data?: {
+    prompt?: string;
+    teacher_script?: string;
+    sample_answer?: string;
+    [key: string]: any;
+  };
 }
 
 interface Activity {
@@ -176,7 +182,18 @@ const VALID_QUESTION_TYPES = [
   'review_six_seven',
   'review_eight_nine',
   'review_ten',
-  'counting_groups'
+  'counting_groups',
+  'listening',
+  'say_circle',
+  'find_circles',
+  'circle_objects',
+  'draw_circle',
+  'circle_colors',
+  'circle_sizes',
+  'circle_movement',
+  'circle_counting',
+  'circle_patterns',
+  'circle_review'
 ] as const;
 
 type ValidQuestionType = typeof VALID_QUESTION_TYPES[number];
@@ -272,6 +289,21 @@ const QUESTION_TYPE_MAPPING: Record<string, QuestionType> = {
   'class': 'speaking',
   'group_activity': 'speaking',
   'movement_activity': 'speaking',
+  
+  // Add listening mapping
+  'listening': 'speaking',
+  
+  // Add circle-related mappings
+  'say_circle': 'speaking',
+  'find_circles': 'speaking',
+  'circle_objects': 'speaking',
+  'draw_circle': 'speaking',
+  'circle_colors': 'speaking',
+  'circle_sizes': 'speaking',
+  'circle_movement': 'speaking',
+  'circle_counting': 'speaking',
+  'circle_patterns': 'speaking',
+  'circle_review': 'speaking'
 };
 
 // Valid sub-types list (for reference and validation)
@@ -434,78 +466,276 @@ class DatabaseInserter {
   }
 
   private async processTopic(topic: Topic, gradeId: string) {
-    const topicId = uuidv4()
-    const { error: topicError } = await this.supabase
+    // Check if topic already exists
+    const { data: existingTopics, error: topicError } = await this.supabase
       .from(dbConfig.tables.topics)
-      .insert({
-        id: topicId,
-        title: topic.title,
-        description: topic.description,
-        grade_id: gradeId,
-        order_index: topic.order_index
-      })
+      .select('*')
+      .eq('title', topic.title)
+      .eq('grade_id', gradeId);
 
-    if (topicError) throw topicError
-    this.trackInsertedId(dbConfig.tables.topics, topicId)
-    this.logger.log('SUCCESS', `Topic "${topic.title}" inserted`)
+    if (topicError) throw topicError;
 
+    let topicId: string;
+
+    if (existingTopics && existingTopics.length > 0) {
+      topicId = existingTopics[0].id;
+      this.logger.log('INFO', `Topic "${topic.title}" already exists - checking for updates`);
+      
+      // Check if topic needs updating
+      if (existingTopics[0].description !== topic.description || 
+          existingTopics[0].order_index !== topic.order_index) {
+        const { error: updateError } = await this.supabase
+          .from(dbConfig.tables.topics)
+          .update({
+            description: topic.description,
+            order_index: topic.order_index
+          })
+          .eq('id', topicId);
+
+        if (updateError) throw updateError;
+        this.logger.log('SUCCESS', `Topic "${topic.title}" updated`);
+      }
+    } else {
+      // Create new topic
+      topicId = uuidv4();
+      const { error: insertError } = await this.supabase
+        .from(dbConfig.tables.topics)
+        .insert({
+          id: topicId,
+          title: topic.title,
+          description: topic.description,
+          grade_id: gradeId,
+          order_index: topic.order_index
+        });
+
+      if (insertError) throw insertError;
+      this.trackInsertedId(dbConfig.tables.topics, topicId);
+      this.logger.log('SUCCESS', `Topic "${topic.title}" inserted`);
+    }
+
+    // Process subtopics
     for (const subtopic of topic.subtopics) {
-      await this.processSubtopic(subtopic, topicId, gradeId)
+      await this.processSubtopic(subtopic, topicId, gradeId);
     }
   }
 
   private async processSubtopic(subtopic: Subtopic, topicId: string, gradeId: string) {
-    const subtopicId = uuidv4()
-    const { error: subtopicError } = await this.supabase
+    // Check if subtopic exists
+    const { data: existingSubtopics, error: subtopicError } = await this.supabase
       .from(dbConfig.tables.subtopics)
-      .insert({
-        id: subtopicId,
-        title: subtopic.title,
-        description: subtopic.description,
-        topic_id: topicId,
-        order_index: subtopic.order_index
-      })
+      .select('*')
+      .eq('title', subtopic.title)
+      .eq('topic_id', topicId);
 
-    if (subtopicError) throw subtopicError
-    this.trackInsertedId(dbConfig.tables.subtopics, subtopicId)
-    this.logger.log('SUCCESS', `Subtopic "${subtopic.title}" inserted`)
+    if (subtopicError) throw subtopicError;
 
+    let subtopicId: string;
+
+    if (existingSubtopics && existingSubtopics.length > 0) {
+      subtopicId = existingSubtopics[0].id;
+      this.logger.log('INFO', `Subtopic "${subtopic.title}" already exists - checking for updates`);
+
+      // Check if subtopic needs updating
+      if (existingSubtopics[0].description !== subtopic.description || 
+          existingSubtopics[0].order_index !== subtopic.order_index) {
+        const { error: updateError } = await this.supabase
+          .from(dbConfig.tables.subtopics)
+          .update({
+            description: subtopic.description,
+            order_index: subtopic.order_index
+          })
+          .eq('id', subtopicId);
+
+        if (updateError) throw updateError;
+        this.logger.log('SUCCESS', `Subtopic "${subtopic.title}" updated`);
+      }
+    } else {
+      // Create new subtopic
+      subtopicId = uuidv4();
+      const { error: insertError } = await this.supabase
+        .from(dbConfig.tables.subtopics)
+        .insert({
+          id: subtopicId,
+          title: subtopic.title,
+          description: subtopic.description,
+          topic_id: topicId,
+          order_index: subtopic.order_index
+        });
+
+      if (insertError) throw insertError;
+      this.trackInsertedId(dbConfig.tables.subtopics, subtopicId);
+      this.logger.log('SUCCESS', `Subtopic "${subtopic.title}" inserted`);
+    }
+
+    // Process lessons
     for (const lesson of subtopic.lessons) {
-      await this.processLesson(lesson, subtopicId, topicId, gradeId)
+      await this.processLesson(lesson, subtopicId, topicId, gradeId);
     }
   }
 
   private async processLesson(lesson: Lesson, subtopicId: string, topicId: string, gradeId: string) {
-    const lessonId = uuidv4()
-    const { error: lessonError } = await this.supabase
+    // Check if lesson exists
+    const { data: existingLessons, error: lessonError } = await this.supabase
       .from(dbConfig.tables.lessons)
-      .insert({
-        id: lessonId,
-        title: lesson.title,
-        description: lesson.description,
-        content_type: lesson.content_type,
-        duration: lesson.duration,
-        difficulty: lesson.difficulty,
-        metadata: lesson.metadata,
-        subtopic_id: subtopicId,
-        topic_id: topicId,
-        grade_id: gradeId,
-        order_index: lesson.order_index,
-        status: 'draft',
-        content: lesson.content || null
-      })
+      .select('*')
+      .eq('title', lesson.title)
+      .eq('subtopic_id', subtopicId);
 
-    if (lessonError) throw lessonError
-    this.trackInsertedId(dbConfig.tables.lessons, lessonId)
-    this.logger.log('SUCCESS', `Lesson "${lesson.title}" inserted`)
+    if (lessonError) throw lessonError;
 
+    let lessonId: string;
+
+    if (existingLessons && existingLessons.length > 0) {
+      lessonId = existingLessons[0].id;
+      this.logger.log('INFO', `Lesson "${lesson.title}" already exists - checking for updates`);
+
+      // Check if lesson needs updating
+      if (this.isLessonDifferent(existingLessons[0], lesson)) {
+        const { error: updateError } = await this.supabase
+          .from(dbConfig.tables.lessons)
+          .update({
+            description: lesson.description,
+            content_type: lesson.content_type,
+            duration: lesson.duration,
+            difficulty: lesson.difficulty,
+            metadata: lesson.metadata,
+            order_index: lesson.order_index,
+            content: lesson.content || null
+          })
+          .eq('id', lessonId);
+
+        if (updateError) throw updateError;
+        this.logger.log('SUCCESS', `Lesson "${lesson.title}" updated`);
+      }
+    } else {
+      // Create new lesson
+      lessonId = uuidv4();
+      const { error: insertError } = await this.supabase
+        .from(dbConfig.tables.lessons)
+        .insert({
+          id: lessonId,
+          title: lesson.title,
+          description: lesson.description,
+          content_type: lesson.content_type,
+          duration: lesson.duration,
+          difficulty: lesson.difficulty,
+          metadata: lesson.metadata,
+          subtopic_id: subtopicId,
+          topic_id: topicId,
+          grade_id: gradeId,
+          order_index: lesson.order_index,
+          status: 'draft',
+          content: lesson.content || null
+        });
+
+      if (insertError) throw insertError;
+      this.trackInsertedId(dbConfig.tables.lessons, lessonId);
+      this.logger.log('SUCCESS', `Lesson "${lesson.title}" inserted`);
+    }
+
+    // Process questions and activities
     for (const question of lesson.questions) {
-      await this.processQuestion(question, lessonId)
+      await this.processQuestion(question, lessonId);
     }
 
     if (lesson.activities && lesson.activities.length > 0) {
-      await this.processActivities(lesson.activities, lessonId)
+      await this.processActivities(lesson.activities, lessonId);
     }
+  }
+
+  private isLessonDifferent(existing: any, newLesson: Lesson): boolean {
+    return existing.description !== newLesson.description ||
+            existing.content_type !== newLesson.content_type ||
+            existing.duration !== newLesson.duration ||
+            existing.difficulty !== newLesson.difficulty ||
+            JSON.stringify(existing.metadata) !== JSON.stringify(newLesson.metadata) ||
+            existing.order_index !== newLesson.order_index ||
+            existing.content !== newLesson.content;
+  }
+
+  private async processQuestion(question: Question, lessonId: string) {
+    // Check if question exists
+    const { data: existingQuestions, error: questionError } = await this.supabase
+      .from(dbConfig.tables.questions)
+      .select('*, exercise_prompts(*)')
+      .eq('original_id', question.id)
+      .eq('lesson_id', lessonId);
+
+    if (questionError) throw questionError;
+
+    let questionId: string;
+
+    if (existingQuestions && existingQuestions.length > 0) {
+      questionId = existingQuestions[0].id;
+      this.logger.log('INFO', `Question "${question.title}" already exists - checking for updates`);
+
+      // Check if question needs updating
+      if (this.isQuestionDifferent(existingQuestions[0], question)) {
+        const newData = {
+          prompt: question.prompt,
+          teacher_script: question.teacher_script,
+          sample_answer: question.sample_answer
+        };
+
+        const { error: updateError } = await this.supabase
+          .from(dbConfig.tables.questions)
+          .update({
+            title: question.title,
+            content: question.content,
+            type: this.mapQuestionType(question.type),
+            sub_type: question.type,
+            order_index: question.order_index,
+            metadata: question.metadata,
+            data: newData
+          })
+          .eq('id', questionId);
+
+        if (updateError) throw updateError;
+        this.logger.log('SUCCESS', `Question "${question.title}" updated`);
+      }
+    } else {
+      // Create new question
+      questionId = uuidv4();
+      const newData = {
+        prompt: question.prompt,
+        teacher_script: question.teacher_script,
+        sample_answer: question.sample_answer
+      };
+
+      const { error: insertError } = await this.supabase
+        .from(dbConfig.tables.questions)
+        .insert({
+          id: questionId,
+          original_id: question.id,
+          title: question.title,
+          content: question.content,
+          type: this.mapQuestionType(question.type),
+          sub_type: question.type,
+          lesson_id: lessonId,
+          order_index: question.order_index,
+          metadata: question.metadata,
+          data: newData
+        });
+
+      if (insertError) throw insertError;
+      this.trackInsertedId(dbConfig.tables.questions, questionId);
+      this.logger.log('SUCCESS', `Question "${question.title}" inserted`);
+    }
+
+    // Process exercise prompts
+    await this.processExercisePrompts(question.exercise_prompts, questionId, lessonId);
+  }
+
+  private isQuestionDifferent(existing: any, newQuestion: Question): boolean {
+    return existing.title !== newQuestion.title ||
+            existing.content !== newQuestion.content ||
+            existing.type !== this.mapQuestionType(newQuestion.type) ||
+            existing.sub_type !== newQuestion.type ||
+            existing.order_index !== newQuestion.order_index ||
+            JSON.stringify(existing.metadata) !== JSON.stringify(newQuestion.metadata) ||
+            existing.data?.prompt !== newQuestion.prompt ||
+            existing.data?.teacher_script !== newQuestion.teacher_script ||
+            existing.data?.sample_answer !== newQuestion.sample_answer;
   }
 
   private mapQuestionType(originalType: string): QuestionType {
@@ -521,48 +751,59 @@ class DatabaseInserter {
     return mappedType;
   }
 
-  private async processQuestion(question: Question, lessonId: string) {
-    const questionId = uuidv4();
-    const mappedType = this.mapQuestionType(question.type);
-    
-    const { error: questionError } = await this.supabase
-      .from(dbConfig.tables.questions)
-      .insert({
-        id: questionId,
-        title: question.title,
-        content: question.content,
-        type: mappedType,           // Main question type (from our core types)
-        sub_type: question.type,    // Original, more specific type
-        lesson_id: lessonId,
-        order_index: question.order_index,
-        metadata: question.metadata
-      });
-
-    if (questionError) throw questionError;
-    this.trackInsertedId(dbConfig.tables.questions, questionId);
-    this.logger.log('SUCCESS', `Question "${question.title}" inserted with type ${mappedType} and sub-type ${question.type}`);
-
-    for (const exercisePrompt of question.exercise_prompts) {
-      await this.processExercisePrompt(exercisePrompt, questionId);
-    }
-  }
-
-  private async processExercisePrompt(exercisePrompt: ExercisePrompt, questionId: string) {
-    const promptId = uuidv4()
-    const { error: promptError } = await this.supabase
+  private async processExercisePrompts(prompts: ExercisePrompt[], questionId: string, lessonId: string) {
+    // First get existing prompts
+    const { data: existingPrompts, error: fetchError } = await this.supabase
       .from(dbConfig.tables.exercise_prompts)
-      .insert({
-        id: promptId,
-        text: exercisePrompt.text,
-        narration: exercisePrompt.narration,
-        saytext: exercisePrompt.saytext,
-        order_index: exercisePrompt.order_index,
-        question_id: questionId
-      })
+      .select('*')
+      .eq('question_id', questionId);
 
-    if (promptError) throw promptError
-    this.trackInsertedId(dbConfig.tables.exercise_prompts, promptId)
-    this.logger.log('SUCCESS', `Exercise prompt inserted`)
+    if (fetchError) throw fetchError;
+
+    // Delete prompts that no longer exist
+    if (existingPrompts?.length > 0) {
+      const existingTexts = new Set(existingPrompts.map(p => p.text));
+      const newTexts = new Set(prompts.map(p => p.text));
+      
+      const promptsToDelete = existingPrompts.filter(p => !newTexts.has(p.text));
+      if (promptsToDelete.length > 0) {
+        const { error: deleteError } = await this.supabase
+          .from(dbConfig.tables.exercise_prompts)
+          .delete()
+          .in('id', promptsToDelete.map(p => p.id));
+
+        if (deleteError) throw deleteError;
+      }
+    }
+
+    // Insert or update prompts
+    for (const prompt of prompts) {
+      const existingPrompt = existingPrompts?.find(ep => 
+        ep.text === prompt.text &&
+        ep.narration === prompt.narration &&
+        ep.saytext === prompt.saytext &&
+        ep.order_index === prompt.order_index
+      );
+
+      if (!existingPrompt) {
+        const promptId = uuidv4();
+        const { error: insertError } = await this.supabase
+          .from(dbConfig.tables.exercise_prompts)
+          .insert({
+            id: promptId,
+            text: prompt.text,
+            narration: prompt.narration,
+            saytext: prompt.saytext,
+            order_index: prompt.order_index,
+            question_id: questionId,
+            lesson_id: lessonId
+          });
+
+        if (insertError) throw insertError;
+        this.trackInsertedId(dbConfig.tables.exercise_prompts, promptId);
+        this.logger.log('SUCCESS', `Exercise prompt "${prompt.text}" inserted`);
+      }
+    }
   }
 
   private validateActivityType(type: string): boolean {

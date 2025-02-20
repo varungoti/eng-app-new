@@ -566,10 +566,10 @@ export interface ClassStudent {
 export interface ExtendedLesson extends Lesson {
   color: string;
   unlocked: boolean;
+  difficulty: 'beginner' | 'intermediate' | 'advanced';
   completed: boolean;
   lessonNumber: string;
   totalTopics: string;
-  difficulty: string;
   subLessons: SubLesson[];
 }
 

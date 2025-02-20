@@ -20,8 +20,8 @@ import {
   Volume2,
   VolumeX,
   RefreshCw,
-  ArrowLeft,
-  ArrowRight,
+  ArrowLeft, 
+  ArrowRight, 
   Clock,
   PenTool,
   Info,
@@ -45,6 +45,7 @@ import confetti from 'canvas-confetti';
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSound } from 'use-sound';
+//import { Question } from '@/types/index.ts';
 
 // Types
 interface LessonState {
@@ -65,18 +66,17 @@ interface LessonState {
       data: {
         prompt?: string;
         teacherScript?: string;
-        options?: string[];
-      metadata?: {
-          imageUrl?: string;
-          videoUrl?: string;
+        followupPrompt?: string[];
+        sampleAnswer?: string;
       };
-  };
+      metadata: QuestionMetadata;
+      exercise_prompts: ExercisePrompt[];
     }>;
     exercise_prompts: Array<{
-    id: string;
+      id: string;
       text: string;
       media: string | null;
-      type: 'image' | 'gif' | 'video';
+      type: 'image' | 'video' | 'gif';
       narration: string | null;
       saytext: string | null;
     }>;
@@ -93,25 +93,97 @@ interface LessonState {
 interface ExercisePrompt {
   id: string;
   text: string;
+  content?: {
+    question: string;
+  };
   media: string | null;
-  type: 'multiple-choice' | 'writing' | 'speaking' | 'listening' | 'image' | 'video';
+  type: 'image' | 'video' | 'gif';
   narration: string | null;
   saytext: string | null;
   question_id: string | null;
-  correct: boolean | null;
-  content: {
-    question?: string;
-    options?: string[];
-    correctAnswer?: string;
-    instructions?: string;
-    hints?: string[];
+  order_index: number;
+  created_at?: string;  // Made optional
+  updated_at?: string;  // Made optional
+  metadata?: {
+    estimatedTime: number;
   };
-  metadata: {
-    targetSkills?: string[];
-    prerequisites?: string[];
-    learningObjectives?: string[];
-    estimatedTime?: number;
+}
+
+// First, update the Question interface to better match our data structure
+interface Question {
+  id: string;
+  title: string;
+  content: string;
+  type: string;
+  data: {
+    prompt?: string;
+    teacherScript?: string;
+    followupPrompt?: string[];
+    sampleAnswer?: string;
   };
+  metadata: QuestionMetadata;
+  exercise_prompts: ExercisePrompt[];
+}
+
+// Add a comprehensive QuestionMetadata interface
+interface QuestionMetadata {
+  // Common fields for all question types
+  difficulty?: 'easy' | 'medium' | 'hard';
+  timeLimit?: number;
+  points?: number;
+  tags?: string[];
+  
+  // Type-specific metadata
+  imageUrl?: string;
+  videoUrl?: string;
+  audioUrl?: string;
+  
+  // Multiple Choice specific
+  shuffleOptions?: boolean;
+  allowMultipleAnswers?: boolean;
+  
+  // Speaking specific
+  pronunciationFocus?: string[];
+  intonationPattern?: string;
+  stressPattern?: string;
+  
+  // Listening specific
+  audioTranscript?: string;
+  playbackSettings?: {
+    maxReplays?: number;
+    playbackSpeed?: number[];
+  };
+  
+  // Writing specific
+  minWords?: number;
+  maxWords?: number;
+  grammarFocus?: string[];
+  
+  // Reading specific
+  readingLevel?: string;
+  vocabularyFocus?: string[];
+  
+  // Interactive specific
+  interactionType?: 'drag-drop' | 'fill-blank' | 'matching';
+  interactionSettings?: {
+    allowHints?: boolean;
+    maxAttempts?: number;
+  };
+}
+
+interface LessonData {
+  id: string;
+  title: string;
+  content: string | null;
+  description: string | null;
+  topic_id: string | null;
+  subtopic_id: string;
+  contentheading: string | null;
+  voice_id: string | null;
+  exercise_prompts: ExercisePrompt[];
+  questions: Question[];
+  topic?: { title: string };
+  subtopic?: { title: string };
 }
 
 const LessonPage: React.FC = () => {
@@ -203,8 +275,7 @@ const LessonPage: React.FC = () => {
         
         toast({
           title: "🎉 Congratulations!",
-          description: "You've completed all exercises in this lesson!",
-          variant: "default"
+          description: "You've completed all exercises in this lesson!"
         });
         
         logger.info('Lesson completed', {
@@ -218,115 +289,86 @@ const LessonPage: React.FC = () => {
     }
   }, [exerciseProgress, lessonState?.lesson.exercise_prompts, overallProgress, toast]);
 
-  useEffect(() => {
-    const fetchLessonData = async () => {
-      try {
-        setIsLoading(true);
-        const searchParams = new URLSearchParams(location.search);
-        const lessonId = searchParams.get('lessonId');
-        const context = searchParams.get('context');
+  // Update the fetchLessonData function to properly structure the data
+  const fetchLessonData = async () => {
+    try {
+      setIsLoading(true);
+      const searchParams = new URLSearchParams(location.search);
+      const lessonId = searchParams.get('lessonId');
+      
+      if (!lessonId) {
+        throw new Error('No lesson ID provided');
+      }
 
-        // First try to get data from URL parameters
-        if (lessonId && context) {
-          try {
-            const decodedContext = JSON.parse(decodeURIComponent(context));
-            setLessonState({
-              lesson: decodedContext.lesson,
-              topic: { title: decodedContext.topic },
-              subtopic: { title: decodedContext.subtopic }
-            });
-            
-            // Notify parent that lesson is loaded
-            window.parent.postMessage({ 
-              type: 'LESSON_LOADED', 
-              lessonId,
-              timestamp: decodedContext.timestamp 
-            }, '*');
-            
-            logger.info('Lesson data loaded from URL context', {
-              source: 'LessonPage',
-              context: { 
-                lessonId,
-                timestamp: decodedContext.timestamp
-              }
-            });
-            setIsLoading(false);
-            return;
-          } catch (parseError) {
-            logger.warn('Failed to parse context from URL', {
-              source: 'LessonPage',
-              context: { error: parseError }
-            });
-          }
-        }
-
-        // If URL data is not available or invalid, try to fetch from Supabase
-        if (lessonId) {
-          // Ensure we have a valid session before making the request
-          const { data: { session } } = await supabase.auth.getSession();
-          if (!session) {
-            throw new Error('No authenticated session available');
-          }
-
-          const { data: lessonData, error: lessonError } = await supabase
+      // Fetch lesson with questions
+      const { data: lessonData, error: lessonError } = (await supabase
         .from('lessons')
         .select(`
-              *,
-              topic:topics(title),
-              subtopic:subtopics(title),
-              questions(
-                id, title, content, type,
-                data
-              ),
-              exercise_prompts(*)
+          *,
+          topic:topics(title),
+          subtopic:subtopics(title),
+          questions(
+            id, 
+            title, 
+            content, 
+            type,
+            data,
+            metadata,
+          )
         `)
         .eq('id', lessonId)
-            .single();
+        .single()) as { data: LessonData; error: any };
 
-          if (lessonError) throw lessonError;
+      if (lessonError) throw lessonError;
 
-          setLessonState({
-            lesson: lessonData,
-            topic: lessonData.topic,
-            subtopic: lessonData.subtopic
-          });
+      // Fetch exercise prompts for each question
+      const questionsWithPrompts = await Promise.all(
+        lessonData.questions.map(async (question: Question) => {
+          const { data: promptsData, error: promptsError } = await supabase
+            .from('exercise_prompts')
+            .select('*')
+            .eq('question_id', question.id)
+            .order('order_index');
 
-          // Notify parent that lesson is loaded
-          window.parent.postMessage({ 
-            type: 'LESSON_LOADED', 
-            lessonId,
-            timestamp: new Date().toISOString()
-          }, '*');
+          if (promptsError) throw promptsError;
 
-          logger.info('Lesson data fetched successfully', {
-            source: 'LessonPage',
-            context: { 
-              lessonId,
-              hasAuth: !!session
-            }
-          });
-        } else {
-          throw new Error('No lesson ID provided');
-        }
-      } catch (error) {
-        logger.error('Error fetching lesson data', {
-          source: 'LessonPage',
-          context: { error }
-        });
-        setError(error instanceof Error ? error.message : 'Failed to load lesson');
-        
-        // Notify parent of error
-        window.parent.postMessage({ 
-          type: 'LESSON_ERROR', 
-          error: error instanceof Error ? error.message : 'Failed to load lesson'
-        }, '*');
-      } finally {
-        setIsLoading(false);
-      }
-    };
+          return {
+            ...question,
+            data: {
+              prompt: question.data?.prompt || '',
+              teacherScript: question.data?.teacherScript || '',
+              followupPrompt: question.data?.followupPrompt || [],
+              sampleAnswer: question.data?.sampleAnswer || '',
+            },
+            exercise_prompts: promptsData || []
+          };
+        })
+      );
 
-    fetchLessonData();
-  }, [location.search]);
+      setLessonState({
+        lesson: {
+          id: lessonData?.id || '',
+          title: lessonData?.title || '',
+          content: lessonData?.content || null,
+          description: lessonData?.description || null,
+          topic_id: lessonData?.topic_id || null,
+          subtopic_id: lessonData?.subtopic_id || '',
+          contentheading: lessonData?.contentheading || null,
+          voice_id: lessonData?.voice_id || null,
+          exercise_prompts: lessonData?.exercise_prompts || [],
+          questions: questionsWithPrompts as Question[],
+        },
+        topic: lessonData.topic,
+        subtopic: lessonData.subtopic
+      });
+
+    } catch (error) {
+      console.error('Error fetching lesson data:', error);
+      setError(error instanceof Error ? error.message : 'Failed to load lesson');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // Add message listener for iframe communication
   useEffect(() => {
@@ -709,6 +751,99 @@ const LessonPage: React.FC = () => {
     }
   }, [activeExerciseIndex]);
 
+  // Update the question rendering part
+  const renderQuestion = (question: Question) => {
+    if (!question.data) return null;
+
+    return (
+      <div className="space-y-4">
+        {/* Question Title and Type */}
+        <div className="flex items-center gap-2">
+          <Badge variant="outline">{question.type}</Badge>
+          <h3 className="text-lg font-medium">{question.title}</h3>
+        </div>
+
+        {/* Question Content */}
+        <div className="prose dark:prose-invert max-w-none">
+          {/* Prompt */}
+          {question.data.prompt && (
+            <div className="bg-card p-4 rounded-lg">
+              <h4 className="font-medium mb-2">Prompt:</h4>
+              <p>{question.data.prompt}</p>
+            </div>
+          )}
+
+          {/* Teacher Script */}
+          {question.data.teacherScript && (
+            <div className="bg-muted p-4 rounded-lg mt-4">
+              <h4 className="font-medium mb-2">Teacher Script:</h4>
+              <p>{question.data.teacherScript}</p>
+            </div>
+          )}
+
+          {/* Sample Answer */}
+          {question.data.sampleAnswer && (
+            <div className="bg-primary/5 p-4 rounded-lg mt-4">
+              <h4 className="font-medium mb-2">Sample Answer:</h4>
+              <p>{question.data.sampleAnswer}</p>
+            </div>
+          )}
+        </div>
+
+        {/* Exercise Prompts */}
+        {question.exercise_prompts?.length > 0 && (
+          <div className="mt-6 space-y-4">
+            <h4 className="font-medium">Exercise Prompts:</h4>
+            {question.exercise_prompts.map((prompt, idx) => (
+              <Card key={idx} className="bg-card">
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+                        <span className="font-medium">{idx + 1}</span>
+                      </div>
+                      <div>
+                        <CardTitle className="text-base">{prompt.text}</CardTitle>
+                        {prompt.type && (
+                          <CardDescription>{prompt.type}</CardDescription>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  {prompt.narration && (
+                    <div className="text-sm text-muted-foreground">
+                      {prompt.narration}
+                    </div>
+                  )}
+                  {prompt.media && (
+                    <div className="mt-4">
+                      {prompt.type === 'image' && (
+                        <img 
+                          src={prompt.media} 
+                          alt={prompt.text}
+                          className="rounded-lg max-h-48 object-cover"
+                        />
+                      )}
+                      {prompt.type === 'video' && (
+                        <video
+                          src={prompt.media}
+                          controls
+                          className="w-full rounded-lg"
+                        />
+                      )}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -818,7 +953,7 @@ const LessonPage: React.FC = () => {
                         )}
               </Button>
                     </motion.div>
-                    <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
+                    <motion.div whileHover={{ scale: 1.2 }} whileTap={{ scale: 0.95 }}>
               <Button 
                         variant="ghost"
                         size="icon"
@@ -896,37 +1031,13 @@ const LessonPage: React.FC = () => {
                           transition={{ duration: 0.3 }}
                         >
                           <CardContent className="p-6">
-                            <p className="text-gray-600 dark:text-gray-300 mb-4">
-                              {question.content}
-                            </p>
-                            {question.data?.options && (
-                              <div className="space-y-2">
-                                {question.data.options.map((option: string, optIndex: number) => (
-                                  <motion.div
-                                    key={optIndex}
-                                    whileHover={{ scale: 1.01 }}
-                                    whileTap={{ scale: 0.99 }}
-                                  >
-                                    <Button
-                                      variant="outline"
-                                      className={cn(
-                                        "w-full justify-start text-left p-4 h-auto",
-                                        selectedAnswers[question.id] === option && "border-primary bg-primary/5"
-                                      )}
-                                      onClick={() => handleAnswerSelect(question.id, option)}
-                                    >
-                                      <div className="flex items-center gap-4">
-                                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                                          {String.fromCharCode(65 + optIndex)}
-                                        </div>
-                                        <span>{option}</span>
-                                      </div>
-                                    </Button>
-                          </motion.div>
-                        ))}
-                      </div>
-                            )}
-                </CardContent>
+                            {renderQuestion({
+                              ...question,
+                              data: {
+                                ...question.data
+                              }
+                            })}
+                          </CardContent>
                         </motion.div>
                       )}
                     </AnimatePresence>
@@ -1050,7 +1161,7 @@ const LessonPage: React.FC = () => {
                                                 Instructions
                                               </h4>
                                               <p className="text-sm text-muted-foreground">
-                                                {transformedPrompt.content?.instructions || transformedPrompt.narration || 'Complete the exercise below.'}
+                                                {transformedPrompt.narration || 'Complete the exercise below.'}
                                               </p>
                                             </motion.div>
 
@@ -1082,9 +1193,9 @@ const LessonPage: React.FC = () => {
                                               </motion.div>
                                             )}
 
-                                            {/* Exercise Input Based on Type */}
+                                             {/*Exercise Input Based on Type
                                             <div className="space-y-4">
-                                              {transformedPrompt.type === 'multiple-choice' && transformedPrompt.content?.options && (
+                                              {question.type === 'multiple-choice' && question.content?.options && (
                                                 <RadioGroup
                                                   value={exerciseResponses[transformedPrompt.id] || ''}
                                                   onValueChange={(value: string) => {
@@ -1138,7 +1249,7 @@ const LessonPage: React.FC = () => {
                                                 </RadioGroup>
                                               )}
 
-                                              {transformedPrompt.type === 'writing' && (
+                                              {question.type === 'writing' && (
                               <div className="space-y-4">
                                                   <Textarea
                                                     placeholder="Type your answer here..."
@@ -1184,7 +1295,7 @@ const LessonPage: React.FC = () => {
                                               )}
 
                                               {/* Hints Section */}
-                                              {transformedPrompt.content?.hints && transformedPrompt.content.hints.length > 0 && (
+                                              {/* {transformedPrompt.content?.hints && transformedPrompt.content.hints.length > 0 && (
                                                 <div className="mt-6">
                                                   <Collapsible>
                                                     <CollapsibleTrigger asChild>
@@ -1216,7 +1327,7 @@ const LessonPage: React.FC = () => {
                                                   </Collapsible>
                               </div>
                             )}
-                                            </div>
+                                            </div> */} 
                           </div>
                         </CardContent>
                                       </motion.div>
@@ -1250,7 +1361,7 @@ const LessonPage: React.FC = () => {
                     <AnimatePresence>
                       {lessonState?.lesson.questions?.map((question, index) => (
                         <React.Fragment key={`media-${index}`}>
-                          {question.data?.metadata?.imageUrl && (
+                          {question.metadata?.imageUrl && (
                             <motion.div
                               initial={{ opacity: 0, scale: 0.9 }}
                               animate={{ opacity: 1, scale: 1 }}
@@ -1260,7 +1371,7 @@ const LessonPage: React.FC = () => {
                             >
                               <Card className="overflow-hidden">
                                 <img
-                                  src={question.data.metadata.imageUrl}
+                                  src={question.metadata.imageUrl}
                                   alt={`Media ${index + 1}`}
                                   className="w-full h-48 object-cover transition-transform hover:scale-105"
                                   loading="lazy"
@@ -1268,7 +1379,7 @@ const LessonPage: React.FC = () => {
                               </Card>
                             </motion.div>
                           )}
-                          {question.data?.metadata?.videoUrl && (
+                          {question.metadata?.videoUrl && (
                             <motion.div
                               initial={{ opacity: 0, scale: 0.9 }}
                               animate={{ opacity: 1, scale: 1 }}
@@ -1276,7 +1387,7 @@ const LessonPage: React.FC = () => {
                             >
                               <Card className="overflow-hidden">
                                 <video
-                                  src={question.data.metadata.videoUrl}
+                                  src={question.metadata.videoUrl}
                                   controls
                                   className="w-full"
                                   preload="metadata"
