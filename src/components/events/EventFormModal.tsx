@@ -1,7 +1,7 @@
 import React from 'react';
 import { X } from 'lucide-react';
 import type { Event } from './EventCard';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../ui/dialog';
 
 interface EventFormModalProps {
   event?: Event;
@@ -37,6 +37,9 @@ const EventFormModal: React.FC<EventFormModalProps> = ({
           <DialogTitle>
             {event ? 'Edit Event' : 'Add New Event'}
           </DialogTitle>
+          <DialogDescription>
+            Fill in the details below to {event ? 'update the' : 'create a new'} event.
+          </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4 pt-4">
@@ -75,6 +78,7 @@ const EventFormModal: React.FC<EventFormModalProps> = ({
               <input
                 type="datetime-local"
                 name="startDate"
+                aria-label="Event start date and time"
                 defaultValue={event?.startDate}
                 required
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm"
@@ -87,9 +91,12 @@ const EventFormModal: React.FC<EventFormModalProps> = ({
               <input
                 type="datetime-local"
                 name="endDate"
+                aria-label="Event end date and time"
                 defaultValue={event?.endDate}
                 required
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm"
+
+
               />
             </div>
           </div>
@@ -115,6 +122,7 @@ const EventFormModal: React.FC<EventFormModalProps> = ({
             <input
               type="number"
               name="attendees"
+              aria-label="Expected number of attendees"
               defaultValue={event?.attendees}
               required
               min="0"
@@ -129,9 +137,11 @@ const EventFormModal: React.FC<EventFormModalProps> = ({
               </label>
               <select
                 name="type"
+                aria-label="Event type"
                 defaultValue={event?.type}
                 required
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm"
+
               >
                 <option value="academic">Academic</option>
                 <option value="administrative">Administrative</option>
@@ -146,9 +156,11 @@ const EventFormModal: React.FC<EventFormModalProps> = ({
               </label>
               <select
                 name="status"
+                aria-label="Event status"
                 defaultValue={event?.status}
                 required
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm"
+
               >
                 <option value="upcoming">Upcoming</option>
                 <option value="ongoing">Ongoing</option>

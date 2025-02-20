@@ -1,16 +1,22 @@
-import { DEBUG_CONFIG } from './config';
+import { LogLevel } from '../types/logging';
 
-type LogLevel = 'debug' | 'info' | 'warn' | 'error';
-
-interface LogOptions {
+export interface LogContext {
+  source?: string;
   context?: Record<string, any>;
-  source: string;
+  error?: Error | unknown;
+  level?: LogLevel;
+  timestamp?: string;
 }
+
+type LogMessage = string | { message: string; [key: string]: any };
 
 class Logger {
   private static instance: Logger;
-  
-  private constructor() {}
+  private debugEnabled: boolean;
+
+  private constructor() {
+    this.debugEnabled = process.env.NODE_ENV === 'development';
+  }
 
   public static getInstance(): Logger {
     if (!Logger.instance) {
@@ -19,95 +25,55 @@ class Logger {
     return Logger.instance;
   }
 
-  private safeStringify(value: unknown): string {
-    try {
-      if (value instanceof Error) {
-        return JSON.stringify({
-          message: value.message,
-          name: value.name,
-          stack: value.stack
-        });
-      }
-      if (typeof value === 'string') {
-        return value;
-      }
-      if (value && typeof value === 'object') {
-        return JSON.stringify(value, (key, val) => {
-          // Handle circular references and non-serializable objects
-          if (val instanceof Error) {
-            return {
-              message: val.message,
-              name: val.name,
-              stack: val.stack
-            };
-          }
-          if (typeof val === 'object' && val !== null) {
-            // Remove any Symbol properties
-            const clean = { ...val };
-            Object.getOwnPropertySymbols(val).forEach(sym => {
-              delete clean[sym as any];
-            });
-            return clean;
-          }
-          return val;
-        });
-      }
-      return String(value);
-    } catch {
-      return '[Unable to stringify value]';
-    }
-  }
-
-  private log(level: LogLevel, message: string, options: LogOptions) {
-    const { context, source } = options;
-    
+  private formatMessage(message: LogMessage, context?: LogContext): string {
     const timestamp = new Date().toISOString();
-    const logPrefix = `[${timestamp}] [${source}] [${level.toUpperCase()}]`;
+    const source = context?.source ? `[${context.source}]` : '';
+    const level = context?.level ? `[${context.level}]` : '';
+    const emoji = this.getLogEmoji(context?.level);
     
-    if (DEBUG_CONFIG.enabled) {
-      if (level === 'error') {
-        console.group(`${logPrefix} 🔴 Error`);
-        console.error(message);
-        if (context?.error) {
-          console.error('Error details:', this.safeStringify(context.error));
-        }
-        if (context) {
-          const safeContext = Object.entries(context).reduce((acc, [key, val]) => ({
-            ...acc,
-            [key]: this.safeStringify(val)
-          }), {});
-          console.log('Context:', safeContext);
-        }
-        console.groupEnd();
-      } else if (level === 'warn') {
-        console.group(`${logPrefix} ⚠️ Warning`);
-        console.warn(message);
-        if (context) console.log('Context:', this.safeStringify(context));
-        console.groupEnd();
-      } else if (level === 'info' || level === 'debug') {
-        console.group(`${logPrefix} ℹ️ ${level}`);
-        console.log(message);
-        if (context) console.log('Context:', this.safeStringify(context));
-        console.groupEnd();
-      }
+    const formattedMessage = typeof message === 'string' ? message : message.message;
+    
+    return `[${timestamp}] ${formattedMessage} ${level} ${emoji} ${source}`;
+  }
+
+  private getLogEmoji(level?: LogLevel): string {
+    switch (level) {
+      case 'ERROR': return '❌';
+      case 'WARN': return '⚠️';
+      case 'INFO': return '✅👍🏻';
+      case 'DEBUG': return '🔍🐞';
+      default: return '';
     }
   }
 
-  public debug(message: string, options: LogOptions) {
-    this.log('debug', message, options);
+  public debug(message: LogMessage, context?: LogContext): void {
+    if (!this.debugEnabled) return;
+    console.debug(this.formatMessage(message, { ...context, level: 'DEBUG' }));
   }
 
-  public info(message: string, options: LogOptions) {
-    this.log('info', message, options);
+  public info(message: LogMessage, context?: LogContext): void {
+    console.info(this.formatMessage(message, { ...context, level: 'INFO' }));
   }
 
-  public warn(message: string, options: LogOptions) {
-    this.log('warn', message, options);
+  public warn(message: LogMessage, context?: LogContext): void {
+    console.warn(this.formatMessage(message, { ...context, level: 'WARN' }));
   }
 
-  public error(message: string, options: LogOptions) {
-    this.log('error', message, options);
+  public error(message: LogMessage, context?: LogContext): void {
+    console.error(this.formatMessage(message, { ...context, level: 'ERROR' }));
   }
 }
 
 export const logger = Logger.getInstance();
+
+export const createLogger = (namespace: string) => ({
+  info: (message: string, context?: LogContext) => {
+    console.log(`[${namespace}] ${message}`, context || '');
+  },
+  error: (message: string, context?: LogContext) => {
+    console.error(`[${namespace}] ${message}`, context || '');
+  },
+  warn: (message: string, context?: LogContext) => {
+    console.warn(`[${namespace}] ${message}`, context || '');
+  }
+});

@@ -1,0 +1,46 @@
+{
+    "sourceFile": "src/app/schools/[schoolId]/onboarding/page.tsx",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 7,
+            "patches": [
+                {
+                    "date": 1739438105112,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1739438232623,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -3,9 +3,9 @@\n import { useEffect } from 'react';\r\n import { useParams } from 'next/navigation';\r\n import { useOnboarding } from '@/hooks/useOnboarding';\r\n import OnboardingProgress from '@/components/OnboardingProgress';\r\n-import { OnboardingSteps  from '@/components/school/OnboardingSteps';\r\n+import OnboardingSteps from '@/components/school/OnboardingSteps';\r\n import { LoadingSpinner } from '@/components/ui/loading-spinner';\r\n \r\n export default function SchoolOnboardingPage() {\r\n   const { schoolId } = useParams();\r\n@@ -74,9 +74,9 @@\n \r\n       {/* Onboarding Steps */}\r\n       <OnboardingSteps\r\n         schoolId={schoolId as string}\r\n-        currentStep={stats?.completedTasks || 0}\r\n+        step={stats?.completedTasks || 0}\r\n         onStepComplete={refresh}\r\n       />\r\n \r\n       {/* Task Progress */}\r\n"
+                },
+                {
+                    "date": 1739438244269,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -74,9 +74,9 @@\n \r\n       {/* Onboarding Steps */}\r\n       <OnboardingSteps\r\n         schoolId={schoolId as string}\r\n-        step={stats?.completedTasks || 0}\r\n+        currentStep={stats?.completedTasks || 0}\r\n         onStepComplete={refresh}\r\n       />\r\n \r\n       {/* Task Progress */}\r\n"
+                },
+                {
+                    "date": 1739438263956,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -74,9 +74,8 @@\n \r\n       {/* Onboarding Steps */}\r\n       <OnboardingSteps\r\n         schoolId={schoolId as string}\r\n-        currentStep={stats?.completedTasks || 0}\r\n         onStepComplete={refresh}\r\n       />\r\n \r\n       {/* Task Progress */}\r\n"
+                },
+                {
+                    "date": 1739438295586,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -74,8 +74,9 @@\n \r\n       {/* Onboarding Steps */}\r\n       <OnboardingSteps\r\n         schoolId={schoolId as string}\r\n+        currentStep={stats?.completedTasks || 0}\r\n         onStepComplete={refresh}\r\n       />\r\n \r\n       {/* Task Progress */}\r\n"
+                },
+                {
+                    "date": 1739438309453,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -74,9 +74,12 @@\n \r\n       {/* Onboarding Steps */}\r\n       <OnboardingSteps\r\n         schoolId={schoolId as string}\r\n-        currentStep={stats?.completedTasks || 0}\r\n+<<<<<<< Tabnine <<<<<<<\r\n+        currentStep={stats?.completedTasks || 0}//-\r\n+        currentStep={stats?.completedTasks ?? 0}//+\r\n+>>>>>>> Tabnine >>>>>>>// {\"conversationId\":\"916c80f2-b832-4853-bbb4-369a0f4647da\",\"source\":\"instruct\"}\r\n         onStepComplete={refresh}\r\n       />\r\n \r\n       {/* Task Progress */}\r\n"
+                },
+                {
+                    "date": 1739438315914,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -74,12 +74,9 @@\n \r\n       {/* Onboarding Steps */}\r\n       <OnboardingSteps\r\n         schoolId={schoolId as string}\r\n-<<<<<<< Tabnine <<<<<<<\r\n-        currentStep={stats?.completedTasks || 0}//-\r\n-        currentStep={stats?.completedTasks ?? 0}//+\r\n->>>>>>> Tabnine >>>>>>>// {\"conversationId\":\"916c80f2-b832-4853-bbb4-369a0f4647da\",\"source\":\"instruct\"}\r\n+        currentStep={stats?.completedTasks ?? 0}\r\n         onStepComplete={refresh}\r\n       />\r\n \r\n       {/* Task Progress */}\r\n"
+                },
+                {
+                    "date": 1739438326328,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -74,9 +74,12 @@\n \r\n       {/* Onboarding Steps */}\r\n       <OnboardingSteps\r\n         schoolId={schoolId as string}\r\n-        currentStep={stats?.completedTasks ?? 0}\r\n+<<<<<<< Tabnine <<<<<<<\r\n+        currentStep={stats?.completedTasks || 0}//-\r\n+        currentStep={stats?.completedTasks ?? 0}//+\r\n+>>>>>>> Tabnine >>>>>>>// {\"conversationId\":\"916c80f2-b832-4853-bbb4-369a0f4647da\",\"source\":\"instruct\"}\r\n         onStepComplete={refresh}\r\n       />\r\n \r\n       {/* Task Progress */}\r\n"
+                }
+            ],
+            "date": 1739438105112,
+            "name": "Commit-0",
+            "content": "\"use client\";\r\n\r\nimport { useEffect } from 'react';\r\nimport { useParams } from 'next/navigation';\r\nimport { useOnboarding } from '@/hooks/useOnboarding';\r\nimport OnboardingProgress from '@/components/OnboardingProgress';\r\nimport { OnboardingSteps  from '@/components/school/OnboardingSteps';\r\nimport { LoadingSpinner } from '@/components/ui/loading-spinner';\r\n\r\nexport default function SchoolOnboardingPage() {\r\n  const { schoolId } = useParams();\r\n  const { \r\n    tasks, \r\n    progress, \r\n    stats, \r\n    loading, \r\n    error,\r\n    updateProgress,\r\n    refresh \r\n  } = useOnboarding(schoolId as string);\r\n\r\n  useEffect(() => {\r\n    refresh();\r\n  }, [schoolId]);\r\n\r\n  if (loading) {\r\n    return <LoadingSpinner />;\r\n  }\r\n\r\n  if (error) {\r\n    return (\r\n      <div className=\"p-4 bg-red-50 rounded-lg\">\r\n        <p className=\"text-red-600\">{error}</p>\r\n      </div>\r\n    );\r\n  }\r\n\r\n  return (\r\n    <div className=\"max-w-4xl mx-auto py-8 px-4\">\r\n      <div className=\"mb-8\">\r\n        <h1 className=\"text-2xl font-bold text-gray-900\">School Onboarding</h1>\r\n        <p className=\"text-gray-600\">Complete these steps to set up your school</p>\r\n      </div>\r\n\r\n      {/* Progress Overview */}\r\n      <div className=\"mb-8 p-4 bg-white rounded-lg shadow\">\r\n        <div className=\"grid grid-cols-4 gap-4\">\r\n          <div>\r\n            <p className=\"text-sm text-gray-600\">Overall Progress</p>\r\n            <p className=\"text-2xl font-semibold text-primary\">\r\n              {Math.round(stats?.progress || 0)}%\r\n            </p>\r\n          </div>\r\n          <div>\r\n            <p className=\"text-sm text-gray-600\">Completed Tasks</p>\r\n            <p className=\"text-2xl font-semibold text-green-600\">\r\n              {stats?.completedTasks || 0}\r\n            </p>\r\n          </div>\r\n          <div>\r\n            <p className=\"text-sm text-gray-600\">Pending Tasks</p>\r\n            <p className=\"text-2xl font-semibold text-yellow-600\">\r\n              {stats?.pendingTasks || 0}\r\n            </p>\r\n          </div>\r\n          <div>\r\n            <p className=\"text-sm text-gray-600\">Required Remaining</p>\r\n            <p className=\"text-2xl font-semibold text-red-600\">\r\n              {stats?.remainingRequired || 0}\r\n            </p>\r\n          </div>\r\n        </div>\r\n      </div>\r\n\r\n      {/* Onboarding Steps */}\r\n      <OnboardingSteps\r\n        schoolId={schoolId as string}\r\n        currentStep={stats?.completedTasks || 0}\r\n        onStepComplete={refresh}\r\n      />\r\n\r\n      {/* Task Progress */}\r\n      <div className=\"mt-8\">\r\n        <OnboardingProgress\r\n          tasks={tasks}\r\n          progress={progress}\r\n          onUpdateProgress={updateProgress}\r\n        />\r\n      </div>\r\n    </div>\r\n  );\r\n} "
+        }
+    ]
+}

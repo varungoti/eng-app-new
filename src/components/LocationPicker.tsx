@@ -1,3 +1,5 @@
+/// <reference types="@types/google.maps" />
+
 import React, { useState, useRef, useEffect } from 'react';
 import { GoogleMap, Marker } from '@react-google-maps/api';
 import { Search } from 'lucide-react';
@@ -11,7 +13,7 @@ interface LocationPickerProps {
 
 const LocationPicker: React.FC<LocationPickerProps> = ({ onLocationSelect, initialLocation }) => {
   const [marker, setMarker] = useState<google.maps.LatLng | null>(
-    initialLocation ? new google.maps.LatLng(initialLocation.lat, initialLocation.lng) : null
+    initialLocation && window.google ? new window.google.maps.LatLng(initialLocation.lat, initialLocation.lng) : null
   );
   const [error, setError] = useState<string | null>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -146,7 +148,8 @@ const LocationPicker: React.FC<LocationPickerProps> = ({ onLocationSelect, initi
             setMarker(e.latLng);
             
             // Reverse geocode to get address
-            const geocoder = new google.maps.Geocoder();
+            if (!window.google) return;
+            const geocoder = new window.google.maps.Geocoder();
             geocoder.geocode({ location: e.latLng }, (results, status) => {
               if (status === 'OK' && results?.[0]) {
                 const address = results[0].formatted_address;
@@ -154,8 +157,8 @@ const LocationPicker: React.FC<LocationPickerProps> = ({ onLocationSelect, initi
                   searchInputRef.current.value = address;
                 }
                 onLocationSelect({
-                  lat: e.latLng.lat(),
-                  lng: e.latLng.lng(),
+                  lat: e.latLng!.lat(),
+                  lng: e.latLng!.lng(),
                   address,
                 });
                 setError(null);
@@ -163,14 +166,14 @@ const LocationPicker: React.FC<LocationPickerProps> = ({ onLocationSelect, initi
                 logger.info('Location selected from map click', {
                   context: {
                     address,
-                    location: e.latLng.toJSON()
+                    location: e.latLng!.toJSON()
                   },
                   source: 'LocationPicker'
                 });
               } else {
                 setError('Failed to get address for selected location');
                 logger.error('Geocoding failed', {
-                  context: { status, location: e.latLng.toJSON() },
+                  context: { status, location: e.latLng!.toJSON() },
                   source: 'LocationPicker'
                 });
               }

@@ -13,6 +13,7 @@ const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   const { user, loading } = auth;
   const mountedRef = useRef(true);
   const [loadingProgress, setLoadingProgress] = React.useState(0);
+  const initialLoadRef = useRef(true);
 
   useEffect(() => {
     return () => {
@@ -20,36 +21,107 @@ const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => 
     };
   }, []);
 
-  // Redirect to login if not authenticated
+  // Handle route persistence
   useEffect(() => {
-    if (!user && !loading) {
-      logger.debug('Redirecting to login', {
-        context: {
-          from: location.pathname,
-          reason: 'No authenticated user'
+    if (user && !loading && initialLoadRef.current) {
+      const lastRoute = localStorage.getItem('lastRoute');
+      const currentPath = location.pathname + location.search;
+      
+      // Don't redirect if we're already on the lastRoute or if it's a lesson page
+      if (lastRoute && 
+          lastRoute !== currentPath && 
+          lastRoute !== '/login' && 
+          !currentPath.includes('/lessons/')) {
+        logger.debug('Restoring last route', {
+          context: {
+            from: currentPath,
+            to: lastRoute,
+            userId: user.id
+          },
+          source: 'PrivateRoute'
+        });
+        navigate(lastRoute, { replace: true });
+      }
+      initialLoadRef.current = false;
+    }
+  }, [user, loading, location, navigate]);
+
+  // Store current route with enhanced persistence
+  useEffect(() => {
+    if (user && !loading && location.pathname !== '/login') {
+      const currentPath = location.pathname + location.search;
+      
+      // Store route in both localStorage and sessionStorage for redundancy
+      localStorage.setItem('lastRoute', currentPath);
+      sessionStorage.setItem('currentRoute', currentPath);
+      
+      // Store additional context for lesson pages
+      if (currentPath.includes('/lessons/')) {
+        const lessonContext = {
+          path: currentPath,
+          userId: user.id,
+          timestamp: new Date().toISOString(),
+          role: user.role
+        };
+        sessionStorage.setItem('lessonContext', JSON.stringify(lessonContext));
+      }
+
+      logger.debug('Route stored', {
+        context: { 
+          route: currentPath,
+          isLessonPage: currentPath.includes('/lessons/'),
+          userId: user.id,
+          role: user.role
         },
         source: 'PrivateRoute'
       });
-
-      navigate('/login', { state: { from: location }, replace: true });
-      // Clear cache only when redirecting
-      queryClient.clear();
     }
-    
-  }, [user, loading, location, navigate, queryClient]);
+  }, [location, user, loading]);
 
+  // Enhanced session check
   useEffect(() => {
-    // Only log authentication failure once per session
-    if (!user && !loading && !sessionStorage.getItem('auth_redirect_logged')) {
-      sessionStorage.setItem('auth_redirect_logged', 'true');
-      // Clear query cache on auth failure
-      queryClient.clear();
-      logger.warn('Authentication required', {
-        context: { path: location.pathname },
-        source: 'PrivateRoute'
-      });
-    }
-  }, [user, loading, location.pathname, queryClient]);
+    const checkSession = async () => {
+      if (!user && !loading) {
+        const currentPath = location.pathname + location.search;
+        const isLessonPage = currentPath.includes('/lessons/');
+        
+        // Try to recover session from storage
+        const lessonContext = sessionStorage.getItem('lessonContext');
+        const currentRoute = sessionStorage.getItem('currentRoute');
+        
+        if (isLessonPage && lessonContext) {
+          logger.info('Attempting to recover lesson session', {
+            context: {
+              path: currentPath,
+              lessonContext: JSON.parse(lessonContext)
+            },
+            source: 'PrivateRoute'
+          });
+        }
+
+        logger.debug('Session check', {
+          context: {
+            path: currentPath,
+            isLessonPage,
+            hasLessonContext: !!lessonContext,
+            currentRoute
+          },
+          source: 'PrivateRoute'
+        });
+
+        // Store the attempted route before redirecting
+        if (location.pathname !== '/login') {
+          localStorage.setItem('lastRoute', currentPath);
+          sessionStorage.setItem('redirectPath', currentPath);
+        }
+
+        navigate('/login', { state: { from: location }, replace: true });
+        queryClient.clear();
+      }
+    };
+
+    checkSession();
+  }, [user, loading, location, navigate, queryClient]);
 
   // Handle loading state
   if (loading) {
@@ -61,7 +133,7 @@ const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => 
         timeout={15000}
         showRetry={true}
         onRetry={() => {
-          queryClient.invalidateQueries(['auth']);
+          queryClient.invalidateQueries({ queryKey: ['auth'] });
           window.location.reload();
         }}
       />

@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/lib/monitoring/types.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1739013942035,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1739013942035,
+            "name": "Commit-0",
+            "content": "import type { SupabaseClient } from '@supabase/supabase-js';\r\nimport type { Database } from '../database.types';\r\n\r\nexport interface MonitoringConfig {\r\n  supabase?: SupabaseClient<Database>;\r\n  enableLogging?: boolean;\r\n  logLevel?: 'debug' | 'info' | 'warn' | 'error';\r\n  sampleRate?: number;\r\n}\r\n\r\nexport interface LoadingState {\r\n  isLoading: boolean;\r\n  startTime?: number;\r\n  duration?: number;\r\n}\r\n\r\nexport interface DataFlowMetrics {\r\n  operationCount: number;\r\n  errorCount: number;\r\n  averageDuration: number;\r\n}\r\n\r\nexport interface DataLoadMetrics {\r\n  recordCount: number;\r\n  errorCount: number;\r\n  averageDuration: number;\r\n}\r\n\r\nexport interface DatabaseMetrics {\r\n  connectionStatus: 'error' | 'healthy' | 'degraded';\r\n  lastCheckTime: Date;\r\n  responseTime: number;\r\n  count: number;\r\n  errorCount: number;\r\n}\r\n\r\nexport interface DataFlowMonitor {\r\n  trackDataLoad: (loadId: string, metadata: { source: string; recordCount: number }) => Promise<void>;\r\n  getFlowMetrics: (flowId: string) => Promise<any[]>;\r\n  startOperation: (type: string, name: string, metadata?: any) => string;\r\n  endOperation: (opId: string) => void;\r\n}"
+        }
+    ]
+}

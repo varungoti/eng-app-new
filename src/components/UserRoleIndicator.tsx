@@ -19,16 +19,10 @@ const UserRoleIndicator: React.FC = () => {
       setIsOpen(false); // Close dropdown immediately
       await changeRole(newRole);
       
-      logger.info('Role change initiated', {
-        context: { from: user.role, to: newRole },
-        source: 'UserRoleIndicator'
-      });
+      logger.info(`Role change initiated from ${user.role} to ${newRole}`, 'UserRoleIndicator');
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Failed to change role';
-      logger.error(message, {
-        context: { error: err },
-        source: 'UserRoleIndicator'
-      });
+      logger.error(`Failed to change role: ${message}`, 'UserRoleIndicator');
       addError(message);
     }
   };

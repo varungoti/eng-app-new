@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/pages/api/cursor/bulk-logs.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1739383276699,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1739383276699,
+            "name": "Commit-0",
+            "content": "import { NextApiRequest, NextApiResponse } from 'next';\r\n\r\nexport default async function handler(req: NextApiRequest, res: NextApiResponse) {\r\n  if (req.method !== 'POST') {\r\n    return res.status(405).json({ message: 'Method not allowed' });\r\n  }\r\n\r\n  try {\r\n    const { logs } = req.body;\r\n    // Process bulk logs\r\n    // Send to your Cursor integration\r\n    res.status(200).json({ success: true });\r\n  } catch (error) {\r\n    res.status(500).json({ error: 'Failed to process logs' });\r\n  }\r\n} "
+        }
+    ]
+}

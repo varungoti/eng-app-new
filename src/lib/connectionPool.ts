@@ -57,20 +57,14 @@ class ConnectionPool {
         if (conn) this.idleConnections.set(conn.id, conn);
       });
 
-      logger.info('Connection pool initialized', {
-        context: {
-          minConnections: this.config.minConnections,
-          maxConnections: this.config.maxConnections
-        },
-        source: 'ConnectionPool'
-      });
+      logger.info('Connection pool initialized', 'ConnectionPool');
+
     } catch (err) {
-      logger.error('Failed to initialize connection pool', {
-        context: { error: err },
-        source: 'ConnectionPool'
-      });
+      logger.error('Failed to initialize connection pool', 'ConnectionPool', err);
     }
   }
+
+
 
   private async createConnection(): Promise<PoolConnection | null> {
     try {
@@ -86,12 +80,10 @@ class ConnectionPool {
         isHealthy: true
       };
     } catch (err) {
-      logger.error('Failed to create connection', {
-        context: { error: err },
-        source: 'ConnectionPool'
-      });
+      logger.error('Failed to create connection', 'ConnectionPool', err);
       return null;
     }
+
   }
 
   private startHealthChecks() {
@@ -138,20 +130,13 @@ class ConnectionPool {
         });
       }
 
-      logger.info('Health check completed', {
-        context: {
-          unhealthy: unhealthyConnections.length,
-          total: this.idleConnections.size
-        },
-        source: 'ConnectionPool'
-      });
+      logger.info('Health check completed', 'ConnectionPool');
+
     } catch (err) {
-      logger.error('Health check failed', {
-        context: { error: err },
-        source: 'ConnectionPool'
-      });
+      logger.error('Health check failed', 'ConnectionPool', err);
     }
   }
+
 
   public async getConnection() {
     try {
@@ -178,11 +163,9 @@ class ConnectionPool {
       // Return default client if no connections available
       return supabase;
     } catch (err) {
-      logger.error('Failed to get connection', {
-        context: { error: err },
-        source: 'ConnectionPool'
-      });
+      logger.error('Failed to get connection', 'ConnectionPool', err);
       return supabase; // Fallback to default client
+
     }
   }
 
@@ -200,10 +183,7 @@ class ConnectionPool {
       // Clean up old idle connections
       this.cleanupIdleConnections();
     } catch (err) {
-      logger.error('Failed to release connection', {
-        context: { error: err },
-        source: 'ConnectionPool'
-      });
+      logger.error('Failed to release connection', 'ConnectionPool', err);
     }
   }
 

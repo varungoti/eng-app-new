@@ -1,0 +1,30 @@
+{
+    "sourceFile": "src/lib/errorHandler.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 3,
+            "patches": [
+                {
+                    "date": 1739015936595,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1739312153473,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -77,8 +77,14 @@\n \r\n   private handleError(error: any, options: { context?: Record<string, any> } = {}) {\r\n     const errorMessage = error instanceof Error ? error.message : String(error);\r\n     \r\n+    logger.error(`${errorMessage}${error instanceof Error ? `\\nStack: ${error.stack}` : ''}`, {\r\n+      context: {\r\n+        type: 'error',\r\n+        message: errorMessage,\r\n+        stack: error instanceof Error ? error.stack : undefined\r\n+      }\r\n     logger.error(`${errorMessage}${error instanceof Error ? `\\nStack: ${error.stack}` : ''}`, 'ErrorHandler');\r\n \r\n     this.notifyListeners(error instanceof Error ? error : new Error(errorMessage));\r\n   }\r\n"
+                },
+                {
+                    "date": 1739312159817,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -77,14 +77,8 @@\n \r\n   private handleError(error: any, options: { context?: Record<string, any> } = {}) {\r\n     const errorMessage = error instanceof Error ? error.message : String(error);\r\n     \r\n-    logger.error(`${errorMessage}${error instanceof Error ? `\\nStack: ${error.stack}` : ''}`, {\r\n-      context: {\r\n-        type: 'error',\r\n-        message: errorMessage,\r\n-        stack: error instanceof Error ? error.stack : undefined\r\n-      }\r\n     logger.error(`${errorMessage}${error instanceof Error ? `\\nStack: ${error.stack}` : ''}`, 'ErrorHandler');\r\n \r\n     this.notifyListeners(error instanceof Error ? error : new Error(errorMessage));\r\n   }\r\n"
+                },
+                {
+                    "date": 1739312169006,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -77,9 +77,12 @@\n \r\n   private handleError(error: any, options: { context?: Record<string, any> } = {}) {\r\n     const errorMessage = error instanceof Error ? error.message : String(error);\r\n     \r\n-    logger.error(`${errorMessage}${error instanceof Error ? `\\nStack: ${error.stack}` : ''}`, 'ErrorHandler');\r\n+    logger.error(`${errorMessage}${error instanceof Error ? `\\nStack: ${error.stack}` : ''}`, {\r\n+      context: options.context,\r\n+      error: error instanceof Error ? error : new Error(errorMessage)\r\n+    });\r\n \r\n     this.notifyListeners(error instanceof Error ? error : new Error(errorMessage));\r\n   }\r\n \r\n"
+                }
+            ],
+            "date": 1739015936595,
+            "name": "Commit-0",
+            "content": "import { logger } from './logger';\r\n\r\ninterface ErrorHandlerOptions {\r\n  retry?: boolean;\r\n  maxRetries?: number;\r\n  retryDelay?: number;\r\n  context?: Record<string, any>;\r\n}\r\n\r\nexport class ErrorHandler {\r\n  private static instance: ErrorHandler;\r\n  private errorListeners: Set<(error: Error) => void> = new Set();\r\n\r\n  private constructor() {\r\n    this.setupGlobalHandlers();\r\n  }\r\n\r\n  public static getInstance(): ErrorHandler {\r\n    if (!ErrorHandler.instance) {\r\n      ErrorHandler.instance = new ErrorHandler();\r\n    }\r\n    return ErrorHandler.instance;\r\n  }\r\n\r\n  private setupGlobalHandlers() {\r\n    window.addEventListener('unhandledrejection', (event) => {\r\n      this.handleError(event.reason, {\r\n        context: { type: 'unhandledrejection' }\r\n      });\r\n    });\r\n\r\n    window.addEventListener('error', (event) => {\r\n      this.handleError(event.error, {\r\n        context: { type: 'error', message: event.message }\r\n      });\r\n    });\r\n  }\r\n\r\n  public async handle<T>(\r\n    operation: () => Promise<T>,\r\n    options: ErrorHandlerOptions = {}\r\n  ): Promise<T> {\r\n    const {\r\n      retry = false,\r\n      maxRetries = 3,\r\n      retryDelay = 1000,\r\n      context = {}\r\n    } = options;\r\n\r\n    let attempts = 0;\r\n    let lastError: Error | null = null;\r\n\r\n    while (attempts < (retry ? maxRetries : 1)) {\r\n      try {\r\n        return await operation();\r\n      } catch (error) {\r\n        attempts++;\r\n        lastError = error instanceof Error ? error : new Error(String(error));\r\n        \r\n        this.handleError(error, {\r\n          context: {\r\n            ...context,\r\n            attempt: attempts,\r\n            maxRetries\r\n          }\r\n        });\r\n\r\n        if (attempts < maxRetries && retry) {\r\n          await new Promise(resolve => setTimeout(resolve, retryDelay * attempts));\r\n          continue;\r\n        }\r\n      }\r\n    }\r\n\r\n    throw lastError || new Error('Operation failed after max retries');\r\n  }\r\n\r\n  private handleError(error: any, options: { context?: Record<string, any> } = {}) {\r\n    const errorMessage = error instanceof Error ? error.message : String(error);\r\n    \r\n    logger.error(`${errorMessage}${error instanceof Error ? `\\nStack: ${error.stack}` : ''}`, 'ErrorHandler');\r\n\r\n    this.notifyListeners(error instanceof Error ? error : new Error(errorMessage));\r\n  }\r\n\r\n  public addListener(listener: (error: Error) => void): () => void {\r\n    this.errorListeners.add(listener);\r\n    return () => this.errorListeners.delete(listener);\r\n  }\r\n\r\n  private notifyListeners(error: Error) {\r\n    this.errorListeners.forEach(listener => listener(error));\r\n  }\r\n}\r\n\r\nexport const errorHandler = ErrorHandler.getInstance();"
+        }
+    ]
+}

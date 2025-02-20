@@ -1,0 +1,22 @@
+{
+    "sourceFile": "src/lib/auth/store.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1739024932303,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1739279374357,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -19,9 +19,9 @@\n       currentRole: null,\r\n       previousRole: null,\r\n       isTransitioning: false,\r\n       setRole: (role) => set((state) => {\r\n-        logger.info(`Role state update: ${state.currentRole || 'none'} -> ${role || 'none'}`, 'RoleStore');\r\n+        logger.info(`Role state update: ${state.currentRole || 'none'} -> ${role || 'none'}`, { source: 'RoleStore' });\r\n         return {\r\n           currentRole: role,\r\n           previousRole: state.currentRole,\r\n           isTransitioning: false\r\n"
+                }
+            ],
+            "date": 1739024932303,
+            "name": "Commit-0",
+            "content": "import { create } from 'zustand';\r\nimport { persist } from 'zustand/middleware';\r\nimport type { UserRole } from '../../types/roles';\r\nimport { logger } from '../logger';\r\n\r\ninterface RoleState {\r\n  currentRole: UserRole | null;\r\n  previousRole: UserRole | null;\r\n  isTransitioning: boolean;\r\n  setRole: (role: UserRole | null) => void;\r\n  startTransition: () => void;\r\n  completeTransition: () => void;\r\n  resetTransition: () => void;\r\n}\r\n\r\nexport const useRoleStore = create<RoleState>()(\r\n  persist(\r\n    (set) => ({\r\n      currentRole: null,\r\n      previousRole: null,\r\n      isTransitioning: false,\r\n      setRole: (role) => set((state) => {\r\n        logger.info(`Role state update: ${state.currentRole || 'none'} -> ${role || 'none'}`, 'RoleStore');\r\n        return {\r\n          currentRole: role,\r\n          previousRole: state.currentRole,\r\n          isTransitioning: false\r\n        };\r\n      }),\r\n      startTransition: () => set({ isTransitioning: true }),\r\n      completeTransition: () => set({ isTransitioning: false, previousRole: null }),\r\n      resetTransition: () => set({ isTransitioning: false })\r\n    }),\r\n    {\r\n      name: 'role-storage',\r\n     // partialize: (state) => ({ currentRole: state.currentRole }),\r\n      storage: {\r\n        getItem: (name) => {\r\n          const str = localStorage.getItem(name);\r\n          if (!str) return null;\r\n          try {\r\n            const state = JSON.parse(str);\r\n            return {\r\n              state: {\r\n                currentRole: state.currentRole,\r\n                previousRole: null,\r\n                isTransitioning: false\r\n              }\r\n            };\r\n          } catch {\r\n            return null;\r\n          }\r\n        },\r\n        setItem: (name, value) => {\r\n          localStorage.setItem(name, JSON.stringify({\r\n            currentRole: value.state.currentRole\r\n          }));\r\n        },\r\n        removeItem: (name) => localStorage.removeItem(name)\r\n      }\r\n    }\r\n  )\r\n);"
+        }
+    ]
+}

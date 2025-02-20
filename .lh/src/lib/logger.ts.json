@@ -1,0 +1,86 @@
+{
+    "sourceFile": "src/lib/logger.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 17,
+            "patches": [
+                {
+                    "date": 1739278744697,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1739278764621,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -3,8 +3,9 @@\n interface LogContext {\n   source?: string;\n   context?: Record<string, any>;\n   error?: Error | unknown;\n+  level?: LogLevel;\n }\n \n type LogMessage = string | { message: string; [key: string]: any };\n \n@@ -33,9 +34,9 @@\n     \n     return `[${timestamp}] ${formattedMessage} ${level} ${emoji} ${source}`;\n   }\n \n-  private getLogEmoji(level?: string): string {\n+  private getLogEmoji(level?: LogLevel): string {\n     switch (level) {\n       case 'ERROR': return '❌';\n       case 'WARN': return '⚠️';\n       case 'INFO': return '✅👍🏻';\n"
+                },
+                {
+                    "date": 1739311368980,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,12 +1,10 @@\n import { LogLevel } from '../types/logging';\n \n-interface LogContext {\n+type LogContext = {\n   source?: string;\n-  context?: Record<string, any>;\n-  error?: Error | unknown;\n-  level?: LogLevel;\n-}\n+  [key: string]: any;\n+};\n \n type LogMessage = string | { message: string; [key: string]: any };\n \n class Logger {\n@@ -62,5 +60,17 @@\n     console.error(this.formatMessage(message, { ...context, level: 'ERROR' }));\n   }\n }\n \n-export const logger = Logger.getInstance();\n\\ No newline at end of file\n+export const logger = Logger.getInstance();\n+\n+export const createLogger = (namespace: string) => ({\n+  info: (message: string, context?: LogContext) => {\n+    console.log(`[${namespace}] ${message}`, context || '');\n+  },\n+  error: (message: string, context?: LogContext) => {\n+    console.error(`[${namespace}] ${message}`, context || '');\n+  },\n+  warn: (message: string, context?: LogContext) => {\n+    console.warn(`[${namespace}] ${message}`, context || '');\n+  }\n+});\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1739311447612,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,10 +1,12 @@\n import { LogLevel } from '../types/logging';\n \n type LogContext = {\n   source?: string;\n-  [key: string]: any;\n-};\n+  context?: Record<string, any>;\n+  error?: Error | unknown;\n+  level?: LogLevel;\n+}\n \n type LogMessage = string | { message: string; [key: string]: any };\n \n class Logger {\n"
+                },
+                {
+                    "date": 1739311454561,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,7 +1,7 @@\n import { LogLevel } from '../types/logging';\n \n-type LogContext = {\n+interface LogContext {\n   source?: string;\n   context?: Record<string, any>;\n   error?: Error | unknown;\n   level?: LogLevel;\n"
+                },
+                {
+                    "date": 1739311466544,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,5 +1,5 @@\n-import { LogLevel } from '../types/logging';\n+import { LogLevel } from '@/types/logging';\n \n interface LogContext {\n   source?: string;\n   context?: Record<string, any>;\n"
+                },
+                {
+                    "date": 1739311489819,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,5 +1,5 @@\n-import { LogLevel } from '@/types/logging';\n+import { LogLevel } from '@types/logging';\n \n interface LogContext {\n   source?: string;\n   context?: Record<string, any>;\n"
+                },
+                {
+                    "date": 1739311502344,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,5 +1,5 @@\n-import { LogLevel } from '@types/logging';\n+import { LogLevel } from '/types/logging';\n \n interface LogContext {\n   source?: string;\n   context?: Record<string, any>;\n"
+                },
+                {
+                    "date": 1739311510735,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,5 +1,5 @@\n-import { LogLevel } from '/types/logging';\n+import { LogLevel } from './types/logging';\n \n interface LogContext {\n   source?: string;\n   context?: Record<string, any>;\n"
+                },
+                {
+                    "date": 1739311534335,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,5 +1,5 @@\n-import { LogLevel } from './types/logging';\n+import { LogLevel } from '/types/logging';\n \n interface LogContext {\n   source?: string;\n   context?: Record<string, any>;\n"
+                },
+                {
+                    "date": 1739311553706,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,5 +1,5 @@\n-import { LogLevel } from '/types/logging';\n+import { LogLevel } from '@types/types/logging';\n \n interface LogContext {\n   source?: string;\n   context?: Record<string, any>;\n"
+                },
+                {
+                    "date": 1739311563640,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,5 +1,5 @@\n-import { LogLevel } from '@types/types/logging';\n+import { LogLevel } from '/types/logging';\n \n interface LogContext {\n   source?: string;\n   context?: Record<string, any>;\n"
+                },
+                {
+                    "date": 1739311584006,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,5 +1,5 @@\n-import { LogLevel } from '/types/logging';\n+import { LogLevel } from '../../types/logging';\n \n interface LogContext {\n   source?: string;\n   context?: Record<string, any>;\n"
+                },
+                {
+                    "date": 1739311590604,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,5 +1,5 @@\n-import { LogLevel } from '../../types/logging';\n+import { LogLevel } from './types/logging';\n \n interface LogContext {\n   source?: string;\n   context?: Record<string, any>;\n"
+                },
+                {
+                    "date": 1739311597504,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,5 +1,5 @@\n-import { LogLevel } from './types/logging';\n+import { LogLevel } from 'types/logging';\n \n interface LogContext {\n   source?: string;\n   context?: Record<string, any>;\n"
+                },
+                {
+                    "date": 1739311619414,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,5 +1,5 @@\n-import { LogLevel } from 'types/logging';\n+import { LogLevel } from '/src/types/logging';\n \n interface LogContext {\n   source?: string;\n   context?: Record<string, any>;\n"
+                },
+                {
+                    "date": 1739311627013,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,5 +1,5 @@\n-import { LogLevel } from './src/types/logging';\n+import { LogLevel } from './types/logging';\n \n interface LogContext {\n   source?: string;\n   context?: Record<string, any>;\n"
+                },
+                {
+                    "date": 1739348937948,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -60,9 +60,9 @@\n         return '#2196F3';\n       case 'warn':\n         return '#FFC107';\n       case 'error':\n-        return '#F44336';\n+        return '❌#F44336';\n       case 'debug':\n         return '#9E9E9E';\n       default:\n         return '#000000';\n"
+                }
+            ],
+            "date": 1739278744697,
+            "name": "Commit-0",
+            "content": "import { LogLevel } from '../types/logging';\n\ninterface LogContext {\n  source?: string;\n  context?: Record<string, any>;\n  error?: Error | unknown;\n}\n\ntype LogMessage = string | { message: string; [key: string]: any };\n\nclass Logger {\n  private static instance: Logger;\n  private debugEnabled: boolean;\n\n  private constructor() {\n    this.debugEnabled = process.env.NODE_ENV === 'development';\n  }\n\n  public static getInstance(): Logger {\n    if (!Logger.instance) {\n      Logger.instance = new Logger();\n    }\n    return Logger.instance;\n  }\n\n  private formatMessage(message: LogMessage, context?: LogContext): string {\n    const timestamp = new Date().toISOString();\n    const source = context?.source ? `[${context.source}]` : '';\n    const level = context?.level ? `[${context.level}]` : '';\n    const emoji = this.getLogEmoji(context?.level);\n    \n    const formattedMessage = typeof message === 'string' ? message : message.message;\n    \n    return `[${timestamp}] ${formattedMessage} ${level} ${emoji} ${source}`;\n  }\n\n  private getLogEmoji(level?: string): string {\n    switch (level) {\n      case 'ERROR': return '❌';\n      case 'WARN': return '⚠️';\n      case 'INFO': return '✅👍🏻';\n      case 'DEBUG': return '🔍🐞';\n      default: return '';\n    }\n  }\n\n  public debug(message: LogMessage, context?: LogContext): void {\n    if (!this.debugEnabled) return;\n    console.debug(this.formatMessage(message, { ...context, level: 'DEBUG' }));\n  }\n\n  public info(message: LogMessage, context?: LogContext): void {\n    console.info(this.formatMessage(message, { ...context, level: 'INFO' }));\n  }\n\n  public warn(message: LogMessage, context?: LogContext): void {\n    console.warn(this.formatMessage(message, { ...context, level: 'WARN' }));\n  }\n\n  public error(message: LogMessage, context?: LogContext): void {\n    console.error(this.formatMessage(message, { ...context, level: 'ERROR' }));\n  }\n}\n\nexport const logger = Logger.getInstance();"
+        }
+    ]
+}

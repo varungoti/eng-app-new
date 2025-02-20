@@ -200,8 +200,8 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
                   <Label>Media File</Label>
                   <FileUpload
                     value={media.url}
-                    previewType={media.type}
-                    onFileSelect={async (file) => {
+                    type={media.type}
+                    onFileSelect={async (file: File) => {
                       try {
                         const url = await handleFileUpload(file);
                         if (url && mounted.current) {

@@ -36,6 +36,7 @@ export interface RolePermissions {
       content: boolean;
       schools: boolean;
       staff: boolean;
+      myclasses: boolean;
       schedule: boolean;
       settings: boolean;
       sales: boolean;
@@ -50,11 +51,11 @@ export interface RolePermissions {
       delete: boolean;
       approve: boolean;
       view: boolean;
+      content_management: boolean;
+      content_editor: boolean;
     };
   };
-}
-
-export const ROLE_PERMISSIONS: RolePermissions = {
+}export const ROLE_PERMISSIONS: RolePermissions = {
   super_admin: {
     name: 'Super Admin',
     description: 'Full system access with all permissions',
@@ -66,9 +67,12 @@ export const ROLE_PERMISSIONS: RolePermissions = {
       revenueMetrics: true
     },
     permissions: {
+      content_management: true,
       content: true,
+      content_editor: true,
       schools: true,
       staff: true,
+      myclasses: true,
       schedule: true,
       settings: true,
       sales: true,
@@ -90,8 +94,11 @@ export const ROLE_PERMISSIONS: RolePermissions = {
     description: 'Administrative access with limited delete permissions',
     permissions: {
       content: true,
+      content_management: true,
+      content_editor: true,
       schools: true,
       staff: true,
+      myclasses: true,
       schedule: true,
       settings: true,
       sales: true,
@@ -109,8 +116,10 @@ export const ROLE_PERMISSIONS: RolePermissions = {
     description: 'Manages technical infrastructure and IT operations',
     permissions: {
       content: false,
+      content_editor: false,
       schools: false,
       staff: true,
+      myclasses: true,
       schedule: false,
       settings: true,
       sales: false,
@@ -125,6 +134,7 @@ export const ROLE_PERMISSIONS: RolePermissions = {
       delete: true,
       approve: true,
       view: true,
+      content_management: false,
     },
   },
   developer: {
@@ -132,8 +142,10 @@ export const ROLE_PERMISSIONS: RolePermissions = {
     description: 'Handles application development and maintenance',
     permissions: {
       content: false,
+      content_editor: false,
       schools: false,
       staff: false,
+      myclasses: true,
       schedule: false,
       settings: true,
       sales: false,
@@ -148,6 +160,7 @@ export const ROLE_PERMISSIONS: RolePermissions = {
       delete: false,
       approve: false,
       view: true,
+      content_management: false,
     },
   },
   sales_head: {
@@ -155,8 +168,10 @@ export const ROLE_PERMISSIONS: RolePermissions = {
     description: 'Manages sales team and operations',
     permissions: {
       content: false,
+      content_editor: false,
       schools: true,
       staff: true,
+      myclasses: true,
       schedule: false,
       settings: false,
       sales: true,
@@ -167,6 +182,7 @@ export const ROLE_PERMISSIONS: RolePermissions = {
       delete: false,
       approve: true,
       view: true,
+      content_management: false,
     },
   },
   sales_lead: {
@@ -174,8 +190,10 @@ export const ROLE_PERMISSIONS: RolePermissions = {
     description: 'Team lead for sales operations',
     permissions: {
       content: false,
+      content_editor: false,
       schools: true,
       staff: false,
+      myclasses: true,
       schedule: false,
       settings: false,
       sales: true,
@@ -186,6 +204,7 @@ export const ROLE_PERMISSIONS: RolePermissions = {
       delete: false,
       approve: false,
       view: true,
+      content_management: false,
     },
   },
   sales_executive: {
@@ -193,8 +212,10 @@ export const ROLE_PERMISSIONS: RolePermissions = {
     description: 'Handles sales operations',
     permissions: {
       content: false,
+      content_editor: false,
       schools: true,
       staff: false,
+      myclasses: true,
       schedule: false,
       settings: false,
       sales: true,
@@ -205,15 +226,19 @@ export const ROLE_PERMISSIONS: RolePermissions = {
       delete: false,
       approve: false,
       view: true,
+      content_management: false,
     },
   },
   content_head: {
     name: 'Content Head',
     description: 'Manages content team and curriculum',
     permissions: {
+      content_management: true,
       content: true,
+      content_editor: true,
       schools: false,
       staff: true,
+      myclasses: false,
       schedule: true,
       settings: false,
       sales: false,
@@ -230,9 +255,12 @@ export const ROLE_PERMISSIONS: RolePermissions = {
     name: 'Content Editor',
     description: 'Creates and edits content',
     permissions: {
+      content_management: false,
       content: true,
+      content_editor: true,
       schools: false,
       staff: false,
+      myclasses: false,
       schedule: false,
       settings: false,
       sales: false,
@@ -250,8 +278,10 @@ export const ROLE_PERMISSIONS: RolePermissions = {
     description: 'Manages accounting operations',
     permissions: {
       content: false,
+      content_editor: false,
       schools: true,
       staff: false,
+      myclasses: false,
       schedule: false,
       settings: false,
       sales: true,
@@ -262,6 +292,7 @@ export const ROLE_PERMISSIONS: RolePermissions = {
       delete: false,
       approve: true,
       view: true,
+      content_management: false,
     },
   },
   accounts_executive: {
@@ -269,8 +300,10 @@ export const ROLE_PERMISSIONS: RolePermissions = {
     description: 'Handles accounting tasks',
     permissions: {
       content: false,
+      content_editor: false,
       schools: true,
       staff: false,
+      myclasses: false,
       schedule: false,
       settings: false,
       sales: false,
@@ -281,6 +314,7 @@ export const ROLE_PERMISSIONS: RolePermissions = {
       delete: false,
       approve: false,
       view: true,
+      content_management: false,
     },
   },
   school_leader: {
@@ -288,8 +322,10 @@ export const ROLE_PERMISSIONS: RolePermissions = {
     description: 'Manages multiple schools',
     permissions: {
       content: true,
+      content_editor: false,
       schools: true,
       staff: true,
+      myclasses: true,
       schedule: true,
       settings: false,
       sales: false,
@@ -300,6 +336,7 @@ export const ROLE_PERMISSIONS: RolePermissions = {
       delete: false,
       approve: true,
       view: true,
+      content_management: false,
     },
   },
   school_principal: {
@@ -307,8 +344,10 @@ export const ROLE_PERMISSIONS: RolePermissions = {
     description: 'Manages a single school',
     permissions: {
       content: true,
+      content_editor: false,
       schools: false,
       staff: true,
+      myclasses: true,
       schedule: true,
       settings: false,
       sales: false,
@@ -319,6 +358,7 @@ export const ROLE_PERMISSIONS: RolePermissions = {
       delete: false,
       approve: true,
       view: true,
+      content_management: false,
     },
   },
   teacher_head: {
@@ -326,8 +366,10 @@ export const ROLE_PERMISSIONS: RolePermissions = {
     description: 'Leads teaching staff',
     permissions: {
       content: true,
+      content_editor: false,
       schools: false,
       staff: true,
+      myclasses: true,
       schedule: true,
       settings: false,
       sales: false,
@@ -338,6 +380,7 @@ export const ROLE_PERMISSIONS: RolePermissions = {
       delete: false,
       approve: false,
       view: true,
+      content_management: false,
     },
   },
   teacher: {
@@ -345,8 +388,10 @@ export const ROLE_PERMISSIONS: RolePermissions = {
     description: 'Conducts classes and assessments',
     permissions: {
       content: true,
+      content_editor: false,
       schools: false,
       staff: false,
+      myclasses: true,
       schedule: true,
       settings: false,
       sales: false,
@@ -357,6 +402,21 @@ export const ROLE_PERMISSIONS: RolePermissions = {
       delete: false,
       approve: false,
       view: true,
+      content_management: false,
     },
   },
 };
+
+export interface Permissions {
+  content_management: boolean;
+  content_editor: boolean;
+}
+
+export interface RoleSettings {
+  id: string;
+  role_key: string;
+  settings: Record<string, any>;
+  created_at?: string;
+  updated_at?: string;
+}
+

@@ -1,24 +1,34 @@
-import React, { createContext, useState, useContext } from 'react';
-import type { Theme } from '../lib/themes';
+"use client";
+import React, { createContext, ReactNode, useContext } from 'react';
+import { useTheme } from 'next-themes';
+import { themes } from '@/lib/themes';
+import { ThemeProvider as NextThemeProvider } from 'next-themes';
 
-interface ThemeContextType {
-  theme: Theme;
-  setTheme: (theme: Theme) => void;
+interface ThemeContextProps {
+  children: ReactNode;
 }
 
-const ThemeContext = createContext<ThemeContextType>({
-  theme: 'light',
-  setTheme: () => {},
-});
-
-export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [theme, setTheme] = useState<Theme>('light');
-
-  return (
-    <ThemeContext.Provider value={{ theme, setTheme }}>
-      {children}
-    </ThemeContext.Provider>
-  );
+type ThemeContextType = {
+  currentTheme: typeof themes.light;
 };
 
-export const useTheme = () => useContext(ThemeContext);
+const ThemeContext = createContext<ThemeContextType>({ currentTheme: themes.light });
+
+export function ThemeContextProvider({ children }: ThemeContextProps) {
+  const { theme, resolvedTheme } = useTheme();
+  const currentTheme = themes[theme as keyof typeof themes] || themes[resolvedTheme as keyof typeof themes] || themes.light;
+
+  return (
+    <ThemeContext.Provider value={{ currentTheme }}>
+      <NextThemeProvider
+        attribute="class"
+        defaultTheme="system"
+        enableSystem
+      >
+        {children}
+      </NextThemeProvider>
+    </ThemeContext.Provider>
+  );
+}
+
+export const useCurrentTheme = () => useContext(ThemeContext);

@@ -8,10 +8,14 @@ import { DEBUG_CONFIG } from '../lib/config';
 // Component that throws an error
 const BuggyComponent: React.FC = () => {
   logger.warn('BuggyComponent will throw a test error', {
-    source: 'ErrorTest'
+    source: 'ErrorTest',
+    context: {
+      component: 'BuggyComponent',
+      isSimulated: true,
+      severity: 'info'
+    }
   });
   throw new Error('This is a simulated component error');
-  return null;
 };
 
 const ErrorTest: React.FC = () => {
@@ -19,9 +23,18 @@ const ErrorTest: React.FC = () => {
   const errorWatcher = ErrorWatcher.getInstance();
 
   const simulateNetworkError = () => {
+    logger.warn('Simulating network error', {
+      source: 'ErrorTest',
+      context: {
+        type: 'network',
+        endpoint: '/api/data',
+        statusCode: 500
+      }
+    });
+
     errorWatcher.trackError({
       message: 'Failed to fetch data from API',
-      severity: 'warning', // Changed to warning since this is a test
+      severity: 'warning',
       source: 'NetworkRequest',
       context: {
         endpoint: '/api/data',
@@ -31,6 +44,14 @@ const ErrorTest: React.FC = () => {
   };
 
   const simulateFatalError = () => {
+    logger.error('Simulating fatal error', {
+      source: 'ErrorTest',
+      context: {
+        type: 'fatal',
+        reason: 'Critical system failure'
+      }
+    });
+
     errorWatcher.trackError({
       message: 'Application encountered a fatal error',
       severity: 'fatal',
@@ -42,6 +63,15 @@ const ErrorTest: React.FC = () => {
   };
 
   const simulateWarning = () => {
+    logger.warn('Simulating performance warning', {
+      source: 'ErrorTest',
+      context: {
+        type: 'performance',
+        metric: 'response_time',
+        value: '2500ms'
+      }
+    });
+
     errorWatcher.trackError({
       message: 'Performance degradation detected',
       severity: 'info', // Changed to info since this is a test
@@ -54,6 +84,14 @@ const ErrorTest: React.FC = () => {
   };
 
   const simulateAuthError = () => {
+    logger.error('Simulating auth error', {
+      source: 'ErrorTest',
+      context: {
+        type: 'auth',
+        reason: 'Token expired'
+      }
+    });
+
     errorWatcher.trackError({
       message: 'Authentication token expired',
       severity: 'error',
@@ -111,7 +149,13 @@ const ErrorTest: React.FC = () => {
               </button>
 
               <button
-                onClick={() => setShowBuggy(true)}
+                onClick={() => {
+                  logger.info('Triggering component error', {
+                    source: 'ErrorTest',
+                    context: { action: 'showBuggy', value: true }
+                  });
+                  setShowBuggy(true);
+                }}
                 className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors"
               >
                 Trigger Component Error

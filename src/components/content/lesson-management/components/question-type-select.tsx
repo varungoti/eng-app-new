@@ -1,15 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { QUESTION_TYPES, QuestionType, isQuestionType } from '../constants';
+import { QUESTION_TYPES, isQuestionType } from '@/app/content-management/constants';
 import { logger } from '@/lib/logger';
 import { useCallback } from 'react';
+import { Question, QuestionType } from "@/app/content-management/types";
 
 interface QuestionTypeSelectProps {
   value: string;
-  onValueChange: (value: string) => void;
+  onChange: (value: string, defaultData: any) => void;
 }
 
-export function QuestionTypeSelect({ value, onValueChange }: QuestionTypeSelectProps) {
+export function QuestionTypeSelect({ value, onChange }: QuestionTypeSelectProps) {
   const [hoveredType, setHoveredType] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
 
@@ -22,9 +23,10 @@ export function QuestionTypeSelect({ value, onValueChange }: QuestionTypeSelectP
       if (!isQuestionType(newValue)) {
         throw new Error(`Invalid question type: ${newValue}`);
       }
-      onValueChange(newValue);
+      const defaultData = QUESTION_TYPES[newValue].defaultData;
+      onChange(newValue, defaultData);
       logger.debug('Question type selected', {
-        context: { type: newValue },
+        context: { type: newValue, defaultData },
         source: 'QuestionTypeSelect'
       });
     } catch (err) {
@@ -33,7 +35,7 @@ export function QuestionTypeSelect({ value, onValueChange }: QuestionTypeSelectP
         source: 'QuestionTypeSelect'
       });
     }
-  }, [onValueChange]);
+  }, [onChange]);
 
   const renderPreview = (type: string) => {
     if (!isQuestionType(type)) return null;
@@ -62,17 +64,17 @@ export function QuestionTypeSelect({ value, onValueChange }: QuestionTypeSelectP
         </SelectTrigger>
         <SelectContent align="start" side="right" className="w-[200px]">
           <div className="relative">
-            {Object.entries(QUESTION_TYPES).map(([key, type]) => (
-              <div key={key} className="relative group">
+            {Object.entries(QUESTION_TYPES).map(([type, { label }]) => (
+              <div key={type} className="relative group">
                 <SelectItem
-                  value={key}
-                  onMouseEnter={() => setHoveredType(key)}
+                  value={type}
+                  onMouseEnter={() => setHoveredType(type)}
                   onMouseLeave={() => setHoveredType(null)}
                   className="cursor-pointer"
                 >
-                  {type.label}
+                  {label}
                 </SelectItem>
-                {mounted && hoveredType === key && (
+                {mounted && hoveredType === type && (
                   <div 
                     className="absolute left-full top-0 ml-2 z-[9999]"
                   >
@@ -84,7 +86,7 @@ export function QuestionTypeSelect({ value, onValueChange }: QuestionTypeSelectP
                       }}
                       className="bg-popover border rounded-md shadow-md"
                     >
-                      {renderPreview(key)}
+                      {renderPreview(type)}
                     </div>
                   </div>
                 )}

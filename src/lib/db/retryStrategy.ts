@@ -5,7 +5,15 @@ export interface RetryConfig {
 }
 
 export class RetryStrategy {
-  constructor(private config: RetryConfig) {}
+  private attempts: number = 0;
+  constructor(private config: {
+    maxRetries: number;
+    baseDelay: number;
+    maxDelay: number;
+  }) {}
+  getAttempts(): number {
+    return this.attempts;
+  }
 
   async execute<T>(operation: () => Promise<T>): Promise<T> {
     let lastError: Error | null = null;

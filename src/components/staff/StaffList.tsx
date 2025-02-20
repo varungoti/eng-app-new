@@ -10,26 +10,16 @@ import {
   TableHeader,
   TableRow,
 } from '../ui/table';
-import type { Staff } from '../../types/staff';
+import type { Staff, StaffFilters } from '../../types/staff';
 
 interface StaffListProps {
   staff: Staff[];
-  onUpdate: (id: string, updates: Partial<Staff>) => Promise<void>;
-  onDelete: (id: string) => Promise<void>;
-  filters: {
-    role: string;
-    department: string;
-    status: string;
-    search: string;
-  };
+  onUpdate: (id: string, updates: Partial<Staff>) => void;
+  onDelete: (id: string) => void;
+  filters: StaffFilters;
 }
 
-const StaffList: React.FC<StaffListProps> = ({
-  staff,
-  onUpdate,
-  onDelete,
-  filters
-}) => {
+export function StaffList({ staff, onUpdate, onDelete, filters }: StaffListProps) {
   const { can } = usePermissions();
 
   const filteredStaff = staff.filter(member => {
@@ -113,6 +103,6 @@ const StaffList: React.FC<StaffListProps> = ({
       </Table>
     </div>
   );
-};
+}
 
 export default StaffList;

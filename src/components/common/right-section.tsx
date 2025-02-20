@@ -1,15 +1,17 @@
-import React, { useState } from 'react'
+"use client";
+
+import { useState } from 'react'
 import { Lock, Zap, ChevronRight } from 'lucide-react'
 // import AuthModal from '@/app/components/authentication/auth-modal'
 // import AuthModal from './auth-modal'
 
 export default function RightSection() {
-  const [showAuthModal, setShowAuthModal] = useState(false)
-  const [authType, setAuthType] = useState<'signup' | 'login'>('signup')
+  const [, setShowAuthModal] = useState(false);
+  const [, setAuthType] = useState<'signup' | 'login'>('signup');
 
   const handleAuthClick = (type: 'signup' | 'login') => {
-    setAuthType(type)
-    setShowAuthModal(true)
+    setAuthType(type);
+    setShowAuthModal(true);
   }
 
   return (

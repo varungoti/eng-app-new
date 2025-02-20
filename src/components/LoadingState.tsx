@@ -1,5 +1,6 @@
 import React from 'react';
-import { Loader2 } from 'lucide-react';
+import { Icons } from 'lucide-react';
+import { APP_ICONS } from '@/lib/constants/icons';
 import { logger } from '../lib/logger';
 
 interface LoadingStateProps {
@@ -16,8 +17,8 @@ export const LoadingState: React.FC<LoadingStateProps> = ({
   onTimeout
 }) => {
   const [showTimeout, setShowTimeout] = React.useState(false);
-  const timeoutRef = React.useRef<number>();
-  const mounted = React.useRef(true);
+  const timeoutRef = React.useRef<number | undefined>(undefined);
+  const mounted = React.useRef<boolean>(true);
 
   React.useEffect(() => {
     return () => {
@@ -49,7 +50,9 @@ export const LoadingState: React.FC<LoadingStateProps> = ({
   return (
     <div className="flex items-center justify-center min-h-[200px]">
       <div className="text-center space-y-4">
-        <Loader2 className="h-12 w-12 text-indigo-600 animate-spin mx-auto" />
+        {React.createElement(Icons[APP_ICONS.LOADER], {
+          className: "h-12 w-12 text-indigo-600 animate-spin mx-auto"
+        })}
         <p className="text-gray-600 font-medium">{message}</p>
         {showTimeout && (
           <p className="text-sm text-gray-500">

@@ -1,17 +1,22 @@
+"use client";
+
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { logger } from '../lib/logger';
 import { ROLE_PERMISSIONS } from '../types/roles';
-import { Shield } from 'lucide-react';
+import { Shield } from '@phosphor-icons/react';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
   const [selectedRole, setSelectedRole] = useState('super_admin');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
+  const [isResetMode, setIsResetMode] = useState(false);
+  const [isSignUpMode, setIsSignUpMode] = useState(false);
+  const auth = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from?.pathname || '/dashboard';
@@ -22,16 +27,62 @@ const Login = () => {
     setLoading(true);
     
     try {
-      await login(email, password, selectedRole); 
+      if (isSignUpMode) {
+        if (!auth.signUp) {
+          throw new Error('Sign up is not available');
+        }
+        await auth.signUp({ email, password, name });
+        logger.info('Signup successful', {
+          context: { email, name },
+          source: 'LoginPage'
+        });
+        // Automatically log in after successful signup
+        if (!auth.login) {
+          throw new Error('Login is not available');
+        }
+        await auth.login({ email, password });
+      } else {
+        if (!auth.login) {
+          throw new Error('Login is not available');
+        }
+        await auth.login({ email, password }); 
+        logger.info('Login successful', {
+          context: { email, role: selectedRole },
+          source: 'LoginPage'
+        });
+      }
       navigate(from);
-      logger.info('Login successful', {
-        context: { email, role: selectedRole },
-        source: 'LoginPage'
-      });
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Failed to sign in. Please check your credentials and try again.';
       setError(message);
-      logger.error('Login failed', {
+      logger.error(isSignUpMode ? 'Signup failed' : 'Login failed', {
+        context: { error: err },
+        source: 'LoginPage'
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setLoading(true);
+    
+    try {
+      if (!auth.resetPassword) {
+        throw new Error('Password reset is not available');
+      }
+      await auth.resetPassword({ email });
+      setError('Password reset email sent. Please check your inbox.');
+      logger.info('Password reset email sent', {
+        context: { email },
+        source: 'LoginPage'
+      });
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to send reset email.';
+      setError(message);
+      logger.error('Password reset failed', {
         context: { error: err },
         source: 'LoginPage'
       });
@@ -48,7 +99,7 @@ const Login = () => {
           <h3 className="text-sm font-medium text-blue-800">Super Admin Account</h3>
           <div className="mt-2 text-sm text-blue-700">
             <p>Email: varungoti@gmail.com</p>
-            <p>Password: ********</p>
+            <p>Password: *************</p>
           </div>
         </div>
 
@@ -57,11 +108,29 @@ const Login = () => {
             <Shield className="h-12 w-12 text-indigo-600" />
           </div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Sign in to your account
+            {isSignUpMode ? 'Create an account' : 'Sign in to your account'}
           </h2>
         </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit} noValidate>
+        <form className="mt-8 space-y-6" onSubmit={isResetMode ? handleResetPassword : handleSubmit} noValidate>
           <div className="rounded-md shadow-sm -space-y-px">
+            {isSignUpMode && (
+              <div>
+                <label htmlFor="name" className="sr-only">
+                  Full Name
+                </label>
+                <input
+                  id="name"
+                  name="name"
+                  type="text"
+                  required
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                  placeholder="Full Name"
+                  disabled={loading}
+                />
+              </div>
+            )}
             <div>
               <label htmlFor="email-address" className="sr-only">
                 Email address
@@ -74,46 +143,51 @@ const Login = () => {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
+                className={`appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 ${!isSignUpMode && !isResetMode ? 'rounded-t-md' : ''} focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed`}
                 disabled={loading}
                 placeholder="Email address"
               />
             </div>
-            <div>
-              <label htmlFor="password" className="sr-only">
-                Password
-              </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="current-password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
-                disabled={loading}
-                placeholder="Password"
-              />
-            </div>
+            {!isResetMode && (
+              <div>
+                <label htmlFor="password" className="sr-only">
+                  Password
+                </label>
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  autoComplete={isSignUpMode ? 'new-password' : 'current-password'}
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
+                  disabled={loading}
+                  placeholder={isSignUpMode ? 'Create Password' : 'Password'}
+                />
+              </div>
+            )}
           </div>
           
-          <div className="mt-4">
-            <label className="block text-sm font-medium text-gray-700">
-              Login As
-            </label>
-            <select
-              value={selectedRole}
-              onChange={(e) => setSelectedRole(e.target.value)}
-              className="mt-1 block w-full pl-3 pr-10 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-            >
-              {Object.entries(ROLE_PERMISSIONS).map(([role, details]) => (
-                <option key={role} value={role}>
-                  {details.name}
-                </option>
-              ))}
-            </select>
-          </div>
+          {!isSignUpMode && !isResetMode && (
+            <div className="mt-4">
+              <label className="block text-sm font-medium text-gray-700">
+                Login As
+              </label>
+              <select
+                value={selectedRole}
+                onChange={(e) => setSelectedRole(e.target.value)}
+                className="mt-1 block w-full pl-3 pr-10 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                aria-label="Select role"
+              >
+                {Object.entries(ROLE_PERMISSIONS).map(([role, details]) => (
+                  <option key={role} value={role}>
+                    {details.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
           {error && (
             <div className="rounded-md bg-red-50 p-4 animate-shake">
@@ -129,6 +203,35 @@ const Login = () => {
               </div>
             </div>
           )}
+
+          <div className="flex items-center justify-between">
+            <button
+              type="button"
+              onClick={() => {
+                if (isResetMode) {
+                  setIsResetMode(false);
+                } else {
+                  setIsSignUpMode(!isSignUpMode);
+                }
+                setError(null);
+              }}
+              className="text-sm font-medium text-indigo-600 hover:text-indigo-500"
+            >
+              {isResetMode ? 'Back to login' : isSignUpMode ? 'Already have an account? Sign in' : "Don't have an account? Sign up"}
+            </button>
+            {!isSignUpMode && (
+              <button
+                type="button"
+                onClick={() => {
+                  setIsResetMode(!isResetMode);
+                  setError(null);
+                }}
+                className="text-sm font-medium text-indigo-600 hover:text-indigo-500"
+              >
+                {isResetMode ? 'Back to login' : 'Forgot your password?'}
+              </button>
+            )}
+          </div>
 
           <div>
             <button
@@ -148,7 +251,7 @@ const Login = () => {
                   </svg>
                 )}
               </span>
-              {loading ? 'Signing in...' : 'Sign in'}
+              {loading ? 'Processing...' : isResetMode ? 'Reset Password' : isSignUpMode ? 'Sign up' : 'Sign in'}
             </button>
           </div>
         </form>

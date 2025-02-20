@@ -1,0 +1,6261 @@
+{
+  "metadata": {
+    "timestamp": "2025-01-30T11:24:29.186Z",
+    "projectId": "pxjhsbezqybrksmcpwmx",
+    "version": "1.0"
+  },
+  "tables": {
+    "exercise_prompts": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "default": "uuid_generate_v4()",
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "text",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "media",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "type",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "narration",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "saytext",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "question_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "timezone('utc'::text, now())",
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "default": "timezone('utc'::text, now())",
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "order_index",
+          "type": "bigint",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        }
+      ],
+      "indexes": [
+        {
+          "name": "exercise_prompts_pkey",
+          "definition": "CREATE UNIQUE INDEX exercise_prompts_pkey ON public.exercise_prompts USING btree (id)"
+        },
+        {
+          "name": "idx_exercise_prompts_questionid",
+          "definition": "CREATE INDEX idx_exercise_prompts_questionid ON public.exercise_prompts USING btree (question_id)"
+        },
+        {
+          "name": "idx_exercise_prompts_question_id",
+          "definition": "CREATE INDEX idx_exercise_prompts_question_id ON public.exercise_prompts USING btree (question_id)"
+        },
+        {
+          "name": "idx_exercise_prompts_order",
+          "definition": "CREATE INDEX idx_exercise_prompts_order ON public.exercise_prompts USING btree (order_index)"
+        }
+      ],
+      "policies": [
+        {
+          "name": "Enable all access to exercise_prompts",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "ALL"
+        },
+        {
+          "name": "Enable read access for authenticated users",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "SELECT"
+        }
+      ],
+      "triggers": null,
+      "constraints": [
+        {
+          "name": "exercise_prompts_pkey",
+          "type": "PRIMARY KEY",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "exercise_prompts_question_id_fkey",
+          "type": "FOREIGN KEY",
+          "definition": "FOREIGN KEY (question_id) REFERENCES questions(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "exercise_prompts_type_check",
+          "type": "CHECK",
+          "definition": "CHECK ((type = ANY (ARRAY['image'::text, 'gif'::text, 'video'::text])))"
+        },
+        {
+          "name": "exercise_prompts_user_id_fkey",
+          "type": "FOREIGN KEY",
+          "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id)"
+        }
+      ],
+      "foreign_keys": [
+        {
+          "name": "exercise_prompts_question_id_fkey",
+          "column": "question_id",
+          "foreign_table": "questions",
+          "foreign_column": "id"
+        },
+        {
+          "name": "exercise_prompts_user_id_fkey",
+          "column": "user_id",
+          "foreign_table": "users",
+          "foreign_column": "id"
+        }
+      ]
+    },
+    "students": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "default": "gen_random_uuid()",
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "last_name",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "roll_number",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "school_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "grade_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "gender",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "date_of_birth",
+          "type": "date",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "contact_number",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "email",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "address",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "guardian_name",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "guardian_contact",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "first_name",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "description": "First name of the student"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "students_pkey",
+          "definition": "CREATE UNIQUE INDEX students_pkey ON public.students USING btree (id)"
+        },
+        {
+          "name": "students_school_id_roll_number_key",
+          "definition": "CREATE UNIQUE INDEX students_school_id_roll_number_key ON public.students USING btree (school_id, roll_number)"
+        },
+        {
+          "name": "idx_students_school_id",
+          "definition": "CREATE INDEX idx_students_school_id ON public.students USING btree (school_id)"
+        },
+        {
+          "name": "idx_students_grade_id",
+          "definition": "CREATE INDEX idx_students_grade_id ON public.students USING btree (grade_id)"
+        },
+        {
+          "name": "idx_students_roll_number",
+          "definition": "CREATE INDEX idx_students_roll_number ON public.students USING btree (roll_number)"
+        }
+      ],
+      "policies": [
+        {
+          "name": "students_manage_policy_v2",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "ALL"
+        },
+        {
+          "name": "students_manage_policy_v3",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "ALL"
+        },
+        {
+          "name": "students_view_policy_v2",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "SELECT"
+        },
+        {
+          "name": "students_view_policy_v3",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "SELECT"
+        }
+      ],
+      "triggers": [
+        {
+          "name": "set_timestamp",
+          "event": "UPDATE",
+          "timing": "BEFORE",
+          "statement": "EXECUTE FUNCTION trigger_set_timestamp()"
+        },
+        {
+          "name": "update_students_updated_at",
+          "event": "UPDATE",
+          "timing": "BEFORE",
+          "statement": "EXECUTE FUNCTION update_updated_at_column()"
+        }
+      ],
+      "constraints": [
+        {
+          "name": "fk_student_grade",
+          "type": "FOREIGN KEY",
+          "definition": "FOREIGN KEY (grade_id) REFERENCES grades(id)"
+        },
+        {
+          "name": "students_gender_check",
+          "type": "CHECK",
+          "definition": "CHECK ((gender = ANY (ARRAY['Male'::text, 'Female'::text, 'Other'::text])))"
+        },
+        {
+          "name": "students_pkey",
+          "type": "PRIMARY KEY",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "students_school_id_fkey",
+          "type": "FOREIGN KEY",
+          "definition": "FOREIGN KEY (school_id) REFERENCES schools(id)"
+        },
+        {
+          "name": "students_school_id_roll_number_key",
+          "type": "UNIQUE",
+          "definition": "UNIQUE (school_id, roll_number)"
+        }
+      ],
+      "foreign_keys": [
+        {
+          "name": "fk_student_grade",
+          "column": "grade_id",
+          "foreign_table": "grades",
+          "foreign_column": "id"
+        },
+        {
+          "name": "students_school_id_fkey",
+          "column": "school_id",
+          "foreign_table": "schools",
+          "foreign_column": "id"
+        }
+      ]
+    },
+    "sales_leads": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "default": "gen_random_uuid()",
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "company_name",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "contact_name",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "email",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "phone",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "source",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "assigned_to",
+          "type": "uuid",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "estimated_value",
+          "type": "numeric",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "probability",
+          "type": "integer",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "expected_close_date",
+          "type": "date",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "notes",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "YES",
+          "description": null
+        }
+      ],
+      "indexes": [
+        {
+          "name": "sales_leads_pkey",
+          "definition": "CREATE UNIQUE INDEX sales_leads_pkey ON public.sales_leads USING btree (id)"
+        },
+        {
+          "name": "idx_sales_leads_status",
+          "definition": "CREATE INDEX idx_sales_leads_status ON public.sales_leads USING btree (status)"
+        },
+        {
+          "name": "idx_sales_leads_assigned_to",
+          "definition": "CREATE INDEX idx_sales_leads_assigned_to ON public.sales_leads USING btree (assigned_to)"
+        }
+      ],
+      "policies": [
+        {
+          "name": "Enable read for authenticated users",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "SELECT"
+        },
+        {
+          "name": "Enable write for authenticated users",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "ALL"
+        }
+      ],
+      "triggers": null,
+      "constraints": [
+        {
+          "name": "sales_leads_assigned_to_fkey",
+          "type": "FOREIGN KEY",
+          "definition": "FOREIGN KEY (assigned_to) REFERENCES auth.users(id)"
+        },
+        {
+          "name": "sales_leads_pkey",
+          "type": "PRIMARY KEY",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "sales_leads_probability_check",
+          "type": "CHECK",
+          "definition": "CHECK (((probability >= 0) AND (probability <= 100)))"
+        },
+        {
+          "name": "sales_leads_status_check",
+          "type": "CHECK",
+          "definition": "CHECK ((status = ANY (ARRAY['new'::text, 'contacted'::text, 'qualified'::text, 'proposal'::text, 'negotiation'::text, 'won'::text, 'lost'::text])))"
+        }
+      ],
+      "foreign_keys": [
+        {
+          "name": "sales_leads_assigned_to_fkey",
+          "column": "assigned_to",
+          "foreign_table": "users",
+          "foreign_column": "id"
+        }
+      ]
+    },
+    "sales_activities": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "default": "gen_random_uuid()",
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "lead_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "type",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "subject",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "due_date",
+          "type": "timestamp with time zone",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "completed_at",
+          "type": "timestamp with time zone",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "performed_by",
+          "type": "uuid",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "YES",
+          "description": null
+        }
+      ],
+      "indexes": [
+        {
+          "name": "sales_activities_pkey",
+          "definition": "CREATE UNIQUE INDEX sales_activities_pkey ON public.sales_activities USING btree (id)"
+        },
+        {
+          "name": "idx_sales_activities_lead_id",
+          "definition": "CREATE INDEX idx_sales_activities_lead_id ON public.sales_activities USING btree (lead_id)"
+        }
+      ],
+      "policies": [
+        {
+          "name": "Enable read for authenticated users",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "SELECT"
+        },
+        {
+          "name": "Enable write for authenticated users",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "ALL"
+        }
+      ],
+      "triggers": null,
+      "constraints": [
+        {
+          "name": "sales_activities_lead_id_fkey",
+          "type": "FOREIGN KEY",
+          "definition": "FOREIGN KEY (lead_id) REFERENCES sales_leads(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "sales_activities_performed_by_fkey",
+          "type": "FOREIGN KEY",
+          "definition": "FOREIGN KEY (performed_by) REFERENCES auth.users(id)"
+        },
+        {
+          "name": "sales_activities_pkey",
+          "type": "PRIMARY KEY",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "sales_activities_status_check",
+          "type": "CHECK",
+          "definition": "CHECK ((status = ANY (ARRAY['planned'::text, 'completed'::text, 'cancelled'::text])))"
+        },
+        {
+          "name": "sales_activities_type_check",
+          "type": "CHECK",
+          "definition": "CHECK ((type = ANY (ARRAY['call'::text, 'email'::text, 'meeting'::text, 'note'::text, 'task'::text])))"
+        }
+      ],
+      "foreign_keys": [
+        {
+          "name": "sales_activities_lead_id_fkey",
+          "column": "lead_id",
+          "foreign_table": "sales_leads",
+          "foreign_column": "id"
+        },
+        {
+          "name": "sales_activities_performed_by_fkey",
+          "column": "performed_by",
+          "foreign_table": "users",
+          "foreign_column": "id"
+        }
+      ]
+    },
+    "sales_opportunities": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "default": "gen_random_uuid()",
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "lead_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "stage",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "amount",
+          "type": "numeric",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "close_date",
+          "type": "date",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "probability",
+          "type": "integer",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "next_step",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "competition",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "notes",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "YES",
+          "description": null
+        }
+      ],
+      "indexes": [
+        {
+          "name": "sales_opportunities_pkey",
+          "definition": "CREATE UNIQUE INDEX sales_opportunities_pkey ON public.sales_opportunities USING btree (id)"
+        },
+        {
+          "name": "idx_sales_opportunities_lead_id",
+          "definition": "CREATE INDEX idx_sales_opportunities_lead_id ON public.sales_opportunities USING btree (lead_id)"
+        }
+      ],
+      "policies": [
+        {
+          "name": "Enable read for authenticated users",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "SELECT"
+        },
+        {
+          "name": "Enable write for authenticated users",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "ALL"
+        }
+      ],
+      "triggers": null,
+      "constraints": [
+        {
+          "name": "sales_opportunities_lead_id_fkey",
+          "type": "FOREIGN KEY",
+          "definition": "FOREIGN KEY (lead_id) REFERENCES sales_leads(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "sales_opportunities_pkey",
+          "type": "PRIMARY KEY",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "sales_opportunities_probability_check",
+          "type": "CHECK",
+          "definition": "CHECK (((probability >= 0) AND (probability <= 100)))"
+        },
+        {
+          "name": "sales_opportunities_stage_check",
+          "type": "CHECK",
+          "definition": "CHECK ((stage = ANY (ARRAY['discovery'::text, 'qualification'::text, 'proposal'::text, 'negotiation'::text, 'closed_won'::text, 'closed_lost'::text])))"
+        }
+      ],
+      "foreign_keys": [
+        {
+          "name": "sales_opportunities_lead_id_fkey",
+          "column": "lead_id",
+          "foreign_table": "sales_leads",
+          "foreign_column": "id"
+        }
+      ]
+    },
+    "user_preferences": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "default": "gen_random_uuid()",
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "preferences",
+          "type": "jsonb",
+          "default": "'{}'::jsonb",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "YES",
+          "description": null
+        }
+      ],
+      "indexes": [
+        {
+          "name": "user_preferences_pkey",
+          "definition": "CREATE UNIQUE INDEX user_preferences_pkey ON public.user_preferences USING btree (id)"
+        },
+        {
+          "name": "user_preferences_user_id_key",
+          "definition": "CREATE UNIQUE INDEX user_preferences_user_id_key ON public.user_preferences USING btree (user_id)"
+        }
+      ],
+      "policies": [
+        {
+          "name": "Users can manage their own preferences",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "ALL"
+        }
+      ],
+      "triggers": null,
+      "constraints": [
+        {
+          "name": "user_preferences_pkey",
+          "type": "PRIMARY KEY",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "user_preferences_user_id_fkey",
+          "type": "FOREIGN KEY",
+          "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "user_preferences_user_id_key",
+          "type": "UNIQUE",
+          "definition": "UNIQUE (user_id)"
+        }
+      ],
+      "foreign_keys": [
+        {
+          "name": "user_preferences_user_id_fkey",
+          "column": "user_id",
+          "foreign_table": "users",
+          "foreign_column": "id"
+        }
+      ]
+    },
+    "sales_contacts": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "default": "gen_random_uuid()",
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "lead_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "email",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "phone",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "is_primary",
+          "type": "boolean",
+          "default": "false",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "department",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "notes",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "YES",
+          "description": null
+        }
+      ],
+      "indexes": [
+        {
+          "name": "sales_contacts_pkey",
+          "definition": "CREATE UNIQUE INDEX sales_contacts_pkey ON public.sales_contacts USING btree (id)"
+        },
+        {
+          "name": "idx_sales_contacts_lead_id",
+          "definition": "CREATE INDEX idx_sales_contacts_lead_id ON public.sales_contacts USING btree (lead_id)"
+        }
+      ],
+      "policies": [
+        {
+          "name": "Enable read for authenticated users",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "SELECT"
+        },
+        {
+          "name": "Enable write for authenticated users",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "ALL"
+        }
+      ],
+      "triggers": null,
+      "constraints": [
+        {
+          "name": "sales_contacts_lead_id_fkey",
+          "type": "FOREIGN KEY",
+          "definition": "FOREIGN KEY (lead_id) REFERENCES sales_leads(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "sales_contacts_pkey",
+          "type": "PRIMARY KEY",
+          "definition": "PRIMARY KEY (id)"
+        }
+      ],
+      "foreign_keys": [
+        {
+          "name": "sales_contacts_lead_id_fkey",
+          "column": "lead_id",
+          "foreign_table": "sales_leads",
+          "foreign_column": "id"
+        }
+      ]
+    },
+    "user_schools": {
+      "columns": [
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "school_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        }
+      ],
+      "indexes": [
+        {
+          "name": "user_schools_pkey",
+          "definition": "CREATE UNIQUE INDEX user_schools_pkey ON public.user_schools USING btree (user_id, school_id)"
+        }
+      ],
+      "policies": [
+        {
+          "name": "Enable delete for authenticated users",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "DELETE"
+        },
+        {
+          "name": "Enable insert for authenticated users",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "INSERT"
+        },
+        {
+          "name": "Enable read access for all authenticated users",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "SELECT"
+        },
+        {
+          "name": "Enable update for authenticated users",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "UPDATE"
+        },
+        {
+          "name": "Super admins and admins can manage user school assignments",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "ALL"
+        },
+        {
+          "name": "Users can view their own school assignments",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "SELECT"
+        }
+      ],
+      "triggers": null,
+      "constraints": [
+        {
+          "name": "user_schools_pkey",
+          "type": "PRIMARY KEY",
+          "definition": "PRIMARY KEY (user_id, school_id)"
+        },
+        {
+          "name": "user_schools_user_id_fkey",
+          "type": "FOREIGN KEY",
+          "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        }
+      ],
+      "foreign_keys": [
+        {
+          "name": "user_schools_user_id_fkey",
+          "column": "user_id",
+          "foreign_table": "users",
+          "foreign_column": "id"
+        }
+      ]
+    },
+    "dashboards": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "default": "gen_random_uuid()",
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "layout",
+          "type": "jsonb",
+          "default": "'[]'::jsonb",
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "is_default",
+          "type": "boolean",
+          "default": "false",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "YES",
+          "description": null
+        }
+      ],
+      "indexes": [
+        {
+          "name": "dashboards_pkey",
+          "definition": "CREATE UNIQUE INDEX dashboards_pkey ON public.dashboards USING btree (id)"
+        }
+      ],
+      "policies": [
+        {
+          "name": "dashboard_delete_policy",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "DELETE"
+        },
+        {
+          "name": "dashboard_insert_policy",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "INSERT"
+        },
+        {
+          "name": "dashboard_select_policy",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "SELECT"
+        },
+        {
+          "name": "dashboard_update_policy",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "UPDATE"
+        }
+      ],
+      "triggers": null,
+      "constraints": [
+        {
+          "name": "dashboards_pkey",
+          "type": "PRIMARY KEY",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "dashboards_user_id_fkey",
+          "type": "FOREIGN KEY",
+          "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        }
+      ],
+      "foreign_keys": [
+        {
+          "name": "dashboards_user_id_fkey",
+          "column": "user_id",
+          "foreign_table": "users",
+          "foreign_column": "id"
+        }
+      ]
+    },
+    "schools": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "default": "gen_random_uuid()",
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "type",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "parent_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "address",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "latitude",
+          "type": "double precision",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "longitude",
+          "type": "double precision",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "contact_number",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "email",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "capacity",
+          "type": "integer",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "principal_name",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "website",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "established_year",
+          "type": "integer",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "accreditation_status",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "facilities",
+          "type": "jsonb",
+          "default": "'{}'::jsonb",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "operating_hours",
+          "type": "jsonb",
+          "default": "'{}'::jsonb",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "social_media",
+          "type": "jsonb",
+          "default": "'{}'::jsonb",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "emergency_contact",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "tax_id",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "license_number",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "last_inspection_date",
+          "type": "date",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "student_count",
+          "type": "integer",
+          "default": "0",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "staff_count",
+          "type": "integer",
+          "default": "0",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "classroom_count",
+          "type": "integer",
+          "default": "0",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "is_boarding",
+          "type": "boolean",
+          "default": "false",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "transportation_provided",
+          "type": "boolean",
+          "default": "false",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "curriculum_type",
+          "type": "ARRAY",
+          "default": "'{}'::text[]",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "languages_offered",
+          "type": "ARRAY",
+          "default": "'{}'::text[]",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "extracurricular_activities",
+          "type": "ARRAY",
+          "default": "'{}'::text[]",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "grades",
+          "type": "ARRAY",
+          "default": "'{}'::text[]",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "school_type",
+          "type": "USER-DEFINED",
+          "default": "'public'::school_category",
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "school_level",
+          "type": "USER-DEFINED",
+          "default": "'elementary'::school_level",
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "classes",
+          "type": "ARRAY",
+          "default": "'{}'::jsonb[]",
+          "nullable": "YES",
+          "description": null
+        }
+      ],
+      "indexes": [
+        {
+          "name": "schools_pkey",
+          "definition": "CREATE UNIQUE INDEX schools_pkey ON public.schools USING btree (id)"
+        },
+        {
+          "name": "idx_schools_type",
+          "definition": "CREATE INDEX idx_schools_type ON public.schools USING btree (type)"
+        },
+        {
+          "name": "idx_schools_status",
+          "definition": "CREATE INDEX idx_schools_status ON public.schools USING btree (status)"
+        },
+        {
+          "name": "idx_schools_parent_id",
+          "definition": "CREATE INDEX idx_schools_parent_id ON public.schools USING btree (parent_id)"
+        }
+      ],
+      "policies": [
+        {
+          "name": "Enable delete for authenticated users",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "DELETE"
+        },
+        {
+          "name": "Enable insert for authenticated users",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "INSERT"
+        },
+        {
+          "name": "Enable read access for all authenticated users",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "SELECT"
+        },
+        {
+          "name": "Enable update for authenticated users",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "UPDATE"
+        }
+      ],
+      "triggers": [
+        {
+          "name": "set_timestamp",
+          "event": "UPDATE",
+          "timing": "BEFORE",
+          "statement": "EXECUTE FUNCTION trigger_set_timestamp()"
+        },
+        {
+          "name": "update_schools_updated_at",
+          "event": "UPDATE",
+          "timing": "BEFORE",
+          "statement": "EXECUTE FUNCTION update_updated_at_column()"
+        }
+      ],
+      "constraints": [
+        {
+          "name": "check_capacity",
+          "type": "CHECK",
+          "definition": "CHECK ((capacity >= 0))"
+        },
+        {
+          "name": "check_email",
+          "type": "CHECK",
+          "definition": "CHECK ((email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$'::text))"
+        },
+        {
+          "name": "check_latitude",
+          "type": "CHECK",
+          "definition": "CHECK (((latitude >= ('-90'::integer)::double precision) AND (latitude <= (90)::double precision)))"
+        },
+        {
+          "name": "check_longitude",
+          "type": "CHECK",
+          "definition": "CHECK (((longitude >= ('-180'::integer)::double precision) AND (longitude <= (180)::double precision)))"
+        },
+        {
+          "name": "schools_parent_id_fkey",
+          "type": "FOREIGN KEY",
+          "definition": "FOREIGN KEY (parent_id) REFERENCES schools(id)"
+        },
+        {
+          "name": "schools_pkey",
+          "type": "PRIMARY KEY",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "schools_status_check",
+          "type": "CHECK",
+          "definition": "CHECK ((status = ANY (ARRAY['active'::text, 'inactive'::text])))"
+        },
+        {
+          "name": "schools_type_check",
+          "type": "CHECK",
+          "definition": "CHECK ((type = ANY (ARRAY['main'::text, 'branch'::text])))"
+        }
+      ],
+      "foreign_keys": [
+        {
+          "name": "schools_parent_id_fkey",
+          "column": "parent_id",
+          "foreign_table": "schools",
+          "foreign_column": "id"
+        }
+      ]
+    },
+    "school_grades": {
+      "columns": [
+        {
+          "name": "school_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "grade_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "YES",
+          "description": null
+        }
+      ],
+      "indexes": [
+        {
+          "name": "school_grades_pkey",
+          "definition": "CREATE UNIQUE INDEX school_grades_pkey ON public.school_grades USING btree (school_id, grade_id)"
+        },
+        {
+          "name": "idx_school_grades_school_id",
+          "definition": "CREATE INDEX idx_school_grades_school_id ON public.school_grades USING btree (school_id)"
+        },
+        {
+          "name": "idx_school_grades_grade_id",
+          "definition": "CREATE INDEX idx_school_grades_grade_id ON public.school_grades USING btree (grade_id)"
+        }
+      ],
+      "policies": [
+        {
+          "name": "Enable delete for authenticated users",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "DELETE"
+        },
+        {
+          "name": "Enable insert for authenticated users",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "INSERT"
+        },
+        {
+          "name": "Enable read access for all authenticated users",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "SELECT"
+        },
+        {
+          "name": "Enable update for authenticated users",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "UPDATE"
+        }
+      ],
+      "triggers": null,
+      "constraints": [
+        {
+          "name": "school_grades_pkey",
+          "type": "PRIMARY KEY",
+          "definition": "PRIMARY KEY (school_id, grade_id)"
+        },
+        {
+          "name": "school_grades_school_id_fkey",
+          "type": "FOREIGN KEY",
+          "definition": "FOREIGN KEY (school_id) REFERENCES schools(id) ON DELETE CASCADE"
+        }
+      ],
+      "foreign_keys": [
+        {
+          "name": "school_grades_school_id_fkey",
+          "column": "school_id",
+          "foreign_table": "schools",
+          "foreign_column": "id"
+        }
+      ]
+    },
+    "staff": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "default": "gen_random_uuid()",
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "email",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "role",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "school_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "department",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "default": "'active'::text",
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "YES",
+          "description": null
+        }
+      ],
+      "indexes": [
+        {
+          "name": "staff_pkey",
+          "definition": "CREATE UNIQUE INDEX staff_pkey ON public.staff USING btree (id)"
+        },
+        {
+          "name": "staff_email_key",
+          "definition": "CREATE UNIQUE INDEX staff_email_key ON public.staff USING btree (email)"
+        },
+        {
+          "name": "idx_staff_school_id",
+          "definition": "CREATE INDEX idx_staff_school_id ON public.staff USING btree (school_id)"
+        },
+        {
+          "name": "idx_staff_role",
+          "definition": "CREATE INDEX idx_staff_role ON public.staff USING btree (role)"
+        },
+        {
+          "name": "idx_staff_email",
+          "definition": "CREATE INDEX idx_staff_email ON public.staff USING btree (email)"
+        }
+      ],
+      "policies": [
+        {
+          "name": "staff_manage_policy",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "ALL"
+        },
+        {
+          "name": "staff_view_policy",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "SELECT"
+        }
+      ],
+      "triggers": [
+        {
+          "name": "set_timestamp",
+          "event": "UPDATE",
+          "timing": "BEFORE",
+          "statement": "EXECUTE FUNCTION trigger_set_timestamp()"
+        }
+      ],
+      "constraints": [
+        {
+          "name": "staff_email_key",
+          "type": "UNIQUE",
+          "definition": "UNIQUE (email)"
+        },
+        {
+          "name": "staff_pkey",
+          "type": "PRIMARY KEY",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "staff_school_id_fkey",
+          "type": "FOREIGN KEY",
+          "definition": "FOREIGN KEY (school_id) REFERENCES schools(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "staff_status_check",
+          "type": "CHECK",
+          "definition": "CHECK ((status = ANY (ARRAY['active'::text, 'inactive'::text, 'pending'::text])))"
+        }
+      ],
+      "foreign_keys": [
+        {
+          "name": "staff_school_id_fkey",
+          "column": "school_id",
+          "foreign_table": "schools",
+          "foreign_column": "id"
+        }
+      ]
+    },
+    "grades": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "default": "uuid_generate_v4()",
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "name",
+          "type": "character varying",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "level",
+          "type": "integer",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "CURRENT_TIMESTAMP",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "default": "CURRENT_TIMESTAMP",
+          "nullable": "YES",
+          "description": null
+        }
+      ],
+      "indexes": [
+        {
+          "name": "grades_pkey",
+          "definition": "CREATE UNIQUE INDEX grades_pkey ON public.grades USING btree (id)"
+        }
+      ],
+      "policies": [
+        {
+          "name": "Enable insert for authenticated users",
+          "roles": [
+            "public"
+          ],
+          "command": "INSERT"
+        },
+        {
+          "name": "Enable read access for all users",
+          "roles": [
+            "public"
+          ],
+          "command": "SELECT"
+        }
+      ],
+      "triggers": null,
+      "constraints": [
+        {
+          "name": "grades_pkey",
+          "type": "PRIMARY KEY",
+          "definition": "PRIMARY KEY (id)"
+        }
+      ],
+      "foreign_keys": null
+    },
+    "topics": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "default": "uuid_generate_v4()",
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "title",
+          "type": "character varying",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "grade_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "order_index",
+          "type": "integer",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "CURRENT_TIMESTAMP",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "default": "CURRENT_TIMESTAMP",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "course_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "YES",
+          "description": "course id"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "topics_pkey",
+          "definition": "CREATE UNIQUE INDEX topics_pkey ON public.topics USING btree (id)"
+        },
+        {
+          "name": "idx_topics_grade_id",
+          "definition": "CREATE INDEX idx_topics_grade_id ON public.topics USING btree (grade_id)"
+        }
+      ],
+      "policies": [
+        {
+          "name": "Enable insert for authenticated users",
+          "roles": [
+            "public"
+          ],
+          "command": "INSERT"
+        },
+        {
+          "name": "Enable read access for all users",
+          "roles": [
+            "public"
+          ],
+          "command": "SELECT"
+        },
+        {
+          "name": "Enable read access for authenticated users",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "SELECT"
+        }
+      ],
+      "triggers": null,
+      "constraints": [
+        {
+          "name": "topics_course_id_fkey",
+          "type": "FOREIGN KEY",
+          "definition": "FOREIGN KEY (course_id) REFERENCES courses(id) ON UPDATE CASCADE ON DELETE CASCADE"
+        },
+        {
+          "name": "topics_grade_id_fkey",
+          "type": "FOREIGN KEY",
+          "definition": "FOREIGN KEY (grade_id) REFERENCES grades(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "topics_pkey",
+          "type": "PRIMARY KEY",
+          "definition": "PRIMARY KEY (id)"
+        }
+      ],
+      "foreign_keys": [
+        {
+          "name": "topics_course_id_fkey",
+          "column": "course_id",
+          "foreign_table": "courses",
+          "foreign_column": "id"
+        },
+        {
+          "name": "topics_grade_id_fkey",
+          "column": "grade_id",
+          "foreign_table": "grades",
+          "foreign_column": "id"
+        }
+      ]
+    },
+    "subtopics": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "default": "uuid_generate_v4()",
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "title",
+          "type": "character varying",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "topic_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "order_index",
+          "type": "integer",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "CURRENT_TIMESTAMP",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "default": "CURRENT_TIMESTAMP",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "description": "title"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "subtopics_pkey",
+          "definition": "CREATE UNIQUE INDEX subtopics_pkey ON public.subtopics USING btree (id)"
+        },
+        {
+          "name": "idx_subtopics_topic_id",
+          "definition": "CREATE INDEX idx_subtopics_topic_id ON public.subtopics USING btree (topic_id)"
+        }
+      ],
+      "policies": [
+        {
+          "name": "Enable insert for authenticated users",
+          "roles": [
+            "public"
+          ],
+          "command": "INSERT"
+        },
+        {
+          "name": "Enable read access for all users",
+          "roles": [
+            "public"
+          ],
+          "command": "SELECT"
+        },
+        {
+          "name": "Enable read access for authenticated users",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "SELECT"
+        }
+      ],
+      "triggers": null,
+      "constraints": [
+        {
+          "name": "subtopics_pkey",
+          "type": "PRIMARY KEY",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "subtopics_topic_id_fkey",
+          "type": "FOREIGN KEY",
+          "definition": "FOREIGN KEY (topic_id) REFERENCES topics(id) ON DELETE CASCADE"
+        }
+      ],
+      "foreign_keys": [
+        {
+          "name": "subtopics_topic_id_fkey",
+          "column": "topic_id",
+          "foreign_table": "topics",
+          "foreign_column": "id"
+        }
+      ]
+    },
+    "lesson_content": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "default": "uuid_generate_v4()",
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "lesson_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "content_type",
+          "type": "character varying",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "metadata",
+          "type": "jsonb",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "order_index",
+          "type": "integer",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "default": "CURRENT_TIMESTAMP",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "content",
+          "type": "ARRAY",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        }
+      ],
+      "indexes": [
+        {
+          "name": "lesson_content_pkey",
+          "definition": "CREATE UNIQUE INDEX lesson_content_pkey ON public.lesson_content USING btree (id)"
+        }
+      ],
+      "policies": [
+        {
+          "name": "Allow insert/update for own lesson_content",
+          "roles": [
+            "public"
+          ],
+          "command": "ALL"
+        },
+        {
+          "name": "Allow read access to lesson_content",
+          "roles": [
+            "public"
+          ],
+          "command": "SELECT"
+        },
+        {
+          "name": "Enable insert for authenticated users",
+          "roles": [
+            "public"
+          ],
+          "command": "INSERT"
+        },
+        {
+          "name": "Enable read access for all users",
+          "roles": [
+            "public"
+          ],
+          "command": "SELECT"
+        },
+        {
+          "name": "Users can manage their own lessons_content",
+          "roles": [
+            "public"
+          ],
+          "command": "ALL"
+        }
+      ],
+      "triggers": null,
+      "constraints": [
+        {
+          "name": "lesson_content_lesson_id_fkey",
+          "type": "FOREIGN KEY",
+          "definition": "FOREIGN KEY (lesson_id) REFERENCES lessons(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "lesson_content_pkey",
+          "type": "PRIMARY KEY",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "lesson_content_user_id_fkey",
+          "type": "FOREIGN KEY",
+          "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id)"
+        }
+      ],
+      "foreign_keys": [
+        {
+          "name": "lesson_content_user_id_fkey",
+          "column": "user_id",
+          "foreign_table": "users",
+          "foreign_column": "id"
+        },
+        {
+          "name": "lesson_content_lesson_id_fkey",
+          "column": "lesson_id",
+          "foreign_table": "lessons",
+          "foreign_column": "id"
+        }
+      ]
+    },
+    "lessons": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "default": "uuid_generate_v4()",
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "title",
+          "type": "character varying",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "content",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "grade_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "topic_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "subtopic_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "order_index",
+          "type": "integer",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "status",
+          "type": "character varying",
+          "default": "'draft'::character varying",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "CURRENT_TIMESTAMP",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "default": "CURRENT_TIMESTAMP",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "media_type",
+          "type": "USER-DEFINED",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "media_url",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "duration",
+          "type": "bigint",
+          "default": null,
+          "nullable": "YES",
+          "description": "time duration"
+        },
+        {
+          "name": "subjectId",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "description": "Subject ID"
+        },
+        {
+          "name": "contentheading",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "description": "Content Heading"
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        }
+      ],
+      "indexes": [
+        {
+          "name": "lessons_pkey",
+          "definition": "CREATE UNIQUE INDEX lessons_pkey ON public.lessons USING btree (id)"
+        },
+        {
+          "name": "idx_lessons_subtopic_id",
+          "definition": "CREATE INDEX idx_lessons_subtopic_id ON public.lessons USING btree (subtopic_id)"
+        }
+      ],
+      "policies": [
+        {
+          "name": "Enable insert for authenticated users",
+          "roles": [
+            "public"
+          ],
+          "command": "INSERT"
+        },
+        {
+          "name": "Enable read access for all users",
+          "roles": [
+            "public"
+          ],
+          "command": "SELECT"
+        },
+        {
+          "name": "Enable read access for authenticated users",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "SELECT"
+        },
+        {
+          "name": "Users can manage their own lessons",
+          "roles": [
+            "public"
+          ],
+          "command": "ALL"
+        }
+      ],
+      "triggers": null,
+      "constraints": [
+        {
+          "name": "lessons_grade_id_fkey",
+          "type": "FOREIGN KEY",
+          "definition": "FOREIGN KEY (grade_id) REFERENCES grades(id)"
+        },
+        {
+          "name": "lessons_pkey",
+          "type": "PRIMARY KEY",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "lessons_subtopic_id_fkey",
+          "type": "FOREIGN KEY",
+          "definition": "FOREIGN KEY (subtopic_id) REFERENCES subtopics(id)"
+        },
+        {
+          "name": "lessons_topic_id_fkey",
+          "type": "FOREIGN KEY",
+          "definition": "FOREIGN KEY (topic_id) REFERENCES topics(id)"
+        },
+        {
+          "name": "lessons_user_id_fkey",
+          "type": "FOREIGN KEY",
+          "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id)"
+        }
+      ],
+      "foreign_keys": [
+        {
+          "name": "lessons_user_id_fkey",
+          "column": "user_id",
+          "foreign_table": "users",
+          "foreign_column": "id"
+        },
+        {
+          "name": "lessons_grade_id_fkey",
+          "column": "grade_id",
+          "foreign_table": "grades",
+          "foreign_column": "id"
+        },
+        {
+          "name": "lessons_topic_id_fkey",
+          "column": "topic_id",
+          "foreign_table": "topics",
+          "foreign_column": "id"
+        },
+        {
+          "name": "lessons_subtopic_id_fkey",
+          "column": "subtopic_id",
+          "foreign_table": "subtopics",
+          "foreign_column": "id"
+        }
+      ]
+    },
+    "sections": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "default": "uuid_generate_v4()",
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "class_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "room_no",
+          "type": "integer",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "room_location",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "CURRENT_TIMESTAMP",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "default": "CURRENT_TIMESTAMP",
+          "nullable": "YES",
+          "description": null
+        }
+      ],
+      "indexes": [
+        {
+          "name": "sections_pkey",
+          "definition": "CREATE UNIQUE INDEX sections_pkey ON public.sections USING btree (id)"
+        },
+        {
+          "name": "idx_sections_class_id",
+          "definition": "CREATE INDEX idx_sections_class_id ON public.sections USING btree (class_id)"
+        }
+      ],
+      "policies": null,
+      "triggers": null,
+      "constraints": [
+        {
+          "name": "sections_class_id_fkey",
+          "type": "FOREIGN KEY",
+          "definition": "FOREIGN KEY (class_id) REFERENCES classes(id)"
+        },
+        {
+          "name": "sections_pkey",
+          "type": "PRIMARY KEY",
+          "definition": "PRIMARY KEY (id)"
+        }
+      ],
+      "foreign_keys": [
+        {
+          "name": "sections_class_id_fkey",
+          "column": "class_id",
+          "foreign_table": "classes",
+          "foreign_column": "id"
+        }
+      ]
+    },
+    "_health": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "default": "gen_random_uuid()",
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "last_check",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "default": "'healthy'::text",
+          "nullable": "YES",
+          "description": null
+        }
+      ],
+      "indexes": [
+        {
+          "name": "_health_pkey",
+          "definition": "CREATE UNIQUE INDEX _health_pkey ON public._health USING btree (id)"
+        }
+      ],
+      "policies": [
+        {
+          "name": "health_check_read_policy_v5",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "SELECT"
+        },
+        {
+          "name": "health_check_update_policy_v5",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "UPDATE"
+        }
+      ],
+      "triggers": null,
+      "constraints": [
+        {
+          "name": "_health_pkey",
+          "type": "PRIMARY KEY",
+          "definition": "PRIMARY KEY (id)"
+        }
+      ],
+      "foreign_keys": null
+    },
+    "section_students": {
+      "columns": [
+        {
+          "name": "section_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "student_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "CURRENT_TIMESTAMP",
+          "nullable": "YES",
+          "description": null
+        }
+      ],
+      "indexes": [
+        {
+          "name": "section_students_pkey",
+          "definition": "CREATE UNIQUE INDEX section_students_pkey ON public.section_students USING btree (section_id, student_id)"
+        },
+        {
+          "name": "idx_section_students_section_id",
+          "definition": "CREATE INDEX idx_section_students_section_id ON public.section_students USING btree (section_id)"
+        }
+      ],
+      "policies": null,
+      "triggers": null,
+      "constraints": [
+        {
+          "name": "section_students_pkey",
+          "type": "PRIMARY KEY",
+          "definition": "PRIMARY KEY (section_id, student_id)"
+        },
+        {
+          "name": "section_students_section_id_fkey",
+          "type": "FOREIGN KEY",
+          "definition": "FOREIGN KEY (section_id) REFERENCES sections(id)"
+        },
+        {
+          "name": "section_students_student_id_fkey",
+          "type": "FOREIGN KEY",
+          "definition": "FOREIGN KEY (student_id) REFERENCES auth.users(id)"
+        }
+      ],
+      "foreign_keys": [
+        {
+          "name": "section_students_section_id_fkey",
+          "column": "section_id",
+          "foreign_table": "sections",
+          "foreign_column": "id"
+        },
+        {
+          "name": "section_students_student_id_fkey",
+          "column": "student_id",
+          "foreign_table": "users",
+          "foreign_column": "id"
+        }
+      ]
+    },
+    "questions": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "default": "uuid_generate_v4()",
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "title",
+          "type": "character varying",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "content",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "type",
+          "type": "USER-DEFINED",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "lesson_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "points",
+          "type": "integer",
+          "default": "0",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "metadata",
+          "type": "jsonb",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "order_index",
+          "type": "integer",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "CURRENT_TIMESTAMP",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "default": "CURRENT_TIMESTAMP",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "data",
+          "type": "jsonb",
+          "default": "'{}'::jsonb",
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "correct_answer",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "exercise_prompts",
+          "type": "ARRAY",
+          "default": "ARRAY[]::jsonb[]",
+          "nullable": "YES",
+          "description": null
+        }
+      ],
+      "indexes": [
+        {
+          "name": "questions_pkey",
+          "definition": "CREATE UNIQUE INDEX questions_pkey ON public.questions USING btree (id)"
+        },
+        {
+          "name": "idx_questions_lesson_id",
+          "definition": "CREATE INDEX idx_questions_lesson_id ON public.questions USING btree (lesson_id)"
+        },
+        {
+          "name": "idx_questions_type",
+          "definition": "CREATE INDEX idx_questions_type ON public.questions USING btree (type)"
+        }
+      ],
+      "policies": [
+        {
+          "name": "Enable all access to questions",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "ALL"
+        },
+        {
+          "name": "Enable read access for authenticated users",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "SELECT"
+        }
+      ],
+      "triggers": null,
+      "constraints": [
+        {
+          "name": "questions_lesson_id_fkey",
+          "type": "FOREIGN KEY",
+          "definition": "FOREIGN KEY (lesson_id) REFERENCES lessons(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "questions_pkey",
+          "type": "PRIMARY KEY",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "questions_user_id_fkey",
+          "type": "FOREIGN KEY",
+          "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id)"
+        }
+      ],
+      "foreign_keys": [
+        {
+          "name": "questions_lesson_id_fkey",
+          "column": "lesson_id",
+          "foreign_table": "lessons",
+          "foreign_column": "id"
+        },
+        {
+          "name": "questions_user_id_fkey",
+          "column": "user_id",
+          "foreign_table": "users",
+          "foreign_column": "id"
+        }
+      ]
+    },
+    "loading_states": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "component",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "timezone('utc'::text, now())",
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "default": "timezone('utc'::text, now())",
+          "nullable": "NO",
+          "description": null
+        }
+      ],
+      "indexes": [
+        {
+          "name": "loading_states_pkey",
+          "definition": "CREATE UNIQUE INDEX loading_states_pkey ON public.loading_states USING btree (id)"
+        }
+      ],
+      "policies": null,
+      "triggers": null,
+      "constraints": [
+        {
+          "name": "loading_states_pkey",
+          "type": "PRIMARY KEY",
+          "definition": "PRIMARY KEY (id)"
+        }
+      ],
+      "foreign_keys": null
+    },
+    "role_settings": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "default": "gen_random_uuid()",
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "role_key",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "settings",
+          "type": "jsonb",
+          "default": "'{}'::jsonb",
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "YES",
+          "description": null
+        }
+      ],
+      "indexes": [
+        {
+          "name": "role_settings_pkey",
+          "definition": "CREATE UNIQUE INDEX role_settings_pkey ON public.role_settings USING btree (id)"
+        },
+        {
+          "name": "role_settings_role_key_key",
+          "definition": "CREATE UNIQUE INDEX role_settings_role_key_key ON public.role_settings USING btree (role_key)"
+        }
+      ],
+      "policies": [
+        {
+          "name": "Enable read access for authenticated users",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "SELECT"
+        },
+        {
+          "name": "Enable write access for admins",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "ALL"
+        },
+        {
+          "name": "Enable write access for admins on insert",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "INSERT"
+        },
+        {
+          "name": "Enable write access for admins on update",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "UPDATE"
+        }
+      ],
+      "triggers": [
+        {
+          "name": "validate_role_settings",
+          "event": "INSERT",
+          "timing": "BEFORE",
+          "statement": "EXECUTE FUNCTION validate_role_permissions()"
+        },
+        {
+          "name": "validate_role_settings",
+          "event": "UPDATE",
+          "timing": "BEFORE",
+          "statement": "EXECUTE FUNCTION validate_role_permissions()"
+        }
+      ],
+      "constraints": [
+        {
+          "name": "role_settings_pkey",
+          "type": "PRIMARY KEY",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "role_settings_role_key_key",
+          "type": "UNIQUE",
+          "definition": "UNIQUE (role_key)"
+        }
+      ],
+      "foreign_keys": null
+    },
+    "courses": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "default": "uuid_generate_v4()",
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "document_id",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "image_url",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "level",
+          "type": "numeric",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "progress",
+          "type": "integer",
+          "default": "0",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "CURRENT_TIMESTAMP",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "default": "CURRENT_TIMESTAMP",
+          "nullable": "YES",
+          "description": null
+        }
+      ],
+      "indexes": [
+        {
+          "name": "courses_pkey",
+          "definition": "CREATE UNIQUE INDEX courses_pkey ON public.courses USING btree (id)"
+        },
+        {
+          "name": "courses_document_id_key",
+          "definition": "CREATE UNIQUE INDEX courses_document_id_key ON public.courses USING btree (document_id)"
+        },
+        {
+          "name": "idx_courses_document_id",
+          "definition": "CREATE INDEX idx_courses_document_id ON public.courses USING btree (document_id)"
+        },
+        {
+          "name": "courses_level_key",
+          "definition": "CREATE UNIQUE INDEX courses_level_key ON public.courses USING btree (level)"
+        }
+      ],
+      "policies": [
+        {
+          "name": "Courses are viewable by authenticated users",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "SELECT"
+        },
+        {
+          "name": "Users can create courses",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "INSERT"
+        },
+        {
+          "name": "Users can update courses",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "UPDATE"
+        }
+      ],
+      "triggers": null,
+      "constraints": [
+        {
+          "name": "courses_document_id_key",
+          "type": "UNIQUE",
+          "definition": "UNIQUE (document_id)"
+        },
+        {
+          "name": "courses_level_key",
+          "type": "UNIQUE",
+          "definition": "UNIQUE (level)"
+        },
+        {
+          "name": "courses_pkey",
+          "type": "PRIMARY KEY",
+          "definition": "PRIMARY KEY (id)"
+        }
+      ],
+      "foreign_keys": null
+    },
+    "events": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "default": "gen_random_uuid()",
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "start_date",
+          "type": "timestamp with time zone",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "end_date",
+          "type": "timestamp with time zone",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "location",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "attendees",
+          "type": "integer",
+          "default": "0",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "type",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "created_by",
+          "type": "uuid",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "school_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "department",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        }
+      ],
+      "indexes": [
+        {
+          "name": "events_pkey",
+          "definition": "CREATE UNIQUE INDEX events_pkey ON public.events USING btree (id)"
+        },
+        {
+          "name": "idx_events_created_by",
+          "definition": "CREATE INDEX idx_events_created_by ON public.events USING btree (created_by)"
+        },
+        {
+          "name": "idx_events_department",
+          "definition": "CREATE INDEX idx_events_department ON public.events USING btree (department)"
+        },
+        {
+          "name": "idx_events_school_id",
+          "definition": "CREATE INDEX idx_events_school_id ON public.events USING btree (school_id)"
+        },
+        {
+          "name": "idx_events_type",
+          "definition": "CREATE INDEX idx_events_type ON public.events USING btree (type)"
+        },
+        {
+          "name": "idx_events_status",
+          "definition": "CREATE INDEX idx_events_status ON public.events USING btree (status)"
+        },
+        {
+          "name": "idx_events_start_date",
+          "definition": "CREATE INDEX idx_events_start_date ON public.events USING btree (start_date)"
+        }
+      ],
+      "policies": [
+        {
+          "name": "Users with delete permission can delete their events",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "DELETE"
+        },
+        {
+          "name": "events_create_policy",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "INSERT"
+        },
+        {
+          "name": "events_delete_policy",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "DELETE"
+        },
+        {
+          "name": "events_update_policy",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "UPDATE"
+        },
+        {
+          "name": "events_view_policy",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "SELECT"
+        }
+      ],
+      "triggers": [
+        {
+          "name": "event_notification_trigger",
+          "event": "INSERT",
+          "timing": "AFTER",
+          "statement": "EXECUTE FUNCTION notify_event_changes()"
+        },
+        {
+          "name": "event_notification_trigger",
+          "event": "UPDATE",
+          "timing": "AFTER",
+          "statement": "EXECUTE FUNCTION notify_event_changes()"
+        },
+        {
+          "name": "set_timestamp",
+          "event": "UPDATE",
+          "timing": "BEFORE",
+          "statement": "EXECUTE FUNCTION trigger_set_timestamp()"
+        },
+        {
+          "name": "update_events_updated_at",
+          "event": "UPDATE",
+          "timing": "BEFORE",
+          "statement": "EXECUTE FUNCTION update_updated_at_column()"
+        }
+      ],
+      "constraints": [
+        {
+          "name": "events_created_by_fkey",
+          "type": "FOREIGN KEY",
+          "definition": "FOREIGN KEY (created_by) REFERENCES auth.users(id)"
+        },
+        {
+          "name": "events_department_check",
+          "type": "CHECK",
+          "definition": "CHECK ((department = ANY (ARRAY['academic'::text, 'administrative'::text, 'hr'::text, 'finance'::text, 'other'::text])))"
+        },
+        {
+          "name": "events_pkey",
+          "type": "PRIMARY KEY",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "events_school_id_fkey",
+          "type": "FOREIGN KEY",
+          "definition": "FOREIGN KEY (school_id) REFERENCES schools(id)"
+        },
+        {
+          "name": "events_status_check",
+          "type": "CHECK",
+          "definition": "CHECK ((status = ANY (ARRAY['upcoming'::text, 'ongoing'::text, 'completed'::text, 'cancelled'::text])))"
+        },
+        {
+          "name": "events_type_check",
+          "type": "CHECK",
+          "definition": "CHECK ((type = ANY (ARRAY['academic'::text, 'administrative'::text, 'training'::text, 'meeting'::text, 'other'::text])))"
+        }
+      ],
+      "foreign_keys": [
+        {
+          "name": "events_created_by_fkey",
+          "column": "created_by",
+          "foreign_table": "users",
+          "foreign_column": "id"
+        },
+        {
+          "name": "events_school_id_fkey",
+          "column": "school_id",
+          "foreign_table": "schools",
+          "foreign_column": "id"
+        }
+      ]
+    },
+    "onboarding_tasks": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "default": "gen_random_uuid()",
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "category",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "required",
+          "type": "boolean",
+          "default": "true",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "order_index",
+          "type": "integer",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "YES",
+          "description": null
+        }
+      ],
+      "indexes": [
+        {
+          "name": "onboarding_tasks_pkey",
+          "definition": "CREATE UNIQUE INDEX onboarding_tasks_pkey ON public.onboarding_tasks USING btree (id)"
+        }
+      ],
+      "policies": [
+        {
+          "name": "Admins can manage tasks",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "ALL"
+        },
+        {
+          "name": "Authenticated users can view tasks",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "SELECT"
+        }
+      ],
+      "triggers": [
+        {
+          "name": "set_timestamp_onboarding_tasks",
+          "event": "UPDATE",
+          "timing": "BEFORE",
+          "statement": "EXECUTE FUNCTION trigger_set_timestamp()"
+        }
+      ],
+      "constraints": [
+        {
+          "name": "onboarding_tasks_category_check",
+          "type": "CHECK",
+          "definition": "CHECK ((category = ANY (ARRAY['documentation'::text, 'setup'::text, 'training'::text, 'compliance'::text])))"
+        },
+        {
+          "name": "onboarding_tasks_pkey",
+          "type": "PRIMARY KEY",
+          "definition": "PRIMARY KEY (id)"
+        }
+      ],
+      "foreign_keys": null
+    },
+    "onboarding_progress": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "default": "gen_random_uuid()",
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "school_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "task_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "notes",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "completed_by",
+          "type": "uuid",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "completed_at",
+          "type": "timestamp with time zone",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "YES",
+          "description": null
+        }
+      ],
+      "indexes": [
+        {
+          "name": "onboarding_progress_pkey",
+          "definition": "CREATE UNIQUE INDEX onboarding_progress_pkey ON public.onboarding_progress USING btree (id)"
+        },
+        {
+          "name": "onboarding_progress_school_id_task_id_key",
+          "definition": "CREATE UNIQUE INDEX onboarding_progress_school_id_task_id_key ON public.onboarding_progress USING btree (school_id, task_id)"
+        }
+      ],
+      "policies": [
+        {
+          "name": "School staff can update their progress",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "UPDATE"
+        },
+        {
+          "name": "School staff can view their progress",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "SELECT"
+        }
+      ],
+      "triggers": [
+        {
+          "name": "set_timestamp_onboarding_progress",
+          "event": "UPDATE",
+          "timing": "BEFORE",
+          "statement": "EXECUTE FUNCTION trigger_set_timestamp()"
+        }
+      ],
+      "constraints": [
+        {
+          "name": "onboarding_progress_completed_by_fkey",
+          "type": "FOREIGN KEY",
+          "definition": "FOREIGN KEY (completed_by) REFERENCES auth.users(id)"
+        },
+        {
+          "name": "onboarding_progress_pkey",
+          "type": "PRIMARY KEY",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "onboarding_progress_school_id_fkey",
+          "type": "FOREIGN KEY",
+          "definition": "FOREIGN KEY (school_id) REFERENCES schools(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "onboarding_progress_school_id_task_id_key",
+          "type": "UNIQUE",
+          "definition": "UNIQUE (school_id, task_id)"
+        },
+        {
+          "name": "onboarding_progress_status_check",
+          "type": "CHECK",
+          "definition": "CHECK ((status = ANY (ARRAY['pending'::text, 'in_progress'::text, 'completed'::text, 'blocked'::text])))"
+        },
+        {
+          "name": "onboarding_progress_task_id_fkey",
+          "type": "FOREIGN KEY",
+          "definition": "FOREIGN KEY (task_id) REFERENCES onboarding_tasks(id) ON DELETE CASCADE"
+        }
+      ],
+      "foreign_keys": [
+        {
+          "name": "onboarding_progress_school_id_fkey",
+          "column": "school_id",
+          "foreign_table": "schools",
+          "foreign_column": "id"
+        },
+        {
+          "name": "onboarding_progress_task_id_fkey",
+          "column": "task_id",
+          "foreign_table": "onboarding_tasks",
+          "foreign_column": "id"
+        },
+        {
+          "name": "onboarding_progress_completed_by_fkey",
+          "column": "completed_by",
+          "foreign_table": "users",
+          "foreign_column": "id"
+        }
+      ]
+    },
+    "school_documents": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "default": "gen_random_uuid()",
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "school_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "type",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "url",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "notes",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "uploaded_by",
+          "type": "uuid",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "reviewed_by",
+          "type": "uuid",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "reviewed_at",
+          "type": "timestamp with time zone",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "valid_until",
+          "type": "timestamp with time zone",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "YES",
+          "description": null
+        }
+      ],
+      "indexes": [
+        {
+          "name": "school_documents_pkey",
+          "definition": "CREATE UNIQUE INDEX school_documents_pkey ON public.school_documents USING btree (id)"
+        }
+      ],
+      "policies": [
+        {
+          "name": "School staff can upload documents",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "INSERT"
+        },
+        {
+          "name": "School staff can view their documents",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "SELECT"
+        }
+      ],
+      "triggers": [
+        {
+          "name": "set_timestamp_school_documents",
+          "event": "UPDATE",
+          "timing": "BEFORE",
+          "statement": "EXECUTE FUNCTION trigger_set_timestamp()"
+        }
+      ],
+      "constraints": [
+        {
+          "name": "school_documents_pkey",
+          "type": "PRIMARY KEY",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "school_documents_reviewed_by_fkey",
+          "type": "FOREIGN KEY",
+          "definition": "FOREIGN KEY (reviewed_by) REFERENCES auth.users(id)"
+        },
+        {
+          "name": "school_documents_school_id_fkey",
+          "type": "FOREIGN KEY",
+          "definition": "FOREIGN KEY (school_id) REFERENCES schools(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "school_documents_status_check",
+          "type": "CHECK",
+          "definition": "CHECK ((status = ANY (ARRAY['pending'::text, 'approved'::text, 'rejected'::text])))"
+        },
+        {
+          "name": "school_documents_type_check",
+          "type": "CHECK",
+          "definition": "CHECK ((type = ANY (ARRAY['license'::text, 'registration'::text, 'tax'::text, 'insurance'::text, 'curriculum'::text, 'other'::text])))"
+        },
+        {
+          "name": "school_documents_uploaded_by_fkey",
+          "type": "FOREIGN KEY",
+          "definition": "FOREIGN KEY (uploaded_by) REFERENCES auth.users(id)"
+        }
+      ],
+      "foreign_keys": [
+        {
+          "name": "school_documents_school_id_fkey",
+          "column": "school_id",
+          "foreign_table": "schools",
+          "foreign_column": "id"
+        },
+        {
+          "name": "school_documents_uploaded_by_fkey",
+          "column": "uploaded_by",
+          "foreign_table": "users",
+          "foreign_column": "id"
+        },
+        {
+          "name": "school_documents_reviewed_by_fkey",
+          "column": "reviewed_by",
+          "foreign_table": "users",
+          "foreign_column": "id"
+        }
+      ]
+    },
+    "class_teachers": {
+      "columns": [
+        {
+          "name": "class_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "teacher_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "assigned_by",
+          "type": "uuid",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "assigned_at",
+          "type": "timestamp with time zone",
+          "default": "CURRENT_TIMESTAMP",
+          "nullable": "YES",
+          "description": null
+        }
+      ],
+      "indexes": [
+        {
+          "name": "class_teachers_pkey",
+          "definition": "CREATE UNIQUE INDEX class_teachers_pkey ON public.class_teachers USING btree (class_id, teacher_id)"
+        }
+      ],
+      "policies": null,
+      "triggers": null,
+      "constraints": [
+        {
+          "name": "class_teachers_assigned_by_fkey",
+          "type": "FOREIGN KEY",
+          "definition": "FOREIGN KEY (assigned_by) REFERENCES users(id)"
+        },
+        {
+          "name": "class_teachers_class_id_fkey",
+          "type": "FOREIGN KEY",
+          "definition": "FOREIGN KEY (class_id) REFERENCES classes(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "class_teachers_pkey",
+          "type": "PRIMARY KEY",
+          "definition": "PRIMARY KEY (class_id, teacher_id)"
+        },
+        {
+          "name": "class_teachers_teacher_id_fkey",
+          "type": "FOREIGN KEY",
+          "definition": "FOREIGN KEY (teacher_id) REFERENCES users(id) ON DELETE CASCADE"
+        }
+      ],
+      "foreign_keys": [
+        {
+          "name": "class_teachers_class_id_fkey",
+          "column": "class_id",
+          "foreign_table": "classes",
+          "foreign_column": "id"
+        },
+        {
+          "name": "class_teachers_teacher_id_fkey",
+          "column": "teacher_id",
+          "foreign_table": "users",
+          "foreign_column": "id"
+        },
+        {
+          "name": "class_teachers_assigned_by_fkey",
+          "column": "assigned_by",
+          "foreign_table": "users",
+          "foreign_column": "id"
+        }
+      ]
+    },
+    "class_students": {
+      "columns": [
+        {
+          "name": "class_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "student_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "assigned_by",
+          "type": "uuid",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "assigned_at",
+          "type": "timestamp with time zone",
+          "default": "CURRENT_TIMESTAMP",
+          "nullable": "YES",
+          "description": null
+        }
+      ],
+      "indexes": [
+        {
+          "name": "class_students_pkey",
+          "definition": "CREATE UNIQUE INDEX class_students_pkey ON public.class_students USING btree (class_id, student_id)"
+        }
+      ],
+      "policies": null,
+      "triggers": null,
+      "constraints": [
+        {
+          "name": "class_students_assigned_by_fkey",
+          "type": "FOREIGN KEY",
+          "definition": "FOREIGN KEY (assigned_by) REFERENCES users(id)"
+        },
+        {
+          "name": "class_students_class_id_fkey",
+          "type": "FOREIGN KEY",
+          "definition": "FOREIGN KEY (class_id) REFERENCES classes(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "class_students_pkey",
+          "type": "PRIMARY KEY",
+          "definition": "PRIMARY KEY (class_id, student_id)"
+        },
+        {
+          "name": "class_students_student_id_fkey",
+          "type": "FOREIGN KEY",
+          "definition": "FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE"
+        }
+      ],
+      "foreign_keys": [
+        {
+          "name": "class_students_class_id_fkey",
+          "column": "class_id",
+          "foreign_table": "classes",
+          "foreign_column": "id"
+        },
+        {
+          "name": "class_students_student_id_fkey",
+          "column": "student_id",
+          "foreign_table": "users",
+          "foreign_column": "id"
+        },
+        {
+          "name": "class_students_assigned_by_fkey",
+          "column": "assigned_by",
+          "foreign_table": "users",
+          "foreign_column": "id"
+        }
+      ]
+    },
+    "assigned_content": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "default": "uuid_generate_v4()",
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "class_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "content_type",
+          "type": "character varying",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "content_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "valid_from",
+          "type": "timestamp with time zone",
+          "default": "CURRENT_TIMESTAMP",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "valid_until",
+          "type": "timestamp with time zone",
+          "default": "(CURRENT_TIMESTAMP + '7 days'::interval)",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "assigned_by",
+          "type": "uuid",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "CURRENT_TIMESTAMP",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "default": "CURRENT_TIMESTAMP",
+          "nullable": "YES",
+          "description": null
+        }
+      ],
+      "indexes": [
+        {
+          "name": "assigned_content_pkey",
+          "definition": "CREATE UNIQUE INDEX assigned_content_pkey ON public.assigned_content USING btree (id)"
+        },
+        {
+          "name": "idx_assigned_content_class_id",
+          "definition": "CREATE INDEX idx_assigned_content_class_id ON public.assigned_content USING btree (class_id)"
+        },
+        {
+          "name": "idx_assigned_content_content_id",
+          "definition": "CREATE INDEX idx_assigned_content_content_id ON public.assigned_content USING btree (content_id)"
+        },
+        {
+          "name": "idx_assigned_content_validity",
+          "definition": "CREATE INDEX idx_assigned_content_validity ON public.assigned_content USING btree (valid_from, valid_until)"
+        }
+      ],
+      "policies": null,
+      "triggers": null,
+      "constraints": [
+        {
+          "name": "assigned_content_assigned_by_fkey",
+          "type": "FOREIGN KEY",
+          "definition": "FOREIGN KEY (assigned_by) REFERENCES users(id)"
+        },
+        {
+          "name": "assigned_content_class_id_fkey",
+          "type": "FOREIGN KEY",
+          "definition": "FOREIGN KEY (class_id) REFERENCES classes(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "assigned_content_content_type_check",
+          "type": "CHECK",
+          "definition": "CHECK (((content_type)::text = ANY ((ARRAY['TOPIC'::character varying, 'SUBTOPIC'::character varying, 'LESSON'::character varying])::text[])))"
+        },
+        {
+          "name": "assigned_content_pkey",
+          "type": "PRIMARY KEY",
+          "definition": "PRIMARY KEY (id)"
+        }
+      ],
+      "foreign_keys": [
+        {
+          "name": "assigned_content_class_id_fkey",
+          "column": "class_id",
+          "foreign_table": "classes",
+          "foreign_column": "id"
+        },
+        {
+          "name": "assigned_content_assigned_by_fkey",
+          "column": "assigned_by",
+          "foreign_table": "users",
+          "foreign_column": "id"
+        }
+      ]
+    },
+    "users": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "default": "uuid_generate_v4()",
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "email",
+          "type": "character varying",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "name",
+          "type": "character varying",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "role",
+          "type": "character varying",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "school_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "CURRENT_TIMESTAMP",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "default": "CURRENT_TIMESTAMP",
+          "nullable": "YES",
+          "description": null
+        }
+      ],
+      "indexes": [
+        {
+          "name": "idx_users_email",
+          "definition": "CREATE INDEX idx_users_email ON public.users USING btree (email)"
+        },
+        {
+          "name": "idx_users_role",
+          "definition": "CREATE INDEX idx_users_role ON public.users USING btree (role)"
+        },
+        {
+          "name": "users_pkey",
+          "definition": "CREATE UNIQUE INDEX users_pkey ON public.users USING btree (id)"
+        },
+        {
+          "name": "users_email_key",
+          "definition": "CREATE UNIQUE INDEX users_email_key ON public.users USING btree (email)"
+        }
+      ],
+      "policies": null,
+      "triggers": null,
+      "constraints": [
+        {
+          "name": "users_email_key",
+          "type": "UNIQUE",
+          "definition": "UNIQUE (email)"
+        },
+        {
+          "name": "users_pkey",
+          "type": "PRIMARY KEY",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "users_pkey",
+          "type": "PRIMARY KEY",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "users_role_check",
+          "type": "CHECK",
+          "definition": "CHECK (((role)::text = ANY ((ARRAY['SUPER_ADMIN'::character varying, 'ADMIN'::character varying, 'SALES_HEAD'::character varying, 'SCHOOL_LEADER'::character varying, 'SCHOOL_PRINCIPAL'::character varying, 'TEACHER_HEAD'::character varying, 'TEACHER'::character varying, 'STUDENT'::character varying])::text[])))"
+        }
+      ],
+      "foreign_keys": null
+    },
+    "classes": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "default": "uuid_generate_v4()",
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "name",
+          "type": "character varying",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "grade_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "created_by",
+          "type": "uuid",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "CURRENT_TIMESTAMP",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "default": "CURRENT_TIMESTAMP",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "section",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        }
+      ],
+      "indexes": [
+        {
+          "name": "classes_pkey",
+          "definition": "CREATE UNIQUE INDEX classes_pkey ON public.classes USING btree (id)"
+        },
+        {
+          "name": "idx_classes_grade_id",
+          "definition": "CREATE INDEX idx_classes_grade_id ON public.classes USING btree (grade_id)"
+        }
+      ],
+      "policies": null,
+      "triggers": null,
+      "constraints": [
+        {
+          "name": "classes_created_by_fkey",
+          "type": "FOREIGN KEY",
+          "definition": "FOREIGN KEY (created_by) REFERENCES users(id)"
+        },
+        {
+          "name": "classes_grade_id_fkey",
+          "type": "FOREIGN KEY",
+          "definition": "FOREIGN KEY (grade_id) REFERENCES grades(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "classes_pkey",
+          "type": "PRIMARY KEY",
+          "definition": "PRIMARY KEY (id)"
+        }
+      ],
+      "foreign_keys": [
+        {
+          "name": "classes_grade_id_fkey",
+          "column": "grade_id",
+          "foreign_table": "grades",
+          "foreign_column": "id"
+        },
+        {
+          "name": "classes_created_by_fkey",
+          "column": "created_by",
+          "foreign_table": "users",
+          "foreign_column": "id"
+        }
+      ]
+    },
+    "user_permissions": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "default": "uuid_generate_v4()",
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "permissions",
+          "type": "jsonb",
+          "default": "'{\"content_editor\": false, \"content_management\": false}'::jsonb",
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "CURRENT_TIMESTAMP",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "default": "CURRENT_TIMESTAMP",
+          "nullable": "YES",
+          "description": null
+        }
+      ],
+      "indexes": [
+        {
+          "name": "user_permissions_pkey",
+          "definition": "CREATE UNIQUE INDEX user_permissions_pkey ON public.user_permissions USING btree (id)"
+        },
+        {
+          "name": "user_permissions_user_id_key",
+          "definition": "CREATE UNIQUE INDEX user_permissions_user_id_key ON public.user_permissions USING btree (user_id)"
+        },
+        {
+          "name": "idx_user_permissions_user_id",
+          "definition": "CREATE INDEX idx_user_permissions_user_id ON public.user_permissions USING btree (user_id)"
+        }
+      ],
+      "policies": null,
+      "triggers": [
+        {
+          "name": "update_user_permissions_updated_at",
+          "event": "UPDATE",
+          "timing": "BEFORE",
+          "statement": "EXECUTE FUNCTION update_updated_at_column()"
+        }
+      ],
+      "constraints": [
+        {
+          "name": "user_permissions_pkey",
+          "type": "PRIMARY KEY",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "user_permissions_user_id_fkey",
+          "type": "FOREIGN KEY",
+          "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "user_permissions_user_id_key",
+          "type": "UNIQUE",
+          "definition": "UNIQUE (user_id)"
+        }
+      ],
+      "foreign_keys": [
+        {
+          "name": "user_permissions_user_id_fkey",
+          "column": "user_id",
+          "foreign_table": "users",
+          "foreign_column": "id"
+        }
+      ]
+    },
+    "event_notifications": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "default": "gen_random_uuid()",
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "event_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "type",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "message",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "read",
+          "type": "boolean",
+          "default": "false",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "YES",
+          "description": null
+        }
+      ],
+      "indexes": [
+        {
+          "name": "event_notifications_pkey",
+          "definition": "CREATE UNIQUE INDEX event_notifications_pkey ON public.event_notifications USING btree (id)"
+        }
+      ],
+      "policies": [
+        {
+          "name": "Event creators can create notifications",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "INSERT"
+        },
+        {
+          "name": "Users can view their own notifications",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "SELECT"
+        }
+      ],
+      "triggers": null,
+      "constraints": [
+        {
+          "name": "event_notifications_event_id_fkey",
+          "type": "FOREIGN KEY",
+          "definition": "FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "event_notifications_pkey",
+          "type": "PRIMARY KEY",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "event_notifications_type_check",
+          "type": "CHECK",
+          "definition": "CHECK ((type = ANY (ARRAY['reminder'::text, 'update'::text, 'cancellation'::text])))"
+        },
+        {
+          "name": "event_notifications_user_id_fkey",
+          "type": "FOREIGN KEY",
+          "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        }
+      ],
+      "foreign_keys": [
+        {
+          "name": "event_notifications_event_id_fkey",
+          "column": "event_id",
+          "foreign_table": "events",
+          "foreign_column": "id"
+        },
+        {
+          "name": "event_notifications_user_id_fkey",
+          "column": "user_id",
+          "foreign_table": "users",
+          "foreign_column": "id"
+        }
+      ]
+    },
+    "user_preference": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "default": "uuid_generate_v4()",
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "preferences",
+          "type": "jsonb",
+          "default": "'{}'::jsonb",
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "CURRENT_TIMESTAMP",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "default": "CURRENT_TIMESTAMP",
+          "nullable": "YES",
+          "description": null
+        }
+      ],
+      "indexes": [
+        {
+          "name": "user_preference_pkey",
+          "definition": "CREATE UNIQUE INDEX user_preference_pkey ON public.user_preference USING btree (id)"
+        },
+        {
+          "name": "user_preference_user_id_key",
+          "definition": "CREATE UNIQUE INDEX user_preference_user_id_key ON public.user_preference USING btree (user_id)"
+        }
+      ],
+      "policies": [
+        {
+          "name": "Users can insert own preferences",
+          "roles": [
+            "public"
+          ],
+          "command": "INSERT"
+        },
+        {
+          "name": "Users can update own preferences",
+          "roles": [
+            "public"
+          ],
+          "command": "UPDATE"
+        },
+        {
+          "name": "Users can view own preferences",
+          "roles": [
+            "public"
+          ],
+          "command": "SELECT"
+        }
+      ],
+      "triggers": [
+        {
+          "name": "update_user_preference_updated_at",
+          "event": "UPDATE",
+          "timing": "BEFORE",
+          "statement": "EXECUTE FUNCTION update_updated_at_column()"
+        }
+      ],
+      "constraints": [
+        {
+          "name": "user_preference_pkey",
+          "type": "PRIMARY KEY",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "user_preference_user_id_fkey",
+          "type": "FOREIGN KEY",
+          "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "user_preference_user_id_key",
+          "type": "UNIQUE",
+          "definition": "UNIQUE (user_id)"
+        }
+      ],
+      "foreign_keys": [
+        {
+          "name": "user_preference_user_id_fkey",
+          "column": "user_id",
+          "foreign_table": "users",
+          "foreign_column": "id"
+        }
+      ]
+    },
+    "activities": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "default": "gen_random_uuid()",
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "timezone('utc'::text, now())",
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "lesson_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "type",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "content",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "default": "timezone('utc'::text, now())",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "instructions",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "data",
+          "type": "jsonb",
+          "default": "jsonb_build_object('prompt', '', 'teacherScript', '', 'media', ARRAY[]::text[])",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "media",
+          "type": "ARRAY",
+          "default": "ARRAY[]::jsonb[]",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "order_index",
+          "type": "bigint",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        }
+      ],
+      "indexes": [
+        {
+          "name": "activities_pkey",
+          "definition": "CREATE UNIQUE INDEX activities_pkey ON public.activities USING btree (id)"
+        },
+        {
+          "name": "idx_activities_lesson_id",
+          "definition": "CREATE INDEX idx_activities_lesson_id ON public.activities USING btree (lesson_id)"
+        }
+      ],
+      "policies": [
+        {
+          "name": "Enable all access for authenticated users",
+          "roles": [
+            "public"
+          ],
+          "command": "ALL"
+        },
+        {
+          "name": "Enable read access for authenticated users",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "SELECT"
+        }
+      ],
+      "triggers": null,
+      "constraints": [
+        {
+          "name": "activities_lesson_id_fkey",
+          "type": "FOREIGN KEY",
+          "definition": "FOREIGN KEY (lesson_id) REFERENCES lessons(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "activities_pkey",
+          "type": "PRIMARY KEY",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "activities_type_check",
+          "type": "CHECK",
+          "definition": "CHECK ((type = ANY (ARRAY['exercise'::text, 'quiz'::text, 'project'::text])))"
+        }
+      ],
+      "foreign_keys": [
+        {
+          "name": "activities_lesson_id_fkey",
+          "column": "lesson_id",
+          "foreign_table": "lessons",
+          "foreign_column": "id"
+        }
+      ]
+    },
+    "event_attendees": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "default": "gen_random_uuid()",
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "event_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "YES",
+          "description": null
+        }
+      ],
+      "indexes": [
+        {
+          "name": "event_attendees_pkey",
+          "definition": "CREATE UNIQUE INDEX event_attendees_pkey ON public.event_attendees USING btree (id)"
+        },
+        {
+          "name": "event_attendees_event_id_user_id_key",
+          "definition": "CREATE UNIQUE INDEX event_attendees_event_id_user_id_key ON public.event_attendees USING btree (event_id, user_id)"
+        }
+      ],
+      "policies": [
+        {
+          "name": "attendees_manage_policy",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "ALL"
+        },
+        {
+          "name": "attendees_view_policy",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "SELECT"
+        }
+      ],
+      "triggers": [
+        {
+          "name": "update_event_attendees_updated_at",
+          "event": "UPDATE",
+          "timing": "BEFORE",
+          "statement": "EXECUTE FUNCTION update_updated_at_column()"
+        }
+      ],
+      "constraints": [
+        {
+          "name": "event_attendees_event_id_fkey",
+          "type": "FOREIGN KEY",
+          "definition": "FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "event_attendees_event_id_user_id_key",
+          "type": "UNIQUE",
+          "definition": "UNIQUE (event_id, user_id)"
+        },
+        {
+          "name": "event_attendees_pkey",
+          "type": "PRIMARY KEY",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "event_attendees_status_check",
+          "type": "CHECK",
+          "definition": "CHECK ((status = ANY (ARRAY['attending'::text, 'declined'::text, 'maybe'::text])))"
+        },
+        {
+          "name": "event_attendees_user_id_fkey",
+          "type": "FOREIGN KEY",
+          "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        }
+      ],
+      "foreign_keys": [
+        {
+          "name": "event_attendees_event_id_fkey",
+          "column": "event_id",
+          "foreign_table": "events",
+          "foreign_column": "id"
+        },
+        {
+          "name": "event_attendees_user_id_fkey",
+          "column": "user_id",
+          "foreign_table": "users",
+          "foreign_column": "id"
+        }
+      ]
+    },
+    "event_reminders": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "default": "gen_random_uuid()",
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "event_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "remind_at",
+          "type": "timestamp with time zone",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "sent",
+          "type": "boolean",
+          "default": "false",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "YES",
+          "description": null
+        }
+      ],
+      "indexes": [
+        {
+          "name": "event_reminders_pkey",
+          "definition": "CREATE UNIQUE INDEX event_reminders_pkey ON public.event_reminders USING btree (id)"
+        }
+      ],
+      "policies": [
+        {
+          "name": "reminders_manage_policy",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "ALL"
+        },
+        {
+          "name": "reminders_view_policy",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "SELECT"
+        }
+      ],
+      "triggers": [
+        {
+          "name": "update_event_reminders_updated_at",
+          "event": "UPDATE",
+          "timing": "BEFORE",
+          "statement": "EXECUTE FUNCTION update_updated_at_column()"
+        }
+      ],
+      "constraints": [
+        {
+          "name": "event_reminders_event_id_fkey",
+          "type": "FOREIGN KEY",
+          "definition": "FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "event_reminders_pkey",
+          "type": "PRIMARY KEY",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "event_reminders_user_id_fkey",
+          "type": "FOREIGN KEY",
+          "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        }
+      ],
+      "foreign_keys": [
+        {
+          "name": "event_reminders_event_id_fkey",
+          "column": "event_id",
+          "foreign_table": "events",
+          "foreign_column": "id"
+        },
+        {
+          "name": "event_reminders_user_id_fkey",
+          "column": "user_id",
+          "foreign_table": "users",
+          "foreign_column": "id"
+        }
+      ]
+    },
+    "documents": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "default": "gen_random_uuid()",
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "type",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "url",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "size",
+          "type": "integer",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "mime_type",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "tags",
+          "type": "ARRAY",
+          "default": "'{}'::text[]",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "created_by",
+          "type": "uuid",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "YES",
+          "description": null
+        }
+      ],
+      "indexes": [
+        {
+          "name": "documents_pkey",
+          "definition": "CREATE UNIQUE INDEX documents_pkey ON public.documents USING btree (id)"
+        }
+      ],
+      "policies": [
+        {
+          "name": "Users can upload documents",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "INSERT"
+        },
+        {
+          "name": "Users can view documents",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "SELECT"
+        }
+      ],
+      "triggers": null,
+      "constraints": [
+        {
+          "name": "documents_created_by_fkey",
+          "type": "FOREIGN KEY",
+          "definition": "FOREIGN KEY (created_by) REFERENCES auth.users(id)"
+        },
+        {
+          "name": "documents_pkey",
+          "type": "PRIMARY KEY",
+          "definition": "PRIMARY KEY (id)"
+        }
+      ],
+      "foreign_keys": [
+        {
+          "name": "documents_created_by_fkey",
+          "column": "created_by",
+          "foreign_table": "users",
+          "foreign_column": "id"
+        }
+      ]
+    },
+    "notifications": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "default": "gen_random_uuid()",
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "type",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "message",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "read",
+          "type": "boolean",
+          "default": "false",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "YES",
+          "description": null
+        }
+      ],
+      "indexes": [
+        {
+          "name": "notifications_pkey",
+          "definition": "CREATE UNIQUE INDEX notifications_pkey ON public.notifications USING btree (id)"
+        }
+      ],
+      "policies": [
+        {
+          "name": "Users can view their own notifications",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "SELECT"
+        }
+      ],
+      "triggers": null,
+      "constraints": [
+        {
+          "name": "notifications_pkey",
+          "type": "PRIMARY KEY",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "notifications_type_check",
+          "type": "CHECK",
+          "definition": "CHECK ((type = ANY (ARRAY['system'::text, 'event'::text, 'task'::text, 'message'::text])))"
+        },
+        {
+          "name": "notifications_user_id_fkey",
+          "type": "FOREIGN KEY",
+          "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        }
+      ],
+      "foreign_keys": [
+        {
+          "name": "notifications_user_id_fkey",
+          "column": "user_id",
+          "foreign_table": "users",
+          "foreign_column": "id"
+        }
+      ]
+    },
+    "reports": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "default": "gen_random_uuid()",
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "type",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "config",
+          "type": "jsonb",
+          "default": "'{}'::jsonb",
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "url",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "error",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "created_by",
+          "type": "uuid",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "YES",
+          "description": null
+        }
+      ],
+      "indexes": [
+        {
+          "name": "reports_pkey",
+          "definition": "CREATE UNIQUE INDEX reports_pkey ON public.reports USING btree (id)"
+        }
+      ],
+      "policies": [
+        {
+          "name": "Users can create reports",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "INSERT"
+        },
+        {
+          "name": "Users can view reports they created",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "SELECT"
+        }
+      ],
+      "triggers": null,
+      "constraints": [
+        {
+          "name": "reports_created_by_fkey",
+          "type": "FOREIGN KEY",
+          "definition": "FOREIGN KEY (created_by) REFERENCES auth.users(id)"
+        },
+        {
+          "name": "reports_pkey",
+          "type": "PRIMARY KEY",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "reports_status_check",
+          "type": "CHECK",
+          "definition": "CHECK ((status = ANY (ARRAY['pending'::text, 'processing'::text, 'completed'::text, 'failed'::text])))"
+        }
+      ],
+      "foreign_keys": [
+        {
+          "name": "reports_created_by_fkey",
+          "column": "created_by",
+          "foreign_table": "users",
+          "foreign_column": "id"
+        }
+      ]
+    },
+    "tasks": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "default": "gen_random_uuid()",
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "assigned_to",
+          "type": "uuid",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "due_date",
+          "type": "timestamp with time zone",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "priority",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "tags",
+          "type": "ARRAY",
+          "default": "'{}'::text[]",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "created_by",
+          "type": "uuid",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "YES",
+          "description": null
+        }
+      ],
+      "indexes": [
+        {
+          "name": "tasks_pkey",
+          "definition": "CREATE UNIQUE INDEX tasks_pkey ON public.tasks USING btree (id)"
+        }
+      ],
+      "policies": [
+        {
+          "name": "Users can create tasks",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "INSERT"
+        },
+        {
+          "name": "Users can view assigned tasks",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "SELECT"
+        }
+      ],
+      "triggers": null,
+      "constraints": [
+        {
+          "name": "tasks_assigned_to_fkey",
+          "type": "FOREIGN KEY",
+          "definition": "FOREIGN KEY (assigned_to) REFERENCES auth.users(id)"
+        },
+        {
+          "name": "tasks_created_by_fkey",
+          "type": "FOREIGN KEY",
+          "definition": "FOREIGN KEY (created_by) REFERENCES auth.users(id)"
+        },
+        {
+          "name": "tasks_pkey",
+          "type": "PRIMARY KEY",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "tasks_priority_check",
+          "type": "CHECK",
+          "definition": "CHECK ((priority = ANY (ARRAY['low'::text, 'medium'::text, 'high'::text])))"
+        },
+        {
+          "name": "tasks_status_check",
+          "type": "CHECK",
+          "definition": "CHECK ((status = ANY (ARRAY['pending'::text, 'in_progress'::text, 'completed'::text, 'blocked'::text])))"
+        }
+      ],
+      "foreign_keys": [
+        {
+          "name": "tasks_assigned_to_fkey",
+          "column": "assigned_to",
+          "foreign_table": "users",
+          "foreign_column": "id"
+        },
+        {
+          "name": "tasks_created_by_fkey",
+          "column": "created_by",
+          "foreign_table": "users",
+          "foreign_column": "id"
+        }
+      ]
+    },
+    "analytics_metrics": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "default": "gen_random_uuid()",
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "value",
+          "type": "numeric",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "unit",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "category",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "tags",
+          "type": "jsonb",
+          "default": "'{}'::jsonb",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "timestamp",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "YES",
+          "description": null
+        }
+      ],
+      "indexes": [
+        {
+          "name": "analytics_metrics_pkey",
+          "definition": "CREATE UNIQUE INDEX analytics_metrics_pkey ON public.analytics_metrics USING btree (id)"
+        }
+      ],
+      "policies": [
+        {
+          "name": "Users can view analytics",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "SELECT"
+        }
+      ],
+      "triggers": null,
+      "constraints": [
+        {
+          "name": "analytics_metrics_pkey",
+          "type": "PRIMARY KEY",
+          "definition": "PRIMARY KEY (id)"
+        }
+      ],
+      "foreign_keys": null
+    },
+    "messages": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "default": "gen_random_uuid()",
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "sender_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "recipient_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "subject",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "content",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "read",
+          "type": "boolean",
+          "default": "false",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "YES",
+          "description": null
+        }
+      ],
+      "indexes": [
+        {
+          "name": "messages_pkey",
+          "definition": "CREATE UNIQUE INDEX messages_pkey ON public.messages USING btree (id)"
+        }
+      ],
+      "policies": [
+        {
+          "name": "Users can send messages",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "INSERT"
+        },
+        {
+          "name": "Users can view their messages",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "SELECT"
+        }
+      ],
+      "triggers": null,
+      "constraints": [
+        {
+          "name": "messages_pkey",
+          "type": "PRIMARY KEY",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "messages_pkey",
+          "type": "PRIMARY KEY",
+          "definition": "PRIMARY KEY (id, inserted_at)"
+        },
+        {
+          "name": "messages_recipient_id_fkey",
+          "type": "FOREIGN KEY",
+          "definition": "FOREIGN KEY (recipient_id) REFERENCES auth.users(id)"
+        },
+        {
+          "name": "messages_sender_id_fkey",
+          "type": "FOREIGN KEY",
+          "definition": "FOREIGN KEY (sender_id) REFERENCES auth.users(id)"
+        }
+      ],
+      "foreign_keys": [
+        {
+          "name": "messages_sender_id_fkey",
+          "column": "sender_id",
+          "foreign_table": "users",
+          "foreign_column": "id"
+        },
+        {
+          "name": "messages_recipient_id_fkey",
+          "column": "recipient_id",
+          "foreign_table": "users",
+          "foreign_column": "id"
+        }
+      ]
+    },
+    "message_threads": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "default": "gen_random_uuid()",
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "participants",
+          "type": "ARRAY",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "subject",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "last_message_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "YES",
+          "description": null
+        }
+      ],
+      "indexes": [
+        {
+          "name": "message_threads_pkey",
+          "definition": "CREATE UNIQUE INDEX message_threads_pkey ON public.message_threads USING btree (id)"
+        }
+      ],
+      "policies": [
+        {
+          "name": "Users can view their threads",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "SELECT"
+        }
+      ],
+      "triggers": null,
+      "constraints": [
+        {
+          "name": "message_threads_pkey",
+          "type": "PRIMARY KEY",
+          "definition": "PRIMARY KEY (id)"
+        }
+      ],
+      "foreign_keys": null
+    },
+    "branches": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "default": "uuid_generate_v4()",
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "school_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "location",
+          "type": "jsonb",
+          "default": "'{\"city\": \"\", \"state\": \"\", \"address\": \"\", \"country\": \"\", \"postalCode\": \"\", \"coordinates\": {\"latitude\": 0, \"longitude\": 0}}'::jsonb",
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "latitude",
+          "type": "double precision",
+          "default": "0",
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "longitude",
+          "type": "double precision",
+          "default": "0",
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "contact_number",
+          "type": "text",
+          "default": "''::text",
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "email",
+          "type": "text",
+          "default": "''::text",
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "status",
+          "type": "USER-DEFINED",
+          "default": "'active'::school_status",
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "capacity",
+          "type": "jsonb",
+          "default": "'{\"total\": 0, \"current\": 0}'::jsonb",
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "administration",
+          "type": "jsonb",
+          "default": "'{\"principalName\": \"\", \"principalEmail\": \"\", \"principalPhone\": \"\", \"administrativeStaff\": []}'::jsonb",
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "website",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "established_year",
+          "type": "integer",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "accreditation_status",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "facilities",
+          "type": "ARRAY",
+          "default": "'{}'::text[]",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "operating_hours",
+          "type": "jsonb",
+          "default": "'{\"friday\": {\"open\": \"8:00 AM\", \"close\": \"3:00 PM\"}, \"monday\": {\"open\": \"8:00 AM\", \"close\": \"3:00 PM\"}, \"sunday\": {\"open\": \"Closed\", \"close\": \"Closed\", \"isHoliday\": true}, \"tuesday\": {\"open\": \"8:00 AM\", \"close\": \"3:00 PM\"}, \"saturday\": {\"open\": \"8:00 AM\", \"close\": \"12:00 PM\"}, \"thursday\": {\"open\": \"8:00 AM\", \"close\": \"3:00 PM\"}, \"wednesday\": {\"open\": \"8:00 AM\", \"close\": \"3:00 PM\"}}'::jsonb",
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "social_media",
+          "type": "jsonb",
+          "default": "'{\"twitter\": null, \"facebook\": null, \"linkedin\": null, \"instagram\": null}'::jsonb",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "emergency_contact",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "tax_id",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "license_number",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "last_inspection_date",
+          "type": "timestamp with time zone",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "student_count",
+          "type": "integer",
+          "default": "0",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "staff_count",
+          "type": "integer",
+          "default": "0",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "classroom_count",
+          "type": "integer",
+          "default": "0",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "is_boarding",
+          "type": "boolean",
+          "default": "false",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "transportation_provided",
+          "type": "boolean",
+          "default": "false",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "curriculum_type",
+          "type": "ARRAY",
+          "default": "'{}'::text[]",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "languages_offered",
+          "type": "ARRAY",
+          "default": "'{}'::text[]",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "extracurricular_activities",
+          "type": "ARRAY",
+          "default": "'{}'::text[]",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "grades",
+          "type": "ARRAY",
+          "default": "'{}'::text[]",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "CURRENT_TIMESTAMP",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "default": "CURRENT_TIMESTAMP",
+          "nullable": "YES",
+          "description": null
+        }
+      ],
+      "indexes": [
+        {
+          "name": "branches_pkey",
+          "definition": "CREATE UNIQUE INDEX branches_pkey ON public.branches USING btree (id)"
+        }
+      ],
+      "policies": null,
+      "triggers": [
+        {
+          "name": "update_branches_updated_at",
+          "event": "UPDATE",
+          "timing": "BEFORE",
+          "statement": "EXECUTE FUNCTION update_updated_at_column()"
+        }
+      ],
+      "constraints": [
+        {
+          "name": "branches_pkey",
+          "type": "PRIMARY KEY",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "branches_school_id_fkey",
+          "type": "FOREIGN KEY",
+          "definition": "FOREIGN KEY (school_id) REFERENCES schools(id) ON DELETE CASCADE"
+        }
+      ],
+      "foreign_keys": [
+        {
+          "name": "branches_school_id_fkey",
+          "column": "school_id",
+          "foreign_table": "schools",
+          "foreign_column": "id"
+        }
+      ]
+    },
+    "audit_logs": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "default": "gen_random_uuid()",
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "action",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "details",
+          "type": "jsonb",
+          "default": "'{}'::jsonb",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "YES",
+          "description": null
+        }
+      ],
+      "indexes": [
+        {
+          "name": "audit_logs_pkey",
+          "definition": "CREATE UNIQUE INDEX audit_logs_pkey ON public.audit_logs USING btree (id)"
+        }
+      ],
+      "policies": [
+        {
+          "name": "enable_audit_logs_insert",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "INSERT"
+        },
+        {
+          "name": "enable_audit_logs_select",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "SELECT"
+        }
+      ],
+      "triggers": null,
+      "constraints": [
+        {
+          "name": "audit_logs_pkey",
+          "type": "PRIMARY KEY",
+          "definition": "PRIMARY KEY (id)"
+        }
+      ],
+      "foreign_keys": null
+    },
+    "calendar_events": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "default": "gen_random_uuid()",
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "start_time",
+          "type": "timestamp with time zone",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "end_time",
+          "type": "timestamp with time zone",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "location",
+          "type": "text",
+          "default": null,
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "type",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "default": null,
+          "nullable": "NO",
+          "description": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "YES",
+          "description": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "nullable": "YES",
+          "description": null
+        }
+      ],
+      "indexes": [
+        {
+          "name": "calendar_events_pkey",
+          "definition": "CREATE UNIQUE INDEX calendar_events_pkey ON public.calendar_events USING btree (id)"
+        },
+        {
+          "name": "idx_calendar_events_user_id",
+          "definition": "CREATE INDEX idx_calendar_events_user_id ON public.calendar_events USING btree (user_id)"
+        },
+        {
+          "name": "idx_calendar_events_start_time",
+          "definition": "CREATE INDEX idx_calendar_events_start_time ON public.calendar_events USING btree (start_time)"
+        }
+      ],
+      "policies": [
+        {
+          "name": "calendar_events_delete",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "DELETE"
+        },
+        {
+          "name": "calendar_events_insert",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "INSERT"
+        },
+        {
+          "name": "calendar_events_read",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "SELECT"
+        },
+        {
+          "name": "calendar_events_update",
+          "roles": [
+            "authenticated"
+          ],
+          "command": "UPDATE"
+        }
+      ],
+      "triggers": [
+        {
+          "name": "update_calendar_events_updated_at",
+          "event": "UPDATE",
+          "timing": "BEFORE",
+          "statement": "EXECUTE FUNCTION update_updated_at_column()"
+        }
+      ],
+      "constraints": [
+        {
+          "name": "calendar_events_pkey",
+          "type": "PRIMARY KEY",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "calendar_events_status_check",
+          "type": "CHECK",
+          "definition": "CHECK ((status = ANY (ARRAY['scheduled'::text, 'cancelled'::text, 'completed'::text])))"
+        },
+        {
+          "name": "calendar_events_type_check",
+          "type": "CHECK",
+          "definition": "CHECK ((type = ANY (ARRAY['meeting'::text, 'task'::text, 'reminder'::text, 'other'::text])))"
+        },
+        {
+          "name": "calendar_events_user_id_fkey",
+          "type": "FOREIGN KEY",
+          "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        }
+      ],
+      "foreign_keys": [
+        {
+          "name": "calendar_events_user_id_fkey",
+          "column": "user_id",
+          "foreign_table": "users",
+          "foreign_column": "id"
+        }
+      ]
+    }
+  }
+}

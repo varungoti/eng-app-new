@@ -2,7 +2,7 @@ import { dbConnection } from './connection';
 import { checkDatabaseHealth } from './healthCheck';
 import { logger } from '../logger';
 
-export const database = {
+const database = {
   isHealthy: async () => {
     try {
       const isHealthy = await checkDatabaseHealth();
@@ -18,3 +18,6 @@ export const database = {
 };
 
 export { dbConnection, checkDatabaseHealth };
+
+export { database };
+export { database as db };

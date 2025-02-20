@@ -12,7 +12,7 @@ export const useContentMutation = () => {
       const result = await contentService.createContent(type, data);
       return result || null;
     },
-    onSuccess: (data, variables) => {
+    onSuccess: (data: any, variables: { type: string; data: any }) => {
       // Invalidate relevant queries
       queryClient.invalidateQueries({ queryKey: [variables.type] });
       queryClient.invalidateQueries({ queryKey: ['topics'] }); // Invalidate topics specifically
@@ -32,7 +32,7 @@ export const useContentMutation = () => {
 
       return data;
     },
-    onError: (error, variables) => {
+    onError: (error: Error, variables: { type: string; data: any }) => {
       showToast('Failed to create content', { type: 'error' });
       logger.error(`Failed to create ${variables.type}`, {
         context: { error },
@@ -46,7 +46,7 @@ export const useContentMutation = () => {
       const result = await contentService.updateContent(type, id, data);
       return result;
     },
-    onSuccess: (data, variables) => {
+    onSuccess: (data: any, variables: { type: string; id: string; data: any }) => {
       queryClient.invalidateQueries({ queryKey: [variables.type] });
       showToast('Content updated successfully', { type: 'success' });
       
@@ -55,7 +55,7 @@ export const useContentMutation = () => {
         source: 'useContentMutation'
       });
     },
-    onError: (error, variables) => {
+    onError: (error: Error, variables: { type: string; id: string; data: any }) => {
       showToast('Failed to update content', { type: 'error' });
       logger.error(`Failed to update ${variables.type}`, {
         context: { error },

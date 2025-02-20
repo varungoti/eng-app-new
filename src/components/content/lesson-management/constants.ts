@@ -1,3 +1,5 @@
+export const API_BASE_URL = '/api/admin';
+
 export const QUESTION_TYPES = {
   speaking: {
     label: 'Speaking Practice',
@@ -15,8 +17,8 @@ export const QUESTION_TYPES = {
       prompt: '',
       teacherScript: '',
       storyPrompt: '',
-      keywords: [],
-      hints: []
+      keywords: [] as string[],
+      hints: [] as string[]
     }
   },
   listening: {
@@ -27,7 +29,7 @@ export const QUESTION_TYPES = {
       teacherScript: '',
       audioContent: '',
       transcript: '',
-      questions: []
+      questions: [] as string[]
     }
   },
   listenAndRepeat: {
@@ -36,8 +38,8 @@ export const QUESTION_TYPES = {
     defaultData: {
       prompt: '',
       teacherScript: '',
-      phrases: [],
-      translations: []
+      phrases: [] as string[],
+      translations: [] as string[]
     }
   },
   multipleChoice: {
@@ -46,7 +48,7 @@ export const QUESTION_TYPES = {
     defaultData: {
       prompt: '',
       teacherScript: '',
-      options: [],
+      options: [] as string[],
       correctAnswer: null
     }
   },
@@ -59,11 +61,65 @@ export const QUESTION_TYPES = {
       grammarPoint: '',
       example: ''
     }
+  },
+  idiomPractice: {
+    label: 'Idiom Practice',
+    description: 'Learn and practice using English idioms in context.',
+    defaultData: {
+      prompt: '',
+      teacherScript: '',
+      idiom: '',
+      meaning: '',
+      example: '',
+      usageNotes: ''
+    }
+  },
+  lookAndSpeak: {
+    label: 'Look and Speak',
+    description: 'Describe images and practice vocabulary.',
+    defaultData: {
+      prompt: '',
+      teacherScript: '',
+      imageUrl: '',
+      imageCaption: '',
+      helpfulVocabulary: [] as string[]
+    }
+  },
+  watchAndSpeak: {
+    label: 'Watch and Speak',
+    description: 'Watch videos and discuss their content.',
+    defaultData: {
+      prompt: '',
+      teacherScript: '',
+      videoUrl: '',
+      discussionPoints: [] as string[]
+    }
+  },
+  debate: {
+    label: 'Debate Practice',
+    description: 'Practice argumentation and persuasive speaking.',
+    defaultData: {
+      prompt: '',
+      teacherScript: '',
+      topic: '',
+      position: '',
+      keyPoints: [] as string[]
+    }
+  },
+  presentation: {
+    label: 'Presentation Practice',
+    description: 'Prepare and deliver structured presentations.',
+    defaultData: {
+      prompt: '',
+      teacherScript: '',
+      topic: '',
+      duration: '',
+      structure: [] as Array<{ title: string; points: string[] }>,
+      visualAids: [] as Array<{ url: string; description: string }>
+    }
   }
 } as const;
 
-export type QuestionType = keyof typeof QUESTION_TYPES;
-
-export function isQuestionType(type: string): type is QuestionType {
-  return Object.prototype.hasOwnProperty.call(QUESTION_TYPES, type);
-}
+export function isQuestionType(type: string): type is keyof typeof QUESTION_TYPES {
+  return type in QUESTION_TYPES;
+} 

@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/lib/errorTracker/ErrorWatcher.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1739009281641,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1739009281641,
+            "name": "Commit-0",
+            "content": "import { ErrorEvent, ErrorResolution, ErrorSeverity, ErrorWatcherConfig } from './types';\r\nimport { ErrorResolver } from './ErrorResolver';\r\nimport { logger } from '../logger';\r\nimport { DEBUG_CONFIG } from '../config';\r\n\r\nexport class ErrorWatcher {\r\n  private static instance: ErrorWatcher;\r\n  private errors: ErrorEvent[] = [];\r\n  private config: Required<ErrorWatcherConfig> = {\r\n    maxErrors: 100,\r\n    autoResolve: true,\r\n    retryAttempts: 3,\r\n    retryDelay: 1000,\r\n    logToConsole: DEBUG_CONFIG.enabled,\r\n    router: null\r\n  };\r\n\r\n  private constructor(config: ErrorWatcherConfig = {}) {\r\n    this.config = { ...this.config, ...config };\r\n  }\r\n\r\n  public trackError(error: ErrorEvent): void {\r\n    this.errors = [error, ...this.errors].slice(0, this.config.maxErrors);\r\n    \r\n    if (this.config.logToConsole) {\r\n      const logLevel = error.severity === ErrorSeverity.CRITICAL ? 'error' :\r\n                      error.severity === ErrorSeverity.HIGH ? 'error' :\r\n                      error.severity === ErrorSeverity.MEDIUM ? 'warn' : 'info';\r\n      \r\n      logger[logLevel](error.message, error.source);\r\n    }\r\n  }\r\n}"
+        }
+    ]
+}

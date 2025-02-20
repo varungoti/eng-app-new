@@ -97,7 +97,7 @@ export default function TeacherStats() {
               <div
                 className={`w-8 h-8 rounded-full flex items-center justify-center mb-1 
                 ${
-                  teacherStats.streak.dailyProgress[day]
+                  teacherStats.streak.dailyProgress[day as keyof typeof teacherStats.streak.dailyProgress]
                     ? "bg-orange-500 text-white"
                     : "bg-gray-100 text-gray-400"
                 }`}

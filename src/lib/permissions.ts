@@ -1,6 +1,40 @@
+import Classes from '@/app/teacher/classes/page';
 import type { UserRole } from '../types/roles';
 import { ROLE_PERMISSIONS } from '../types/roles';
-import * as Icons from 'lucide-react';
+import { TEACHER_ROUTES } from './content/routes';
+import { 
+  Home, 
+  Users, 
+  Calendar, 
+  Settings, 
+  BookOpen, 
+  BarChart2, 
+  FolderOpen,
+  GraduationCap,
+  School,
+  FileText,
+  DollarSign,
+  Bell,
+  Bookmark,
+  FolderPlus,
+  Building,
+  Folders,
+  Eye,
+  Edit,
+  Code,
+  ServerIcon,
+  CreditCard,
+  FileBarChart,
+  AlertTriangle,
+  LucideCloudHail,
+  CloudHailIcon,
+  Activity,
+  Award,
+  MessageSquare,
+  Layout
+} from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+
 
 // Get allowed roles for staff management based on user role
 export const getAllowedStaffRoles = (userRole: UserRole): string[] => {
@@ -26,26 +60,135 @@ export const canAccessDashboard = (userRole: UserRole, targetRole: string): bool
   return userRole === targetRole;
 };
 
+interface NavigationItem {
+  name: string;
+  href?: string;
+  icon: LucideIcon;
+  submenu?: { 
+    name: string; 
+    href: string; 
+    icon: LucideIcon;
+  }[];
+}
+
 // Get navigation items based on role permissions
-export const getNavigationItems = (role: string) => {
+export const getNavigationItems = (role: string): NavigationItem[] => {
   const permissions = ROLE_PERMISSIONS[role]?.permissions;
   if (!permissions) return [];
 
-  const items = [];
+  const items: NavigationItem[] = [];
 
   // Dashboard is available for all roles
   items.push({ 
     name: 'Dashboard', 
     href: '/dashboard',
-    icon: 'LayoutDashboard' 
+    icon: Bookmark 
   });
+
+  if (role === 'teacher' || role === 'teacher_head') {
+    // For teachers, keep the original structure
+    items.push(
+      { 
+        name: 'Dashboard', 
+        href: '/teacher/dashboard',
+        icon: Layout 
+      },
+      { 
+        name: 'My Classes', 
+        href: '/teacher/my-class',
+        icon: Users 
+      },
+      { 
+        name: 'Lessons', 
+        href: '/teacher/lessons',
+        icon: BookOpen 
+      },
+      { 
+        name: 'Assessments', 
+        href: '/teacher/assessments',
+        icon: Activity 
+      },
+      { 
+        name: 'Progress', 
+        href: '/teacher/progress',
+        icon: Award 
+      },
+      { 
+        name: 'AI Assistant', 
+        href: '/teacher/ai-assistant',
+        icon: MessageSquare 
+      },
+      { 
+        name: 'Schedule', 
+        href: '/teacher/schedule',
+        icon: Calendar 
+      },
+      { 
+        name: 'Settings', 
+        href: '/teacher/settings',
+        icon: Settings 
+      }
+    );
+
+    return items;
+  }
+
+  // For non-teacher roles, nest everything under My Classes
+  if (permissions.myclasses) {
+    items.push({ 
+      name: 'My Classes',
+      icon: CloudHailIcon,
+      submenu: [
+        { 
+          name: 'Dashboard', 
+          href: '/teacher/dashboard',
+          icon: Layout 
+        },
+        { 
+          name: 'Class Overview', 
+          href: '/teacher/my-class',
+          icon: Users 
+        },
+        { 
+          name: 'Lessons', 
+          href: '/teacher/lessons',
+          icon: BookOpen 
+        },
+        { 
+          name: 'Assessments', 
+          href: '/teacher/assessments',
+          icon: Activity 
+        },
+        { 
+          name: 'Progress', 
+          href: '/teacher/progress',
+          icon: Award 
+        },
+        { 
+          name: 'AI Assistant', 
+          href: '/teacher/ai-assistant',
+          icon: MessageSquare 
+        },
+        { 
+          name: 'Schedule', 
+          href: '/teacher/schedule',
+          icon: Calendar 
+        },
+        { 
+          name: 'Settings', 
+          href: '/teacher/settings',
+          icon: Settings 
+        }
+      ]
+    });
+  }
 
   // Add menu items based on permissions
   if (permissions.schools) {
     items.push({ 
       name: 'Schools', 
       href: '/schools', 
-      icon: 'Building2' 
+      icon: Building
     });
   }
 
@@ -53,7 +196,7 @@ export const getNavigationItems = (role: string) => {
     items.push({ 
       name: 'Students', 
       href: '/students', 
-      icon: 'Users' 
+      icon: Users
     });
   }
 
@@ -61,31 +204,36 @@ export const getNavigationItems = (role: string) => {
     items.push({ 
       name: 'Sales', 
       href: '/sales', 
-      icon: 'DollarSign' 
+      icon: DollarSign 
     });
   }
 
   if (permissions.content) {
     items.push({
       name: 'Content',
-      icon: 'FileText',
+      icon: Folders,
       submenu: [
         { 
           name: 'View Content', 
           href: '/content/view', 
-          icon: 'Eye' 
+          icon: Eye 
         },
         { 
           name: 'Edit Content', 
           href: '/content/edit', 
-          icon: 'Edit'
+          icon: Edit
         },
         {
           name: 'Lesson Management',
           href: '/content/lesson-management',
-          icon: 'BookOpen'
+          icon: BookOpen 
         }
       ]
+    });
+    items.push({
+      name: 'Content Management',
+      href: '/content-management',
+      icon: FolderPlus
     });
   }
 
@@ -93,7 +241,7 @@ export const getNavigationItems = (role: string) => {
     items.push({ 
       name: 'Development', 
       href: '/development', 
-      icon: 'Code' 
+      icon: Code 
     });
   }
 
@@ -101,29 +249,29 @@ export const getNavigationItems = (role: string) => {
     items.push({ 
       name: 'Infrastructure', 
       href: '/infrastructure', 
-      icon: 'Server' 
+      icon: ServerIcon 
     });
   }
 
   if (permissions.finance) {
     items.push({
       name: 'Finance',
-      icon: 'DollarSign',
+      icon: DollarSign,
       submenu: [
         {
           name: 'Overview',
           href: '/finance',
-          icon: 'BarChart'
+          icon: BarChart2
         },
         {
           name: 'Invoices',
           href: '/finance/invoices',
-          icon: 'FileText'
+          icon: FileText
         },
         {
           name: 'Payments',
           href: '/finance/payments',
-          icon: 'CreditCard'
+          icon: CreditCard
         }
       ]
     });
@@ -133,7 +281,7 @@ export const getNavigationItems = (role: string) => {
     items.push({ 
       name: 'Staff', 
       href: '/staff', 
-      icon: 'Users' 
+      icon: Users 
     });
   }
 
@@ -141,7 +289,7 @@ export const getNavigationItems = (role: string) => {
     items.push({ 
       name: 'Schedule', 
       href: '/schedule', 
-      icon: 'Calendar' 
+      icon: Calendar 
     });
   }
 
@@ -149,7 +297,7 @@ export const getNavigationItems = (role: string) => {
     items.push({ 
       name: 'Reports', 
       href: '/reports', 
-      icon: 'FileBarChart' 
+      icon: FileBarChart 
     });
   }
 
@@ -157,7 +305,7 @@ export const getNavigationItems = (role: string) => {
   items.push({ 
     name: 'Events', 
     href: '/events', 
-    icon: 'Calendar' 
+    icon: Calendar 
   });
 
   // Error Test only for technical roles
@@ -165,7 +313,7 @@ export const getNavigationItems = (role: string) => {
     items.push({ 
       name: 'Error Test', 
       href: '/error-test', 
-      icon: 'AlertTriangle' 
+      icon: AlertTriangle 
     });
   }
 
@@ -174,9 +322,10 @@ export const getNavigationItems = (role: string) => {
     items.push({ 
       name: 'Settings', 
       href: '/settings', 
-      icon: 'Settings' 
+      icon: Settings 
     });
   }
 
   return items;
 };
+

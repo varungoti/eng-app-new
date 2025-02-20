@@ -72,10 +72,12 @@ class MessageManager {
       return messages;
     } catch (err) {
       logger.error('Failed to fetch messages', {
-        context: { error: err },
-        source: 'MessageManager'
+        source: 'MessageManager',
+        error: err,
+        timestamp: new Date().toISOString()
       });
       return [];
+
     }
   }
 
@@ -107,10 +109,12 @@ class MessageManager {
       };
     } catch (err) {
       logger.error('Failed to send message', {
-        context: { error: err, message },
-        source: 'MessageManager'
+        source: 'MessageManager',
+        error: err,
+        timestamp: new Date().toISOString()
       });
       return null;
+
     }
   }
 
@@ -125,9 +129,11 @@ class MessageManager {
       await this.fetchMessages();
     } catch (err) {
       logger.error('Failed to mark message as read', {
-        context: { error: err, messageId },
-        source: 'MessageManager'
+        source: 'MessageManager',
+        error: err,
+        timestamp: new Date().toISOString()
       });
+
     }
   }
 
@@ -152,10 +158,12 @@ class MessageManager {
       }));
     } catch (err) {
       logger.error('Failed to get threads', {
-        context: { error: err },
-        source: 'MessageManager'
+        source: 'MessageManager',
+        error: err,
+        timestamp: new Date().toISOString()
       });
       return [];
+
     }
   }
 

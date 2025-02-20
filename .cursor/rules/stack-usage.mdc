@@ -1,0 +1,15 @@
+---
+description: we are using react, supabase and vite for this project.
+globs: 
+---
+
+# Your rule content
+
+- You can @ files here
+- You can use markdown but dont have to
+give all suggestions that suit the current environment only 
+Environment:
+
+React
+Vite
+Supabase

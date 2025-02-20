@@ -1,0 +1,70 @@
+{
+    "sourceFile": "src/components/ErrorToast.tsx",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 13,
+            "patches": [
+                {
+                    "date": 1739050506392,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1739050572981,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -21,12 +21,12 @@\n \r\n   return (\r\n     <Toast\r\n       message={error}\r\n-      type=\"error\"\r\n+      type=\"foreground\"\r\n       onClose={clearError}\r\n       position={position}\r\n     />\r\n   );\r\n };\r\n \r\n\\ No newline at end of file\n-export default ErrorToast;\n+export default ErrorToast;\r\n"
+                },
+                {
+                    "date": 1739050617868,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -20,13 +20,13 @@\n   if (!error) return null;\r\n \r\n   return (\r\n     <Toast\r\n-      message={error}\r\n-      type=\"foreground\"\r\n-      onClose={clearError}\r\n+      title={error}\r\n+      variant=\"destructive\"\r\n+      onDismiss={clearError}\r\n       position={position}\r\n     />\r\n   );\r\n\\ No newline at end of file\n };\r\n \r\n-export default ErrorToast;\n+export default ErrorToast;\r\n"
+                },
+                {
+                    "date": 1739050631349,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -22,11 +22,11 @@\n   return (\r\n     <Toast\r\n       title={error}\r\n       variant=\"destructive\"\r\n-      onDismiss={clearError}\r\n+      onOpenChange={() => clearError()}\r\n       position={position}\r\n     />\r\n   );\r\n };\r\n \r\n\\ No newline at end of file\n-export default ErrorToast;\n+export default ErrorToast;\r\n"
+                },
+                {
+                    "date": 1739050647690,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -23,10 +23,9 @@\n     <Toast\r\n       title={error}\r\n       variant=\"destructive\"\r\n       onOpenChange={() => clearError()}\r\n-      position={position}\r\n     />\r\n   );\r\n };\r\n \r\n-export default ErrorToast;\n\\ No newline at end of file\n+export default ErrorToast;\r\n"
+                },
+                {
+                    "date": 1739050695220,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -23,8 +23,9 @@\n     <Toast\r\n       title={error}\r\n       variant=\"destructive\"\r\n       onOpenChange={() => clearError()}\r\n+      \r\n     />\r\n   );\r\n };\r\n \r\n"
+                },
+                {
+                    "date": 1739050701538,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -23,9 +23,10 @@\n     <Toast\r\n       title={error}\r\n       variant=\"destructive\"\r\n       onOpenChange={() => clearError()}\r\n-      \r\n+      position={position}\r\n+\r\n     />\r\n   );\r\n };\r\n \r\n"
+                },
+                {
+                    "date": 1739349839854,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,32 +1,116 @@\n import React, { useEffect } from 'react';\r\n import { Toast } from './ui/toast';\r\n import { useError } from '../hooks/useError';\r\n+import { AlertTriangle, XCircle, AlertCircle, Info } from 'lucide-react';\r\n+import { logger } from '../lib/logger';\r\n \r\n interface ToastProps {\r\n-  timeout?: number; \r\n+  timeout?: number;\r\n   position?: 'top' | 'bottom';\r\n+  maxWidth?: string;\r\n }\r\n \r\n-const ErrorToast: React.FC<ToastProps> = ({ timeout = 3000, position = 'top' }) => {\r\n+type ErrorSeverity = 'error' | 'warning' | 'info' | 'fatal';\r\n+\r\n+interface ErrorWithSeverity {\r\n+  message: string;\r\n+  severity: ErrorSeverity;\r\n+  source?: string;\r\n+  timestamp?: string;\r\n+}\r\n+\r\n+const getToastVariant = (severity: ErrorSeverity) => {\r\n+  switch (severity) {\r\n+    case 'error':\r\n+      return 'destructive';\r\n+    case 'warning':\r\n+      return 'warning';\r\n+    case 'info':\r\n+      return 'default';\r\n+    case 'fatal':\r\n+      return 'destructive';\r\n+    default:\r\n+      return 'default';\r\n+  }\r\n+};\r\n+\r\n+const getToastIcon = (severity: ErrorSeverity) => {\r\n+  switch (severity) {\r\n+    case 'error':\r\n+      return XCircle;\r\n+    case 'warning':\r\n+      return AlertTriangle;\r\n+    case 'info':\r\n+      return Info;\r\n+    case 'fatal':\r\n+      return AlertCircle;\r\n+    default:\r\n+      return AlertTriangle;\r\n+  }\r\n+};\r\n+\r\n+const ErrorToast: React.FC<ToastProps> = ({ \r\n+  timeout = 5000, \r\n+  position = 'top',\r\n+  maxWidth = '420px'\r\n+}) => {\r\n   const { error, clearError } = useError();\r\n \r\n   useEffect(() => {\r\n     if (error) {\r\n-      const timer = setTimeout(clearError, timeout);\r\n+      logger.info('Showing error toast', {\r\n+        source: 'ErrorToast',\r\n+        context: {\r\n+          error: typeof error === 'string' ? error : error.message,\r\n+          severity: (error as ErrorWithSeverity)?.severity || 'error',\r\n+          timestamp: new Date().toISOString()\r\n+        }\r\n+      });\r\n+\r\n+      const timer = setTimeout(() => {\r\n+        clearError();\r\n+        logger.info('Auto-clearing error toast', {\r\n+          source: 'ErrorToast',\r\n+          context: { timeout }\r\n+        });\r\n+      }, timeout);\r\n+\r\n       return () => clearTimeout(timer);\r\n     }\r\n   }, [error, clearError, timeout]);\r\n \r\n   if (!error) return null;\r\n \r\n+  const errorObj: ErrorWithSeverity = typeof error === 'string' \r\n+    ? { message: error, severity: 'error' }\r\n+    : error as ErrorWithSeverity;\r\n+\r\n+  const Icon = getToastIcon(errorObj.severity);\r\n+  const variant = getToastVariant(errorObj.severity);\r\n+\r\n   return (\r\n     <Toast\r\n-      title={error}\r\n-      variant=\"destructive\"\r\n-      onOpenChange={() => clearError()}\r\n-      position={position}\r\n-\r\n+      title={\r\n+        <div className=\"flex items-center gap-2\">\r\n+          <Icon className=\"h-4 w-4\" />\r\n+          <span>{errorObj.source || 'Error'}</span>\r\n+        </div>\r\n+      }\r\n+      description={errorObj.message}\r\n+      variant={variant}\r\n+      onOpenChange={() => {\r\n+        clearError();\r\n+        logger.info('User dismissed error toast', {\r\n+          source: 'ErrorToast',\r\n+          context: { error: errorObj }\r\n+        });\r\n+      }}\r\n+      className={`max-w-[${maxWidth}]`}\r\n+      style={{ \r\n+        top: position === 'top' ? '1rem' : 'auto',\r\n+        bottom: position === 'bottom' ? '1rem' : 'auto'\r\n+      }}\r\n     />\r\n   );\r\n };\r\n \r\n"
+                },
+                {
+                    "date": 1739390630642,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -60,9 +60,9 @@\n     if (error) {\r\n       logger.info('Showing error toast', {\r\n         source: 'ErrorToast',\r\n         context: {\r\n-          error: typeof error === 'string' ? error : error.message,\r\n+          error: typeof error === 'string' ? error : (error as ErrorWithSeverity).message,\r\n           severity: (error as ErrorWithSeverity)?.severity || 'error',\r\n           timestamp: new Date().toISOString()\r\n         }\r\n       });\r\n"
+                },
+                {
+                    "date": 1739390652117,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -48,8 +48,12 @@\n       return AlertTriangle;\r\n   }\r\n };\r\n \r\n+const isErrorWithSeverity = (error: unknown): error is ErrorWithSeverity => {\r\n+  return typeof error === 'object' && error !== null && 'severity' in error;\r\n+};\r\n+\r\n const ErrorToast: React.FC<ToastProps> = ({ \r\n   timeout = 5000, \r\n   position = 'top',\r\n   maxWidth = '420px'\r\n@@ -80,11 +84,11 @@\n   }, [error, clearError, timeout]);\r\n \r\n   if (!error) return null;\r\n \r\n-  const errorObj: ErrorWithSeverity = typeof error === 'string' \r\n-    ? { message: error, severity: 'error' }\r\n-    : error as ErrorWithSeverity;\r\n+  const errorObj = typeof error === 'string' \r\n+    ? { message: error, severity: 'error' as const } \r\n+    : isErrorWithSeverity(error) ? error : { message: String(error), severity: 'error' as const };\r\n \r\n   const Icon = getToastIcon(errorObj.severity);\r\n   const variant = getToastVariant(errorObj.severity);\r\n \r\n"
+                },
+                {
+                    "date": 1739390675065,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -84,11 +84,11 @@\n   }, [error, clearError, timeout]);\r\n \r\n   if (!error) return null;\r\n \r\n-  const errorObj = typeof error === 'string' \r\n-    ? { message: error, severity: 'error' as const } \r\n-    : isErrorWithSeverity(error) ? error : { message: String(error), severity: 'error' as const };\r\n+  const errorObj: ErrorWithSeverity = typeof error === 'string' \r\n+    ? { message: error, severity: 'error' }\r\n+    : error as ErrorWithSeverity;\r\n \r\n   const Icon = getToastIcon(errorObj.severity);\r\n   const variant = getToastVariant(errorObj.severity);\r\n \r\n"
+                },
+                {
+                    "date": 1739390680858,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -64,10 +64,16 @@\n     if (error) {\r\n       logger.info('Showing error toast', {\r\n         source: 'ErrorToast',\r\n         context: {\r\n-          error: typeof error === 'string' ? error : (error as ErrorWithSeverity).message,\r\n-          severity: (error as ErrorWithSeverity)?.severity || 'error',\r\n+          error: typeof error === 'string' \r\n+            ? error \r\n+            : isErrorWithSeverity(error) \r\n+              ? error.message \r\n+              : String(error),\r\n+          severity: isErrorWithSeverity(error) \r\n+            ? error.severity \r\n+            : 'error',\r\n           timestamp: new Date().toISOString()\r\n         }\r\n       });\r\n \r\n"
+                },
+                {
+                    "date": 1739390698956,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -61,18 +61,19 @@\n   const { error, clearError } = useError();\r\n \r\n   useEffect(() => {\r\n     if (error) {\r\n+      const errorValue = error as string | ErrorWithSeverity | unknown;\r\n       logger.info('Showing error toast', {\r\n         source: 'ErrorToast',\r\n         context: {\r\n-          error: typeof error === 'string' \r\n-            ? error \r\n-            : isErrorWithSeverity(error) \r\n-              ? error.message \r\n-              : String(error),\r\n-          severity: isErrorWithSeverity(error) \r\n-            ? error.severity \r\n+          error: typeof errorValue === 'string' \r\n+            ? errorValue \r\n+            : isErrorWithSeverity(errorValue) \r\n+              ? errorValue.message \r\n+              : String(errorValue),\r\n+          severity: isErrorWithSeverity(errorValue) \r\n+            ? errorValue.severity \r\n             : 'error',\r\n           timestamp: new Date().toISOString()\r\n         }\r\n       });\r\n"
+                },
+                {
+                    "date": 1739390725188,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -7,8 +7,9 @@\n interface ToastProps {\r\n   timeout?: number;\r\n   position?: 'top' | 'bottom';\r\n   maxWidth?: string;\r\n+  title?: string | React.ReactNode;\r\n }\r\n \r\n type ErrorSeverity = 'error' | 'warning' | 'info' | 'fatal';\r\n \r\n"
+                }
+            ],
+            "date": 1739050506392,
+            "name": "Commit-0",
+            "content": "import React, { useEffect } from 'react';\r\nimport { Toast } from './ui/toast';\r\nimport { useError } from '../hooks/useError';\r\n\r\ninterface ToastProps {\r\n  timeout?: number; \r\n  position?: 'top' | 'bottom';\r\n}\r\n\r\nconst ErrorToast: React.FC<ToastProps> = ({ timeout = 3000, position = 'top' }) => {\r\n  const { error, clearError } = useError();\r\n\r\n  useEffect(() => {\r\n    if (error) {\r\n      const timer = setTimeout(clearError, timeout);\r\n      return () => clearTimeout(timer);\r\n    }\r\n  }, [error, clearError, timeout]);\r\n\r\n  if (!error) return null;\r\n\r\n  return (\r\n    <Toast\r\n      message={error}\r\n      type=\"error\"\r\n      onClose={clearError}\r\n      position={position}\r\n    />\r\n  );\r\n};\r\n\r\nexport default ErrorToast;"
+        }
+    ]
+}

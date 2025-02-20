@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/app/content-management/components/CreateLessonDialog.tsx",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1739016941269,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1739016941269,
+            "name": "Commit-0",
+            "content": "'use client';\r\n\r\nimport { useState } from 'react';\r\nimport { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';\r\nimport { Button } from '@/components/ui/button';\r\nimport { Input } from '@/components/ui/input';\r\nimport { useToast } from '@/hooks/use-toast';\r\nimport { contentService } from '@/lib/content/ContentService';\r\nimport { useMutation, useQueryClient } from '@tanstack/react-query';\r\nimport { Icon } from '@/components/ui/icons';\r\n\r\ninterface CreateLessonDialogProps {\r\n  open: boolean;\r\n  onOpenChange: (open: boolean) => void;\r\n  subtopicId: string;\r\n}\r\n\r\nexport function CreateLessonDialog({ open, onOpenChange, subtopicId }: CreateLessonDialogProps) {\r\n  const [title, setTitle] = useState('');\r\n  const queryClient = useQueryClient();\r\n  const { toast } = useToast();\r\n\r\n  const { mutate, isPending: isLoading } = useMutation({\r\n    mutationFn: async () => {\r\n      return contentService.createLesson({ title, subtopicId });\r\n    },\r\n    onSuccess: () => {\r\n      queryClient.invalidateQueries({ queryKey: ['lessons', subtopicId] });\r\n      toast({\r\n        title: \"Success\",\r\n        description: \"Lesson created successfully\"\r\n      });\r\n      setTitle('');\r\n      onOpenChange(false);\r\n    },\r\n    onError: () => {\r\n      toast({\r\n        title: \"Error\",\r\n        description: \"Failed to create lesson\",\r\n      });\r\n    }\r\n  });\r\n\r\n\r\n  const handleSubmit = (e: React.FormEvent) => {\r\n    e.preventDefault();\r\n    if (!title.trim()) {\r\n      toast({\r\n        title: \"Error\",\r\n        description: \"Title is required\",\r\n      });\r\n      return;\r\n\r\n    }\r\n    mutate();\r\n  };\r\n\r\n  return (\r\n    <Dialog open={open} onOpenChange={onOpenChange}>\r\n      <DialogContent className=\"bg-white dark:bg-gray-800 sm:max-w-[425px]\">\r\n        <DialogHeader>\r\n          <DialogTitle className=\"flex items-center gap-2\">\r\n            <Icon type=\"phosphor\" name=\"BOOK_OPEN\" className=\"h-5 w-5\" />\r\n            Create New Lesson\r\n          </DialogTitle>\r\n        </DialogHeader>\r\n        <form onSubmit={handleSubmit} className=\"space-y-4\">\r\n          <Input\r\n            placeholder=\"Lesson title\"\r\n            value={title}\r\n            onChange={(e) => setTitle(e.target.value)}\r\n          />\r\n          <Button type=\"submit\" disabled={isLoading}>\r\n            {isLoading ? 'Creating...' : 'Create Lesson'}\r\n          </Button>\r\n        </form>\r\n      </DialogContent>\r\n    </Dialog>\r\n  );\r\n} "
+        }
+    ]
+}

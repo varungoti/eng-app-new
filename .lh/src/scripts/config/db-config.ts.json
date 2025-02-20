@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/scripts/config/db-config.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1739483097102,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1739483097102,
+            "name": "Commit-0",
+            "content": "export const dbConfig = {\r\n  tables: {\r\n    grades: 'grades',\r\n    topics: 'topics',\r\n    subtopics: 'subtopics',\r\n    lessons: 'lessons',\r\n    questions: 'questions',\r\n    exercise_prompts: 'exercise_prompts',\r\n    activities: 'activities'\r\n  },\r\n  validation: {\r\n    maxTitleLength: 255,\r\n    maxDescriptionLength: 1000,\r\n    allowedDifficulties: ['beginner', 'intermediate', 'advanced'],\r\n    allowedContentTypes: ['speaking_practice', 'listening_practice', 'reading_practice'],\r\n    minOrderIndex: 1,\r\n    maxOrderIndex: 1000\r\n  },\r\n  batchSize: 50 // For batch inserts\r\n}\r\n\r\nexport const logLevels = {\r\n  INFO: 'INFO',\r\n  ERROR: 'ERROR',\r\n  SUCCESS: 'SUCCESS',\r\n  WARNING: 'WARNING'\r\n} as const "
+        }
+    ]
+}

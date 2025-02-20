@@ -8,54 +8,57 @@
       "DOM.Iterable"
     ],
     "module": "ESNext",
+    "composite": true,
     "skipLibCheck": true,
+    "types": [
+      "node",
+      "react",
+      "react-dom"
+    ],
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
+    "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
+    "preserveSymlinks": false,
+    "outDir": "dist",
     "baseUrl": ".",
-    "paths": {
-      "@/*": [
-        "src/*"
-      ],
-      "@components/*": [
-        "src/components/*"
-      ],
-      "@lib/*": [
-        "src/lib/*"
-      ],
-      "@hooks/*": [
-        "src/hooks/*"
-      ],
-      "@pages/*": [
-        "src/pages/*"
-      ],
-      "@types/*": [
-        "src/types/*"
-      ]
-    },
+    "rootDir": ".",
     "allowJs": true,
     "incremental": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "paths": {
+      "@/*": ["src/*"],
+      "@app/*": ["src/app"],
+      "@components/*": ["src/components/*"],
+      "@lib/*": ["src/lib/*"],
+      "@types/*": ["src/types/*"],
+      "@hooks/*": ["src/hooks/*"],
+      "@utils/*": ["src/utils/*"]
+    }
   },
   "include": [
-    "src"
-  ],
-  "references": [
-    {
-      "path": "./tsconfig.app.json"
-    },
-    {
-      "path": "./tsconfig.node.json"
-    }
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "src/types/**/*.d.ts",
+    "vite.config.ts"
   ],
   "exclude": [
-    "node_modules"
-  ]
+    "node_modules",
+    "dist",
+    "build"
+  ],
+  "references": [{ "path": "./tsconfig.node.json" }],
+  "ts-node": {
+    "compilerOptions": {
+      "module": "CommonJS"
+    }
+  }
 }

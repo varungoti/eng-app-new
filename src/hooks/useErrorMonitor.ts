@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { errorMonitor } from '../lib/errorHandler/ErrorMonitor';
 import type { ErrorRegistryEntry } from '../lib/errorHandler/ErrorRegistry';
+import type { ErrorMetrics } from '../lib/errorHandler/ErrorMetrics';
 
 export const useErrorMonitor = (source?: string) => {
   const [errors, setErrors] = useState<ErrorRegistryEntry[]>(

@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/utils/logger.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1739391447818,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1739391447818,
+            "name": "Commit-0",
+            "content": "const LOG_THROTTLE_MS = 5000; // 5 seconds\r\nconst lastLogTimes = new Map<string, number>();\r\n\r\nfunction shouldLog(source: string, level: string): boolean {\r\n  // Always log errors and warnings\r\n  if (level === 'error' || level === 'warn') return true;\r\n  \r\n  // Throttle auth-related logs\r\n  if (source.includes('Auth') || source.includes('Session')) {\r\n    const now = Date.now();\r\n    const lastTime = lastLogTimes.get(source) || 0;\r\n    \r\n    if (now - lastTime < LOG_THROTTLE_MS) {\r\n      return false;\r\n    }\r\n    \r\n    lastLogTimes.set(source, now);\r\n  }\r\n  \r\n  return true;\r\n}\r\n\r\nexport const logger = {\r\n  debug: (message: string, source: string) => {\r\n    if (shouldLog(source, 'debug')) {\r\n      console.debug(`[${new Date().toISOString()}] ${message} [DEBUG] 🔍🐞 [${source}]`);\r\n    }\r\n  },\r\n  // ... other logger methods\r\n}; "
+        }
+    ]
+}

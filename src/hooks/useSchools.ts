@@ -3,8 +3,9 @@ import { supabase } from '../lib/supabase';
 import { logger } from '../lib/logger';
 import { useDataLoadTimeout } from './useDataLoadTimeout';
 import type { School } from '../types';
+import { useEffect } from 'react';
 
-export const useSchools = () => {
+export function useSchools() {
   const queryClient = useQueryClient();
   const { clearTimeout } = useDataLoadTimeout({
     source: 'useSchools',
@@ -26,28 +27,16 @@ export const useSchools = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('schools')
-        .select(`
-          *,
-          school_grades (
-            grade_id
-          )
-        `)
-        .order('name');
-
+        .select('*');
+      
       if (error) throw error;
-      return data;
-    },
-    onSuccess: () => {
-      clearTimeout();
-      queryClient.invalidateQueries({ queryKey: ['schools'] });
-    },
-    onError: (error) => {
-      logger.error('Failed to load schools', {
-        context: { error },
-        source: 'useSchools'
-      });
+      return data as unknown as School[];
     }
   });
+
+  useEffect(() => {
+    clearTimeout();
+  }, [clearTimeout]);
 
   // Add school mutation
   const addSchool = useMutation({
@@ -84,7 +73,7 @@ export const useSchools = () => {
           .from('school_grades')
           .insert(
             school.grades.map(gradeId => ({
-              school_id: schoolData.id,
+              school_id: (schoolData as unknown as { id: string }).id,
               grade_id: gradeId
             }))
           );

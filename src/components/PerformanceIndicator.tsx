@@ -1,6 +1,7 @@
 import React from 'react';
 import { usePerformanceMonitor } from '../hooks/usePerformanceMonitor';
-import { Loader2, AlertTriangle, CheckCircle } from 'lucide-react';
+import { Loader2, CheckCircle, AlertTriangle } from 'lucide-react';
+
 
 interface PerformanceIndicatorProps {
   source: string;
@@ -29,6 +30,7 @@ export const PerformanceIndicator: React.FC<PerformanceIndicatorProps> = ({
       {/* Active Operations */}
       {activeOperations.length > 0 && (
         <div className="space-y-2 mb-4">
+
           <p className="text-xs font-medium text-gray-500">Active Operations</p>
           {activeOperations.map(op => (
             <div key={op.id} className="text-sm">
@@ -65,6 +67,7 @@ export const PerformanceIndicator: React.FC<PerformanceIndicatorProps> = ({
                   ) : (
                     <AlertTriangle className="h-4 w-4 text-red-500" />
                   )}
+
                 </div>
               </div>
             </div>

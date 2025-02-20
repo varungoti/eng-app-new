@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/components/providers/TooltipProvider.tsx",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1739449684928,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1739449684928,
+            "name": "Commit-0",
+            "content": "\"use client\"\r\n\r\nimport * as React from \"react\"\r\nimport { TooltipProvider as RadixTooltipProvider } from \"@radix-ui/react-tooltip\"\r\n\r\nexport function TooltipProvider({ children }: { children: React.ReactNode }) {\r\n  return (\r\n    <RadixTooltipProvider delayDuration={200}>\r\n      {children}\r\n    </RadixTooltipProvider>\r\n  )\r\n} "
+        }
+    ]
+}

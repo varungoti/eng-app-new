@@ -1,37 +1,25 @@
-import { createClient } from '@supabase/supabase-js';
+import { DEBUG_CONFIG } from './config';
 import type { Database } from './database.types';
 import { logger } from './logger';
-import { DEBUG_CONFIG } from './config';
+import { createBrowserClient } from '@supabase/ssr';
+import type { SupabaseClient } from '@supabase/supabase-js';
+import type { AuthChangeEvent, Session } from '@supabase/supabase-js';
+import { createClient } from '@supabase/supabase-js';
 
-// Validate environment variables
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+let supabaseInstance: SupabaseClient<Database> | null = null;
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  const error = 'Missing Supabase environment variables';
-  logger.error(error, {
-    context: {
-      url: !!supabaseUrl,
-      key: !!supabaseAnonKey
-    },
-    source: 'SupabaseClient'
-  });
-  throw new Error(error);
-}
-
-// Configure Supabase client
 const supabaseOptions = {
   auth: {
     autoRefreshToken: true,
     persistSession: true,
     storageKey: 'sb-auth-token',
-    storage: window.localStorage,
+    storage: typeof window !== 'undefined' ? window.localStorage : undefined,
     detectSessionInUrl: true,
-    flowType: 'pkce',
-    debug: DEBUG_CONFIG.enabled,
+    flowType: 'pkce' as const,
+    debug: false,
     cookieOptions: {
-      maxAge: 7 * 24 * 60 * 60, // 7 days
-      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60,
+      sameSite: 'lax' as const,
       secure: true
     },
   },
@@ -47,44 +35,112 @@ const supabaseOptions = {
     }
   },
   db: {
-    schema: 'public',
-    debug: DEBUG_CONFIG.enabled
+    schema: 'public' as const,
+    debug: false
   }
 };
 
-// Log configuration in debug mode
-if (DEBUG_CONFIG.enabled) {
-  console.debug('[Supabase] Initializing with options:', {
-    url: supabaseUrl ? '✓' : '✗',
-    key: supabaseAnonKey ? '✓' : '✗',
-    options: supabaseOptions
-  });
+function validateEnvironment(): void {
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+  const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+  if (!supabaseUrl || !supabaseAnonKey) {
+    throw new Error(
+      'Missing Supabase environment variables. Please ensure VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY are set in your .env file.'
+    );
+  }
 }
 
-// Create Supabase client with enhanced error handling
-const supabaseClient = createClient<Database>(
-  supabaseUrl,
-  supabaseAnonKey,
-  supabaseOptions
-);
+function createSupabaseClient(): SupabaseClient<Database> {
+  validateEnvironment();
 
-// Set up auto-refresh interval
-setInterval(async () => {
-  try {
-    const { data: { session }, error } = await supabaseClient.auth.getSession();
-    if (session && !error) {
-      await supabaseClient.auth.refreshSession();
-      logger.debug('Session refreshed automatically', {
-        source: 'SupabaseClient'
-      });
-    }
-  } catch (err) {
-    logger.error('Failed to refresh session', {
-      context: { error: err },
-      source: 'SupabaseClient' 
-    });
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+  const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+  if (DEBUG_CONFIG.enabled) {
+    logger.info(`Creating Supabase client with URL: ${supabaseUrl}`, 'supabase');
   }
-}, 4 * 60 * 1000); // Check every 4 minutes
 
-// Export the Supabase client
-export const supabase = supabaseClient;
+  const client = createBrowserClient<Database>(
+    supabaseUrl,
+    supabaseAnonKey,
+    supabaseOptions
+  );
+
+  if (DEBUG_CONFIG.enabled) {
+    logger.info('Supabase client initialized', 'supabase');
+  }
+
+
+  return client;
+}
+
+function getSupabaseClient(): SupabaseClient<Database> {
+  if (typeof window === 'undefined') {
+    throw new Error('Supabase client can only be instantiated in browser environment');
+  }
+
+  if (!supabaseInstance) {
+    supabaseInstance = createSupabaseClient();
+  }
+
+  return supabaseInstance;
+}
+
+// Initialize the client immediately but only once
+if (typeof window !== 'undefined' && !supabaseInstance) {
+  supabaseInstance = createSupabaseClient();
+}
+
+// Export both the instance and the getter
+export const supabase = supabaseInstance!;
+export const getSupabase = () => {
+  if (!supabaseInstance) {
+    supabaseInstance = getSupabaseClient();
+  }
+  return supabaseInstance;
+};
+
+// Export the type for use in other files
+export type TypedSupabaseClient = SupabaseClient<Database>;
+
+// Handle cleanup for HMR
+if (import.meta.hot) {
+  import.meta.hot.dispose(() => {
+    if (DEBUG_CONFIG.enabled) {
+      logger.info('Cleaning up Supabase client', 'supabase');
+    }
+    supabaseInstance = null;
+  });
+
+}
+
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error('Missing Supabase environment variables');
+}
+
+// Create a single instance of the Supabase client
+export const supabaseClient = createClient<Database>(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    persistSession: true,
+    storageKey: 'sb-auth-token',
+    storage: localStorage,
+    autoRefreshToken: true,
+    detectSessionInUrl: true
+  }
+});
+
+// Add auth state check helper
+export const ensureAuthenticated = async () => {
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  if (!session) {
+    throw new Error('Authentication required');
+  }
+  return session;
+};
+
+// Add this export
+export const getSupabaseAuth = () => supabaseClient.auth;

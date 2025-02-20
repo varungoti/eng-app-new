@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Plus, Upload } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Plus, Upload, Shield } from 'lucide-react';
 import { usePermissions } from '../hooks/usePermissions';
 import { useStaff } from '../hooks/useStaff';
 import { useAuth } from '../hooks/useAuth';
@@ -12,6 +12,7 @@ import StaffFilters from '../components/staff/StaffFilters';
 import BulkImportDialog from '../components/BulkImport/BulkImportDialog';
 import { Button } from '../components/ui/button';
 import { logger } from '../lib/logger';
+import type { Staff } from '../types';
 
 const Staff = () => {
   const { can } = usePermissions();
@@ -37,10 +38,30 @@ const Staff = () => {
     refresh
   } = useStaff();
 
+  useEffect(() => {
+    if (!user) {
+      showToast('Please log in to access staff management', { type: 'error' });
+    }
+  }, [user, showToast]);
+
+  if (!user) {
+    return (
+      <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+        <h3 className="text-lg font-medium text-red-800">Authentication Required</h3>
+        <p className="mt-2 text-sm text-red-600">
+          Please log in to access staff management.
+        </p>
+      </div>
+    );
+  }
+
   if (!can('staff')) {
     return (
       <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-        <h3 className="text-lg font-medium text-red-800">Access Denied</h3>
+        <div className="flex items-center gap-2">
+          <Shield className="h-5 w-5 text-red-600" />
+          <h3 className="text-lg font-medium text-red-800">Access Denied</h3>
+        </div>
         <p className="mt-2 text-sm text-red-600">
           You do not have permission to access staff management.
         </p>
@@ -48,15 +69,16 @@ const Staff = () => {
     );
   }
 
-  const handleAddStaff = async (data: any) => {
+  const handleAddStaff = async (data: Omit<Staff, 'id' | 'created_at' | 'updated_at'>) => {
     try {
-      await addStaff(data);
+      await addStaff.mutateAsync({
+        ...data,
+        status: 'active' as 'active' | 'inactive' | 'pending'
+      });
       setIsAddModalOpen(false);
-      showToast('Staff member added successfully', { type: 'success' });
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to add staff member';
-      showToast(message, { type: 'error' });
-      logger.error(message, {
+      // Error handling is done in the mutation
+      logger.error('Staff addition failed', {
         context: { error: err },
         source: 'Staff'
       });
@@ -70,24 +92,50 @@ const Staff = () => {
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Failed to send invitation';
       showToast(message, { type: 'error' });
-      logger.error(message, {
+      logger.error('Staff invitation failed', {
         context: { error: err },
         source: 'Staff'
       });
     }
   };
 
-  const handleBulkImport = async (data: any[]) => {
+  const handleBulkImport = async (data: Array<Omit<Staff, 'id'>>) => {
     try {
-      for (const staff of data) {
-        await addStaff(staff);
+      let successCount = 0;
+      let errorCount = 0;
+
+      for (const staffMember of data) {
+        try {
+          await addStaff.mutateAsync({
+            ...staffMember,
+            status: 'active'
+          });
+          successCount++;
+        } catch (err) {
+          errorCount++;
+          logger.error('Failed to import staff member', {
+            context: { error: err, staffMember },
+            source: 'Staff'
+          });
+        }
       }
+
       setIsImportModalOpen(false);
-      showToast('Staff imported successfully', { type: 'success' });
+      
+      if (successCount > 0) {
+        showToast(`Successfully imported ${successCount} staff member${successCount !== 1 ? 's' : ''}`, { 
+          type: 'success' 
+        });
+      }
+      
+      if (errorCount > 0) {
+        showToast(`Failed to import ${errorCount} staff member${errorCount !== 1 ? 's' : ''}`, { 
+          type: 'error' 
+        });
+      }
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to import staff';
-      showToast(message, { type: 'error' });
-      logger.error(message, {
+      showToast('Failed to import staff', { type: 'error' });
+      logger.error('Bulk import failed', {
         context: { error: err },
         source: 'Staff'
       });
@@ -101,14 +149,17 @@ const Staff = () => {
   if (error) {
     return (
       <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-        <h3 className="text-lg font-medium text-red-800">Error</h3>
+        <div className="flex items-center gap-2">
+          <Shield className="h-5 w-5 text-red-600" />
+          <h3 className="text-lg font-medium text-red-800">Error</h3>
+        </div>
         <p className="mt-2 text-sm text-red-600">{error}</p>
-        <button
+        <Button
           onClick={() => refresh()}
           className="mt-4 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200"
         >
           Retry Loading
-        </button>
+        </Button>
       </div>
     );
   }
@@ -150,8 +201,8 @@ const Staff = () => {
         {/* Staff List */}
         <StaffList
           staff={staff}
-          onUpdate={updateStaff}
-          onDelete={deleteStaff}
+          onUpdate={(id, updates) => updateStaff.mutate({ id, updates })}
+          onDelete={deleteStaff.mutate}
           filters={filters}
         />
 

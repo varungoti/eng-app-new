@@ -1,0 +1,26 @@
+{
+    "sourceFile": "src/lib/monitoring/DatabaseMonitor.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 2,
+            "patches": [
+                {
+                    "date": 1739014143582,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1739389649180,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -57,9 +57,9 @@\n         lastCheckTime: new Date(),\r\n         responseTime: duration\r\n       };\r\n \r\n-      logger.info('Database health check successful', 'DatabaseMonitor');\r\n+      logger.info('Database health check successful', { source: 'DatabaseMonitor' });\r\n \r\n     } catch (error) {\r\n       this.metrics.errorCount++;\r\n       this.metrics.connectionStatus = this.metrics.errorCount > 3 ? 'error' : 'degraded';\r\n"
+                },
+                {
+                    "date": 1739389655646,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -63,9 +63,9 @@\n     } catch (error) {\r\n       this.metrics.errorCount++;\r\n       this.metrics.connectionStatus = this.metrics.errorCount > 3 ? 'error' : 'degraded';\r\n \r\n-      logger.error('Database health check failed', 'DatabaseMonitor', error);\r\n+      logger.error('Database health check failed', { source: 'DatabaseMonitor', error });\r\n \r\n     }\r\n   }\r\n \r\n@@ -87,9 +87,9 @@\n \r\n   updateConnectionStatus(status: boolean) {\r\n     this.isConnected = status;\r\n     if (this.config.enableLogging) {\r\n-      logger.info(`Database connection status: ${status ? 'connected' : 'disconnected'}`, 'DatabaseMonitor');\r\n+      logger.info(`Database connection status: ${status ? 'connected' : 'disconnected'}`, { source: 'DatabaseMonitor' });\r\n     }\r\n   }\r\n }\r\n \r\n"
+                }
+            ],
+            "date": 1739014143582,
+            "name": "Commit-0",
+            "content": "import type { SupabaseClient } from '@supabase/supabase-js';\r\nimport { supabase } from '../supabase';\r\nimport type { MonitoringConfig } from './types';\r\nimport { logger } from '../logger';\r\n\r\ntype ConnectionStatus = 'error' | 'healthy' | 'degraded';\r\n\r\nexport interface DatabaseMetrics {\r\n  connectionStatus: ConnectionStatus;\r\n  lastCheckTime: Date;\r\n  responseTime: number;\r\n  recordCount: number;\r\n  errorCount: number;\r\n}\r\n\r\nexport class DatabaseMonitor {\r\n  private client: SupabaseClient;\r\n  private config: MonitoringConfig;\r\n  private metrics: DatabaseMetrics;\r\n  private checkInterval: NodeJS.Timeout | null = null;\r\n  private isConnected: boolean = false;\r\n\r\n  constructor(config: MonitoringConfig) {\r\n    this.client = supabase;\r\n    this.config = config;\r\n    this.metrics = {\r\n      connectionStatus: 'healthy',\r\n      lastCheckTime: new Date(),\r\n      responseTime: 0,\r\n      errorCount: 0,\r\n      recordCount: 0\r\n    };\r\n\r\n    this.startHealthCheck();\r\n  }\r\n\r\n  private async startHealthCheck() {\r\n    this.checkInterval = setInterval(async () => {\r\n      await this.checkHealth();\r\n    }, 60000); // Check every minute\r\n  }\r\n\r\n  private async checkHealth() {\r\n    const startTime = Date.now();\r\n    \r\n    try {\r\n      const { data, error } = await this.client\r\n        .rpc('update_health_check');\r\n\r\n      if (error) throw error;\r\n\r\n      const duration = Date.now() - startTime;\r\n      \r\n      this.metrics = {\r\n        ...this.metrics,\r\n        connectionStatus: 'healthy',\r\n        lastCheckTime: new Date(),\r\n        responseTime: duration\r\n      };\r\n\r\n      logger.info('Database health check successful', 'DatabaseMonitor');\r\n\r\n    } catch (error) {\r\n      this.metrics.errorCount++;\r\n      this.metrics.connectionStatus = this.metrics.errorCount > 3 ? 'error' : 'degraded';\r\n\r\n      logger.error('Database health check failed', 'DatabaseMonitor', error);\r\n\r\n    }\r\n  }\r\n\r\n  public getMetrics(): DatabaseMetrics {\r\n    return {\r\n      connectionStatus: this.isConnected ? 'healthy' : 'error',\r\n      lastCheckTime: new Date(),\r\n      responseTime: 0,\r\n      recordCount: 0,\r\n      errorCount: 0\r\n    };\r\n  }\r\n\r\n  cleanup() {\r\n    if (this.checkInterval) {\r\n      clearInterval(this.checkInterval);\r\n    }\r\n  }\r\n\r\n  updateConnectionStatus(status: boolean) {\r\n    this.isConnected = status;\r\n    if (this.config.enableLogging) {\r\n      logger.info(`Database connection status: ${status ? 'connected' : 'disconnected'}`, 'DatabaseMonitor');\r\n    }\r\n  }\r\n}\r\n\r\n// Export both as default and named export\r\n//export { DatabaseMonitor };\r\nexport default DatabaseMonitor;"
+        }
+    ]
+}

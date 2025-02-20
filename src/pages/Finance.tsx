@@ -3,11 +3,12 @@ import { DollarSign, TrendingUp, PieChart, Activity } from 'lucide-react';
 import { usePermissions } from '../hooks/usePermissions';
 import { formatCurrency } from '../lib/utils/format';
 import DepartmentInputs from '../components/inputs/DepartmentInputs';
+import { Permissions } from '../types/roles';
 
 const Finance = () => {
   const { can } = usePermissions();
 
-  if (!can('finance')) {
+  if (!can('finance' as keyof Permissions)) {
     return (
       <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
         <h3 className="text-lg font-medium text-red-800">Access Denied</h3>

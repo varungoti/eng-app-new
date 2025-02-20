@@ -1,7 +1,7 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { contentService } from '../lib/content/ContentService';
-import { logger } from '../lib/logger';
-import type { Grade, Topic, SubTopic, Lesson } from '../types';
+//import { logger } from '../lib/logger';
+//import type { Grade, Topic, SubTopic, Lesson } from '../types';
 
 export const useContent = () => {
   const queryClient = useQueryClient();

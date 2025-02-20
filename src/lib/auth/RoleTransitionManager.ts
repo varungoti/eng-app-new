@@ -54,26 +54,13 @@ class RoleTransitionManager {
       store.setRole(newRole);
       store.completeTransition();
 
-      logger.info('Role transition completed successfully', {
-        context: { 
-          from: store.currentRole,
-          to: newRole,
-          userId: session.user.id
-        },
-        source: 'RoleTransitionManager'
-      });
+      logger.info(`Role transition completed successfully from ${store.currentRole || 'none'} to ${newRole}`, { source: 'RoleTransitionManager' });
+
 
     } catch (err) {
       store.resetTransition();
 
-      logger.error('Role transition failed', {
-        context: {
-          error: err,
-          from: store.currentRole,
-          to: newRole
-        },
-        source: 'RoleTransitionManager'
-      });
+      logger.error(`Role transition failed: ${err instanceof Error ? err.message : String(err)}`, { source: 'RoleTransitionManager' });
 
       throw err;
     } finally {

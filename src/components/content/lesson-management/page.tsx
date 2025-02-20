@@ -36,7 +36,9 @@ const LessonManagement: React.FC = () => {
         data: {
           prompt: '',
           teacherScript: '',
-          ...QUESTION_TYPES[type].defaultData
+          keywords: [],
+          hints: [],
+          questions: []
         },
         exercisePrompts: []
       };

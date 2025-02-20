@@ -1,12 +1,9 @@
 import { ErrorTracker } from './ErrorTracker';
-import type { ErrorSeverity } from './types';
+import { ErrorSeverity } from './types';
+import type { ConsoleError } from './types';
 
-interface ConsoleError {
-  message: string;
-  stack?: string;
-  timestamp: number;
-  args: any[];
-}
+
+
 
 class ConsoleHandler {
   private static instance: ConsoleHandler;
@@ -54,8 +51,9 @@ class ConsoleHandler {
     const context = args.length > 1 && typeof args[1] === 'object' ? args[1] : {};
 
     this.bufferError(error);
-    this.trackError(error, 'error', context);
+    this.trackError(error, ErrorSeverity.HIGH, context);
   }
+
 
   private handleConsoleWarning(args: any[]) {
     const warning: ConsoleError = {
@@ -65,7 +63,8 @@ class ConsoleHandler {
     };
 
     this.bufferError(warning);
-    this.trackError(warning, 'warning');
+    this.trackError(warning, ErrorSeverity.MEDIUM);
+
   }
 
   private formatErrorMessage(args: any[]): string {

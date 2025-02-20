@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/components/DashboardSwitcher.tsx",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1739011143380,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1739011143380,
+            "name": "Commit-0",
+            "content": "import React from 'react';\r\nimport { useAuth } from '../hooks/useAuth';\r\nimport { ROLE_PERMISSIONS } from '../types/roles';\r\n\r\ninterface DashboardSwitcherProps {\r\n  currentRole: string;\r\n  onRoleChange: (role: string) => void;\r\n}\r\n\r\nconst DashboardSwitcher: React.FC<DashboardSwitcherProps> = ({\r\n  currentRole,\r\n  onRoleChange,\r\n}) => {\r\n  const { user } = useAuth();\r\n\r\n  // Only super admin can switch roles\r\n  if (!user || user.role !== 'super_admin') return null;\r\n\r\n  return (\r\n    <div className=\"bg-white p-4 rounded-lg shadow-md mb-6\">\r\n      <div className=\"flex items-center justify-between\">\r\n        <div>\r\n          <h3 className=\"text-sm font-medium text-gray-900\">Super Admin Dashboard</h3>\r\n          <p className=\"text-xs text-gray-500\">View any role's dashboard</p>\r\n        </div>\r\n        <select\r\n          value={currentRole}\r\n          onChange={(e) => onRoleChange(e.target.value)}\r\n          aria-label=\"Select dashboard role\"\r\n          className=\"ml-4 block pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md\"\r\n        >\r\n          {Object.entries(ROLE_PERMISSIONS).map(([role, details]) => (\r\n            <option key={role} value={role}>\r\n              {details.name}\r\n            </option>\r\n          ))}\r\n        </select>\r\n      </div>\r\n    </div>\r\n  );\r\n};\r\n\r\nexport default DashboardSwitcher;"
+        }
+    ]
+}

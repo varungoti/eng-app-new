@@ -1,0 +1,26 @@
+{
+    "sourceFile": "src/lib/errorTracker/consoleHandler.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 2,
+            "patches": [
+                {
+                    "date": 1739008205172,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1739008430311,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,7 +1,6 @@\n import { ErrorTracker } from './ErrorTracker';\r\n-import { ErrorSeverity } from './types';\r\n-import type { ConsoleError } from './types';\r\n+import type { ErrorSeverity } from './types';\r\n \r\n interface ConsoleError {\r\n   message: string;\r\n   stack?: string;\r\n"
+                },
+                {
+                    "date": 1739008494450,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,14 +1,11 @@\n import { ErrorTracker } from './ErrorTracker';\r\n-import type { ErrorSeverity } from './types';\r\n+import { ErrorSeverity } from './types';\r\n+import type { ConsoleError } from './types';\r\n \r\n-interface ConsoleError {\r\n-  message: string;\r\n-  stack?: string;\r\n-  timestamp: number;\r\n-  args: any[];\r\n-}\r\n \r\n+\r\n+\r\n class ConsoleHandler {\r\n   private static instance: ConsoleHandler;\r\n   private originalConsole: typeof console;\r\n   private errorTracker: ErrorTracker;\r\n"
+                }
+            ],
+            "date": 1739008205172,
+            "name": "Commit-0",
+            "content": "import { ErrorTracker } from './ErrorTracker';\r\nimport { ErrorSeverity } from './types';\r\nimport type { ConsoleError } from './types';\r\n\r\ninterface ConsoleError {\r\n  message: string;\r\n  stack?: string;\r\n  timestamp: number;\r\n  args: any[];\r\n}\r\n\r\nclass ConsoleHandler {\r\n  private static instance: ConsoleHandler;\r\n  private originalConsole: typeof console;\r\n  private errorTracker: ErrorTracker;\r\n  private errorBuffer: ConsoleError[] = [];\r\n  private bufferSize = 50;\r\n\r\n  private constructor() {\r\n    this.originalConsole = { ...console };\r\n    this.errorTracker = ErrorTracker.getInstance();\r\n    this.setupConsoleOverrides();\r\n  }\r\n\r\n  public static getInstance(): ConsoleHandler {\r\n    if (!ConsoleHandler.instance) {\r\n      ConsoleHandler.instance = new ConsoleHandler();\r\n    }\r\n    return ConsoleHandler.instance;\r\n  }\r\n\r\n  private setupConsoleOverrides() {\r\n    // Override console.error\r\n    console.error = (...args: any[]) => {\r\n      this.handleConsoleError(args);\r\n      this.originalConsole.error(...args);\r\n    };\r\n\r\n    // Override console.warn\r\n    console.warn = (...args: any[]) => {\r\n      this.handleConsoleWarning(args);\r\n      this.originalConsole.warn(...args);\r\n    };\r\n  }\r\n\r\n  private handleConsoleError(args: any[]) {\r\n    const error: ConsoleError = {\r\n      message: this.formatErrorMessage(args),\r\n      stack: this.extractStack(args),\r\n      timestamp: Date.now(),\r\n      args\r\n    };\r\n\r\n    // Extract context from error arguments\r\n    const context = args.length > 1 && typeof args[1] === 'object' ? args[1] : {};\r\n\r\n    this.bufferError(error);\r\n    this.trackError(error, ErrorSeverity.HIGH, context);\r\n  }\r\n\r\n\r\n  private handleConsoleWarning(args: any[]) {\r\n    const warning: ConsoleError = {\r\n      message: this.formatErrorMessage(args),\r\n      timestamp: Date.now(),\r\n      args\r\n    };\r\n\r\n    this.bufferError(warning);\r\n    this.trackError(warning, ErrorSeverity.MEDIUM);\r\n\r\n  }\r\n\r\n  private formatErrorMessage(args: any[]): string {\r\n    return args\r\n      .map(arg => {\r\n        if (arg instanceof Error) {\r\n          return arg.message;\r\n        }\r\n        if (typeof arg === 'object') {\r\n          try {\r\n            return JSON.stringify(arg);\r\n          } catch {\r\n            return String(arg);\r\n          }\r\n        }\r\n        return String(arg);\r\n      })\r\n      .join(' ');\r\n  }\r\n\r\n  private extractStack(args: any[]): string | undefined {\r\n    const error = args.find(arg => arg instanceof Error);\r\n    return error?.stack;\r\n  }\r\n\r\n  private bufferError(error: ConsoleError) {\r\n    this.errorBuffer.unshift(error);\r\n    if (this.errorBuffer.length > this.bufferSize) {\r\n      this.errorBuffer.pop();\r\n    }\r\n  }\r\n\r\n  private trackError(error: ConsoleError, severity: ErrorSeverity, context?: Record<string, any>) {\r\n    this.errorTracker.trackError({\r\n      message: error.message,\r\n      severity,\r\n      source: 'Console',\r\n      context: {\r\n        ...context,\r\n        stack: error.stack,\r\n        arguments: error.args,\r\n        timestamp: error.timestamp\r\n      }\r\n    });\r\n  }\r\n\r\n  public getBuffer(): ConsoleError[] {\r\n    return [...this.errorBuffer];\r\n  }\r\n\r\n  public clearBuffer() {\r\n    this.errorBuffer = [];\r\n  }\r\n}\r\n\r\nexport const consoleHandler = ConsoleHandler.getInstance();"
+        }
+    ]
+}

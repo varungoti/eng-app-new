@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/components/dashboards/ContentEditorDashboard.tsx",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1738897974093,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1738897974093,
+            "name": "Commit-0",
+            "content": "'use client';\r\n\r\n//import React from 'react';\r\nimport { Card } from '@/components/ui/card';\r\nimport { RoleSettings } from '@/hooks/useRoleSettings';\r\nimport { useRouter } from 'next/navigation';\r\n\r\n\r\ninterface ContentEditorDashboardProps {\r\n  settings: RoleSettings;\r\n}\r\n\r\nconst ContentEditorDashboard: React.FC<ContentEditorDashboardProps> = ({ settings }) => {\r\n  const router = useRouter();\r\n\r\n\r\n  return (\r\n    <div className=\"container mx-auto p-6\">\r\n      <h1 className=\"text-2xl font-semibold mb-6\">Content Editor Dashboard</h1>\r\n      <div className=\"grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6\">\r\n        <Card \r\n          className=\"p-6 cursor-pointer hover:shadow-lg transition-shadow\"\r\n          onClick={() => router.push('/content-management')}\r\n        >\r\n          <h2 className=\"text-xl font-medium mb-2\">Content Management</h2>\r\n          <p className=\"text-muted-foreground\">\r\n            Manage lessons, topics, and educational content\r\n          </p>\r\n        </Card>\r\n      </div>\r\n    </div>\r\n  );\r\n};\r\n\r\nexport default ContentEditorDashboard;"
+        }
+    ]
+}

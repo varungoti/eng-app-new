@@ -1,0 +1,22 @@
+{
+    "sourceFile": "src/types/navigation.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1739299498057,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1739299915428,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,23 +1,17 @@\n-import { LucideIcon } from 'lucide-react';\r\n-\r\n-export interface SidebarItem {\r\n-  label: string;\r\n-  href: string;\r\n-  icon: LucideIcon;\r\n-  isActive: boolean;\r\n-}\r\n-\r\n-export interface NavigationItem {\r\n-  name: string;\r\n-  href?: string;\r\n-  icon: LucideIcon;\r\n-  submenu?: NavigationSubItem[];\r\n-}\r\n-\r\n-export interface NavigationSubItem {\r\n-  name: string;\r\n-  href: string;\r\n-  icon: LucideIcon;\r\n-}\r\n-\r\n+import { type LucideIcon } from 'lucide-react';\n+\n+export interface SidebarItem {\n+  label: string;\n+  href: string;\n+  icon: LucideIcon;\n+  isActive: boolean;\n+}\n+\n+export interface NavigationItem {\n+  name: string;\n+  href: string;\n+  icon: LucideIcon;\n+  permission: string;\n+}\n+\n export type NavigationItems = NavigationItem[]; \n\\ No newline at end of file\n"
+                }
+            ],
+            "date": 1739299498057,
+            "name": "Commit-0",
+            "content": "import { LucideIcon } from 'lucide-react';\r\n\r\nexport interface SidebarItem {\r\n  label: string;\r\n  href: string;\r\n  icon: LucideIcon;\r\n  isActive: boolean;\r\n}\r\n\r\nexport interface NavigationItem {\r\n  name: string;\r\n  href?: string;\r\n  icon: LucideIcon;\r\n  submenu?: NavigationSubItem[];\r\n}\r\n\r\nexport interface NavigationSubItem {\r\n  name: string;\r\n  href: string;\r\n  icon: LucideIcon;\r\n}\r\n\r\nexport type NavigationItems = NavigationItem[]; "
+        }
+    ]
+}

@@ -75,15 +75,15 @@ export const useDashboard = () => {
             .single();
 
           if (createError) throw createError;
-          setDashboard(newDashboard);
+          setDashboard(newDashboard as unknown as Dashboard);
         } else {
-          setDashboard(defaultDashboard);
+          setDashboard(defaultDashboard as unknown as Dashboard);
           
           // Clean up duplicate default dashboards if they exist
           if (data.length > 1) {
             const duplicateIds = data
               .slice(1)
-              .map(d => d.id);
+              .map((d: unknown) => (d as { id: string }).id);
               
             await supabase
               .from('dashboards')
@@ -126,9 +126,9 @@ export const useDashboard = () => {
 
       if (error) throw error;
 
-      setDashboard(data);
+      setDashboard(data as unknown as Dashboard);
       showToast('Dashboard saved successfully', { type: 'success' });
-      return data;
+      return data as unknown as Dashboard;
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Failed to save dashboard';
       showToast(message, { type: 'error' });
@@ -140,10 +140,21 @@ export const useDashboard = () => {
     }
   };
 
+  const updateWidgetPosition = async (id: string, position: { x: number; y: number; w: number; h: number }) => {
+    if (!dashboard) return;
+    
+    return saveDashboard({
+      widgets: dashboard.widgets.map(widget => 
+        widget.id === id ? { ...widget, position } : widget
+      )
+    });
+  };
+
   return {
     dashboard,
     loading,
     error,
-    saveDashboard
+    saveDashboard,
+    updateWidgetPosition
   };
 };

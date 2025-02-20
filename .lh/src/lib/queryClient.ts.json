@@ -1,0 +1,22 @@
+{
+    "sourceFile": "src/lib/queryClient.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1739016057046,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1739016076218,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -27,11 +27,11 @@\n           );\r\n         }\r\n       },\r\n       onError: (error: Error, variables: unknown, context: unknown) => {\r\n-        logger.error(`Query error: ${error.message}`, {\r\n-          source: (context as { meta?: { source: string } })?.meta?.source || 'unknown'\r\n-        });\r\n+        logger.error(`Query error: ${error.message}`, \r\n+          (context as { meta?: { source: string } })?.meta?.source || 'unknown'\r\n+        );\r\n       }\r\n     }\r\n   }\r\n });\n\\ No newline at end of file\n"
+                }
+            ],
+            "date": 1739016057046,
+            "name": "Commit-0",
+            "content": "import { QueryClient } from '@tanstack/react-query';\r\nimport { logger } from './logger';\r\nimport { DEBUG_CONFIG } from './config';\r\n\r\nexport const queryClient = new QueryClient({\r\n  defaultOptions: {\r\n    queries: {\r\n      staleTime: 1000 * 60 * 5, // 5 minutes\r\n      gcTime: 1000 * 60 * 30,   // 30 minutes\r\n      refetchOnWindowFocus: false,\r\n      refetchOnMount: true,\r\n      refetchOnReconnect: true,\r\n      retry: 2,\r\n      retryDelay: (attemptIndex) => Math.min(1000 * Math.pow(2, attemptIndex), 10000),\r\n      refetchInterval: false, \r\n      enabled: true,\r\n      networkMode: 'always',\r\n      meta: {\r\n        source: 'unknown'\r\n      }\r\n    },\r\n    mutations: {\r\n      onSuccess: (data: unknown, variables: unknown, context: unknown) => {\r\n        if (DEBUG_CONFIG.enabled) {\r\n          logger.debug('Query succeeded', \r\n            (context as { meta?: { source: string } })?.meta?.source || 'unknown'\r\n          );\r\n        }\r\n      },\r\n      onError: (error: Error, variables: unknown, context: unknown) => {\r\n        logger.error(`Query error: ${error.message}`, {\r\n          source: (context as { meta?: { source: string } })?.meta?.source || 'unknown'\r\n        });\r\n      }\r\n    }\r\n  }\r\n});"
+        }
+    ]
+}

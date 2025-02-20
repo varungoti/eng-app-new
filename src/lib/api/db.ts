@@ -1,29 +1,32 @@
-import { withConnection } from '../db/connection';
+import { createClient } from '@supabase/supabase-js';
 import { logger } from '../logger';
-import type { QueryConfig } from '../types';
+import type { QueryConfig } from '../../types';
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 export const query = async <T>(
   sql: string,
   params?: any[],
   config: QueryConfig = {}
 ): Promise<T[]> => {
-  return withConnection(async (client) => {
-    try {
-      const { data, error } = await client
-        .from(config.table || '')
-        .select(config.select || '*')
-        .order(config.orderBy || 'created_at', { ascending: false });
+  try {
+    const { data, error } = await supabase
+      .from(config.table || '')
+      .select(config.select || '*')
+      .order(config.orderBy || 'created_at', { ascending: false });
 
-      if (error) throw error;
-      return data || [];
-    } catch (err) {
-      logger.error('Database query failed', {
-        context: { error: err, sql, params },
-        source: 'Database'
-      });
-      throw err;
-    }
-  });
+    if (error) throw error;
+    return data as T[];
+  } catch (err) {
+    logger.error('Database query failed', {
+      context: { error: err, sql, params },
+      source: 'Database'
+    });
+    throw err;
+  }
 };
 
 export const execute = async (
@@ -31,16 +34,14 @@ export const execute = async (
   params?: any[],
   config: QueryConfig = {}
 ): Promise<void> => {
-  return withConnection(async (client) => {
-    try {
-      const { error } = await client.rpc(sql, params);
-      if (error) throw error;
-    } catch (err) {
-      logger.error('Database execute failed', {
-        context: { error: err, sql, params },
-        source: 'Database'
-      });
-      throw err;
-    }
-  });
+  try {
+    const { error } = await supabase.rpc(sql, params);
+    if (error) throw error;
+  } catch (err) {
+    logger.error('Database execute failed', {
+      context: { error: err, sql, params },
+      source: 'Database'
+    });
+    throw err;
+  }
 };

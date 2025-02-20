@@ -1,0 +1,22 @@
+{
+    "sourceFile": "src/hooks/useVoiceTesting.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1739014930587,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1739014981559,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,1 +1,74 @@\n- \n\\ No newline at end of file\n+import { useState, useCallback } from 'react';\n+import speechService from '@/lib/fish-speech';\n+\n+interface VoiceTestingState {\n+  text: string;\n+  speed: number;\n+  pitch: number;\n+  isPlaying: boolean;\n+  selectedVoiceId: string | null;\n+}\n+\n+export function useVoiceTesting() {\n+  const [state, setState] = useState<VoiceTestingState>({\n+    text: '',\n+    speed: 1.0,\n+    pitch: 1.0,\n+    isPlaying: false,\n+    selectedVoiceId: null,\n+  });\n+\n+  const setText = useCallback((text: string) => {\n+    setState(prev => ({ ...prev, text }));\n+  }, []);\n+\n+  const setSpeed = useCallback((speed: number) => {\n+    setState(prev => ({ ...prev, speed }));\n+  }, []);\n+\n+  const setPitch = useCallback((pitch: number) => {\n+    setState(prev => ({ ...prev, pitch }));\n+  }, []);\n+\n+  const setSelectedVoice = useCallback((voiceId: string) => {\n+    setState(prev => ({ ...prev, selectedVoiceId: voiceId }));\n+  }, []);\n+\n+  const testVoice = useCallback(async () => {\n+    try {\n+      if (!state.selectedVoiceId || !state.text) {\n+        throw new Error('Please select a voice and enter text to test');\n+      }\n+\n+      setState(prev => ({ ...prev, isPlaying: true }));\n+\n+      // Generate audio using Fish Speech\n+      const audio = await speechService.textToSpeech(state.text, {\n+        speed: state.speed,\n+        pitch: state.pitch\n+      });\n+\n+      // Play the audio\n+      await speechService.playAudio(audio);\n+\n+      setState(prev => ({ ...prev, isPlaying: false }));\n+    } catch (error) {\n+      console.error('Error testing voice:', error);\n+      setState(prev => ({ ...prev, isPlaying: false }));\n+      throw error;\n+    }\n+  }, [state.selectedVoiceId, state.text, state.speed, state.pitch]);\n+\n+  return {\n+    text: state.text,\n+    speed: state.speed,\n+    pitch: state.pitch,\n+    isPlaying: state.isPlaying,\n+    selectedVoiceId: state.selectedVoiceId,\n+    setText,\n+    setSpeed,\n+    setPitch,\n+    setSelectedVoice,\n+    testVoice,\n+  };\n+} \n\\ No newline at end of file\n"
+                }
+            ],
+            "date": 1739014930587,
+            "name": "Commit-0",
+            "content": " "
+        }
+    ]
+}

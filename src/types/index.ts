@@ -1,4 +1,6 @@
 import type { UserRole } from './roles';
+import { QUESTION_TYPES } from "@/app/content-management/constants";
+import { RoleSettings } from '@/types/dashboard';
 
 export interface User {
   id: string;
@@ -8,6 +10,36 @@ export interface User {
   role: UserRole;
   schoolId?: string;
   permissions?: string[];
+}
+
+export interface Course {
+  id: number;
+  documentId: string;
+  title: string;
+  description?: string;
+  imageUrl?: string;
+  level?: string;
+  progress?: number;
+}
+
+export interface ClassData {
+  id: number;
+  attributes: {
+    name: string;
+    courses: {
+      data: Array<{
+        id: number;
+        attributes: {
+          title: string;
+          description?: string;
+          documentId: string;
+          level?: string;
+          progress?: number;
+          imageUrl?: string;
+        };
+      }>;
+    };
+  };
 }
 
 export interface School {
@@ -21,16 +53,26 @@ export interface School {
   contactNumber: string;
   email: string;
   status: 'active' | 'inactive';
-  capacity: number;
+  capacity: {
+    total: number;
+    current: number;
+  };
   principalName: string;
+  schoolType: 'public' | 'private' | 'charter' | 'religious' | 'other';
+  schoolLevel: 'elementary' | 'middle' | 'high' | 'other';
+  schoolLeader: string;
+  schoolLeaderTitle: string;
+  schoolLeaderEmail: string;
+  schoolLeaderPhone: string;
   website?: string;
   establishedYear?: number;
   accreditationStatus?: string;
-  facilities?: Record<string, any>;
-  operatingHours?: {
+  facilities: string[];
+  operatingHours: {
     [day: string]: {
       open: string;
       close: string;
+      isHoliday?: boolean;
     };
   };
   socialMedia?: {
@@ -43,21 +85,112 @@ export interface School {
   taxId?: string;
   licenseNumber?: string;
   lastInspectionDate?: string;
-  studentCount?: number;
-  staffCount?: number;
-  classroomCount?: number;
-  isBoarding?: boolean;
-  transportationProvided?: boolean;
-  curriculumType?: string[];
-  languagesOffered?: string[];
-  extracurricularActivities?: string[];
-  grades?: string[];
+  studentCount: number;
+  staffCount: number;
+  classroomCount: number;
+  isBoarding: boolean;
+  transportationProvided: boolean;
+  curriculumType: string[];
+  languagesOffered: string[];
+  extracurricularActivities: string[];
+  grades: string[];
+  classes: Array<{
+    gradeId: string;
+    gradeName: string;
+    sections: Array<{
+      id: string;
+      name: string; // e.g. "A", "B", "C"
+      roomNumber: string;
+      teacherId: string;
+      capacity: number;
+      schedule: {
+        dayOfWeek: number;
+        startTime: string;
+        endTime: string;
+      }[];
+    }>;
+  }>;
+  branches?: School[];
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SchoolBranch {
+  id: string;
+  name: string;
+  location: {
+    address: string;
+    city: string;
+    state: string;
+    country: string;
+    postalCode: string;
+    coordinates: {
+      latitude: number;
+      longitude: number;
+    };
+  };
+  latitude: number;
+  longitude: number;
+  contactNumber: string;
+  email: string;
+  schoolId: string; // Reference to parent school
+  status: 'active' | 'inactive';
+  capacity: {
+    total: number;
+    current: number;
+  };
+  administration: {
+    principalName: string;
+    principalEmail: string;
+    principalPhone: string;
+    administrativeStaff: Array<{
+      name: string;
+      role: string;
+      email: string;
+      phone: string;
+    }>;
+  };
+  website?: string;
+  establishedYear?: number;
+  accreditationStatus?: string;
+  facilities: string[];
+  operatingHours: {
+    [day: string]: {
+      open: string;
+      close: string;
+      isHoliday?: boolean;
+    };
+  };
+  socialMedia?: {
+    facebook?: string;
+    twitter?: string;
+    instagram?: string;
+    linkedin?: string;
+  };
+  emergencyContact: string;
+  taxId: string;
+  licenseNumber: string;
+  lastInspectionDate?: string;
+  studentCount: number;
+  staffCount: number;
+  classroomCount: number;
+  isBoarding: boolean;
+  transportationProvided: boolean;
+  curriculumType: string[];
+  languagesOffered: string[];
+  extracurricularActivities: string[];
+  grades: string[];
+  created_at: string;
+  updated_at: string;
 }
 
 export interface Grade {
   id: string;
-  name: string; // e.g., "PP1", "Grade 1"
-  level: number; // 0 for PP1, 1 for PP2, etc.
+  name: string;
+  level: number;
+  created_at?: string;
+  updated_at?: string;
+  topics?: Topic[];
   description?: string;
   students: number;
   schedule: string;
@@ -71,36 +204,84 @@ export interface Grade {
 
 export interface Topic {
   id: string;
-  gradeId: string;
   title: string;
-  description: string;
-  order: number;
+  description?: string;
+  grade_id: string;
+  order_index?: number;
+  created_at?: string;
+  updated_at?: string;
+  course_id: string | null; // uuid
+  // subtopics?: Array<Subtopic & {
+  //   lessons?: Array<Lesson>;
+  // }>;
+  subtopics?: Subtopic[];
 }
 
 export interface SubTopic {
   id: string;
-  topicId: string;
+  name: string;
+  topic_id: string;
   title: string;
-  description: string;
-  order: number;
+  topicId: string;
+  description: string | null;
+  order: number | null;
+  order_index: number | null;
+  created_at: Date;
+  updated_at: Date;
 }
 
 export interface Lesson {
   id: string;
-  subTopicId: string;
   title: string;
-  description: string;
-  order: number;
-  teacherScript: string;
-  teacherPrompt: string;
-  sampleAnswer?: string;
-  exercises: Exercise[];
-  duration: number;
-  difficulty: 'Beginner' | 'Intermediate' | 'Advanced';
-  materials: string[];
-  objectives: string[];
-  vocabulary: string[];
-  activities: Activity[];
+  content?: string | null;
+  grade_id?: string | null;
+  topic_id?: string | null;
+  subtopic_id: string;
+  questions?: Question[];
+  activities?: Activity[];
+  order_index?: number | null;
+  duration?: number | null;
+  subjectId?: string | null;
+  status?: 'draft' | 'published';
+  created_at?: string;
+  updated_at?: string;
+  description?: string | null;
+  prerequisites?: string[];
+  media_type?: 'image' | 'video' | 'document';
+  media_url?: string | null;
+  contentheading: string | null;
+  user_id: string | null; // uuid
+  student_id: string;
+  lesson_status: 'not_started' | 'in_progress' | 'completed';
+    progress_data: {
+    lastQuestionIndex?: number;
+    answers?: Record<string, any>;
+    totalSteps?: number;
+    completedSteps?: number;
+    activities?: Record<string, any>;
+  };
+  completed_at?: string;
+  difficulty?: 'beginner' | 'intermediate' | 'advanced';
+  voice_id?: string;
+  total_questions?: number;
+}
+
+
+export interface LessonProgress {
+  id: string;
+  lesson_id: string;
+  student_id: string;
+  status: 'not_started' | 'in_progress' | 'completed';
+    progress_data: {
+    lastQuestionIndex?: number;
+    answers?: Record<string, any>;
+    totalSteps?: number;
+    completedSteps?: number;
+    activities?: Record<string, any>;
+  };
+  completed_at?: string;
+  completed_questions: string[];
+  progress: number;
 }
 
 export interface Exercise {
@@ -127,36 +308,125 @@ export interface ContentModule {
 
 export interface Question {
   id: string;
-  type: 'speaking' | 'roleplay' | 'pronunciation' | 'vocabulary';
-  question: string;
-  expectedAnswer?: string;
-  hints?: string[];
-  points: number;
-  prompt: string;
-  correctAnswer: string;
-  sentence?: string;
-  imageUrl?: string;
-  videoUrl?: string;
+  title: string;
+  content?: string;
+  type: string;
+  sub_type?: string;
+  points?: number;
+  lesson_id: string;
+  data?: {
+    prompt: string;
+    teacherScript: string;
+    sampleAnswer?: string;
+    metadata?: {
+      prompt?: string;
+      sampleAnswer?: string;
+      storyPrompt?: string;
+      keywords?: string[];
+      hints?: string[];
+      audioContent?: string;
+      transcript?: string;
+      questions?: string[];
+      phrases?: string[];
+      translations?: string[];
+      options?: string[];
+      correctAnswer?: number | null;
+      grammarPoint?: string;
+      example?: string;
+      idiom?: string;
+      meaning?: string;
+      usageNotes?: string;
+      imageUrl?: string;
+      imageCaption?: string;
+      speakingPrompt?: string;
+      speakingPrompt2?: string;
+      helpfulVocabulary?: string[];
+      videoUrl?: string;
+      discussionPoints?: string[];
+      topic?: string;
+      position?: string;
+      keyPoints?: string[];
+      duration?: string;
+      structure?: Array<{ title: string; points: string[] }>;
+      visualAids?: Array<{ url: string; description: string }>;
+      visualAidsInstructions?: string;
+      matching?: Array<{ text: string; correct: boolean }>;
+      fillInTheBlank?: Array<{ sentence: string; blanks: string[] }>;
+      fillInTheBlankWithMultipleChoices?: Array<{
+        sentence: string;
+        blanks: string[];
+        options: string[];
+        correctAnswer: number;
+      }>;
+      trueOrFalse?: Array<{ sentence: string; correctAnswer: boolean }>;
+      readingComprehension?: Array<{ passage: string; questions: string[] }>;
+      speakingAndWriting?: Array<{ speakingPrompt: string; writingPrompt: string }>;
+      listeningAndSpeaking?: Array<{ listeningPrompt: string; speakingPrompt: string }>;
+      readingAndSpeaking?: Array<{ readingPrompt: string; speakingPrompt: string }>;
+      speakingWithAPartner?: Array<{ speakingPrompt: string; partnerPrompt: string }>;
+      actionAndReaction?: Array<{ action: string; reaction: string }>;
+      actionAndSpeaking?: Array<{ action: string; speakingPrompt: string }>;
+      vocabularyPractice?: Array<{
+        word: string;
+        spelling: string;
+        definition: string;
+        sentences: string[];
+      }>;
+      spellingPractice?: Array<{
+        word: string;
+        spelling: string;
+        sentences: string[];
+      }>;
+      items?: string[];
+    };
+  };
+  exercisePrompts: ExercisePrompt[];
+  order_index?: number;
+  created_at?: string;
+  updated_at?: string;
+  status?: 'draft' | 'published';
+  isDraft?: boolean;
   interval?: number;
   easeFactor?: number;
-  nextReviewDate?: Date;
+  score?: number
+  correct?: boolean;
 }
 
 export interface Activity {
   id: string;
+  created_at?: string;
+  lesson_id: string;
   title: string;
-  type: 'Speaking' | 'Listening' | 'Reading' | 'Writing' | 'Grammar';
-  description: string;
-  duration: number; // in minutes
-  instructions: string[];
-  materials?: string[];
+  duration?: number;
+  description?: string;
+  type: string;
+  content?: string;
+  updated_at?: string;
+  name: string;
+  instructions?: string;
+  data?: {
+    prompt: string;
+    teacherScript: string;
+    media: string[];
+  };
+  media?: Array<{
+    url: string;
+    type: 'image' | 'gif' | 'video';
+  }>;
+  score?: number;
 }
 
 export interface Class {
-  id: string;
+  id: number;
+  name: string;
+  description: string | null;
   schoolId: string;
-  gradeId: string;
+  grade_id: string;
   teacherId: string;
+  section: string | null;
+  created_by: string | null; // uuid
+  created_at: Date;
+  updated_at: Date;
   schedule: {
     dayOfWeek: number;
     startTime: string;
@@ -165,7 +435,7 @@ export interface Class {
 }
 
 export interface Quiz {
-  id: string;
+  id: number;
   title: string;
   classId: string;
   moduleId: string;
@@ -176,6 +446,20 @@ export interface Quiz {
 
 export interface Student {
   id: number;
+  first_name: string;
+  last_name: string;
+  roll_number: string;
+  school_id: string | null; // uuid
+  grade_id: string | null; // uuid
+  gender: string | null;
+  date_of_birth: Date | null;
+  contact_number: string | null;
+  email: string | null;
+  address: string | null;
+  guardian_name: string | null;
+  guardian_contact: string | null;
+  created_at: Date;
+  updated_at: Date;
   name: string;
   avatar: string;
   level: string;
@@ -202,43 +486,147 @@ export interface LessonWithExercises {
   exercises: Exercise[];
 }
 
-type QuestionType = 'sentenceRepetition' | 'imageDescription' | 'videoDescription' | 'multipleChoice' | 'fillInBlank' | 'repeat';
+type QuestionType = keyof typeof QUESTION_TYPES;
 
-interface BaseQuestion {
-  id: string;
-  type: QuestionType;
+export interface BaseQuestionData {
   prompt: string;
-  correctAnswer: string;
+  teacherScript: string;
 }
 
-interface SentenceRepetitionQuestion extends BaseQuestion {
-  type: 'sentenceRepetition';
-  sentence: string;
+export interface ExercisePromptCardProps {
+  prompt: ExercisePrompt;
+  promptIndex: number;
+  onUpdate: (updatedPrompt: ExercisePrompt) => void;
+  onRemove: () => void;
 }
 
-interface ImageDescriptionQuestion extends BaseQuestion {
-  type: 'imageDescription';
-  imageUrl: string;
+export interface QuestionFormProps {
+  question: Question;
+  index: number;
+  onUpdate: (index: number, updatedQuestion: Question) => Promise<void>;
+  onRemove: (index: number) => void;
+  onAddExercisePrompt: (questionIndex: number) => void;
+  onRemoveExercisePrompt: (questionIndex: number, promptIndex: number) => void;
+  onExercisePromptChange: (questionIndex: number, promptIndex: number, updatedPrompt: ExercisePrompt) => void;
 }
 
-interface VideoDescriptionQuestion extends BaseQuestion {
-  type: 'videoDescription';
-  videoUrl: string;
+export interface Subtopic {
+  id: string;
+  title: string;
+  description?: string;
+  topic_id: string;
+  order_index?: number;
+  created_at?: string;
+  updated_at?: string;
+  name?: string;
+  lessons?: Lesson[];
 }
 
-interface MultipleChoiceQuestion extends BaseQuestion {
-  type: 'multipleChoice';
-  options: string[];
+export interface QuestionTypeSelectProps {
+  value: string;
+  onChange: (type: string) => void;
 }
 
-interface FillInBlankQuestion extends BaseQuestion {
-  type: 'fillInBlank';
-  sentence: string;
+export interface Prompt {
+  _id?: string;
+  id?: string;
+  prompt: string;
+  created_at?: string;
+  updated_at?: string;
+  lessonId: string;
+  description: string;
 }
 
-interface RepeatQuestion extends BaseQuestion {
-  type: 'repeat';
-  content: string;
+export interface ContentManagementData {
+  grades: Grade[];
+  topics: Topic[];
+  subtopics: Subtopic[];
+  lessons: Lesson[];
 }
 
-export type QuestionUnion = SentenceRepetitionQuestion | ImageDescriptionQuestion | VideoDescriptionQuestion | MultipleChoiceQuestion | FillInBlankQuestion | RepeatQuestion;
+export interface DashboardProps {
+  settings: RoleSettings;
+}
+
+export interface ClassTeacher {
+  class_id: string; // uuid
+  teacher_id: string; // uuid
+  assigned_by: string | null; // uuid
+  assigned_at: Date;
+}
+
+export interface ClassStudent {
+  class_id: string; // uuid
+  student_id: string; // uuid
+  assigned_by: string | null; // uuid
+  assigned_at: Date;
+}
+
+// Component Types
+export interface ExtendedLesson extends Lesson {
+  color: string;
+  unlocked: boolean;
+  difficulty: 'beginner' | 'intermediate' | 'advanced';
+  completed: boolean;
+  lessonNumber: string;
+  totalTopics: string;
+  subLessons: SubLesson[];
+}
+
+export interface SubLesson {
+  id: string;
+  title: string;
+  unlocked: boolean;
+  completed?: boolean;
+  duration?: number;
+  description?: string;
+}
+
+export interface QueryConfig {
+  table?: string;
+  select?: string;
+  orderBy?: string;
+  limit?: number;
+  offset?: number;
+  retry?: number;
+  gcTime?: number;
+  staleTime?: number;
+}
+
+export interface CustomSubLesson {
+  id: string;
+  title: string;
+  description: string;
+  duration: number;
+  unlocked: boolean;
+  completed: boolean;
+}
+
+export interface CustomLesson {
+  id: string;
+  title: string;
+  status?: 'draft' | 'published';
+  color: string;
+  unlocked: boolean;
+  completed: boolean;
+  lessonNumber: string;
+  totalTopics: string;
+  difficulty: string;
+  duration: number;
+  customSubLessons: CustomSubLesson[];
+}
+
+export type { School as SchoolType };
+
+export interface Staff {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  department: string;
+  status: 'active' | 'inactive' | 'pending';
+  school_id: string;
+  created_at?: string;
+  updated_at?: string;
+}
+

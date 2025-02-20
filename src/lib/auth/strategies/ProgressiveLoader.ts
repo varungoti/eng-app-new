@@ -1,17 +1,25 @@
+import { supabase } from '../../supabase';
+import { LoadingMonitor, type MonitorConfig } from '../../monitoring';
 import { logger } from '../../logger';
-import { loadingMonitor } from '../../monitoring/LoadingMonitor';
 
 export class ProgressiveLoader {
   private static STAGES = ['init', 'session', 'profile', 'complete'];
   private currentStage = 0;
   private loadingId?: string;
   private isCancelled = false;
+  private loadingMonitor: LoadingMonitor;
 
-  constructor(private component: string) {}
+  constructor(private component: string) {
+    this.loadingMonitor = new LoadingMonitor(supabase, {
+      maxTries: 3,
+      intervalMs: 1000,
+      timeoutMs: 5000
+    } as MonitorConfig);
+  }
 
-  public start(): void {
+  public async start(): Promise<void> {
     if (this.isCancelled) return;
-    this.loadingId = loadingMonitor.startLoading(this.component);
+    this.loadingId = await this.loadingMonitor.startLoading(this.component);
     this.updateProgress(0);
   }
 
@@ -26,7 +34,7 @@ export class ProgressiveLoader {
   public complete(): void {
     if (this.isCancelled) return;
     if (this.loadingId) {
-      loadingMonitor.endLoading(this.loadingId);
+      this.loadingMonitor.endLoading(this.loadingId);
       this.loadingId = undefined;
     }
   }
@@ -34,7 +42,8 @@ export class ProgressiveLoader {
   public error(err: Error): void {
     if (this.isCancelled) return;
     if (this.loadingId) {
-      loadingMonitor.endLoading(this.loadingId, err);
+      this.loadingMonitor.endLoading(this.loadingId);
+      logger.error(`Loading error: ${err instanceof Error ? err.message : String(err)}`, { source: 'ProgressiveLoader' });
       this.loadingId = undefined;
     }
   }
@@ -42,20 +51,13 @@ export class ProgressiveLoader {
   public cancel(): void {
     this.isCancelled = true;
     if (this.loadingId) {
-      loadingMonitor.endLoading(this.loadingId);
+      this.loadingMonitor.endLoading(this.loadingId);
       this.loadingId = undefined;
     }
   }
 
   private updateProgress(percent: number): void {
     if (this.isCancelled) return;
-    logger.debug(`Loading progress: ${percent}%`, {
-      context: {
-        component: this.component,
-        stage: ProgressiveLoader.STAGES[this.currentStage],
-        progress: percent
-      },
-      source: 'ProgressiveLoader'
-    });
+    logger.debug(`Loading progress: ${percent}% (Stage: ${ProgressiveLoader.STAGES[this.currentStage]})`, { source: 'ProgressiveLoader' });
   }
 }

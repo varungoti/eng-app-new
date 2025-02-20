@@ -1,4 +1,4 @@
-import { ChangeEvent, useState, useEffect } from 'react';
+import { ChangeEvent, useState, useEffect, useRef } from 'react';
 import { Input } from './input';
 import { Button } from './button';
 import { logger } from '@/lib/logger';
@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 
 export interface FileUploadProps {
   value?: string;
+  type: 'image' | 'gif' | 'video';
   onChange?: (url: string) => void;
   onUploadComplete?: (url: string) => void;
   onError?: (error: Error) => void;
@@ -16,6 +17,7 @@ export interface FileUploadProps {
 
 export function FileUpload({ 
   value = '', 
+  type,
   onChange,
   onUploadComplete,
   onError,

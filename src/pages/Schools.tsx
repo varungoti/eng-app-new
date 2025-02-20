@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { School, Plus, Edit, Trash2, MapPin, Phone, Mail, User } from 'lucide-react';
 import type { School as SchoolType } from '../types';
@@ -7,13 +8,18 @@ import { ScrollArea } from '../components/ui/scroll-area';
 import { useError } from '../hooks/useError';
 import GradeSelector from '../components/GradeSelector';
 import { useSchools } from '../hooks/useSchools';
-import { useToast } from '../hooks/useToast';
+import { useToast } from '@/components/ui/use-toast';
 import LoadingSpinner from '../components/LoadingSpinner';
+import { Dialog } from '@/components/ui/dialog';
+
+const isSchool = (school: unknown): school is SchoolType => {
+  return typeof school === 'object' && school !== null && 'type' in school && 'id' in school;
+};
 
 const Schools = () => {
   const { schools, loading, error, addSchool, updateSchool, deleteSchool } = useSchools();
   const { setError } = useError();
-  const { showToast } = useToast();
+  const { toast } = useToast();
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [selectedSchool, setSelectedSchool] = useState<SchoolType | null>(null);
   const [isAddBranchOpen, setIsAddBranchOpen] = useState(false);
@@ -22,7 +28,8 @@ const Schools = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleEditSchool = (updatedSchool: SchoolType) => {
-    updateSchool(updatedSchool.id, updatedSchool);
+    console.log('Updating school:', updatedSchool);
+    updateSchool.mutate(updatedSchool);
     setEditingSchool(null);
   };
 
@@ -56,49 +63,126 @@ const Schools = () => {
     }
 
     // Create school object
-    const newSchool: SchoolType = {
+    const newSchool: Omit<SchoolType, 'id'> = {
       name: formData.get('name') as string,
-      type: 'main',
+      type: 'main' as const,
       address,
       latitude,
       longitude,
       contactNumber: formData.get('contactNumber') as string,
       email: formData.get('email') as string,
       status: formData.get('status') as 'active' | 'inactive',
-      capacity: parseInt(formData.get('capacity') as string),
+      capacity: {
+        total: parseInt(formData.get('capacity') as string),
+        current: 0
+      },
       principalName: formData.get('principalName') as string,
-      grades: selectedGrades
+      grades: selectedGrades,
+      schoolType: formData.get('schoolType') as 'public' | 'private' | 'charter' | 'religious' | 'other',
+      schoolLevel: formData.get('schoolLevel') as 'elementary' | 'middle' | 'high' | 'other',
+      schoolLeader: formData.get('principalName') as string,
+      schoolLeaderTitle: 'Principal',
+      schoolLeaderEmail: formData.get('leaderEmail') as string,
+      schoolLeaderPhone: formData.get('leaderPhone') as string,
+      operatingHours: {
+        monday: { open: '8:00 AM', close: '3:00 PM' },
+        tuesday: { open: '8:00 AM', close: '3:00 PM' },
+        wednesday: { open: '8:00 AM', close: '3:00 PM' },
+        thursday: { open: '8:00 AM', close: '3:00 PM' },
+        friday: { open: '8:00 AM', close: '3:00 PM' },
+        saturday: { open: '8:00 AM', close: '12:00 PM' },
+        sunday: { open: 'Closed', close: 'Closed', isHoliday: true }
+      },
+      facilities: ['classroom', 'library'],
+      curriculumType: ['standard'],
+      languagesOffered: ['english'],
+      transportationProvided: false,
+      extracurricularActivities: [],
+      classes: [],
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      studentCount: 0,
+      staffCount: 0,
+      classroomCount: 0,
+      isBoarding: false
     };
     try {
       // Show loading state
       setIsLoading(true);
 
-      const result = await addSchool(newSchool);
+      const result = await addSchool.mutateAsync(newSchool);
       if (result) {
         setIsAddModalOpen(false);
         setSelectedGrades([]);
         setError(null);
         
         // Show success message
-        showToast('School added successfully', { type: 'success' });
+        toast({
+          title: "Success",
+          description: "School added successfully",
+        });
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to add school');
-      showToast('Failed to add school', { type: 'error' });
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to add school",
+      });
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleAddBranch = async (branch: Omit<SchoolType, 'id' | 'type' | 'parentId'>) => {
+  const handleAddBranch = async (formData: FormData) => {
     if (selectedSchool) {
-      const newBranch: SchoolType = {
-        ...branch,
-        type: 'branch',
+      const newBranch: Omit<SchoolType, 'id'> = {
+        name: formData.get('name') as string,
+        type: 'branch' as const,
+        address: formData.get('address') as string,
+        latitude: parseFloat(formData.get('latitude') as string),
+        longitude: parseFloat(formData.get('longitude') as string),
+        contactNumber: formData.get('contactNumber') as string,
+        email: formData.get('email') as string,
+        status: formData.get('status') as 'active' | 'inactive',
+        capacity: {
+          total: parseInt(formData.get('capacity') as string),
+          current: 0
+        },
+        principalName: formData.get('principalName') as string,
+        schoolType: formData.get('schoolType') as 'public' | 'private' | 'charter' | 'religious' | 'other',
+        schoolLevel: formData.get('schoolLevel') as 'elementary' | 'middle' | 'high' | 'other',
+        schoolLeader: formData.get('principalName') as string,
+        schoolLeaderTitle: 'Principal',
+        schoolLeaderEmail: formData.get('leaderEmail') as string,
+        schoolLeaderPhone: formData.get('leaderPhone') as string,
+        operatingHours: {
+          monday: { open: '8:00 AM', close: '3:00 PM' },
+          tuesday: { open: '8:00 AM', close: '3:00 PM' },
+          wednesday: { open: '8:00 AM', close: '3:00 PM' },
+          thursday: { open: '8:00 AM', close: '3:00 PM' },
+          friday: { open: '8:00 AM', close: '3:00 PM' },
+          saturday: { open: '8:00 AM', close: '12:00 PM' },
+          sunday: { open: 'Closed', close: 'Closed', isHoliday: true }
+        },
+        facilities: ['classroom', 'library'],
+        curriculumType: ['standard'],
+        languagesOffered: ['english'],
+        transportationProvided: false,
+        extracurricularActivities: [],
+        classes: [],
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        studentCount: 0,
+        staffCount: 0,
+        classroomCount: 0,
+        isBoarding: false,
         parentId: selectedSchool.id,
+        grades: selectedGrades
       };
-      await addSchool(newBranch);
+      await addSchool.mutateAsync(newBranch);
       setIsAddBranchOpen(false);
+      setSelectedGrades([]);
     }
   };
 
@@ -119,7 +203,10 @@ const Schools = () => {
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {schools
-          .filter((school) => school.type !== 'branch')
+          .filter((school): school is SchoolType => {
+            if (!isSchool(school)) return false;
+            return school.type !== 'branch';
+          })
           .map((school) => (
             <div key={school.id} className="bg-white shadow rounded-lg overflow-hidden">
               <div className="px-4 py-4 flex items-center sm:px-6">
@@ -158,6 +245,8 @@ const Schools = () => {
                           setIsAddBranchOpen(true);
                         }}
                         className="text-indigo-600 hover:text-indigo-700"
+                        aria-label="Add branch school"
+                        title="Add branch school"
                       >
                         <Plus className="h-5 w-5" />
                       </button>
@@ -172,7 +261,7 @@ const Schools = () => {
                       </button>
                       <button
                         onClick={() => {
-                          deleteSchool(school.id);
+                          deleteSchool.mutate(school.id);
                         }}
                         className="text-red-400 hover:text-red-500"
                       >
@@ -188,7 +277,11 @@ const Schools = () => {
                   <h3 className="text-sm font-medium text-gray-600">Branches</h3>
                   <div className="mt-2 space-y-2">
                     {schools
-                      .filter((branch) => branch.type === 'branch' && branch.parentId === school.id)
+                      .filter((branch): branch is SchoolType => 
+                        isSchool(branch) && 
+                        branch.type === 'branch' && 
+                        branch.parentId === school.id
+                      )
                       .map((branch) => (
                         <div
                           key={branch.id}
@@ -212,7 +305,7 @@ const Schools = () => {
                             </button>
                             <button
                               onClick={() => {
-                                deleteSchool(branch.id);
+                                deleteSchool.mutate(branch.id);
                               }}
                               className="text-red-400 hover:text-red-500"
                             >
@@ -272,10 +365,12 @@ const Schools = () => {
                     <input type="hidden" name="longitude" required />
                     <input type="hidden" name="address" required />
                   </div>
-                  <GradeSelector
-                    selectedGrades={selectedGrades}
-                    onChange={setSelectedGrades}
-                  />
+                  <div className="mt-4">
+                    <GradeSelector
+                      selectedGrades={selectedGrades}
+                      onChange={setSelectedGrades}
+                    />
+                  </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
                       Principal Name
@@ -313,12 +408,14 @@ const Schools = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label htmlFor="status" className="block text-sm font-medium text-gray-700">
                       Status
                     </label>
                     <select
+                      id="status"
                       name="status"
                       required
+                      aria-label="School Status"
                       className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                     >
                       <option value="active">Active</option>
@@ -326,14 +423,76 @@ const Schools = () => {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label htmlFor="capacity" className="block text-sm font-medium text-gray-700">
                       Student Capacity
                     </label>
                     <input
+                      id="capacity"
                       type="number"
                       name="capacity"
+                      placeholder="Enter total student capacity"
+                      aria-label="Student Capacity"
                       className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                       required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      School Type
+                    </label>
+                    <select
+                      id="schoolType"
+                      name="schoolType"
+                      required
+                      aria-label="School Type"
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    >
+                      <option value="public">Public</option>
+                      <option value="private">Private</option>
+                      <option value="charter">Charter</option>
+                      <option value="religious">Religious</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      School Level
+                    </label>
+                    <select
+                      id="schoolLevel"
+                      name="schoolLevel"
+                      required
+                      aria-label="School Level"
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    >
+                      <option value="elementary">Elementary</option>
+                      <option value="middle">Middle</option>
+                      <option value="high">High</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Leader Email
+                    </label>
+                    <input
+                      type="email"
+                      name="leaderEmail"
+                      required
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                      placeholder="Leader's email address"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Leader Phone
+                    </label>
+                    <input
+                      type="tel"
+                      name="leaderPhone"
+                      required
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                      placeholder="Leader's phone number"
                     />
                   </div>
                 </div>
@@ -377,17 +536,7 @@ const Schools = () => {
               onSubmit={(e) => {
                 e.preventDefault();
                 const formData = new FormData(e.currentTarget);
-                handleAddBranch({
-                  name: formData.get('name') as string,
-                  address: formData.get('address') as string,
-                  latitude: parseFloat(formData.get('latitude') as string),
-                  longitude: parseFloat(formData.get('longitude') as string),
-                  contactNumber: formData.get('contactNumber') as string,
-                  email: formData.get('email') as string,
-                  status: formData.get('status') as 'active' | 'inactive',
-                  capacity: parseInt(formData.get('capacity') as string),
-                  principalName: formData.get('principalName') as string,
-                });
+                handleAddBranch(formData);
               }}
             >
               <div className="space-y-4">
@@ -484,8 +633,10 @@ const Schools = () => {
                     Status
                   </label>
                   <select
+                    id="status"
                     name="status"
                     required
+                    aria-label="Branch Status"
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   >
                     <option value="active">Active</option>
@@ -497,8 +648,11 @@ const Schools = () => {
                     Student Capacity
                   </label>
                   <input
+                    id="capacity"
                     type="number"
                     name="capacity"
+                    placeholder="Enter total student capacity"
+                    aria-label="Branch Student Capacity"
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                     required
                   />
@@ -531,12 +685,18 @@ const Schools = () => {
         </div>
       )}
       
-      {/* Edit School Modal */}
+      {/* Edit School Dialog */}
       {editingSchool && (
         <EditSchoolDialog
           school={editingSchool}
+          selectedGrades={selectedGrades}
+          onGradesChange={setSelectedGrades}
           onSave={handleEditSchool}
-          onCancel={() => setEditingSchool(null)}
+          onCancel={() => {
+            setEditingSchool(null);
+            setSelectedGrades([]);
+          }}
+          open={!!editingSchool}
         />
       )}
     </div>

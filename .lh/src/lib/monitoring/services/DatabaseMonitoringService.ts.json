@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/lib/monitoring/services/DatabaseMonitoringService.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1739389718709,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1739389718709,
+            "name": "Commit-0",
+            "content": "import { supabase } from '../../supabase';\r\nimport { DatabaseMonitor } from '../DatabaseMonitor';\r\nimport type { DatabaseMetrics } from '../types';\r\n\r\nexport class DatabaseMonitoringService {\r\n  private static instance: DatabaseMonitoringService;\r\n  private monitor: DatabaseMonitor | null = null;\r\n  private isInitialized = false;\r\n\r\n  private constructor() {}\r\n\r\n  static getInstance(): DatabaseMonitoringService {\r\n    if (!DatabaseMonitoringService.instance) {\r\n      DatabaseMonitoringService.instance = new DatabaseMonitoringService();\r\n    }\r\n    return this.instance;\r\n  }\r\n\r\n  async initialize() {\r\n    if (this.isInitialized) return;\r\n    try {\r\n      this.monitor = new DatabaseMonitor({\r\n        supabase,\r\n        enableLogging: true,\r\n        logLevel: 'info',\r\n        sampleRate: import.meta.env.DEV ? 1 : 0.1\r\n      });\r\n      this.isInitialized = true;\r\n    } catch (error) {\r\n      console.warn('Failed to initialize database monitor:', error);\r\n    }\r\n  }\r\n\r\n  async getMetrics(): Promise<DatabaseMetrics | null> {\r\n    try {\r\n      if (!this.monitor) {\r\n        await this.initialize();\r\n      }\r\n      const metrics = this.monitor?.getMetrics();\r\n      return metrics ? {\r\n        connectionStatus: metrics.connectionStatus as 'error' | 'healthy' | 'degraded',\r\n        lastCheckTime: metrics.lastCheckTime,\r\n        responseTime: metrics.responseTime,\r\n        count: metrics.recordCount,\r\n        errorCount: metrics.errorCount\r\n      } : null;\r\n    } catch (error) {\r\n      console.warn('Failed to get database metrics:', error);\r\n      return null;\r\n    }\r\n  }\r\n\r\n  async cleanup() {\r\n    if (this.monitor) {\r\n      try {\r\n        // Add any cleanup logic here\r\n        this.monitor = null;\r\n        this.isInitialized = false;\r\n      } catch (error) {\r\n        console.warn('Failed to cleanup database monitor:', error);\r\n      }\r\n    }\r\n  }\r\n} "
+        }
+    ]
+}

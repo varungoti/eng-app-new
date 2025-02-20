@@ -11,3 +11,4 @@ export { default as SchoolLeaderDashboard } from './SchoolLeaderDashboard';
 export { default as SchoolPrincipalDashboard } from './SchoolPrincipalDashboard';
 export { default as TeacherHeadDashboard } from './TeacherHeadDashboard';
 export { default as TeacherDashboard } from './TeacherDashboard';
+export { default as ContentEditorDashboard } from './ContentEditorDashboard';

@@ -1,0 +1,22 @@
+{
+    "sourceFile": "src/pages/_app.tsx",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1739379501573,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1739384079506,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -9,10 +9,14 @@\n   const { user } = useAuth();\r\n   const userPermissions = user ? ROLE_PERMISSIONS[user.role]?.permissions : null;\r\n \r\n   useEffect(() => {\r\n-    if (process.env.NODE_ENV === 'development') {\r\n-      ConsoleMonitor.getInstance();\r\n+    if (typeof window !== 'undefined') {\r\n+      // Initialize console monitoring\r\n+      const monitor = ConsoleMonitor.getInstance();\r\n+\r\n+      // Optional: Log initial page load\r\n+      console.log('Page loaded:', window.location.pathname);\r\n     }\r\n   }, []);\r\n \r\n   return (\r\n"
+                }
+            ],
+            "date": 1739379501573,
+            "name": "Commit-0",
+            "content": "import { Providers } from '../providers/ToastProvider';\r\nimport { useAuth } from '../hooks/useAuth';\r\nimport { ROLE_PERMISSIONS } from '../types/roles';\r\nimport type { AppProps } from 'next/app';\r\nimport { useEffect } from 'react';\r\nimport { ConsoleMonitor } from '@/utils/consoleMonitor';\r\n\r\nfunction MyApp({ Component, pageProps }: AppProps) {\r\n  const { user } = useAuth();\r\n  const userPermissions = user ? ROLE_PERMISSIONS[user.role]?.permissions : null;\r\n\r\n  useEffect(() => {\r\n    if (process.env.NODE_ENV === 'development') {\r\n      ConsoleMonitor.getInstance();\r\n    }\r\n  }, []);\r\n\r\n  return (\r\n    <Providers>\r\n      {process.env.NODE_ENV === 'development' && (\r\n        <div className=\"fixed bottom-0 left-0 p-2 bg-black text-white text-xs\">\r\n          Role: {user?.role}, Content Management: {String(userPermissions?.content_management)}\r\n        </div>\r\n      )}\r\n      <Component {...pageProps} />\r\n    </Providers>\r\n  );\r\n}\r\n\r\nexport default MyApp; "
+        }
+    ]
+}

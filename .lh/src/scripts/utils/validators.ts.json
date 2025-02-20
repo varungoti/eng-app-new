@@ -1,0 +1,42 @@
+{
+    "sourceFile": "src/scripts/utils/validators.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 6,
+            "patches": [
+                {
+                    "date": 1739483119209,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1739483981397,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,6 @@\n import { dbConfig } from '../config/db-config'\r\n-import type { Topic, Subtopic, Lesson, Question, ExercisePrompt, Activity } from '../types/curriculum'\r\n+import type { Topic, Subtopic, Lesson, Question, ExercisePrompt, Activity } from '../types/\r\n \r\n export class ValidationError extends Error {\r\n   constructor(message: string) {\r\n     super(message)\r\n"
+                },
+                {
+                    "date": 1739483987920,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,6 @@\n import { dbConfig } from '../config/db-config'\r\n-import type { Topic, Subtopic, Lesson, Question, ExercisePrompt, Activity } from '../types/\r\n+import type { Topic, Subtopic, Lesson, Question, ExercisePrompt, Activity } from '../typess/\r\n \r\n export class ValidationError extends Error {\r\n   constructor(message: string) {\r\n     super(message)\r\n"
+                },
+                {
+                    "date": 1739483996913,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,6 @@\n import { dbConfig } from '../config/db-config'\r\n-import type { Topic, Subtopic, Lesson, Question, ExercisePrompt, Activity } from '../typess/\r\n+import type { Topic, Subtopic, Lesson, Question, ExercisePrompt, Activity } from '\r\n \r\n export class ValidationError extends Error {\r\n   constructor(message: string) {\r\n     super(message)\r\n"
+                },
+                {
+                    "date": 1739484002760,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,6 @@\n import { dbConfig } from '../config/db-config'\r\n-import type { Topic, Subtopic, Lesson, Question, ExercisePrompt, Activity } from '\r\n+import type { Topic, Subtopic, Lesson, Question, ExercisePrompt, Activity } from '@/types\r\n \r\n export class ValidationError extends Error {\r\n   constructor(message: string) {\r\n     super(message)\r\n"
+                },
+                {
+                    "date": 1739484011558,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,6 @@\n import { dbConfig } from '../config/db-config'\r\n-import type { Topic, Subtopic, Lesson, Question, ExercisePrompt, Activity } from '@/types\r\n+import type { Topic, Subtopic, Lesson, Question, ExercisePrompt, Activity } from '@/types/index\r\n \r\n export class ValidationError extends Error {\r\n   constructor(message: string) {\r\n     super(message)\r\n"
+                },
+                {
+                    "date": 1739484023470,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,6 @@\n import { dbConfig } from '../config/db-config'\r\n-import type { Topic, Subtopic, Lesson, Question, ExercisePrompt, Activity } from '@/types/index\r\n+import type { Topic, Subtopic, Lesson, Question, ExercisePrompt, Activity } from '@/types/index;\r\n \r\n export class ValidationError extends Error {\r\n   constructor(message: string) {\r\n     super(message)\r\n"
+                }
+            ],
+            "date": 1739483119209,
+            "name": "Commit-0",
+            "content": "import { dbConfig } from '../config/db-config'\r\nimport type { Topic, Subtopic, Lesson, Question, ExercisePrompt, Activity } from '../types/curriculum'\r\n\r\nexport class ValidationError extends Error {\r\n  constructor(message: string) {\r\n    super(message)\r\n    this.name = 'ValidationError'\r\n  }\r\n}\r\n\r\nexport const validators = {\r\n  validateString(value: string, maxLength: number, field: string): void {\r\n    if (!value || value.trim().length === 0) {\r\n      throw new ValidationError(`${field} cannot be empty`)\r\n    }\r\n    if (value.length > maxLength) {\r\n      throw new ValidationError(`${field} exceeds maximum length of ${maxLength}`)\r\n    }\r\n  },\r\n\r\n  validateOrderIndex(value: number): void {\r\n    if (value < dbConfig.validation.minOrderIndex || value > dbConfig.validation.maxOrderIndex) {\r\n      throw new ValidationError(`Order index must be between ${dbConfig.validation.minOrderIndex} and ${dbConfig.validation.maxOrderIndex}`)\r\n    }\r\n  },\r\n\r\n  validateContentType(type: string): void {\r\n    if (!dbConfig.validation.allowedContentTypes.includes(type)) {\r\n      throw new ValidationError(`Invalid content type: ${type}`)\r\n    }\r\n  },\r\n\r\n  validateDifficulty(difficulty: string): void {\r\n    if (!dbConfig.validation.allowedDifficulties.includes(difficulty)) {\r\n      throw new ValidationError(`Invalid difficulty level: ${difficulty}`)\r\n    }\r\n  }\r\n} "
+        }
+    ]
+}

@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/components/layout/Layout.tsx",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1739349234294,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1739349234294,
+            "name": "Commit-0",
+            "content": "import { useRouter } from 'next/router';\r\nimport { getNavigationItems } from '../../lib/navigation';\r\nimport Sidebar from '@/components/common/sidebar';\r\nimport { useAuth } from '@/hooks/useAuth';\r\nimport { ReactNode, useMemo } from 'react';\r\nimport { ROLE_PERMISSIONS } from '@/types/roles';\r\n\r\nexport function Layout({ children }: { children: ReactNode }) {\r\n  const { pathname } = useRouter();\r\n  const { user } = useAuth();\r\n  \r\n  // Memoize user permissions\r\n  const userPermissions = useMemo(() => \r\n    user?.role ? ROLE_PERMISSIONS[user.role]?.permissions : null,\r\n    [user?.role]\r\n  );\r\n  \r\n  // Debug permissions\r\n  console.log('User Permissions:', {\r\n    role: user?.role,\r\n    permissions: userPermissions,\r\n    hasContentManagement: userPermissions?.content_management\r\n  });\r\n  \r\n  // Memoize navigation items\r\n  const navigationItems = useMemo(() => \r\n    getNavigationItems(user?.role || '', pathname),\r\n    [user?.role, pathname]\r\n  );\r\n  \r\n  // Debug navigation items\r\n  console.log('Navigation Items:', {\r\n    total: navigationItems.length,\r\n    items: navigationItems.map(item => item.label),\r\n    contentManagementIndex: navigationItems.findIndex(item => item.label === 'Content Management')\r\n  });\r\n\r\n  return (\r\n    <div className=\"flex h-screen\">\r\n      <Sidebar \r\n        sidebarItems={navigationItems}\r\n        className=\"fixed left-0 top-0 z-40\"\r\n        currentPath={pathname}\r\n      />\r\n      <main className=\"flex-1 ml-72 p-6\">\r\n        {children}\r\n      </main>\r\n    </div>\r\n  );\r\n} "
+        }
+    ]
+}

@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/app/content-management/components/CreateTopicDialog.tsx",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1739016905199,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1739016905199,
+            "name": "Commit-0",
+            "content": "\"use client\"\r\n\r\nimport { useState } from 'react'\r\nimport { Dialog, DialogContent, DialogHeader, DialogTitle } from \"@/components/ui/dialog\"\r\nimport { Button } from \"@/components/ui/button\"\r\nimport { Input } from \"@/components/ui/input\"\r\nimport { useToast } from \"@/hooks/use-toast\"\r\nimport { useMutation, useQueryClient } from \"@tanstack/react-query\"\r\nimport { Icon } from '@/components/ui/icons'\r\n\r\ninterface CreateTopicDialogProps {\r\n  open: boolean\r\n  onOpenChange: (open: boolean) => void\r\n  gradeId: string\r\n}\r\n\r\nexport function CreateTopicDialog({ open, onOpenChange, gradeId }: CreateTopicDialogProps) {\r\n  const [title, setTitle] = useState('')\r\n  const { toast } = useToast()\r\n  const queryClient = useQueryClient()\r\n\r\n  const { mutate: createTopic, isPending: isLoading } = useMutation({\r\n    mutationFn: async () => {\r\n      // Implementation here\r\n    },\r\n    onSuccess: () => {\r\n      queryClient.invalidateQueries({ queryKey: ['topics', gradeId] })\r\n      toast({\r\n        title: \"Success\",\r\n        description: \"Topic created successfully\"\r\n      })\r\n      onOpenChange(false)\r\n      setTitle('')\r\n    },\r\n    onError: (error) => {\r\n      toast({\r\n        title: \"Error\",\r\n        description: error instanceof Error ? error.message : \"Failed to create topic\",\r\n        //variant: \"destructive\"\r\n      })\r\n    }\r\n  })\r\n\r\n  return (\r\n    <Dialog open={open} onOpenChange={onOpenChange}>\r\n      <DialogContent>\r\n        <DialogHeader>\r\n          <DialogTitle className=\"flex items-center gap-2\">\r\n            <Icon type=\"phosphor\" name=\"FOLDER_PLUS\" className=\"h-5 w-5\" />\r\n            Create New Topic\r\n          </DialogTitle>\r\n        </DialogHeader>\r\n        <form onSubmit={(e) => {\r\n          e.preventDefault()\r\n          createTopic()\r\n        }}>\r\n          <div className=\"space-y-4\">\r\n            <div>\r\n              <Input\r\n                value={title}\r\n                onChange={(e) => setTitle(e.target.value)}\r\n                placeholder=\"Topic title\"\r\n              />\r\n            </div>\r\n            <div className=\"flex justify-end gap-2\">\r\n              <Button type=\"button\" variant=\"outline\" onClick={() => onOpenChange(false)}>\r\n                Cancel\r\n              </Button>\r\n              <Button type=\"submit\" disabled={isLoading}>\r\n                {isLoading ? \"Creating...\" : \"Create\"}\r\n              </Button>\r\n            </div>\r\n          </div>\r\n        </form>\r\n      </DialogContent>\r\n    </Dialog>\r\n  )\r\n} "
+        }
+    ]
+}

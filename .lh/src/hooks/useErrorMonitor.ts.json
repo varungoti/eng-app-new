@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/hooks/useErrorMonitor.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1739389571006,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1739389571006,
+            "name": "Commit-0",
+            "content": "import { useState, useEffect } from 'react';\r\nimport { errorMonitor } from '../lib/errorHandler/ErrorMonitor';\r\nimport type { ErrorRegistryEntry } from '../lib/errorHandler/ErrorRegistry';\r\nimport type { ErrorMetrics } from '../lib/errorHandler/ErrorMetrics';\r\n\r\nexport const useErrorMonitor = (source?: string) => {\r\n  const [errors, setErrors] = useState<ErrorRegistryEntry[]>(\r\n    source \r\n      ? errorMonitor.getErrorsBySource(source)\r\n      : errorMonitor.getUnhandledErrors()\r\n  );\r\n\r\n  useEffect(() => {\r\n    return errorMonitor.subscribe(allErrors => {\r\n      if (source) {\r\n        setErrors(allErrors.filter(e => e.source === source));\r\n      } else {\r\n        setErrors(allErrors);\r\n      }\r\n    });\r\n  }, [source]);\r\n\r\n  const retryOperation = async (errorId: string) => {\r\n    return errorMonitor.retryOperation(errorId);\r\n  };\r\n\r\n  const clearError = (errorId: string) => {\r\n    const error = errorMonitor.getUnhandledErrors().find(e => e.id === errorId);\r\n    if (error) {\r\n      error.handled = true;\r\n      setErrors(errors.filter(e => e.id !== errorId));\r\n    }\r\n  };\r\n\r\n  return {\r\n    errors,\r\n    metrics: errorMonitor.getMetrics(),\r\n    retryOperation,\r\n    clearError\r\n  };\r\n};"
+        }
+    ]
+}

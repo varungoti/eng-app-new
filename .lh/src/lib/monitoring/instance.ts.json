@@ -1,0 +1,22 @@
+{
+    "sourceFile": "src/lib/monitoring/instance.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1739013976355,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1739014156030,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,9 +1,8 @@\n import { createClient } from '@supabase/supabase-js';\r\n import { MonitoringSystem } from './MonitoringSystem';\r\n import { supabase } from '../supabase';\r\n import { env } from '@/config/env';\r\n-import { DataFlowMonitor } from './types';\r\n \r\n // Create a single monitoring system instance\r\n const monitoringSystem = new MonitoringSystem({\r\n   supabaseUrl: env.SUPABASE_URL,\r\n@@ -14,26 +13,14 @@\n   sampleRate: import.meta.env.DEV ? 1 : 0.1\r\n });\r\n \r\n // Export monitor instances\r\n-export const dataFlowMonitor: DataFlowMonitor = monitoringSystem.getDataFlowMonitor();\r\n+export const dataFlowMonitor = monitoringSystem.getDataFlowMonitor();\r\n export const dataLoadMonitor = monitoringSystem.getDataLoadMonitor();\r\n export const databaseMonitor = monitoringSystem.getDatabaseMonitor();\r\n export const loadingMonitor = monitoringSystem.getLoadingMonitor();\r\n \r\n // Export a cleanup function if needed\r\n export function cleanup() {\r\n   databaseMonitor.cleanup();\r\n-}\r\n+} \r\n \r\n-export const dataFlowMonitor: DataFlowMonitor = {\r\n-  // ... existing methods ...\r\n-  startOperation: (type: string, name: string, metadata?: any) => {\r\n-    const opId = `${type}_${Date.now()}`;\r\n-    // Add operation tracking logic here\r\n-    return opId;\r\n-  },\r\n-  endOperation: (opId: string) => {\r\n-    // Add operation completion logic here\r\n-  }\r\n-}; \r\n-\r\n"
+                }
+            ],
+            "date": 1739013976355,
+            "name": "Commit-0",
+            "content": "import { createClient } from '@supabase/supabase-js';\r\nimport { MonitoringSystem } from './MonitoringSystem';\r\nimport { supabase } from '../supabase';\r\nimport { env } from '@/config/env';\r\nimport { DataFlowMonitor } from './types';\r\n\r\n// Create a single monitoring system instance\r\nconst monitoringSystem = new MonitoringSystem({\r\n  supabaseUrl: env.SUPABASE_URL,\r\n  supabaseKey: env.SUPABASE_ANON_KEY,\r\n  supabase,\r\n  enableLogging: true,\r\n  logLevel: 'info',\r\n  sampleRate: import.meta.env.DEV ? 1 : 0.1\r\n});\r\n\r\n// Export monitor instances\r\nexport const dataFlowMonitor: DataFlowMonitor = monitoringSystem.getDataFlowMonitor();\r\nexport const dataLoadMonitor = monitoringSystem.getDataLoadMonitor();\r\nexport const databaseMonitor = monitoringSystem.getDatabaseMonitor();\r\nexport const loadingMonitor = monitoringSystem.getLoadingMonitor();\r\n\r\n// Export a cleanup function if needed\r\nexport function cleanup() {\r\n  databaseMonitor.cleanup();\r\n}\r\n\r\nexport const dataFlowMonitor: DataFlowMonitor = {\r\n  // ... existing methods ...\r\n  startOperation: (type: string, name: string, metadata?: any) => {\r\n    const opId = `${type}_${Date.now()}`;\r\n    // Add operation tracking logic here\r\n    return opId;\r\n  },\r\n  endOperation: (opId: string) => {\r\n    // Add operation completion logic here\r\n  }\r\n}; \r\n\r\n"
+        }
+    ]
+}

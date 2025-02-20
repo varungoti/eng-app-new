@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/types/notifications.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1739389400114,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1739389400114,
+            "name": "Commit-0",
+            "content": "export interface CustomNotification {\r\n  id: string;\r\n  userId: string;\r\n  type: string;\r\n  title: string;\r\n  message: string;\r\n  read: boolean;\r\n  createdAt: Date;\r\n} "
+        }
+    ]
+}

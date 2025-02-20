@@ -1,0 +1,26 @@
+{
+    "sourceFile": "src/components/ui/question-type-icons.tsx",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 2,
+            "patches": [
+                {
+                    "date": 1739454714529,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1739454757475,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -13,14 +13,13 @@\n   Info,\r\n   MessageCircle,\r\n   Mic,\r\n   BookOpen,\r\n-  Users,\r\n   Play,\r\n   Eye,\r\n   Film,\r\n   MessageSquare,\r\n-  PresentationChart,\r\n+  Presentation,\r\n   Book,\r\n   Type,\r\n   SplitSquareHorizontal,\r\n   Shuffle,\r\n@@ -58,9 +57,9 @@\n   speakingWithAPartner: Users,\r\n   lookAndSpeak: Eye,\r\n   watchAndSpeak: Film,\r\n   debate: MessageSquare,\r\n-  presentation: PresentationChart,\r\n+  presentation: Presentation,\r\n   vocabularyAndSpeaking: Book,\r\n   vocabularyAndWordlist: Book,\r\n   sentenceFormation: Type,\r\n   sentenceTransformation: Shuffle,\r\n"
+                },
+                {
+                    "date": 1739454766518,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -13,8 +13,9 @@\n   Info,\r\n   MessageCircle,\r\n   Mic,\r\n   BookOpen,\r\n+  Users,\r\n   Play,\r\n   Eye,\r\n   Film,\r\n   MessageSquare,\r\n"
+                }
+            ],
+            "date": 1739454714529,
+            "name": "Commit-0",
+            "content": "import { LucideIcon } from \"lucide-react\";\r\nimport {\r\n  Circle,\r\n  CheckSquare,\r\n  AlignJustify,\r\n  FileText,\r\n  Hash,\r\n  Image,\r\n  Video,\r\n  BarChart2,\r\n  Grid,\r\n  Star,\r\n  Info,\r\n  MessageCircle,\r\n  Mic,\r\n  BookOpen,\r\n  Users,\r\n  Play,\r\n  Eye,\r\n  Film,\r\n  MessageSquare,\r\n  PresentationChart,\r\n  Book,\r\n  Type,\r\n  SplitSquareHorizontal,\r\n  Shuffle,\r\n  Edit3,\r\n} from \"lucide-react\";\r\n\r\nexport const QuestionTypeIcons: Record<string, LucideIcon> = {\r\n  // Existing types from image\r\n  singleChoice: Circle,\r\n  multipleChoice: CheckSquare,\r\n  likertScale: AlignJustify,\r\n  openQuestion: FileText,\r\n  numberOpenQuestion: Hash,\r\n  pictureChoice: Image,\r\n  audioVideo: Video,\r\n  ranking: BarChart2,\r\n  pictureGallery: Grid,\r\n  matrixQuestion: Grid,\r\n  heatmap: Grid,\r\n  starRating: Star,\r\n  information: Info,\r\n  \r\n  // Additional question types\r\n  speaking: Mic,\r\n  storytelling: MessageCircle,\r\n  listening: Play,\r\n  listenAndRepeat: Video,\r\n  grammarSpeaking: Type,\r\n  idiomPractice: MessageSquare,\r\n  reading: BookOpen,\r\n  writing: Edit3,\r\n  speakingAndWriting: MessageCircle,\r\n  speakingAndListening: Mic,\r\n  readingAndSpeaking: BookOpen,\r\n  speakingWithAPartner: Users,\r\n  lookAndSpeak: Eye,\r\n  watchAndSpeak: Film,\r\n  debate: MessageSquare,\r\n  presentation: PresentationChart,\r\n  vocabularyAndSpeaking: Book,\r\n  vocabularyAndWordlist: Book,\r\n  sentenceFormation: Type,\r\n  sentenceTransformation: Shuffle,\r\n  sentenceCompletion: SplitSquareHorizontal,\r\n  sentenceTransformationAndCompletion: Shuffle,\r\n  objectAndSpeaking: Eye,\r\n  objectActionAndSpeaking: Play,\r\n};\r\n\r\ninterface QuestionTypeIconProps {\r\n  type: string;\r\n  className?: string;\r\n  size?: number;\r\n}\r\n\r\nexport function QuestionTypeIcon({ type, className, size = 24 }: QuestionTypeIconProps) {\r\n  const Icon = QuestionTypeIcons[type] || Info;\r\n  return <Icon className={className} size={size} />;\r\n} "
+        }
+    ]
+}

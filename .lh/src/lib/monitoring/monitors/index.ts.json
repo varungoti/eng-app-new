@@ -1,0 +1,26 @@
+{
+    "sourceFile": "src/lib/monitoring/monitors/index.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 2,
+            "patches": [
+                {
+                    "date": 1738875091969,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1738875169881,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -4,17 +4,16 @@\n import { DataLoadMonitor } from '../DataLoadMonitor';\r\n \r\n // Create singleton instances\r\n const monitors = {\r\n-  loadingMonitor: new LoadingMonitor({\r\n+  loadingMonitor: new LoadingMonitor(supabase, {\r\n     enableLogging: true,\r\n     logLevel: 'info',\r\n     sampleRate: 1,\r\n     supabase\r\n   }),\r\n \r\n-  dataFlowMonitor: new DataFlowMonitor({\r\n-    supabase,\r\n+  dataFlowMonitor: new DataFlowMonitor( supabase, {\r\n     enableLogging: true,\r\n     logLevel: 'info',\r\n     sampleRate: 1\r\n   }),\r\n"
+                },
+                {
+                    "date": 1739015300546,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,8 +1,9 @@\n import { supabase } from '../../supabase';\r\n import { LoadingMonitor } from './LoadingMonitor';\r\n import { DataFlowMonitor } from '../DataFlowMonitor';\r\n import { DataLoadMonitor } from '../DataLoadMonitor';\r\n+import { logger } from '@/lib/logger';\r\n \r\n // Create singleton instances\r\n const monitors = {\r\n   loadingMonitor: new LoadingMonitor(supabase, {\r\n@@ -11,13 +12,13 @@\n     sampleRate: 1,\r\n     supabase\r\n   }),\r\n \r\n-  dataFlowMonitor: new DataFlowMonitor( supabase, {\r\n+  dataFlowMonitor: new DataFlowMonitor(supabase, {\r\n     enableLogging: true,\r\n     logLevel: 'info',\r\n     sampleRate: 1\r\n-  }),\r\n+  }, logger),\r\n \r\n   dataLoadMonitor: new DataLoadMonitor({\r\n     supabase,\r\n     enableLogging: true,\r\n"
+                }
+            ],
+            "date": 1738875091969,
+            "name": "Commit-0",
+            "content": "import { supabase } from '../../supabase';\r\nimport { LoadingMonitor } from './LoadingMonitor';\r\nimport { DataFlowMonitor } from '../DataFlowMonitor';\r\nimport { DataLoadMonitor } from '../DataLoadMonitor';\r\n\r\n// Create singleton instances\r\nconst monitors = {\r\n  loadingMonitor: new LoadingMonitor({\r\n    enableLogging: true,\r\n    logLevel: 'info',\r\n    sampleRate: 1,\r\n    supabase\r\n  }),\r\n\r\n  dataFlowMonitor: new DataFlowMonitor({\r\n    supabase,\r\n    enableLogging: true,\r\n    logLevel: 'info',\r\n    sampleRate: 1\r\n  }),\r\n\r\n  dataLoadMonitor: new DataLoadMonitor({\r\n    supabase,\r\n    enableLogging: true,\r\n    logLevel: 'info',\r\n    sampleRate: 1\r\n  })\r\n};\r\n\r\nexport default monitors; "
+        }
+    ]
+}

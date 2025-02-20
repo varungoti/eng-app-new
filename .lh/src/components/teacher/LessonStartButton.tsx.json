@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/components/teacher/LessonStartButton.tsx",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1739045275077,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1739045275077,
+            "name": "Commit-0",
+            "content": "import React, { useState } from 'react';\r\nimport { Button } from '@/components/ui/button';\r\nimport { cn } from '@/lib/utils';\r\nimport { logger } from '@/lib/logger';\r\n\r\ninterface LessonStartButtonProps {\r\n  lessonId: string;\r\n  isDisabled: boolean;\r\n  onStart: () => void;\r\n}\r\n\r\nexport function LessonStartButton({ lessonId, isDisabled, onStart }: LessonStartButtonProps) {\r\n  const [isLoading, setIsLoading] = useState(false);\r\n  \r\n  const handleStart = async () => {\r\n    try {\r\n      setIsLoading(true);\r\n      await onStart();\r\n    } catch (err) {\r\n      logger.error(`Failed to start lesson ${lessonId}: ${err instanceof Error ? err.message : String(err)}`, 'LessonStartButton');\r\n    } finally {\r\n      setIsLoading(false);\r\n    }\r\n  };\r\n\r\n  return (\r\n    <Button \r\n      onClick={handleStart}\r\n      disabled={isDisabled || isLoading}\r\n      className={cn(\r\n        \"w-full\",\r\n        isDisabled && \"opacity-50 cursor-not-allowed\"\r\n      )}\r\n    >\r\n      {isLoading ? \"Starting...\" : \"Start Lesson\"}\r\n    </Button>\r\n  );\r\n} "
+        }
+    ]
+}

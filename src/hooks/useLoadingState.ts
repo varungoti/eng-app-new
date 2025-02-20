@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { dataLoadMonitor } from '../lib/monitoring/DataLoadMonitor';
+import { monitors } from '../lib/monitoring';
 import { performanceMonitor } from '../lib/monitoring/PerformanceMonitor';
 import { logger } from '../lib/logger';
 
@@ -13,7 +13,7 @@ export const useLoadingState = (source: string) => {
 
   const startLoading = (operation: string, queryKey?: string[]) => {
     // Start data load monitoring
-    const dataLoadId = dataLoadMonitor.startLoad(source, operation, queryKey);
+    const dataLoadId = monitors.dataLoadMonitor.startLoad(source, operation, queryKey);
     setLoadId(dataLoadId);
 
     // Start performance monitoring
@@ -40,8 +40,8 @@ export const useLoadingState = (source: string) => {
 
   const endLoading = (success: boolean = true) => {
     if (loadId) {
-      dataLoadMonitor.endLoad(loadId, success);
-      const metrics = dataLoadMonitor.getMetrics();
+      monitors.dataLoadMonitor.endLoad(loadId, success);
+      const metrics = monitors.dataLoadMonitor.getMetrics();
       const metric = metrics.find(m => m.duration);
       if (metric?.duration) {
         setLoadTime(metric.duration);
@@ -71,7 +71,7 @@ export const useLoadingState = (source: string) => {
   useEffect(() => {
     return () => {
       if (loadId) {
-        dataLoadMonitor.endLoad(loadId, false);
+        monitors.dataLoadMonitor.endLoad(loadId, false);
       }
       if (perfId) {
         performanceMonitor.endOperation(perfId, false);

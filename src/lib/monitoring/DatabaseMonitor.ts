@@ -1,38 +1,98 @@
+import type { SupabaseClient } from '@supabase/supabase-js';
+import { supabase } from '../supabase';
+import type { MonitoringConfig } from './types';
 import { logger } from '../logger';
-import { WarningCache } from './WarningCache';
+
+type ConnectionStatus = 'error' | 'healthy' | 'degraded';
+
+export interface DatabaseMetrics {
+  connectionStatus: ConnectionStatus;
+  lastCheckTime: Date;
+  responseTime: number;
+  recordCount: number;
+  errorCount: number;
+}
 
 export class DatabaseMonitor {
-  private static instance: DatabaseMonitor;
-  private warningCache = new WarningCache(30000);
+  private client: SupabaseClient;
+  private config: MonitoringConfig;
+  private metrics: DatabaseMetrics;
+  private checkInterval: NodeJS.Timeout | null = null;
   private isConnected: boolean = false;
 
-  private constructor() {}
+  constructor(config: MonitoringConfig) {
+    this.client = supabase;
+    this.config = config;
+    this.metrics = {
+      connectionStatus: 'healthy',
+      lastCheckTime: new Date(),
+      responseTime: 0,
+      errorCount: 0,
+      recordCount: 0
+    };
 
-  public static getInstance(): DatabaseMonitor {
-    if (!DatabaseMonitor.instance) {
-      DatabaseMonitor.instance = new DatabaseMonitor();
-    }
-    return DatabaseMonitor.instance;
+    this.startHealthCheck();
   }
 
-  public logWarning(message: string, context: Record<string, any>) {
-    const warningKey = `${message}:${JSON.stringify(context)}`;
+  private async startHealthCheck() {
+    this.checkInterval = setInterval(async () => {
+      await this.checkHealth();
+    }, 60000); // Check every minute
+  }
+
+  private async checkHealth() {
+    const startTime = Date.now();
     
-    if (this.warningCache.shouldLog(warningKey)) {
-      logger.warn(message, {
-        context,
-        source: 'DatabaseMonitor'
-      });
+    try {
+      const { data, error } = await this.client
+        .rpc('update_health_check');
+
+      if (error) throw error;
+
+      const duration = Date.now() - startTime;
+      
+      this.metrics = {
+        ...this.metrics,
+        connectionStatus: 'healthy',
+        lastCheckTime: new Date(),
+        responseTime: duration
+      };
+
+      logger.info('Database health check successful', { source: 'DatabaseMonitor' });
+
+    } catch (error) {
+      this.metrics.errorCount++;
+      this.metrics.connectionStatus = this.metrics.errorCount > 3 ? 'error' : 'degraded';
+
+      logger.error('Database health check failed', { source: 'DatabaseMonitor', error });
+
     }
   }
 
-  public updateConnectionStatus(isConnected: boolean) {
-    this.isConnected = isConnected;
+  public getMetrics(): DatabaseMetrics {
+    return {
+      connectionStatus: this.isConnected ? 'healthy' : 'error',
+      lastCheckTime: new Date(),
+      responseTime: 0,
+      recordCount: 0,
+      errorCount: 0
+    };
   }
 
-  public isHealthy(): boolean {
-    return this.isConnected;
+  cleanup() {
+    if (this.checkInterval) {
+      clearInterval(this.checkInterval);
+    }
+  }
+
+  updateConnectionStatus(status: boolean) {
+    this.isConnected = status;
+    if (this.config.enableLogging) {
+      logger.info(`Database connection status: ${status ? 'connected' : 'disconnected'}`, { source: 'DatabaseMonitor' });
+    }
   }
 }
 
-export const databaseMonitor = DatabaseMonitor.getInstance();
+// Export both as default and named export
+//export { DatabaseMonitor };
+export default DatabaseMonitor;

@@ -1,0 +1,22 @@
+{
+    "sourceFile": "src/lib/db.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1739013294861,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1739013340555,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -28,23 +28,21 @@\n           await new Promise(resolve => setTimeout(resolve, INIT_RETRY_DELAY * retries));\r\n           continue;\r\n         }\r\n \r\n-        logger.error('Database health check failed after all retries', {\r\n-          source: 'Database'\r\n-        });\r\n+        logger.error('Database health check failed after all retries', 'Database');\r\n         return false;\r\n+\r\n       }\r\n \r\n       return false;\r\n     } catch (err) {\r\n-      logger.error('Database health check failed', {\r\n-        context: { error: err },\r\n-        source: 'Database'\r\n-      });\r\n-      return false;\r\n+      logger.error('Database health check failed', 'Database', err);\r\n+      return false; \r\n     }\r\n   }\r\n };\r\n \r\n+\r\n+\r\n // Export all database utilities\r\n export { dbConnection , checkDatabaseHealth };\n\\ No newline at end of file\n"
+                }
+            ],
+            "date": 1739013294861,
+            "name": "Commit-0",
+            "content": "import { createClient } from '@supabase/supabase-js';\r\nimport { logger } from './logger';\r\nimport { checkDatabaseHealth } from './db/healthCheck';\r\nimport { dbConnection } from './db/connection';\r\n\r\nconst MAX_INIT_RETRIES = 3;\r\nconst INIT_RETRY_DELAY = 2000;\r\n\r\nconst supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;\r\nconst supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;\r\n\r\nexport const db = createClient(supabaseUrl, supabaseKey);\r\n\r\nexport const database = {\r\n  isHealthy: async () => {\r\n    try {\r\n      let retries = 0;\r\n      while (retries < MAX_INIT_RETRIES) {\r\n        const isHealthy = await checkDatabaseHealth();\r\n        \r\n        if (isHealthy) {\r\n          return true;\r\n        }\r\n\r\n        retries++;\r\n        if (retries < MAX_INIT_RETRIES) {\r\n          logger.warn(`Database health check failed, attempt ${retries}/${MAX_INIT_RETRIES}`, 'Database');\r\n          await new Promise(resolve => setTimeout(resolve, INIT_RETRY_DELAY * retries));\r\n          continue;\r\n        }\r\n\r\n        logger.error('Database health check failed after all retries', {\r\n          source: 'Database'\r\n        });\r\n        return false;\r\n      }\r\n\r\n      return false;\r\n    } catch (err) {\r\n      logger.error('Database health check failed', {\r\n        context: { error: err },\r\n        source: 'Database'\r\n      });\r\n      return false;\r\n    }\r\n  }\r\n};\r\n\r\n// Export all database utilities\r\nexport { dbConnection , checkDatabaseHealth };"
+        }
+    ]
+}

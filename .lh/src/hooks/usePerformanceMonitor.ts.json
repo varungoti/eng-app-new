@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/hooks/usePerformanceMonitor.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1739389447313,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1739389447313,
+            "name": "Commit-0",
+            "content": "import { useState, useEffect } from 'react';\r\nimport { performanceMonitor, type PerformanceMetric } from '../lib/monitoring/PerformanceMonitor';\r\n\r\nexport const usePerformanceMonitor = (source?: string) => {\r\n  const [metrics, setMetrics] = useState<PerformanceMetric[]>(performanceMonitor.getAllMetrics());\r\n\r\n  useEffect(() => {\r\n    return performanceMonitor.subscribe(allMetrics => {\r\n      if (source) {\r\n        setMetrics(allMetrics.filter(m => m.source === source));\r\n      } else {\r\n        setMetrics(allMetrics);\r\n      }\r\n    });\r\n  }, [source]);\r\n\r\n  const startOperation = (operation: string, context?: Record<string, any>) => {\r\n    return performanceMonitor.startOperation(operation, source || 'unknown', context);\r\n  };\r\n\r\n  const endOperation = (id: string, success: boolean = true) => {\r\n    performanceMonitor.endOperation(id, success);\r\n  };\r\n\r\n  return {\r\n    metrics,\r\n    activeOperations: metrics.filter(m => m.status === 'pending'),\r\n    completedOperations: metrics.filter(m => m.status !== 'pending'),\r\n    startOperation,\r\n    endOperation\r\n  };\r\n};"
+        }
+    ]
+}

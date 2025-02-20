@@ -1,4 +1,5 @@
 import { QUESTION_TYPES } from './constants';
+import { ExercisePrompt, Question as QuestionType, BaseQuestionData } from '@/app/content-management/types';
 
 export interface QuestionData {
   prompt: string;
@@ -20,25 +21,24 @@ export interface QuestionData {
 
 export interface Question {
   type: string;
-  data: Required<Pick<QuestionData, 'prompt' | 'teacherScript'>> & 
-    Partial<Omit<QuestionData, 'prompt' | 'teacherScript'>>;
+  data: Required<Pick<BaseQuestionData, 'prompt' | 'teacherScript'>> & 
+    Partial<Omit<BaseQuestionData, 'prompt' | 'teacherScript'>>;
   exercisePrompts: ExercisePrompt[]; 
 }
 
-export interface ExercisePrompt {
-  text: string;
-  media: string;
-  type: 'image' | 'gif' | 'video';
-  narration: string;
-  sayText: string;
-}
-
 export interface QuestionFormProps {
-  question: Question;
+  question: QuestionType;
   index: number;
-  onUpdate: (index: number, updatedQuestion: Question) => void;
+  onUpdate: (index: number, updatedQuestion: QuestionType) => void;
   onRemove: (index: number) => void;
   onAddExercisePrompt: (questionIndex: number) => void;
   onRemoveExercisePrompt: (questionIndex: number, promptIndex: number) => void;
   onExercisePromptChange: (questionIndex: number, promptIndex: number, updatedPrompt: ExercisePrompt) => void;
+}
+
+export interface ExercisePromptCardProps {
+  prompt: ExercisePrompt;
+  index: number;
+  onRemove: () => void;
+  onUpdate: (prompt: ExercisePrompt) => void;
 }

@@ -3,10 +3,12 @@ import { ErrorResolver } from './ErrorResolver';
 import { logger } from '../logger';
 import { consoleHandler } from './consoleHandler';
 import { networkHandler } from './networkHandler';
+import { ErrorSeverity } from './types';
+
 
 export class ErrorTracker {
   private static instance: ErrorTracker;
-  private errors: ErrorEvent[] = [];
+  private errors: Map<string, ErrorEvent> = new Map();
   private resolutions: ErrorResolution[] = [];
   private listeners: Set<(errors: ErrorEvent[]) => void> = new Set();
   private resolver: ErrorResolver;
@@ -21,7 +23,7 @@ export class ErrorTracker {
 
   private constructor(config: ErrorWatcherConfig = {}) {
     this.config = { ...this.config, ...config };
-    this.resolver = new ErrorResolver(this.config);
+    this.resolver = ErrorResolver.getInstance(this.config);
 
     // Initialize handlers
     consoleHandler;
@@ -31,8 +33,9 @@ export class ErrorTracker {
     window.addEventListener('error', (event) => {
       this.trackError({
         message: event.error?.message || 'An error occurred',
-        severity: 'error',
+        severity: ErrorSeverity.HIGH,
         source: 'Window',
+
         context: {
           filename: event.filename,
           lineno: event.lineno,
@@ -45,12 +48,13 @@ export class ErrorTracker {
     window.addEventListener('unhandledrejection', (event) => {
       this.trackError({
         message: event.reason?.message || 'Unhandled Promise Rejection',
-        severity: 'error',
+        severity: ErrorSeverity.HIGH,
         source: 'Promise',
         context: {
           reason: event.reason
         }
       });
+
     });
   }
 
@@ -69,44 +73,59 @@ export class ErrorTracker {
       resolved: false,
     };
 
-    this.errors = [errorEvent, ...this.errors].slice(0, this.config.maxErrors);
+    this.errors.set(errorEvent.id, errorEvent);
+    
+    // Trim if exceeding max size
+    if (this.errors.size > this.config.maxErrors) {
+      const oldestKey = this.errors.keys().next().value;
+      if (oldestKey) {
+        this.errors.delete(oldestKey);
+      }
+    }
     
     if (this.config.logToConsole) {
-      logger.error(error.message, {
-        context: {
-          ...error.context,
-          severity: error.severity,
-          componentStack: error.componentStack,
-        },
-        source: error.source,
-      });
+      logger.error(error.message, 'ErrorTracker');
     }
 
     if (this.config.autoResolve) {
-      this.resolver.attemptResolution(errorEvent).then((resolution) => {
-        if (resolution) {
-          this.addResolution(resolution);
-        }
+      this.resolver.resolveError(errorEvent, 'Auto-resolved').then(() => {
+        this.addResolution({
+          errorId: errorEvent.id,
+          resolution: 'Auto-resolved',
+          timestamp: Date.now(),
+          successful: true,
+          details: { message: 'Automatically resolved by system' },
+          attempts: 1,
+          resolved: true
+        });
       });
+
     }
+
 
     this.notifyListeners();
   }
 
   public async resolveError(errorId: string): Promise<boolean> {
-    const error = this.errors.find(e => e.id === errorId);
+    const error = this.errors.get(errorId);
     if (!error) return false;
 
-    const resolution = await this.resolver.attemptResolution(error);
-    if (resolution) {
-      this.addResolution(resolution);
-      return resolution.successful;
-    }
-    return false;
+
+    await this.resolver.resolveError(error, 'Manual resolution');
+    this.addResolution({
+      errorId: error.id,
+      resolution: 'Manual resolution',
+      timestamp: Date.now(),
+      successful: true,
+      details: { message: 'Manually resolved by user' },
+      attempts: 1,
+      resolved: true
+    });
+    return true;
   }
 
   public getErrors(): ErrorEvent[] {
-    return [...this.errors];
+    return Array.from(this.errors.values());
   }
 
   public getResolutions(): ErrorResolution[] {
@@ -114,9 +133,10 @@ export class ErrorTracker {
   }
 
   public clearErrors(): void {
-    this.errors = [];
+    this.errors.clear();
     this.notifyListeners();
   }
+
 
   public subscribe(listener: (errors: ErrorEvent[]) => void): () => void {
     this.listeners.add(listener);
@@ -124,11 +144,12 @@ export class ErrorTracker {
   }
 
   private addResolution(resolution: ErrorResolution): void {
-    this.resolutions = [resolution, ...this.resolutions];
-    const error = this.errors.find(e => e.id === resolution.errorId);
+    this.resolutions.push(resolution);
+    const error = this.errors.get(resolution.errorId);
     if (error) {
       error.resolved = resolution.successful;
-      error.resolution = resolution.details;
+
+      error.resolution = resolution.details?.message;
     }
     this.notifyListeners();
   }

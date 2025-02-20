@@ -1,0 +1,22 @@
+{
+    "sourceFile": "src/lib/auth.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1739019613503,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1739019708134,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,8 +1,6 @@\n import { AuthLoader } from './auth/AuthLoader';\r\n import { signIn, signOut, getCurrentSession, AuthError } from './auth/utils';\r\n-import { createClient } from '@supabase/supabase-js'\r\n-import { Session } from '@supabase/supabase-js'\r\n \r\n // Export singleton instance\r\n export const authLoader = AuthLoader.getInstance();\r\n \r\n@@ -14,41 +12,5 @@\n   AuthError\r\n };\r\n \r\n // Export types and classes\r\n-export type { UserRole } from '../types/roles';\r\n-\r\n-// Add session monitoring\r\n-const supabase = createClient(\r\n-  import.meta.env.VITE_SUPABASE_URL,\r\n-  import.meta.env.VITE_SUPABASE_ANON_KEY\r\n-)\r\n-\r\n-// Add debug listener for session changes\r\n-supabase.auth.onAuthStateChange((event, session) => {\r\n-  console.log('Auth event:', event)\r\n-  console.log('Session state:', session)\r\n-  \r\n-  if (event === 'SIGNED_OUT') {\r\n-    console.log('Sign out triggered by:', new Error().stack)\r\n-  }\r\n-})\r\n-\r\n-// Wrap database interactions to monitor session\r\n-export const withSessionCheck = async (operation: () => Promise<any>) => {\r\n-  const session = await supabase.auth.getSession()\r\n-  console.log('Session before operation:', session)\r\n-  \r\n-  try {\r\n-    const result = await operation()\r\n-    \r\n-    // Verify session after operation\r\n-    const postOpSession = await supabase.auth.getSession()\r\n-    console.log('Session after operation:', postOpSession)\r\n-    \r\n-    return result\r\n-  } catch (error) {\r\n-    console.error('Operation failed:', error)\r\n-    console.log('Session after error:', await supabase.auth.getSession())\r\n-    throw error\r\n-  }\r\n-}\n\\ No newline at end of file\n+export type { UserRole } from '../types/roles';\n\\ No newline at end of file\n"
+                }
+            ],
+            "date": 1739019613503,
+            "name": "Commit-0",
+            "content": "import { AuthLoader } from './auth/AuthLoader';\r\nimport { signIn, signOut, getCurrentSession, AuthError } from './auth/utils';\r\nimport { createClient } from '@supabase/supabase-js'\r\nimport { Session } from '@supabase/supabase-js'\r\n\r\n// Export singleton instance\r\nexport const authLoader = AuthLoader.getInstance();\r\n\r\n// Export auth utilities\r\nexport {\r\n  signIn,\r\n  signOut,\r\n  getCurrentSession,\r\n  AuthError\r\n};\r\n\r\n// Export types and classes\r\nexport type { UserRole } from '../types/roles';\r\n\r\n// Add session monitoring\r\nconst supabase = createClient(\r\n  import.meta.env.VITE_SUPABASE_URL,\r\n  import.meta.env.VITE_SUPABASE_ANON_KEY\r\n)\r\n\r\n// Add debug listener for session changes\r\nsupabase.auth.onAuthStateChange((event, session) => {\r\n  console.log('Auth event:', event)\r\n  console.log('Session state:', session)\r\n  \r\n  if (event === 'SIGNED_OUT') {\r\n    console.log('Sign out triggered by:', new Error().stack)\r\n  }\r\n})\r\n\r\n// Wrap database interactions to monitor session\r\nexport const withSessionCheck = async (operation: () => Promise<any>) => {\r\n  const session = await supabase.auth.getSession()\r\n  console.log('Session before operation:', session)\r\n  \r\n  try {\r\n    const result = await operation()\r\n    \r\n    // Verify session after operation\r\n    const postOpSession = await supabase.auth.getSession()\r\n    console.log('Session after operation:', postOpSession)\r\n    \r\n    return result\r\n  } catch (error) {\r\n    console.error('Operation failed:', error)\r\n    console.log('Session after error:', await supabase.auth.getSession())\r\n    throw error\r\n  }\r\n}"
+        }
+    ]
+}

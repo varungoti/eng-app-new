@@ -1,0 +1,22 @@
+{
+    "sourceFile": ".vscode/settings.json",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1739351172044,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1739351183587,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -17,8 +17,9 @@\n     \"lessonid\",\n     \"myclasses\",\n     \"PGRST\",\n     \"pkce\",\n+    \"Postgrest\",\n     \"questionid\",\n     \"rollno\",\n     \"roomno\",\n     \"saytext\",\n"
+                }
+            ],
+            "date": 1739351172044,
+            "name": "Commit-0",
+            "content": "{\n  \"[typescript]\": {\n    \"editor.defaultFormatter\": \"denoland.vscode-deno\"\n  },\n  \"cSpell.words\": [\n    \"Adminsprofile\",\n    \"classid\",\n    \"CODEPEN\",\n    \"CODESANDBOX\",\n    \"contentheading\",\n    \"COOLDOWN\",\n    \"dropcursor\",\n    \"Engspiration\",\n    \"fkey\",\n    \"gotrue\",\n    \"learningpath\",\n    \"lessonid\",\n    \"myclasses\",\n    \"PGRST\",\n    \"pkce\",\n    \"questionid\",\n    \"rollno\",\n    \"roomno\",\n    \"saytext\",\n    \"shadcn\",\n    \"sonner\",\n    \"speakwell\",\n    \"Studentsprofile\",\n    \"supabase\",\n    \"Teachersprofile\",\n    \"Upserting\",\n    \"Upserts\",\n    \"Wordlist\"\n  ],\n  \"deno.enablePaths\": [\n    \"supabase/functions\"\n  ],\n  \"deno.lint\": true,\n  \"deno.unstable\": [\n    \"bare-node-builtins\",\n    \"byonm\",\n    \"sloppy-imports\",\n    \"unsafe-proto\",\n    \"webgpu\",\n    \"broadcast-channel\",\n    \"worker-options\",\n    \"cron\",\n    \"kv\",\n    \"ffi\",\n    \"fs\",\n    \"http\",\n    \"net\"\n  ]\n}\n"
+        }
+    ]
+}

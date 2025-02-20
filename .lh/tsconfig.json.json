@@ -1,0 +1,38 @@
+{
+    "sourceFile": "tsconfig.json",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 5,
+            "patches": [
+                {
+                    "date": 1739299747591,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1739299817033,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -29,21 +29,21 @@\n     \"paths\": {\r\n       \"@/*\": [\r\n         \"src/*\"\r\n       ],\r\n-      \"@/lib/*\": [\r\n+      \"@lib/*\": [\r\n         \"src/lib/*\"\r\n       ],\r\n-      \"@/components/*\": [\r\n+      \"@components/*\": [\r\n         \"src/components/*\"\r\n       ],\r\n-      \"@/types/*\": [\r\n+      \"@types/*\": [\r\n         \"src/types/*\"\r\n       ],\r\n-      \"@/hooks/*\": [\r\n+      \"@hooks/*\": [\r\n         \"src/hooks/*\"\r\n       ],\r\n-      \"@/contexts/*\": [\r\n+      \"@contexts/*\": [\r\n         \"src/contexts/*\"\r\n       ]\r\n     },\r\n     \"allowJs\": true,\r\n"
+                },
+                {
+                    "date": 1739303066892,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -13,9 +13,9 @@\n       \"node\",\r\n       \"react\",\r\n       \"react-dom\"\r\n     ],\r\n-    \"moduleResolution\": \"node\",\r\n+    \"moduleResolution\": \"bundler\",\r\n     \"allowImportingTsExtensions\": true,\r\n     \"resolveJsonModule\": true,\r\n     \"isolatedModules\": true,\r\n     \"noEmit\": true,\r\n@@ -43,8 +43,17 @@\n         \"src/hooks/*\"\r\n       ],\r\n       \"@contexts/*\": [\r\n         \"src/contexts/*\"\r\n+      ],\r\n+      \"@utils/*\": [\r\n+        \"src/utils/*\"\r\n+      ],\r\n+      \"@pages/*\": [\r\n+        \"src/pages/*\"\r\n+      ],\r\n+      \"@app/*\": [\r\n+        \"src/app/*\"\r\n       ]\r\n     },\r\n     \"allowJs\": true,\r\n     \"incremental\": true,\r\n@@ -60,6 +69,7 @@\n   \"exclude\": [\r\n     \"node_modules\",\r\n     \"dist\",\r\n     \"build\"\r\n-  ]\r\n+  ],\r\n+  \"references\": [{ \"path\": \"./tsconfig.node.json\" }]\r\n }\r\n"
+                },
+                {
+                    "date": 1739484286257,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -7,16 +7,18 @@\n       \"DOM\",\r\n       \"DOM.Iterable\"\r\n     ],\r\n     \"module\": \"ESNext\",\r\n+    \"composite\": true,\r\n     \"skipLibCheck\": true,\r\n     \"types\": [\r\n       \"node\",\r\n       \"react\",\r\n       \"react-dom\"\r\n     ],\r\n     \"moduleResolution\": \"bundler\",\r\n     \"allowImportingTsExtensions\": true,\r\n+    \"forceConsistentCasingInFileNames\": true,\r\n     \"resolveJsonModule\": true,\r\n     \"isolatedModules\": true,\r\n     \"noEmit\": true,\r\n     \"jsx\": \"react-jsx\",\r\n@@ -24,42 +26,24 @@\n     \"noUnusedLocals\": true,\r\n     \"noUnusedParameters\": true,\r\n     \"noFallthroughCasesInSwitch\": true,\r\n     \"preserveSymlinks\": false,\r\n+    \"outDir\": \"dist\",\r\n     \"baseUrl\": \".\",\r\n-    \"paths\": {\r\n-      \"@/*\": [\r\n-        \"src/*\"\r\n-      ],\r\n-      \"@lib/*\": [\r\n-        \"src/lib/*\"\r\n-      ],\r\n-      \"@components/*\": [\r\n-        \"src/components/*\"\r\n-      ],\r\n-      \"@types/*\": [\r\n-        \"src/types/*\"\r\n-      ],\r\n-      \"@hooks/*\": [\r\n-        \"src/hooks/*\"\r\n-      ],\r\n-      \"@contexts/*\": [\r\n-        \"src/contexts/*\"\r\n-      ],\r\n-      \"@utils/*\": [\r\n-        \"src/utils/*\"\r\n-      ],\r\n-      \"@pages/*\": [\r\n-        \"src/pages/*\"\r\n-      ],\r\n-      \"@app/*\": [\r\n-        \"src/app/*\"\r\n-      ]\r\n-    },\r\n+    \"resolveJsonModule\": true,\r\n     \"allowJs\": true,\r\n     \"incremental\": true,\r\n     \"esModuleInterop\": true,\r\n-    \"allowSyntheticDefaultImports\": true\r\n+    \"allowSyntheticDefaultImports\": true,\r\n+    \"paths\": {\r\n+      \"@/*\": [\"src/*\"],\r\n+      \"@app/*\": [\"src/app\"],\r\n+      \"@components/*\": [\"src/components/*\"],\r\n+      \"@lib/*\": [\"src/lib/*\"],\r\n+      \"@types/*\": [\"src/types/*\"],\r\n+      \"@hooks/*\": [\"src/hooks/*\"],\r\n+      \"@utils/*\": [\"src/utils/*\"]\r\n+    }\r\n   },\r\n   \"include\": [\r\n     \"src/**/*.ts\",\r\n     \"src/**/*.tsx\",\r\n@@ -71,5 +55,6 @@\n     \"dist\",\r\n     \"build\"\r\n   ],\r\n   \"references\": [{ \"path\": \"./tsconfig.node.json\" }]\r\n+\r\n }\r\n"
+                },
+                {
+                    "date": 1739484291409,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -28,9 +28,9 @@\n     \"noFallthroughCasesInSwitch\": true,\r\n     \"preserveSymlinks\": false,\r\n     \"outDir\": \"dist\",\r\n     \"baseUrl\": \".\",\r\n-    \"resolveJsonModule\": true,\r\n+    \"rootDir\": \".\",\r\n     \"allowJs\": true,\r\n     \"incremental\": true,\r\n     \"esModuleInterop\": true,\r\n     \"allowSyntheticDefaultImports\": true,\r\n"
+                },
+                {
+                    "date": 1739908596211,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -54,7 +54,11 @@\n     \"node_modules\",\r\n     \"dist\",\r\n     \"build\"\r\n   ],\r\n-  \"references\": [{ \"path\": \"./tsconfig.node.json\" }]\r\n-\r\n+  \"references\": [{ \"path\": \"./tsconfig.node.json\" }],\r\n+  \"ts-node\": {\r\n+    \"compilerOptions\": {\r\n+      \"module\": \"CommonJS\"\r\n+    }\r\n+  }\r\n }\r\n"
+                }
+            ],
+            "date": 1739299747591,
+            "name": "Commit-0",
+            "content": "{\r\n  \"compilerOptions\": {\r\n    \"target\": \"ES2020\",\r\n    \"useDefineForClassFields\": true,\r\n    \"lib\": [\r\n      \"ES2020\",\r\n      \"DOM\",\r\n      \"DOM.Iterable\"\r\n    ],\r\n    \"module\": \"ESNext\",\r\n    \"skipLibCheck\": true,\r\n    \"types\": [\r\n      \"node\",\r\n      \"react\",\r\n      \"react-dom\"\r\n    ],\r\n    \"moduleResolution\": \"node\",\r\n    \"allowImportingTsExtensions\": true,\r\n    \"resolveJsonModule\": true,\r\n    \"isolatedModules\": true,\r\n    \"noEmit\": true,\r\n    \"jsx\": \"react-jsx\",\r\n    \"strict\": true,\r\n    \"noUnusedLocals\": true,\r\n    \"noUnusedParameters\": true,\r\n    \"noFallthroughCasesInSwitch\": true,\r\n    \"preserveSymlinks\": false,\r\n    \"baseUrl\": \".\",\r\n    \"paths\": {\r\n      \"@/*\": [\r\n        \"src/*\"\r\n      ],\r\n      \"@/lib/*\": [\r\n        \"src/lib/*\"\r\n      ],\r\n      \"@/components/*\": [\r\n        \"src/components/*\"\r\n      ],\r\n      \"@/types/*\": [\r\n        \"src/types/*\"\r\n      ],\r\n      \"@/hooks/*\": [\r\n        \"src/hooks/*\"\r\n      ],\r\n      \"@/contexts/*\": [\r\n        \"src/contexts/*\"\r\n      ]\r\n    },\r\n    \"allowJs\": true,\r\n    \"incremental\": true,\r\n    \"esModuleInterop\": true,\r\n    \"allowSyntheticDefaultImports\": true\r\n  },\r\n  \"include\": [\r\n    \"src/**/*.ts\",\r\n    \"src/**/*.tsx\",\r\n    \"src/types/**/*.d.ts\",\r\n    \"vite.config.ts\"\r\n  ],\r\n  \"exclude\": [\r\n    \"node_modules\",\r\n    \"dist\",\r\n    \"build\"\r\n  ]\r\n}\r\n"
+        }
+    ]
+}

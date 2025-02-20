@@ -1,0 +1,4 @@
+.progress-bar {
+  @apply bg-indigo-600 h-2 rounded-full transition-all duration-200;
+  width: var(--progress, 0%);
+} 

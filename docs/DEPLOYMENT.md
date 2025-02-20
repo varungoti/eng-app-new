@@ -3,7 +3,7 @@
 ## Prerequisites
 - Node.js 18+
 - Supabase account
-- Vercel account
+- Vite
 - Google Maps API key
 
 ## Environment Setup

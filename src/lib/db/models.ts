@@ -1,4 +1,3 @@
-import mongoose, { Document, Model, Schema } from 'mongoose';
 
 // Interfaces
 export interface IGrade extends Document {

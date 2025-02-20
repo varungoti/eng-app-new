@@ -1,0 +1,50 @@
+{
+    "sourceFile": "src/lib/messaging/MessageManager.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 8,
+            "patches": [
+                {
+                    "date": 1739015420624,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1739442996513,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -70,9 +70,9 @@\n \r\n       this.notifySubscribers(messages);\r\n       return messages;\r\n     } catch (err) {\r\n-      logger.error('Failed to fetch messages', 'MessageManager', err);\r\n+      logger.error('Failed to fetch messages', 'MessageManager', { serr);\r\n       return [];\r\n \r\n     }\r\n   }\r\n"
+                },
+                {
+                    "date": 1739443004109,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -70,9 +70,9 @@\n \r\n       this.notifySubscribers(messages);\r\n       return messages;\r\n     } catch (err) {\r\n-      logger.error('Failed to fetch messages', 'MessageManager', { serr);\r\n+      logger.error('Failed to fetch messages', 'MessageManager', err);\r\n       return [];\r\n \r\n     }\r\n   }\r\n"
+                },
+                {
+                    "date": 1739443010811,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -70,9 +70,9 @@\n \r\n       this.notifySubscribers(messages);\r\n       return messages;\r\n     } catch (err) {\r\n-      logger.error('Failed to fetch messages', 'MessageManager', err);\r\n+      logger.error('Failed to fetch messages', err);\r\n       return [];\r\n \r\n     }\r\n   }\r\n"
+                },
+                {
+                    "date": 1739443016661,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -70,9 +70,9 @@\n \r\n       this.notifySubscribers(messages);\r\n       return messages;\r\n     } catch (err) {\r\n-      logger.error('Failed to fetch messages', err);\r\n+      logger.error('Failed to fetch messages', 'MessageManager', err as LogContext);\r\n       return [];\r\n \r\n     }\r\n   }\r\n"
+                },
+                {
+                    "date": 1739443022911,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -70,9 +70,13 @@\n \r\n       this.notifySubscribers(messages);\r\n       return messages;\r\n     } catch (err) {\r\n-      logger.error('Failed to fetch messages', 'MessageManager', err as LogContext);\r\n+      logger.error('Failed to fetch messages', {\r\n+        source: 'MessageManager',\r\n+        error: err,\r\n+        timestamp: new Date().toISOString()\r\n+      });\r\n       return [];\r\n \r\n     }\r\n   }\r\n"
+                },
+                {
+                    "date": 1739443063844,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -107,9 +107,13 @@\n         read: data.read,\r\n         createdAt: new Date(data.created_at)\r\n       };\r\n     } catch (err) {\r\n-      logger.error('Failed to send message', 'MessageManager', err);\r\n+      logger.error('Failed to send message', {\r\n+        source: 'MessageManager',\r\n+        error: err,\r\n+        timestamp: new Date().toISOString()\r\n+      });\r\n       return null;\r\n \r\n     }\r\n   }\r\n"
+                },
+                {
+                    "date": 1739443071423,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -127,9 +127,13 @@\n \r\n       if (error) throw error;\r\n       await this.fetchMessages();\r\n     } catch (err) {\r\n-      logger.error('Failed to mark message as read', 'MessageManager', err);\r\n+      logger.error('Failed to mark message as read', {\r\n+        source: 'MessageManager',\r\n+        error: err,\r\n+        timestamp: new Date().toISOString()\r\n+      });\r\n \r\n     }\r\n   }\r\n \r\n"
+                },
+                {
+                    "date": 1739443079381,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -156,9 +156,13 @@\n         lastMessage: this.mapMessage(t.messages[0]),\r\n         unreadCount: t.messages.filter((m: any) => !m.read).length\r\n       }));\r\n     } catch (err) {\r\n-      logger.error('Failed to get threads', 'MessageManager', err);\r\n+      logger.error('Failed to get threads', {\r\n+        source: 'MessageManager',\r\n+        error: err,\r\n+        timestamp: new Date().toISOString()\r\n+      });\r\n       return [];\r\n \r\n     }\r\n   }\r\n"
+                }
+            ],
+            "date": 1739015420624,
+            "name": "Commit-0",
+            "content": "import { supabase } from '../supabase';\r\nimport { logger } from '../logger';\r\n\r\nexport interface Message {\r\n  id: string;\r\n  senderId: string;\r\n  recipientId: string;\r\n  subject: string;\r\n  content: string;\r\n  read: boolean;\r\n  createdAt: Date;\r\n}\r\n\r\nexport interface Thread {\r\n  id: string;\r\n  participants: string[];\r\n  subject: string;\r\n  lastMessage: Message;\r\n  unreadCount: number;\r\n}\r\n\r\nclass MessageManager {\r\n  private static instance: MessageManager;\r\n  private subscribers: Set<(messages: Message[]) => void> = new Set();\r\n\r\n  private constructor() {\r\n    this.setupRealtimeSubscription();\r\n  }\r\n\r\n  public static getInstance(): MessageManager {\r\n    if (!MessageManager.instance) {\r\n      MessageManager.instance = new MessageManager();\r\n    }\r\n    return MessageManager.instance;\r\n  }\r\n\r\n  private setupRealtimeSubscription() {\r\n    supabase\r\n      .channel('messages')\r\n      .on(\r\n        'postgres_changes',\r\n        { event: '*', schema: 'public', table: 'messages' },\r\n        this.handleMessageChange.bind(this)\r\n      )\r\n      .subscribe();\r\n  }\r\n\r\n  private async handleMessageChange() {\r\n    await this.fetchMessages();\r\n  }\r\n\r\n  public async fetchMessages(): Promise<Message[]> {\r\n    try {\r\n      const { data, error } = await supabase\r\n        .from('messages')\r\n        .select('*')\r\n        .order('created_at', { ascending: false });\r\n\r\n      if (error) throw error;\r\n\r\n      const messages = data.map(m => ({\r\n        id: m.id,\r\n        senderId: m.sender_id,\r\n        recipientId: m.recipient_id,\r\n        subject: m.subject,\r\n        content: m.content,\r\n        read: m.read,\r\n        createdAt: new Date(m.created_at)\r\n      }));\r\n\r\n      this.notifySubscribers(messages);\r\n      return messages;\r\n    } catch (err) {\r\n      logger.error('Failed to fetch messages', 'MessageManager', err);\r\n      return [];\r\n\r\n    }\r\n  }\r\n\r\n  public async sendMessage(message: Omit<Message, 'id' | 'createdAt' | 'read'>): Promise<Message | null> {\r\n    try {\r\n      const { data, error } = await supabase\r\n        .from('messages')\r\n        .insert({\r\n          sender_id: message.senderId,\r\n          recipient_id: message.recipientId,\r\n          subject: message.subject,\r\n          content: message.content,\r\n          read: false\r\n        })\r\n        .select()\r\n        .single();\r\n\r\n      if (error) throw error;\r\n      await this.fetchMessages();\r\n\r\n      return {\r\n        id: data.id,\r\n        senderId: data.sender_id,\r\n        recipientId: data.recipient_id,\r\n        subject: data.subject,\r\n        content: data.content,\r\n        read: data.read,\r\n        createdAt: new Date(data.created_at)\r\n      };\r\n    } catch (err) {\r\n      logger.error('Failed to send message', 'MessageManager', err);\r\n      return null;\r\n\r\n    }\r\n  }\r\n\r\n  public async markAsRead(messageId: string): Promise<void> {\r\n    try {\r\n      const { error } = await supabase\r\n        .from('messages')\r\n        .update({ read: true })\r\n        .eq('id', messageId);\r\n\r\n      if (error) throw error;\r\n      await this.fetchMessages();\r\n    } catch (err) {\r\n      logger.error('Failed to mark message as read', 'MessageManager', err);\r\n\r\n    }\r\n  }\r\n\r\n  public async getThreads(): Promise<Thread[]> {\r\n    try {\r\n      const { data, error } = await supabase\r\n        .from('message_threads')\r\n        .select(`\r\n          *,\r\n          messages:messages (*)\r\n        `)\r\n        .order('last_message_at', { ascending: false });\r\n\r\n      if (error) throw error;\r\n\r\n      return data.map(t => ({\r\n        id: t.id,\r\n        participants: t.participants,\r\n        subject: t.subject,\r\n        lastMessage: this.mapMessage(t.messages[0]),\r\n        unreadCount: t.messages.filter((m: any) => !m.read).length\r\n      }));\r\n    } catch (err) {\r\n      logger.error('Failed to get threads', 'MessageManager', err);\r\n      return [];\r\n\r\n    }\r\n  }\r\n\r\n  private mapMessage(messageData: any): Message {\r\n    return {\r\n      id: messageData.id,\r\n      senderId: messageData.sender_id,\r\n      recipientId: messageData.recipient_id,\r\n      subject: messageData.subject,\r\n      content: messageData.content,\r\n      read: messageData.read,\r\n      createdAt: new Date(messageData.created_at)\r\n    };\r\n  }\r\n\r\n  public subscribe(callback: (messages: Message[]) => void): () => void {\r\n    this.subscribers.add(callback);\r\n    return () => this.subscribers.delete(callback);\r\n  }\r\n\r\n  private notifySubscribers(messages: Message[]) {\r\n    this.subscribers.forEach(callback => callback(messages));\r\n  }\r\n}\r\n\r\nexport const messageManager = MessageManager.getInstance();"
+        }
+    ]
+}

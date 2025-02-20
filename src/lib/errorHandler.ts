@@ -78,12 +78,9 @@ export class ErrorHandler {
   private handleError(error: any, options: { context?: Record<string, any> } = {}) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     
-    logger.error(errorMessage, {
-      context: {
-        ...options.context,
-        stack: error instanceof Error ? error.stack : undefined
-      },
-      source: 'ErrorHandler'
+    logger.error(`${errorMessage}${error instanceof Error ? `\nStack: ${error.stack}` : ''}`, {
+      context: options.context,
+      error: error instanceof Error ? error : new Error(errorMessage)
     });
 
     this.notifyListeners(error instanceof Error ? error : new Error(errorMessage));
