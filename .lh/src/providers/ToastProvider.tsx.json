@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/providers/ToastProvider.tsx",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1740093637431,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1740093637431,
+            "name": "Commit-0",
+            "content": "import React from 'react';\r\nimport { ToastProvider as InternalToastProvider } from '@/components/ui/Toast';\r\n\r\nexport function Providers({ children }: { children: React.ReactNode }) {\r\n  return (\r\n    <InternalToastProvider>\r\n      {children}\r\n    </InternalToastProvider>\r\n  );\r\n} "
+        }
+    ]
+}

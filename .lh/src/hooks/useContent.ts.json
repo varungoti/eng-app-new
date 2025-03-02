@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/hooks/useContent.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1740922908565,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1740922908565,
+            "name": "Commit-0",
+            "content": "import { useQuery, useQueryClient } from '@tanstack/react-query';\r\nimport { contentService } from '../lib/content/ContentService';\r\n//import { logger } from '../lib/logger';\r\n//import type { Grade, Topic, SubTopic, Lesson } from '../types';\r\n\r\nexport const useContent = () => {\r\n  const queryClient = useQueryClient();\r\n\r\n  // Fetch grades\r\n  const { data: grades = [], isLoading: gradesLoading } = useQuery({\r\n    queryKey: ['grades'],\r\n    queryFn: () => contentService.fetchGrades(),\r\n    staleTime: 5 * 60 * 1000, // 5 minutes\r\n  });\r\n\r\n  // Fetch topics\r\n  const { data: topics = [], isLoading: topicsLoading } = useQuery({\r\n    queryKey: ['topics'],\r\n    queryFn: () => contentService.fetchTopics(\"all\"),\r\n    staleTime: 5 * 60 * 1000,\r\n  });\r\n\r\n  // Fetch sub-topics\r\n  const { data: subTopics = [], isLoading: subTopicsLoading } = useQuery({\r\n    queryKey: ['sub_topics'],\r\n    queryFn: () => contentService.fetchSubtopics(\"all\"),\r\n    staleTime: 5 * 60 * 1000,\r\n  });\r\n\r\n  // Fetch lessons\r\n  const { data: lessons = [], isLoading: lessonsLoading } = useQuery({\r\n    queryKey: ['lessons'],\r\n    queryFn: () => contentService.fetchLessons(\"all\"),\r\n    staleTime: 5 * 60 * 1000,\r\n  });\r\n\r\n  const refresh = async () => {\r\n    await Promise.all([\r\n      queryClient.invalidateQueries({ queryKey: ['grades'] }),\r\n      queryClient.invalidateQueries({ queryKey: ['topics'] }),\r\n      queryClient.invalidateQueries({ queryKey: ['sub_topics'] }),\r\n      queryClient.invalidateQueries({ queryKey: ['lessons'] })\r\n    ]);\r\n  };\r\n\r\n  return {\r\n    grades,\r\n    topics,\r\n    subTopics,\r\n    lessons,\r\n    loading: gradesLoading || topicsLoading || subTopicsLoading || lessonsLoading,\r\n    refresh\r\n  };\r\n};"
+        }
+    ]
+}

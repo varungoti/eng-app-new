@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 72,
+            "activePatchIndex": 76,
             "patches": [
                 {
                     "date": 1739380751162,
@@ -296,6 +296,22 @@
                 {
                     "date": 1739382423209,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -208,13 +208,10 @@\n         };\r\n \r\n         // Clean up interval when cache is destroyed\r\n         return () => clearInterval(expiryInterval);\r\n-        return {\r\n-            success: true,\r\n-            error: null\r\n-        };\r\n         \r\n+        \r\n     }\r\n     const cacheStatus = await this.configureQueryCache(cacheConfig);\r\n     if (cacheStatus.success) {\r\n     console.log('Query cache configured successfully:', {\r\n"
+                },
+                {
+                    "date": 1740746149212,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -137,9 +137,9 @@\n \r\n     // Suggest indexes based on query analysis\r\n     const suggestedIndexes = this.generateIndexSuggestions(slowQueries);\r\n     const indexRecommendations = suggestedIndexes.map(index => ({\r\n-      collection: index.collection,\r\n+      collection: index.collection,``\r\n       fields: index.fields,\r\n       impact: index.estimatedImpact\r\n     }));\r\n     console.log('Index recommendations:', indexRecommendations);\r\n"
+                },
+                {
+                    "date": 1740746159684,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,4 +1,6 @@\n+import { logger } from '../lib/logger';\r\n+\r\n interface QueryPattern {\r\n     query: string;\r\n     collection?: string;\r\n     fields?: string[];\r\n@@ -131,19 +133,19 @@\n     // Analyze query patterns\r\n     const queryPatterns = await this.analyzeQueryPatterns();\r\n     const slowQueries = queryPatterns.filter(query => query.executionTime > 100);\r\n     const frequentQueries = queryPatterns.filter(query => query.frequency > 10);\r\n-    console.log('Slow queries identified:', slowQueries);\r\n-    console.log('Frequently executed queries:', frequentQueries);\r\n+    logger.info('Slow queries identified', { context: { slowQueries }});\r\n+    logger.info('Frequently executed queries', { context: { frequentQueries }});\r\n \r\n     // Suggest indexes based on query analysis\r\n     const suggestedIndexes = this.generateIndexSuggestions(slowQueries);\r\n     const indexRecommendations = suggestedIndexes.map(index => ({\r\n-      collection: index.collection,``\r\n+      collection: index.collection,\r\n       fields: index.fields,\r\n       impact: index.estimatedImpact\r\n     }));\r\n-    console.log('Index recommendations:', indexRecommendations);\r\n+    logger.info('Index recommendations', { context: { indexRecommendations }});\r\n \r\n     // Cache frequently accessed data\r\n     const cacheConfig: CacheConfig = {\r\n     ttl: 5 * 60 * 1000, // 5 minutes cache TTL\r\n@@ -213,15 +215,17 @@\n         \r\n     }\r\n     const cacheStatus = await this.configureQueryCache(cacheConfig);\r\n     if (cacheStatus.success) {\r\n-    console.log('Query cache configured successfully:', {\r\n-        ttl: cacheConfig.ttl,\r\n-        maxEntries: cacheConfig.maxSize,\r\n-        evictionStrategy: cacheConfig.strategy\r\n+    logger.info('Query cache configured successfully', {\r\n+        context: {\r\n+            ttl: cacheConfig.ttl,\r\n+            maxEntries: cacheConfig.maxSize,\r\n+            evictionStrategy: cacheConfig.strategy\r\n+        }\r\n     });\r\n     } else {\r\n-    console.warn('Cache configuration failed:', cacheStatus.error);\r\n+    logger.warn('Cache configuration failed', { context: { error: cacheStatus.error }});\r\n     }\r\n     return {\r\n         success: true,\r\n         error: null\r\n"
+                },
+                {
+                    "date": 1740746229936,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -31,10 +31,10 @@\n error: string | null;\r\n }\r\n \r\n interface QueryCacheInterface {\r\n-get: (key: string) => any;\r\n-set: (key: string, value: any) => void;\r\n+get: <T = unknown>(key: string) => T | null;\r\n+set: <T = unknown>(key: string, value: T) => void;\r\n stats: () => { hits: number; misses: number; evictions: number };\r\n }\r\n \r\n interface CacheConfig {\r\n"
+                },
+                {
+                    "date": 1740746252341,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -198,9 +198,9 @@\n             }\r\n             cacheStats.misses++;\r\n             return null;\r\n         },\r\n-        set: (key: string, value: any) => {\r\n+        set: (key: string, value: unknown) => {\r\n             queryCache.set(key, {\r\n             value,\r\n             timestamp: Date.now()\r\n             });\r\n"
                 }
             ],
             "date": 1739380751162,

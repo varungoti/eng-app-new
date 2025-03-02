@@ -1,5 +1,8 @@
 /** @type {import('tailwindcss').Config} */
-module.exports = {
+import animatePlugin from 'tailwindcss-animate';
+import typographyPlugin from '@tailwindcss/typography';
+
+const config = {
   darkMode: ["class"],
   content: [
     './pages/**/*.{ts,tsx}',
@@ -52,10 +55,26 @@ module.exports = {
           foreground: "hsl(var(--secondary-foreground))",
         },
       },
+      animationDelay: {
+        ...Array.from({ length: 20 }, (_, i) => i * 50).reduce((acc, delay) => ({
+          ...acc,
+          [delay]: `${delay}ms`,
+        }), {}),
+      },
     },
   },
   plugins: [
-    require("tailwindcss-animate"),
-    require("@tailwindcss/typography"),
+    animatePlugin,
+    typographyPlugin,
+    function ({ addUtilities, theme }) {
+      const animationDelays = theme('animationDelay', {});
+      const utilities = Object.entries(animationDelays).reduce((acc, [key, value]) => ({
+        ...acc,
+        [`.animation-delay-${key}`]: { animationDelay: value },
+      }), {});
+      addUtilities(utilities);
+    },
   ],
-}
+};
+
+export default config;

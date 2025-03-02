@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/components/widgets/StatsWidget.tsx",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1740093154722,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1740093154722,
+            "name": "Commit-0",
+            "content": "import React from 'react';\r\nimport { LucideIcon } from 'lucide-react';\r\nimport Widget from './Widget';\r\n\r\ninterface StatItem {\r\n  icon: LucideIcon;\r\n  label: string;\r\n  value: string | number;\r\n  _trend?: 'up' | 'down';\r\n  _subtext?: string;\r\n}\r\n\r\ninterface StatsWidgetProps {\r\n  id: string;\r\n  title: string;\r\n  stats: StatItem[];\r\n  isLoading?: boolean;\r\n  error?: string | null;\r\n}\r\n\r\nconst StatsWidget: React.FC<StatsWidgetProps> = ({\r\n  id,\r\n  title,\r\n  stats,\r\n  isLoading,\r\n  error\r\n}) => {\r\n  return (\r\n    <Widget id={id} title={title} isLoading={isLoading} error={error}>\r\n      <div className=\"grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4\">\r\n        {stats.map((stat, index) => {\r\n          const Icon = stat.icon;\r\n          return (\r\n            <div key={index} className=\"bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200\">\r\n              <div className=\"flex items-center justify-between\">\r\n                <div>\r\n                  <p className=\"text-xs sm:text-sm font-medium text-gray-600 mb-1\">{stat.label}</p>\r\n                  <p className=\"text-lg sm:text-xl lg:text-2xl font-semibold text-gray-900\">{stat.value}</p>\r\n                  {stat._subtext && (\r\n                    <p className=\"text-xs sm:text-sm text-gray-500 mt-1\">{stat._subtext}</p>\r\n                  )}\r\n                </div>\r\n                <Icon className={`h-6 w-6 sm:h-8 sm:w-8 ${\r\n                  stat._trend === 'up' ? 'text-green-500' :\r\n                  stat._trend === 'down' ? 'text-red-500' :\r\n                  'text-gray-400'\r\n                }`} />\r\n              </div>\r\n            </div>\r\n          );\r\n        })}\r\n      </div>\r\n    </Widget>\r\n  );\r\n};\r\n\r\nexport default StatsWidget;"
+        }
+    ]
+}

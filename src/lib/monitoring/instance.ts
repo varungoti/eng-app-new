@@ -1,4 +1,3 @@
-import { createClient } from '@supabase/supabase-js';
 import { MonitoringSystem } from './MonitoringSystem';
 import { supabase } from '../supabase';
 import { env } from '@/config/env';

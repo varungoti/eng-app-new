@@ -98,31 +98,42 @@ export function VirtualList<T>({
     [items, startIndex, endIndex]
   );
 
+  // Create a dynamic CSS style tag in the component
+  const cssRules = `
+    .virtual-list-container {
+      height: ${height}px;
+    }
+    .virtual-list-content {
+      height: ${totalHeight}px;
+    }
+    ${visibleItems.map(({ index }) => `
+      .virtual-item-${index} {
+        top: ${index * itemHeight}px;
+        height: ${itemHeight}px;
+      }
+    `).join('')}
+  `;
+
   return (
-    <div
-      ref={containerRef}
-      className="relative overflow-auto overscroll-contain"
-      style={{ height }}
-    >
-      <div 
-        className="absolute inset-0"
-        style={{ height: totalHeight }}
+    <>
+      <style>{cssRules}</style>
+      <div
+        ref={containerRef}
+        className="virtual-list-container relative overflow-auto overscroll-contain"
       >
-        {visibleItems.map(({ item, index }) => (
-          <div
-            key={index}
-            className="absolute w-full"
-            style={{
-              top: index * itemHeight,
-              height: itemHeight,
-              transform: 'translate3d(0, 0, 0)', // Force GPU acceleration
-              willChange: 'transform' // Hint to browser about animation
-            }}
-          >
-            {renderItem(item, index)}
-          </div>
-        ))}
+        <div 
+          className="virtual-list-content absolute inset-0"
+        >
+          {visibleItems.map(({ item, index }) => (
+            <div
+              key={index}
+              className={`virtual-item-${index} absolute w-full transform-gpu will-change-transform`}
+            >
+              {renderItem(item, index)}
+            </div>
+          ))}
+        </div>
       </div>
-    </div>
+    </>
   );
 }

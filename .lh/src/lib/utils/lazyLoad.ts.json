@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/lib/utils/lazyLoad.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1740899522125,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1740899522125,
+            "name": "Commit-0",
+            "content": "// Re-export the lazyLoad function from the TSX file\r\nexport { lazyLoad } from './lazyLoad';"
+        }
+    ]
+}

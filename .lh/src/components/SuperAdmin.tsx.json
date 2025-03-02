@@ -3,11 +3,15 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 0,
+            "activePatchIndex": 1,
             "patches": [
                 {
                     "date": 1739306051557,
                     "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1740825823289,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -117,17 +117,14 @@\n                     </div>\r\n                     <div className=\"flex items-center space-x-2\">\r\n                       <div className=\"w-24 h-2 bg-gray-200 rounded-full\">\r\n                         <div\r\n-                          className=\"h-full bg-green-500 rounded-full\"\r\n-                          style={{\r\n-                            width: `${Math.min(\r\n-                              100,\r\n-                              ((school.capacity?.current || 0) /\r\n-                                (school.capacity?.total || 1)) *\r\n-                                100\r\n-                            )}%`,\r\n-                          }}\r\n+                          className={`h-full bg-green-500 rounded-full w-[${Math.min(\r\n+                            100,\r\n+                            ((school.capacity?.current || 0) /\r\n+                              (school.capacity?.total || 1)) *\r\n+                              100\r\n+                          )}%]`}\r\n                         />\r\n                       </div>\r\n                       <span className=\"text-sm text-gray-600\">\r\n                         {Math.round(\r\n"
                 }
             ],
             "date": 1739306051557,

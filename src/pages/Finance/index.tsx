@@ -1,6 +1,6 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
-import Finance from './Finance';
+import Finance from '../Finance';
 import Invoices from './Invoices';
 import Payments from './Payments';
 import ErrorBoundary from '../../components/ErrorBoundary';

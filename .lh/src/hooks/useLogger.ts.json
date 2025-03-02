@@ -1,0 +1,50 @@
+{
+    "sourceFile": "src/hooks/useLogger.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 8,
+            "patches": [
+                {
+                    "date": 1740091952575,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1740092115569,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,1 +1,49 @@\n- \n\\ No newline at end of file\n+export interface LoggerOptions {\r\n+  level?: 'debug' | 'info' | 'warn' | 'error';\r\n+  context?: Record<string, unknown>;\r\n+}\r\n+\r\n+export interface Logger {\r\n+  debug: (message: string, data?: unknown) => void;\r\n+  info: (message: string, data?: unknown) => void;\r\n+  warn: (message: string, data?: unknown) => void;\r\n+  error: (message: string, data?: unknown) => void;\r\n+}\r\n+\r\n+export const useLogger = (namespace: string, options: LoggerOptions = {}): Logger => {\r\n+  const log = (level: LoggerOptions['level'], message: string, data?: unknown) => {\r\n+    const timestamp = new Date().toISOString();\r\n+    const context = {\r\n+      namespace,\r\n+      timestamp,\r\n+      ...options.context\r\n+    };\r\n+\r\n+    // In development, log to console\r\n+    if (process.env.NODE_ENV === 'development') {\r\n+      console[level || 'log'](`[${namespace}] ${message}`, {\r\n+        ...context,\r\n+        data\r\n+      });\r\n+    }\r\n+\r\n+    // In production, you might want to send logs to a service\r\n+    if (process.env.NODE_ENV === 'production') {\r\n+      // TODO: Implement production logging\r\n+      // Example: Send to logging service\r\n+      // await logService.log({\r\n+      //   level,\r\n+      //   message,\r\n+      //   context,\r\n+      //   data\r\n+      // });\r\n+    }\r\n+  };\r\n+\r\n+  return {\r\n+    debug: (message: string, data?: unknown) => log('debug', message, data),\r\n+    info: (message: string, data?: unknown) => log('info', message, data),\r\n+    warn: (message: string, data?: unknown) => log('warn', message, data),\r\n+    error: (message: string, data?: unknown) => log('error', message, data)\r\n+  };\r\n+}; \n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1740923346506,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -20,9 +20,9 @@\n     };\r\n \r\n     // In development, log to console\r\n     if (process.env.NODE_ENV === 'development') {\r\n-      console[level || 'log'](`[${namespace}] ${message}`, {\r\n+      console[level | | 'log'](`[${namespace}] ${message}`, {\r\n         ...context,\r\n         data\r\n       });\r\n     }\r\n"
+                },
+                {
+                    "date": 1740923361243,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -19,14 +19,14 @@\n       ...options.context\r\n     };\r\n \r\n     // In development, log to console\r\n-    if (process.env.NODE_ENV === 'development') {\r\n-      console[level | | 'log'](`[${namespace}] ${message}`, {\r\n-        ...context,\r\n-        data\r\n-      });\r\n-    }\r\n+    // if (process.env.NODE_ENV === 'development') {\r\n+    //   console[level || 'log'](`[${namespace}] ${message}`, {\r\n+    //     ...context,\r\n+    //     data\r\n+    //   });\r\n+    // }\r\n \r\n     // In production, you might want to send logs to a service\r\n     if (process.env.NODE_ENV === 'production') {\r\n       // TODO: Implement production logging\r\n"
+                },
+                {
+                    "date": 1740923382609,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -10,9 +10,9 @@\n   error: (message: string, data?: unknown) => void;\r\n }\r\n \r\n export const useLogger = (namespace: string, options: LoggerOptions = {}): Logger => {\r\n-  const log = (level: LoggerOptions['level'], message: string, data?: unknown) => {\r\n+  const log = (_level: LoggerOptions['level'], message: string, data?: unknown) => {\r\n     const timestamp = new Date().toISOString();\r\n     const context = {\r\n       namespace,\r\n       timestamp,\r\n"
+                },
+                {
+                    "date": 1740923389339,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -10,9 +10,9 @@\n   error: (message: string, data?: unknown) => void;\r\n }\r\n \r\n export const useLogger = (namespace: string, options: LoggerOptions = {}): Logger => {\r\n-  const log = (_level: LoggerOptions['level'], message: string, data?: unknown) => {\r\n+  const log = (_level: LoggerOptions['level'], _message: string, data?: unknown) => {\r\n     const timestamp = new Date().toISOString();\r\n     const context = {\r\n       namespace,\r\n       timestamp,\r\n"
+                },
+                {
+                    "date": 1740923398476,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -10,11 +10,11 @@\n   error: (message: string, data?: unknown) => void;\r\n }\r\n \r\n export const useLogger = (namespace: string, options: LoggerOptions = {}): Logger => {\r\n-  const log = (_level: LoggerOptions['level'], _message: string, data?: unknown) => {\r\n+  const log = (_level: LoggerOptions['level'], _message: string, _data?: unknown) => {\r\n     const timestamp = new Date().toISOString();\r\n-    const context = {\r\n+    const _context = {\r\n       namespace,\r\n       timestamp,\r\n       ...options.context\r\n     };\r\n"
+                },
+                {
+                    "date": 1740923426242,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -12,9 +12,9 @@\n \r\n export const useLogger = (namespace: string, options: LoggerOptions = {}): Logger => {\r\n   const log = (_level: LoggerOptions['level'], _message: string, _data?: unknown) => {\r\n     const timestamp = new Date().toISOString();\r\n-    const _context = {\r\n+    const context = {\r\n       namespace,\r\n       timestamp,\r\n       ...options.context\r\n     };\r\n@@ -28,9 +28,9 @@\n     // }\r\n \r\n     // In production, you might want to send logs to a service\r\n     if (process.env.NODE_ENV === 'production') {\r\n-      // TODO: Implement production logging\r\n+      TODO: Implement production logging\r\n       // Example: Send to logging service\r\n       // await logService.log({\r\n       //   level,\r\n       //   message,\r\n"
+                },
+                {
+                    "date": 1740923452667,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -28,9 +28,35 @@\n     // }\r\n \r\n     // In production, you might want to send logs to a service\r\n     if (process.env.NODE_ENV === 'production') {\r\n-      TODO: Implement production logging\r\n+      // Send logs to a centralized logging service\r\n+      try {\r\n+        const payload = {\r\n+          level: _level,\r\n+          message: _message,\r\n+          context,\r\n+          data: _data,\r\n+          timestamp: timestamp\r\n+        };\r\n+        \r\n+        // Use fetch API to send logs to logging service\r\n+        fetch('/api/logs', {\r\n+          method: 'POST',\r\n+          headers: {\r\n+            'Content-Type': 'application/json',\r\n+          },\r\n+          body: JSON.stringify(payload),\r\n+          // Use keepalive to ensure logs are sent even during page navigation\r\n+          keepalive: true\r\n+        }).catch(err => {\r\n+          // Fallback to console in case of network errors\r\n+          console.error('Failed to send log to service:', err);\r\n+        });\r\n+      } catch (error) {\r\n+        // Ensure logging failures don't break the application\r\n+        console.error('Error in production logging:', error);\r\n+      }\r\n       // Example: Send to logging service\r\n       // await logService.log({\r\n       //   level,\r\n       //   message,\r\n"
+                }
+            ],
+            "date": 1740091952575,
+            "name": "Commit-0",
+            "content": " "
+        }
+    ]
+}

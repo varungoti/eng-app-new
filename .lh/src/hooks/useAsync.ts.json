@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/hooks/useAsync.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1740773721667,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1740773721667,
+            "name": "Commit-0",
+            "content": "import { useState, useCallback } from 'react';\r\nimport { logger } from '@/lib/logger';\r\n\r\ninterface AsyncState<T> {\r\n  data: T | null;\r\n  loading: boolean;\r\n  error: Error | null;\r\n}\r\n\r\nexport function useAsync<T>() {\r\n  const [state, setState] = useState<AsyncState<T>>({\r\n    data: null,\r\n    loading: false,\r\n    error: null,\r\n  });\r\n\r\n  const execute = useCallback(async (promise: Promise<T>, source: string) => {\r\n    setState({ data: null, loading: true, error: null });\r\n\r\n    try {\r\n      const data = await promise;\r\n      setState({ data, loading: false, error: null });\r\n      return data;\r\n    } catch (error) {\r\n      const errorMessage = error instanceof Error ? error.message : 'An error occurred';\r\n      logger.error(errorMessage, { context: { error }, source });\r\n      setState({ data: null, loading: false, error: error as Error });\r\n      throw error;\r\n    }\r\n  }, []);\r\n\r\n  return { ...state, execute };\r\n}"
+        }
+    ]
+}

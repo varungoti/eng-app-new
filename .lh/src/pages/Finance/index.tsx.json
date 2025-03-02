@@ -3,11 +3,35 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 0,
+            "activePatchIndex": 6,
             "patches": [
                 {
                     "date": 1739352886647,
                     "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1740927471960,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,42 +1,35 @@\n-import React from 'react';\r\n-import { Routes, Route, Navigate } from 'react-router-dom';\r\n-import Finance from './Finance';\r\n-import Invoices from './Invoices';\r\n-import Payments from './Payments';\r\n-import ErrorBoundary from '../../components/ErrorBoundary';\r\n-import LoadingSpinner from '../../components/LoadingSpinner';\r\n-\r\n-export const FINANCE_ROUTES = {\r\n-  BASE: '/finance',\r\n-  INVOICES: '/finance/invoices',\r\n-  PAYMENTS: '/finance/payments'\r\n-} as const;\r\n-\r\n-const FinanceRoutes = () => {\r\n-  return (\r\n-    <ErrorBoundary source=\"Finance\">\r\n-      <Routes>\r\n-        <Route index element={<Finance />} />\r\n-        <Route \r\n-          path=\"invoices\" \r\n-          element={\r\n-            <React.Suspense fallback={<LoadingSpinner message=\"Loading invoices...\" />}>\r\n-              <Invoices />\r\n-            </React.Suspense>\r\n-          } \r\n-        />\r\n-        <Route \r\n-          path=\"payments\" \r\n-          element={\r\n-            <React.Suspense fallback={<LoadingSpinner message=\"Loading payments...\" />}>\r\n-              <Payments />\r\n-            </React.Suspense>\r\n-          } \r\n-        />\r\n-        <Route path=\"*\" element={<Navigate to={FINANCE_ROUTES.BASE} replace />} />\r\n-      </Routes>\r\n-    </ErrorBoundary>\r\n-  );\r\n-};\r\n-\r\n+import React from 'react';\n+import { Routes, Route } from 'react-router-dom';\n+import Finance from './Finance';\n+import Invoices from './Invoices';\n+import Payments from './Payments';\n+import ErrorBoundary from '../../components/ErrorBoundary';\n+import LoadingSpinner from '../../components/LoadingSpinner';\n+\n+const FinanceRoutes = () => {\n+  return (\n+    <ErrorBoundary source=\"Finance\">\n+      <Routes>\n+        <Route index element={<Finance />} />\n+        <Route \n+          path=\"invoices\" \n+          element={\n+            <React.Suspense fallback={<LoadingSpinner message=\"Loading invoices...\" />}>\n+              <Invoices />\n+            </React.Suspense>\n+          } \n+        />\n+        <Route \n+          path=\"payments\" \n+          element={\n+            <React.Suspense fallback={<LoadingSpinner message=\"Loading payments...\" />}>\n+              <Payments />\n+            </React.Suspense>\n+          } \n+        />\n+      </Routes>\n+    </ErrorBoundary>\n+  );\n+};\n+\n export default FinanceRoutes;\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1740927479479,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,7 +1,7 @@\n import React from 'react';\n import { Routes, Route } from 'react-router-dom';\n-import Finance from './Finance';\n+import Finance from '..//Finance';\n import Invoices from './Invoices';\n import Payments from './Payments';\n import ErrorBoundary from '../../components/ErrorBoundary';\n import LoadingSpinner from '../../components/LoadingSpinner';\n"
+                },
+                {
+                    "date": 1740927490801,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,9 +1,9 @@\n import React from 'react';\n import { Routes, Route } from 'react-router-dom';\n-import Finance from '..//Finance';\n-import Invoices from './Invoices';\n-import Payments from './Payments';\n+import Finance from '../Finance';\n+import Invoices from '../Invoices';\n+import Payments from '../Payments';\n import ErrorBoundary from '../../components/ErrorBoundary';\n import LoadingSpinner from '../../components/LoadingSpinner';\n \n const FinanceRoutes = () => {\n"
+                },
+                {
+                    "date": 1740927504288,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,8 +1,8 @@\n import React from 'react';\n import { Routes, Route } from 'react-router-dom';\n import Finance from '../Finance';\n-import Invoices from '../Invoices';\n+import Invoices from '../../Invoices';\n import Payments from '../Payments';\n import ErrorBoundary from '../../components/ErrorBoundary';\n import LoadingSpinner from '../../components/LoadingSpinner';\n \n"
+                },
+                {
+                    "date": 1740927524808,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,8 +1,8 @@\n import React from 'react';\n import { Routes, Route } from 'react-router-dom';\n import Finance from '../Finance';\n-import Invoices from '../../Invoices';\n+import Invoices from './Invoices';\n import Payments from '../Payments';\n import ErrorBoundary from '../../components/ErrorBoundary';\n import LoadingSpinner from '../../components/LoadingSpinner';\n \n"
+                },
+                {
+                    "date": 1740927532192,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,9 +1,9 @@\n import React from 'react';\n import { Routes, Route } from 'react-router-dom';\n import Finance from '../Finance';\n import Invoices from './Invoices';\n-import Payments from '../Payments';\n+import Payments from './Payments';\n import ErrorBoundary from '../../components/ErrorBoundary';\n import LoadingSpinner from '../../components/LoadingSpinner';\n \n const FinanceRoutes = () => {\n"
                 }
             ],
             "date": 1739352886647,

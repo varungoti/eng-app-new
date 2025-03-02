@@ -63,7 +63,7 @@ const EventManager: React.FC<EventManagerProps> = ({
           return eventDate >= weekStart && eventDate <= weekEnd;
         case 'month':
           return eventDate.getMonth() === now.getMonth() && 
-                 eventDate.getFullYear() === now.getFullYear();
+                eventDate.getFullYear() === now.getFullYear();
       }
     }
     return true;
@@ -78,9 +78,11 @@ const EventManager: React.FC<EventManagerProps> = ({
     }
   };
 
-  const handleEditEvent = async (event: Event) => {
+  const handleEditEvent = async (eventData: Omit<Event, 'id'>) => {
+    if (!editingEvent) return;
+    
     try {
-      await updateEvent(event.id, event);
+      await updateEvent(editingEvent.id, { ...eventData, id: editingEvent.id });
       showToast('Event updated successfully', { type: 'success' });
       setEditingEvent(null);
     } catch (err) {
@@ -114,6 +116,8 @@ const EventManager: React.FC<EventManagerProps> = ({
         <h3 className="text-lg font-medium text-red-800">Error</h3>
         <p className="mt-2 text-sm text-red-600">{error}</p>
         <button
+          title="Retry"
+          type="button"
           onClick={() => window.location.reload()}
           className="mt-4 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200"
         >
@@ -128,6 +132,8 @@ const EventManager: React.FC<EventManagerProps> = ({
       <div className="mb-6 flex justify-between items-center">
         <div className="flex space-x-4">
           <button
+            title="List View"
+            type="button"
             onClick={() => setView('list')}
             className={`inline-flex items-center px-3 py-2 border rounded-md text-sm font-medium ${
               view === 'list'
@@ -139,6 +145,8 @@ const EventManager: React.FC<EventManagerProps> = ({
             List View
           </button>
           <button
+            title="Calendar View"
+            type="button"
             onClick={() => setView('calendar')}
             className={`inline-flex items-center px-3 py-2 border rounded-md text-sm font-medium ${
               view === 'calendar'

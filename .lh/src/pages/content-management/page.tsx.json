@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/pages/content-management/page.tsx",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1740927735928,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1740927735928,
+            "name": "Commit-0",
+            "content": "'use client';\r\n\r\nimport React from 'react';\r\nimport { Card } from '@/components/ui/card';\r\nimport { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';\r\n//import type { UseQueryResult } from '@tanstack/react-query';\r\nimport { supabase } from '@/lib/supabase';\r\nimport LoadingSpinner from '@/components/LoadingSpinner';\r\nimport ErrorBoundary from '@/components/ErrorBoundary';\r\nimport type { Grade } from './types';\r\nimport { useQuery } from '@tanstack/react-query';\r\n\r\nexport default function ContentManagementPage() {\r\n  const [selectedGrade, setSelectedGrade] = React.useState<string>('');\r\n\r\n  const { data: grades, isLoading, error } = useQuery<Grade[]>({\r\n    queryKey: ['grades'],\r\n    queryFn: async () => {\r\n      const { data, error } = await supabase\r\n        .from('grades')\r\n        .select('*')\r\n        .order('name');\r\n      \r\n      if (error) throw error;\r\n      return data as Grade[];\r\n    }\r\n  });\r\n\r\n  if (isLoading) {\r\n    return <LoadingSpinner />;\r\n  }\r\n\r\n  if (error) {\r\n    return <div>Error loading grades</div>;\r\n  }\r\n\r\n  return (\r\n    <ErrorBoundary source=\"ContentManagementPage\">\r\n      <div className=\"container mx-auto p-6\">\r\n        <div className=\"mb-6\">\r\n          <h1 className=\"text-2xl font-semibold mb-2\">Content Management</h1>\r\n          <p className=\"text-muted-foreground\">Manage your educational content</p>\r\n        </div>\r\n\r\n        <div className=\"grid grid-cols-12 gap-6\">\r\n          {/* Left Sidebar */}\r\n          <Card className=\"col-span-3 p-4\">\r\n            <div className=\"space-y-4\">\r\n              <div>\r\n                <label className=\"text-sm font-medium mb-2 block\">Grade</label>\r\n                <Select \r\n                  value={selectedGrade} \r\n                  onValueChange={setSelectedGrade}\r\n                >\r\n                  <SelectTrigger>\r\n                    <SelectValue placeholder=\"Select Grade\" />\r\n                  </SelectTrigger>\r\n                  <SelectContent>\r\n                    {grades?.map((grade: Grade) => (\r\n                      <SelectItem key={grade.id} value={grade.id}>\r\n                        {grade.name}\r\n                      </SelectItem>\r\n                    ))}\r\n                  </SelectContent>\r\n                </Select>\r\n              </div>\r\n            </div>\r\n          </Card>\r\n\r\n          {/* Main Content Area */}\r\n          <div className=\"col-span-9\">\r\n            <Card className=\"p-6\">\r\n              <div className=\"space-y-4\">\r\n                {selectedGrade ? (\r\n                  <p>Selected Grade: {grades?.find((g: Grade) => g.id === selectedGrade)?.name}</p>\r\n                ) : (\r\n                  <p className=\"text-muted-foreground\">Please select a grade to view content</p>\r\n                )}\r\n              </div>\r\n            </Card>\r\n          </div>\r\n        </div>\r\n      </div>\r\n    </ErrorBoundary>\r\n  );\r\n} "
+        }
+    ]
+}

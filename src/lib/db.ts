@@ -24,19 +24,19 @@ export const database = {
 
         retries++;
         if (retries < MAX_INIT_RETRIES) {
-          logger.warn(`Database health check failed, attempt ${retries}/${MAX_INIT_RETRIES}`, 'Database');
+          logger.warn(`Database health check failed, attempt ${retries}/${MAX_INIT_RETRIES}`, { source: "database" });
           await new Promise(resolve => setTimeout(resolve, INIT_RETRY_DELAY * retries));
           continue;
         }
 
-        logger.error('Database health check failed after all retries', 'Database');
+        logger.error('Database health check failed after all retries', { source: "database" });
         return false;
 
       }
 
       return false;
     } catch (err) {
-      logger.error('Database health check failed', 'Database', err);
+      logger.error('Database health check failed', { source: "database", error: err });
       return false; 
     }
   }

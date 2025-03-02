@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 23,
+            "activePatchIndex": 24,
             "patches": [
                 {
                     "date": 1739379465732,
@@ -100,6 +100,10 @@
                 {
                     "date": 1739383464619,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -133,9 +133,16 @@\n       this.originalConsole.error('Failed to send log to Cursor:', err);\r\n     }\r\n   }\r\n \r\n-  \r\n+  private async analyzeAndOptimize(log: any) {\r\n+    // Check performance thresholds\r\n+    if (log.performance.lcp > 2500) {\r\n+      await this.performanceMonitor.optimizeLCP();\r\n+    }\r\n+    if (log.performance.fid > 100) {\r\n+      await this.performanceMonitor.optimizeInteractivity();\r\n+    }\r\n \r\n   private startCursorSync() {\r\n     // Sync logs with Cursor every 5 seconds\r\n     setInterval(() => {\r\n"
+                },
+                {
+                    "date": 1740463452900,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -50,17 +50,17 @@\n     });\r\n   }\r\n \r\n   private interceptConsoleMethods() {\r\n+    const logFn = (msg: any) => globalThis.console.log(msg);\r\n+    const errorFn = (msg: any) => globalThis.console.error(msg);\r\n+    const warnFn = (msg: any) => globalThis.console.warn(msg);\r\n+\r\n     this.originalConsole = {\r\n-      log: console.log,\r\n-      error: console.error,\r\n-      warn: console.warn\r\n+      log: logFn,\r\n+      error: errorFn,\r\n+      warn: warnFn\r\n     };\r\n-\r\n-    console.log = (...args) => this.handleLog('log', ...args);\r\n-    console.error = (...args) => this.handleLog('error', ...args);\r\n-    console.warn = (...args) => this.handleLog('warn', ...args);\r\n   }\r\n \r\n   private interceptFetch() {\r\n     const originalFetch = window.fetch;\r\n"
                 }
             ],
             "date": 1739379465732,

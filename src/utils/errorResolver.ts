@@ -1,3 +1,20 @@
+import { logger } from "@/lib/logger";
+
+// Define interfaces for better type safety
+interface ErrorLog {
+  message: string;
+  stack?: string;
+  source?: string;
+  timestamp?: number;
+}
+
+interface ErrorDiagnosis {
+  pattern: string;
+  diagnosis: string;
+  solution: (error: string) => string;
+  error: string;
+}
+
 export class ErrorResolver {
   private static errorPatterns = new Map([
     ['TypeError: Cannot read property', {
@@ -22,14 +39,14 @@ export class ErrorResolver {
     }]
   ]);
 
-  static async handleError(log: any) {
+  static async handleError(log: ErrorLog) {
     const diagnosis = this.diagnoseError(log.message);
     if (diagnosis) {
       await this.applyFix(diagnosis, log);
     }
   }
 
-  private static diagnoseError(error: string): any {
+  private static diagnoseError(error: string): ErrorDiagnosis | null {
     for (const [pattern, handler] of this.errorPatterns) {
       if (new RegExp(pattern).test(error)) {
         return {
@@ -42,10 +59,10 @@ export class ErrorResolver {
     return null;
   }
 
-  private static async applyFix(diagnosis: any, log: any) {
+  private static async applyFix(diagnosis: ErrorDiagnosis, log: ErrorLog) {
     const fix = diagnosis.solution(diagnosis.error);
-    console.log(`🔧 Attempting to fix: ${diagnosis.diagnosis}`);
-    console.log(`📝 Suggested fix: ${fix}`);
+    logger.info(`🔧 Attempting to fix: ${diagnosis.diagnosis}`);
+    logger.info(`📝 Suggested fix: ${fix}`);
 
     // Send fix suggestion to server
     try {
@@ -59,7 +76,7 @@ export class ErrorResolver {
         })
       });
     } catch (err) {
-      console.error('Failed to send fix suggestion:', err);
+      logger.error('Failed to send fix suggestion:', { context: { error: err } });
     }
   }
 } 

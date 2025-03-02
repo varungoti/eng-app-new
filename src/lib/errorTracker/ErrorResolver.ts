@@ -2,7 +2,7 @@
 
 import { ErrorSeverity } from './types';
 import type { ErrorEvent, ErrorWatcherConfig } from './types';
-import type { MonitorConfig } from '../monitoring';
+//import type { MonitorConfig } from '../monitoring';
 import { logger } from '../logger';
 import { DEBUG_CONFIG } from '../config';
 
@@ -25,6 +25,11 @@ interface ApplicationIndex {
   performanceMetrics: Map<string, number[]>;
 }
 
+interface LoggerOptions {
+  context?: Record<string, unknown>;
+  source?: string;
+}
+
 export class ErrorResolver {
   private static instance: ErrorResolver;
   private resolvedErrors: Map<string, ErrorResolution> = new Map();
@@ -40,7 +45,7 @@ export class ErrorResolver {
     performanceMetrics: new Map()
   };
 
-  private constructor(config?: ErrorWatcherConfig) {
+  private constructor(_config?: ErrorWatcherConfig) {
     this.setupConsoleMonitoring();
     this.initializeApplicationIndex();
     this.interceptLogger();
@@ -59,7 +64,7 @@ export class ErrorResolver {
     const originalWarn = logger.warn;
     const originalInfo = logger.info;
 
-    logger.error = (message: string, options: any = {}) => {
+    logger.error = (message: string, options: LoggerOptions = {}) => {
       // Create an error event from logger call
       const errorEvent: ErrorEvent = {
         id: `error_${Date.now()}`,
@@ -67,8 +72,8 @@ export class ErrorResolver {
         severity: ErrorSeverity.HIGH,
         timestamp: Date.now(),
         source: options.source || 'logger',
-        context: options.context,
-        componentStack: options.context?.componentStack
+        context: options.context as Record<string, unknown>,
+        componentStack: options.context?.componentStack as string | undefined
       };
 
       // Attempt to resolve the error
@@ -80,14 +85,14 @@ export class ErrorResolver {
       originalError.call(logger, message, options);
     };
 
-    logger.warn = (message: string, options: any = {}) => {
+    logger.warn = (message: string, options: LoggerOptions = {}) => {
       const errorEvent: ErrorEvent = {
         id: `warn_${Date.now()}`,
         message,
         severity: ErrorSeverity.MEDIUM,
         timestamp: Date.now(),
         source: options.source || 'logger',
-        context: options.context
+        context: options.context as Record<string, unknown>
       };
 
       this.resolveError(errorEvent).catch(err => {
@@ -97,7 +102,7 @@ export class ErrorResolver {
       originalWarn.call(logger, message, options);
     };
 
-    logger.info = (message: string, options: any = {}) => {
+    logger.info = (message: string, options: LoggerOptions = {}) => {
       // Only track info messages that indicate errors/issues
       if (message.toLowerCase().includes('error') || message.toLowerCase().includes('fail')) {
         const errorEvent: ErrorEvent = {
@@ -106,7 +111,7 @@ export class ErrorResolver {
           severity: ErrorSeverity.LOW,
           timestamp: Date.now(),
           source: options.source || 'logger',
-          context: options.context
+          context: options.context as Record<string, unknown>
         };
 
         this.resolveError(errorEvent).catch(err => {
@@ -157,22 +162,29 @@ export class ErrorResolver {
   }
 
   private setupConsoleMonitoring() {
+    // eslint-disable-next-line no-console
     if (typeof window === 'undefined') return;
 
+    // eslint-disable-next-line no-console
     const originalConsoleError = console.error;
+    // eslint-disable-next-line no-console
     const originalConsoleWarn = console.warn;
+    // eslint-disable-next-line no-console
     const originalConsoleInfo = console.info;
 
+    // eslint-disable-next-line no-console
     console.error = (...args) => {
       this.handleConsoleLog('error', args);
       originalConsoleError.apply(console, args);
     };
 
+    // eslint-disable-next-line no-console
     console.warn = (...args) => {
       this.handleConsoleLog('warning', args);
       originalConsoleWarn.apply(console, args);
     };
 
+    // eslint-disable-next-line no-console
     console.info = (...args) => {
       this.handleConsoleLog('info', args);
       originalConsoleInfo.apply(console, args);
@@ -196,7 +208,7 @@ export class ErrorResolver {
     }
   }
 
-  private handleConsoleLog(level: 'error' | 'warning' | 'info', args: any[]) {
+  private handleConsoleLog(level: 'error' | 'warning' | 'info', args: (string | number | boolean | null | undefined | Error | object)[]) {
     const logMessage = args.map(arg => 
       arg instanceof Error ? `${arg.name}: ${arg.message}\n${arg.stack}` : String(arg)
     ).join(' ');
@@ -240,25 +252,25 @@ export class ErrorResolver {
       ]);
 
       let suggestion = 'Unable to determine resolution';
-      let performanceImpact = '';
-      let uiRecommendations: string[] = [];
+      let _performanceImpact = '';
+      const uiRecommendations: string[] = [];
 
       for (const [pattern, solutions] of errorPatterns) {
         if (errorMessage.includes(pattern)) {
           suggestion = solutions.fix;
-          performanceImpact = solutions.performance;
-          uiRecommendations = solutions.ui;
+          _performanceImpact = solutions.performance;
+          uiRecommendations.push(...solutions.ui);
           break;
         }
       }
 
       if (DEBUG_CONFIG.enabled) {
-        logger.info(`AI Error Analysis: ${errorMessage}`, 'ErrorResolver');
+        logger.info(`AI Error Analysis: ${errorMessage}`, { source: 'ErrorResolver' });
       }
 
       return suggestion;
     } catch (err) {
-      logger.error(`Error in AI analysis: ${err instanceof Error ? err.message : 'Unknown error'}`, 'ErrorResolver');
+      logger.error(`Error in AI analysis: ${err instanceof Error ? err.message : 'Unknown error'}`, { source: 'ErrorResolver' });
       return 'Error analysis failed';
     }
   }
@@ -289,15 +301,15 @@ export class ErrorResolver {
         resolvedAt: Date.now()
       });
 
-      logger.info(`Error resolved: ${error.id} - ${errorResolution.resolution}`, 'ErrorResolver');
+      logger.info(`Error resolved: ${error.id} - ${errorResolution.resolution}`, { source: 'ErrorResolver' });
 
     } catch (err) {
-      logger.error(`Failed to resolve error: ${err instanceof Error ? err.message : 'Unknown error'}`, 'ErrorResolver');
+      logger.error(`Failed to resolve error: ${err instanceof Error ? err.message : 'Unknown error'}`, { source: 'ErrorResolver' });
       throw err;
     }
   }
 
-  private analyzePerformanceImpact(error: ErrorEvent): string {
+  private analyzePerformanceImpact(_error: ErrorEvent): string {
     const metrics = Array.from(this.applicationIndex.performanceMetrics.entries());
     const highImpactThreshold = 1000; // 1 second
 
@@ -326,15 +338,15 @@ export class ErrorResolver {
     return recommendations;
   }
 
-  private async handleCriticalError(error: ErrorEvent, resolution: ErrorResolution): Promise<void> {
-    logger.warn(`Critical error detected: ${error.message}`, 'ErrorResolver');
+  private async handleCriticalError(error: ErrorEvent, _resolution: ErrorResolution): Promise<void> {
+    logger.warn(`Critical error detected: ${error.message}`, { source: 'ErrorResolver' });
 
     let attempts = 0;
     while (attempts < this.MAX_RETRY_ATTEMPTS) {
       try {
         await this.attemptErrorRecovery(error);
         break;
-      } catch (err) {
+      } catch (_err) {
         attempts++;
         if (attempts === this.MAX_RETRY_ATTEMPTS) {
           throw new Error(`Failed to resolve critical error after ${attempts} attempts`);
@@ -344,7 +356,7 @@ export class ErrorResolver {
     }
   }
 
-  private async handleNormalError(error: ErrorEvent, resolution: ErrorResolution): Promise<void> {
+  private async handleNormalError(error: ErrorEvent, _resolution: ErrorResolution): Promise<void> {
     if (error.retryCount && error.retryCount > 0) {
       await this.attemptErrorRecovery(error);
     }
@@ -371,7 +383,7 @@ export class ErrorResolver {
 
   private handleComponentError(error: ErrorEvent): void {
     if (error.componentStack) {
-      logger.warn(`Component error detected: ${error.message}`, 'ErrorResolver');
+      logger.warn(`Component error detected: ${error.message}`, { source: 'ErrorResolver' });
     }
   }
 

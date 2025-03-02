@@ -3,7 +3,7 @@ import type { Database } from './database.types';
 import { logger } from './logger';
 import { createBrowserClient } from '@supabase/ssr';
 import type { SupabaseClient } from '@supabase/supabase-js';
-import type { AuthChangeEvent, Session } from '@supabase/supabase-js';
+//import type { AuthChangeEvent, Session } from '@supabase/supabase-js';
 import { createClient } from '@supabase/supabase-js';
 
 let supabaseInstance: SupabaseClient<Database> | null = null;
@@ -58,7 +58,7 @@ function createSupabaseClient(): SupabaseClient<Database> {
   const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
   if (DEBUG_CONFIG.enabled) {
-    logger.info(`Creating Supabase client with URL: ${supabaseUrl}`, 'supabase');
+    logger.info(`Creating Supabase client with URL: ${supabaseUrl}`, { source: "supabase" });
   }
 
   const client = createBrowserClient<Database>(
@@ -68,7 +68,7 @@ function createSupabaseClient(): SupabaseClient<Database> {
   );
 
   if (DEBUG_CONFIG.enabled) {
-    logger.info('Supabase client initialized', 'supabase');
+    logger.info('Supabase client initialized', { source: "supabase" });
   }
 
 
@@ -108,7 +108,7 @@ export type TypedSupabaseClient = SupabaseClient<Database>;
 if (import.meta.hot) {
   import.meta.hot.dispose(() => {
     if (DEBUG_CONFIG.enabled) {
-      logger.info('Cleaning up Supabase client', 'supabase');
+      logger.info('Cleaning up Supabase client', { source: "supabase" });
     }
     supabaseInstance = null;
   });

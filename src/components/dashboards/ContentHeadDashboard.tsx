@@ -62,10 +62,14 @@ const ContentHeadDashboard: React.FC<ContentHeadDashboardProps> = ({ settings })
                 <div>
                   <p className="text-sm font-medium text-gray-900">{grade}</p>
                   <div className="mt-1 w-full bg-gray-200 rounded-full h-2">
-                    <div 
-                      className="bg-indigo-600 h-2 rounded-full" 
-                      style={{ width: `${Math.floor(Math.random() * 100)}%` }}
-                    />
+                    {(() => {
+                      const width = Math.floor(Math.random() * 100);
+                      return (
+                        <div 
+                          className={`bg-indigo-600 h-2 rounded-full w-[${width}%]`}
+                        />
+                      );
+                    })()}
                   </div>
                 </div>
                 <span className="text-sm font-medium text-indigo-600">
@@ -84,10 +88,14 @@ const ContentHeadDashboard: React.FC<ContentHeadDashboardProps> = ({ settings })
                 <div>
                   <p className="text-sm font-medium text-gray-900">{metric}</p>
                   <div className="mt-1 w-full bg-gray-200 rounded-full h-2">
-                    <div 
-                      className="bg-green-600 h-2 rounded-full" 
-                      style={{ width: `${Math.floor(Math.random() * 100)}%` }}
-                    />
+                    {(() => {
+                      const width = Math.floor(Math.random() * 100);
+                      return (
+                        <div 
+                          className={`bg-green-600 h-2 rounded-full w-[${width}%]`}
+                        />
+                      );
+                    })()}
                   </div>
                 </div>
                 <span className="text-sm font-medium text-green-600">

@@ -1,0 +1,26 @@
+{
+    "sourceFile": "src/lib/features/index.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 2,
+            "patches": [
+                {
+                    "date": 1740900564656,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1740900572724,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,6 @@\n // Export all feature managers\r\n-export * from './/reports';\r\n+export * from './reports';\r\n export * from './calendar';\r\n export * from './documents';\r\n export * from './tasks';\r\n export * from './analytics';\r\n"
+                },
+                {
+                    "date": 1740901219884,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,7 +1,7 @@\n // Export all feature managers\r\n export * from './reports';\r\n-export * from './calendar';\r\n+export * from './calendar/';\r\n export * from './documents';\r\n export * from './tasks';\r\n export * from './analytics';\r\n export * from './messaging';\n\\ No newline at end of file\n"
+                }
+            ],
+            "date": 1740900564656,
+            "name": "Commit-0",
+            "content": "// Export all feature managers\r\nexport * from './/reports';\r\nexport * from './calendar';\r\nexport * from './documents';\r\nexport * from './tasks';\r\nexport * from './analytics';\r\nexport * from './messaging';"
+        }
+    ]
+}

@@ -4,13 +4,15 @@ import { Class } from '../../types';
 interface ClassHeaderProps {
   classes: Class[];
   selectedClass: Class;
-  onClassChange: (classData: Class) => void;
+  onClassChange: (classData: Class | null) => void;
 }
 
 // Utility function to convert 12-hour time format to 24-hour time
 const convertTo24Hour = (time: string): number => {
   const [timeStr, modifier] = time.split(' ');
-  let [hours, minutes] = timeStr.split(':').map(Number);
+  const parts = timeStr.split(':').map(Number);
+  let hours = parts[0];
+  const minutes = parts[1];
   
   if (modifier === 'PM' && hours !== 12) hours += 12;
   if (modifier === 'AM' && hours === 12) hours = 0;
@@ -32,7 +34,11 @@ export default function ClassHeader({ classes, selectedClass, onClassChange }: C
   useEffect(() => {
     const updateDateTime = () => {
       const today = new Date();
-      const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
+      const options: Intl.DateTimeFormatOptions = { 
+        year: 'numeric', 
+        month: '2-digit', 
+        day: '2-digit' 
+      };
       const time = today.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
       const date = today.toLocaleDateString('en-GB', options); // Format: DD/MM/YY
       setCurrentDateTime(`Today, ${time}, ${date}`);
@@ -55,34 +61,24 @@ export default function ClassHeader({ classes, selectedClass, onClassChange }: C
 
     // Find the class that matches the current time and day within the schedule range
     const matchingClass = classes.find((classData) => {
-      // Split the schedule to get the days and times
-      const [scheduleDays, timeRange] = classData.schedule.split(', ');
-      const [startTime, endTime] = timeRange.split(' - ');
-
-      // Convert the class schedule times to 24-hour time in minutes
-      const startMinutes = convertTo24Hour(startTime);
-      const endMinutes = convertTo24Hour(endTime);
-
-      // Get the days of the class schedule (e.g., "Mon - Fri", "Mon - Sat")
-      const [startDay, endDay] = scheduleDays.split(' - ');
-
-      // Check if today is within the scheduled days
-      const isTodayInSchedule = () => {
-        if (startDay === 'Mon' && endDay === 'Sun') {
-          return true; // All days are active (Mon - Sun)
-        }
-
-        const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-        const startIdx = daysOfWeek.indexOf(startDay);
-        const endIdx = daysOfWeek.indexOf(endDay);
-        const currentIdx = daysOfWeek.indexOf(currentDay);
-
-        // Check if current day is within the start and end days
-        return currentIdx >= startIdx && currentIdx <= endIdx;
-      };
-
-      // Check if the current time is within the class's schedule time range
-      return isTodayInSchedule() && currentTimeInMinutes >= startMinutes && currentTimeInMinutes <= endMinutes;
+      // Check if any schedule item matches current day and time
+      return classData.schedule.some(scheduleItem => {
+        const currentDay = new Date().getDay(); // 0 = Sunday, 1 = Monday, etc.
+        
+        // Check if today matches the schedule day
+        if (scheduleItem.dayOfWeek !== currentDay) return false;
+        
+        // Convert the class schedule times to 24-hour time in minutes
+        const startMinutes = convertTo24Hour(scheduleItem.startTime);
+        const endMinutes = convertTo24Hour(scheduleItem.endTime);
+        
+        // Get current time in minutes
+        const currentTime = new Date();
+        const currentTimeInMinutes = currentTime.getHours() * 60 + currentTime.getMinutes();
+        
+        // Check if current time is within schedule time range
+        return currentTimeInMinutes >= startMinutes && currentTimeInMinutes <= endMinutes;
+      });
     });
 
     if (matchingClass) {
@@ -92,7 +88,7 @@ export default function ClassHeader({ classes, selectedClass, onClassChange }: C
       setActiveClass(null); // If no class is active, set to null
       onClassChange(null);   // Pass null if no class is active
     }
-  }, [currentDateTime, classes]); // Re-run when current time or class data changes
+  }, [currentDateTime, classes, onClassChange]); // Re-run when current time or class data changes
 
   return (
     <div>

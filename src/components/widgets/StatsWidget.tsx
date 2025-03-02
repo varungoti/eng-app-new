@@ -6,8 +6,8 @@ interface StatItem {
   icon: LucideIcon;
   label: string;
   value: string | number;
-  trend?: 'up' | 'down';
-  subtext?: string;
+  _trend?: 'up' | 'down';
+  _subtext?: string;
 }
 
 interface StatsWidgetProps {
@@ -36,13 +36,13 @@ const StatsWidget: React.FC<StatsWidgetProps> = ({
                 <div>
                   <p className="text-xs sm:text-sm font-medium text-gray-600 mb-1">{stat.label}</p>
                   <p className="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-900">{stat.value}</p>
-                  {stat.subtext && (
-                    <p className="text-xs sm:text-sm text-gray-500 mt-1">{stat.subtext}</p>
+                  {stat._subtext && (
+                    <p className="text-xs sm:text-sm text-gray-500 mt-1">{stat._subtext}</p>
                   )}
                 </div>
                 <Icon className={`h-6 w-6 sm:h-8 sm:w-8 ${
-                  stat.trend === 'up' ? 'text-green-500' :
-                  stat.trend === 'down' ? 'text-red-500' :
+                  stat._trend === 'up' ? 'text-green-500' :
+                  stat._trend === 'down' ? 'text-red-500' :
                   'text-gray-400'
                 }`} />
               </div>

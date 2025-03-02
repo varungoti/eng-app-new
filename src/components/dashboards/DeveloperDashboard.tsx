@@ -157,12 +157,11 @@ const TaskProgress: React.FC<{
     </div>
     <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
       <div 
-        className={`h-full rounded-full ${
+        className={`h-full rounded-full w-[${progress}%] ${
           status === 'in_progress' ? 'bg-blue-600' :
           status === 'review' ? 'bg-yellow-600' :
           'bg-green-600'
         }`}
-        style={{ width: `${progress}%` }}
       />
     </div>
   </div>
@@ -179,8 +178,7 @@ const MetricBar: React.FC<{
     </div>
     <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
       <div 
-        className="h-full bg-indigo-600 rounded-full"
-        style={{ width: `${value}%` }}
+        className={`h-full bg-indigo-600 rounded-full w-[${value}%]`}
       />
     </div>
   </div>

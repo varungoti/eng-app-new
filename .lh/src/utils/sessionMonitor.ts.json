@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 2,
+            "activePatchIndex": 3,
             "patches": [
                 {
                     "date": 1739380825420,
@@ -16,6 +16,10 @@
                 {
                     "date": 1739380876910,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -25,9 +25,38 @@\n     return true;\r\n   }\r\n \r\n   async refresh() {\r\n-    // Refresh session token\r\n-    // Clear stale data\r\n-    // Update last activity\r\n+    try {\r\n+      // Refresh session token\r\n+      const response = await fetch('/api/auth/refresh', {\r\n+        method: 'POST',\r\n+        credentials: 'include'\r\n+      });\r\n+\r\n+      if (!response.ok) {\r\n+        throw new Error('Failed to refresh session');\r\n+      }\r\n+\r\n+      const { token, expiresAt } = await response.json();\r\n+\r\n+      // Clear stale data from storage\r\n+      localStorage.removeItem('staleSessionData');\r\n+      sessionStorage.clear();\r\n+\r\n+      // Update session info\r\n+      const sessionInfo = {\r\n+        isActive: true,\r\n+        lastActivity: Date.now(),\r\n+        tokenExpiry: expiresAt\r\n+      };\r\n+\r\n+      // Store updated session info\r\n+      localStorage.setItem('sessionInfo', JSON.stringify(sessionInfo));\r\n+\r\n+      return sessionInfo;\r\n+    } catch (error) {\r\n+      console.error('Session refresh failed:', error);\r\n+      throw error;\r\n+    }\r\n   }\r\n } \n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1740094030436,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -36,9 +36,9 @@\n       if (!response.ok) {\r\n         throw new Error('Failed to refresh session');\r\n       }\r\n \r\n-      const { token, expiresAt } = await response.json();\r\n+      const { expiresAt } = await response.json();\r\n \r\n       // Clear stale data from storage\r\n       localStorage.removeItem('staleSessionData');\r\n       sessionStorage.clear();\r\n"
                 }
             ],
             "date": 1739380825420,

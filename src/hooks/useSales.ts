@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient, UseMutationResult } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase';
 import { logger } from '../lib/logger';
 import { api } from '../lib/api';
@@ -8,7 +8,38 @@ import { useDataLoadTimeout } from './useDataLoadTimeout';
 import { useCache } from './useCache';
 import type { SalesLead, SalesActivity, SalesOpportunity } from '../types/sales';
 
-export const useSales = () => {
+interface SalesStats {
+  totalLeads: number;
+  qualifiedLeads: number;
+  pipelineValue: number;
+  conversionRate: number;
+  closedDeals: number;
+  closedDealsCount: number;
+  dealsWon: number;
+  dealsLost: number;
+  dealsProposal: number;
+  dealsContacted: number;
+  dealsNew: number;
+  dealsQualified: number;
+  dealsContactedCount: number;
+  dealsQualifiedCount: number;
+  dealsProposalCount: number;
+  dealsWonCount: number;
+  dealsLostCount: number;
+  dealsNewCount: number;
+}
+interface UseSalesResult {
+  leads: SalesLead[];
+  activities: SalesActivity[];
+  opportunities: SalesOpportunity[];
+  stats: SalesStats;
+  loading: boolean;
+  _createLead: UseMutationResult<SalesLead, Error, Omit<SalesLead, 'id'>>;
+  _updateLead: UseMutationResult<SalesLead, Error, Partial<SalesLead> & { id: string }>;
+  _addActivity: UseMutationResult<SalesActivity, Error, Omit<SalesActivity, 'id'>>;
+}
+
+export const useSales = (): UseSalesResult => {
   const queryClient = useQueryClient();
   const { showToast } = useToast();
   const { cache } = useCache();
@@ -27,7 +58,7 @@ export const useSales = () => {
   const { data: leads = [], isLoading: leadsLoading } = useQuery({
     queryKey: ['sales_leads'],
     staleTime: 5 * 60 * 1000, // 5 minutes
-    cacheTime: 30 * 60 * 1000, // 30 minutes
+    gcTime: 30 * 60 * 1000, // 30 minutes
     retry: 3,
     retryDelay: (attemptIndex) => Math.min(1000 * Math.pow(2, attemptIndex), 10000),
     meta: {
@@ -77,7 +108,7 @@ export const useSales = () => {
   const { data: activities = [], isLoading: activitiesLoading } = useQuery({
     queryKey: ['sales_activities'],
     staleTime: 5 * 60 * 1000,
-    cacheTime: 30 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
     retry: 3,
     retryDelay: (attemptIndex) => Math.min(1000 * Math.pow(2, attemptIndex), 10000),
     queryFn: async () => {
@@ -112,9 +143,9 @@ export const useSales = () => {
   });
 
   const { data: opportunities = [], isLoading: opportunitiesLoading } = useQuery({
-    queryKey: ['sales_opportunities'], 
+    queryKey: ['sales_opportunities'],
     staleTime: 5 * 60 * 1000,
-    cacheTime: 30 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
     retry: 3,
     retryDelay: (attemptIndex) => Math.min(1000 * Math.pow(2, attemptIndex), 10000),
     queryFn: async () => {
@@ -160,9 +191,23 @@ export const useSales = () => {
   const stats = useMemo(() => ({
     totalLeads: leads.length,
     qualifiedLeads: leads.filter(l => l.status === 'qualified').length,
-    wonDeals: leads.filter(l => l.status === 'won').length,
     pipelineValue: opportunities.reduce((sum, opp) => sum + (opp.amount || 0), 0),
     conversionRate: leads.length > 0 ? (leads.filter(l => l.status === 'won').length / leads.length) * 100 : 0,
+    // Add missing properties from SalesStats interface
+    closedDeals: leads.filter(l => l.status === 'closed').length,
+    closedDealsCount: leads.filter(l => l.status === 'closed').length,
+    dealsWon: leads.filter(l => l.status === 'won').length,
+    dealsLost: leads.filter(l => l.status === 'lost').length,
+    dealsProposal: leads.filter(l => l.status === 'proposal').length,
+    dealsContacted: leads.filter(l => l.status === 'contacted').length,
+    dealsNew: leads.filter(l => l.status === 'new').length,
+    dealsQualified: leads.filter(l => l.status === 'qualified').length,
+    dealsContactedCount: leads.filter(l => l.status === 'contacted').length,
+    dealsQualifiedCount: leads.filter(l => l.status === 'qualified').length,
+    dealsProposalCount: leads.filter(l => l.status === 'proposal').length,
+    dealsWonCount: leads.filter(l => l.status === 'won').length,
+    dealsLostCount: leads.filter(l => l.status === 'lost').length,
+    dealsNewCount: leads.filter(l => l.status === 'new').length,
   }), [leads, opportunities]);
 
   React.useEffect(() => {
@@ -222,8 +267,21 @@ export const useSales = () => {
     opportunities,
     stats,
     loading: leadsLoading || activitiesLoading || opportunitiesLoading,
-    createLead,
-    updateLead,
-    addActivity,
-  };
+    _createLead: createLead,
+    _updateLead: updateLead,
+    _addActivity: addActivity,
+    closedDeals: stats.closedDeals,
+    closedDealsCount: stats.closedDealsCount,
+    dealsWon: stats.dealsWon,
+    dealsLost: stats.dealsLost,
+    dealsProposal: stats.dealsProposal,
+    dealsContacted: stats.dealsContacted,
+    dealsNew: stats.dealsNew,
+    dealsQualified: stats.dealsQualified,
+    dealsContactedCount: stats.dealsContactedCount,
+    dealsQualifiedCount: stats.dealsQualifiedCount,
+    dealsProposalCount: stats.dealsProposalCount,
+    dealsWonCount: stats.dealsWonCount,
+    dealsLostCount: stats.dealsLostCount,
+  } as UseSalesResult;
 };

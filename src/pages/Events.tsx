@@ -1,9 +1,9 @@
-import React from 'react';
+//import React from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { usePermissions } from '../hooks/usePermissions';
 import EventManager from '../components/events/EventManager';
 import { Loader2 } from 'lucide-react';
-import { Permissions } from '../types/roles';
+//import { Permissions } from '../types/roles';
 
 const Events = () => {
   const { user, loading } = useAuth();
@@ -43,9 +43,9 @@ const Events = () => {
       </div>
 
       <EventManager 
-        canCreate={can('create' as keyof Permissions)}
-        canEdit={can('edit' as keyof Permissions)}
-        canDelete={can('delete' as keyof Permissions)}
+        canCreate={can("staff")}
+        canEdit={can("staff")}
+        canDelete={can("staff")}
         userRole={user.role}
       />
     </div>

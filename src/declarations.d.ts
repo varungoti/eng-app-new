@@ -45,9 +45,9 @@ declare module "@/lib/utils" {
   export function cn(...inputs: any[]): string;
 }
 
-declare module "@/lib/supabase" {
-  export const supabase: any;
-}
+// declare module "@/lib/supabase" {
+//   export const supabase: any;
+// }
 
 declare module "@/types" {
   export type Question = any;
@@ -73,7 +73,7 @@ declare module "@/components/LoadingSpinner" {
   export default _default;
 } 
 
-declare module "@/lib/logger" {
-    import { LogLevel } from "./types/logging";
-    export const logger: FC>{}
-}
+// declare module "@/lib/logger" {
+//     import { LogLevel } from "./types/logging";
+//     export const logger: FC<{ level: LogLevel }>;
+// }

@@ -6,8 +6,13 @@ interface DepartmentInputProps {
   onSubmit: (data: any) => void;
 }
 
+// Define a Record type for formData
+interface FormData {
+  [key: string]: string;
+}
+
 const DepartmentInput: React.FC<DepartmentInputProps> = ({ department, onSubmit }) => {
-  const [formData, setFormData] = React.useState({});
+  const [formData, setFormData] = React.useState<FormData>({});
 
   const getInputFields = () => {
     switch (department) {
@@ -68,10 +73,11 @@ const DepartmentInput: React.FC<DepartmentInputProps> = ({ department, onSubmit 
         <div className="space-y-4">
           {getInputFields().map((field) => (
             <div key={field.name}>
-              <label className="block text-sm font-medium text-gray-700">
+              <label htmlFor={`${department}-${field.name}`} className="block text-sm font-medium text-gray-700">
                 {field.label}
               </label>
               <input
+                id={`${department}-${field.name}`}
                 type={field.type}
                 name={field.name}
                 value={formData[field.name] || ''}

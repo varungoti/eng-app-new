@@ -33,17 +33,18 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 //import { ExercisePromptCard } from "@/app/content-management/components/exercise-prompt-card";
 import { ExercisePromptView } from "@/components/exercise-prompt-view";
+import { ImagePreview } from '../common/ImagePreview';
 
 // Question Types from question-form.tsx
 interface QuestionMetadata {
   prompt?: string;
-  teacherScript?: string;
-  sampleAnswer?: string;
+  teacher_script?: string;
+  sample_answer?: string;
   options?: string[];
-  correctAnswer?: string | number;
-  imageUrl?: string;
-  videoUrl?: string;
-  audioContent?: string;
+  correct_answer?: string | number;
+  image_url?: string;
+  video_url?: string;
+  audio_content?: string;
   transcript?: string;
   passage?: string;
   questions?: string[];
@@ -91,9 +92,9 @@ interface Question {
   type: string;
   data: {
     prompt: string;
-    teacherScript: string;
-    sampleAnswer?: string;
-    followupPrompt?: string[];
+    teacher_script: string;
+    sample_answer?: string;
+    followup_prompt?: string[];
   };
   metadata?: {
     difficulty?: string;
@@ -628,8 +629,8 @@ export function LessonDialog({
                         >
                           {item.type === 'image' ? (
                             <div className="relative aspect-video">
-                              <img
-                                src={item.url}
+                              <ImagePreview
+                                imageUrl={item.url}
                                 alt={`Media ${index + 1}`}
                                 className={cn(
                                   "w-full h-full object-cover rounded-lg",
@@ -755,9 +756,8 @@ export function LessonDialog({
                       className="relative rounded-xl overflow-hidden shadow-xl"
                     >
                       {item.type === 'image' ? (
-                        <img
-                          src={item.url}
-                          alt={`Media ${index + 1}`}
+                        <ImagePreview
+                          imageUrl={item.url}
                           className="w-full h-auto object-contain max-h-[80vh] rounded-lg"
                         />
                       ) : item.type === 'video' && (
@@ -1028,9 +1028,8 @@ function ExercisesTab({ exercises }: { exercises: any[] }) {
                 {exercise.media && (
                   <div className="mt-4 rounded-lg overflow-hidden border">
                     {exercise.type === 'image' && (
-                      <img 
-                        src={exercise.media} 
-                        alt={exercise.text}
+                      <ImagePreview 
+                        imageUrl={exercise.media}
                         className="w-full h-auto object-cover"
                       />
                     )}
@@ -1183,19 +1182,19 @@ function QuestionCard({
                 <PenTool className="h-4 w-4" />
                 <h4 className="font-medium">Teacher Script</h4>
               </div>
-              <p className="text-muted-foreground">{question.data.teacherScript}</p>
+              <p className="text-muted-foreground">{question.data.teacher_script}</p>
             </CardContent>
           </Card>
 
           {/* Sample Answer - Optional */}
-          {question.data.sampleAnswer && (
+          {question.data.sample_answer && (
             <Card className="bg-primary/5">
               <CardContent className="p-4">
                 <div className="flex items-center gap-2 mb-2 text-primary">
                   <CheckCircle className="h-4 w-4" />
                   <h4 className="font-medium">Sample Answer</h4>
                 </div>
-                <p className="text-muted-foreground">{question.data.sampleAnswer}</p>
+                <p className="text-muted-foreground">{question.data.sample_answer}</p>
               </CardContent>
             </Card>
           )}

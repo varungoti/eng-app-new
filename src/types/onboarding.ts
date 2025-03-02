@@ -1,48 +1,37 @@
 export interface OnboardingTask {
   id: string;
+  school_id: string;
   title: string;
-  description?: string;
-  category: 'documentation' | 'setup' | 'training' | 'compliance';
+  description: string;
+  order: number;
   required: boolean;
-  orderIndex: number;
-  createdAt: Date;
-  updatedAt: Date;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface OnboardingProgress {
   id: string;
-  schoolId: string;
-  taskId: string;
-  status: 'pending' | 'in_progress' | 'completed' | 'blocked';
-  notes?: string;
-  completedBy?: string;
-  completedAt?: Date;
-  createdAt: Date;
-  updatedAt: Date;
+  school_id: string;
+  task_id: string;
+  completed: boolean;
+  completed_by: string;
+  completed_at: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface SchoolDocument {
   id: string;
-  schoolId: string;
-  type: 'license' | 'registration' | 'tax' | 'insurance' | 'curriculum' | 'other';
+  school_id: string;
   name: string;
   url: string;
-  status: 'pending' | 'approved' | 'rejected';
-  notes?: string;
-  uploadedBy: string;
-  reviewedBy?: string;
-  reviewedAt?: Date;
-  validUntil?: Date;
-  createdAt: Date;
-  updatedAt: Date;
+  type: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface OnboardingStats {
-  totalTasks: number;
   completedTasks: number;
-  pendingTasks: number;
-  blockedTasks: number;
-  progress: number;
-  remainingRequired: number;
-  nextTask?: OnboardingTask;
+  totalTasks: number;
+  completionPercentage: number;
 }

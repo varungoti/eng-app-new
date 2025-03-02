@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase';
 import { logger } from '../lib/logger';
 import { useDataLoadTimeout } from './useDataLoadTimeout';
-import type { Student } from '../types';
+//import type { Student } from '../types';
 
 type DatabaseStudent = {
   id: string;

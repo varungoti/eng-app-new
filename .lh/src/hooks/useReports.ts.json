@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/hooks/useReports.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1740041594265,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1740041594265,
+            "name": "Commit-0",
+            "content": "import { useState } from 'react';\r\nimport { reportGenerator, ReportConfig, Report } from '../lib/reports/ReportGenerator';\r\nimport { useToast } from './useToast';\r\n\r\nexport const useReports = () => {\r\n  const [loading, setLoading] = useState(false);\r\n  const [error, setError] = useState<string | null>(null);\r\n  const { showToast } = useToast();\r\n\r\n  const generateReport = async (config: ReportConfig) => {\r\n    try {\r\n      setLoading(true);\r\n      setError(null);\r\n      const reportId = await reportGenerator.generateReport(config);\r\n      showToast('Report generation started', { type: 'success' });\r\n      return reportId;\r\n    } catch (err) {\r\n      const message = err instanceof Error ? err.message : 'Failed to generate report';\r\n      setError(message);\r\n      showToast(message, { type: 'error' });\r\n      return null;\r\n    } finally {\r\n      setLoading(false);\r\n    }\r\n  };\r\n\r\n  const getReport = async (reportId: string): Promise<Report | null> => {\r\n    try {\r\n      setError(null);\r\n      return await reportGenerator.getReport(reportId);\r\n    } catch (err) {\r\n      const message = err instanceof Error ? err.message : 'Failed to get report';\r\n      setError(message);\r\n      showToast(message, { type: 'error' });\r\n      return null;\r\n    }\r\n  };\r\n\r\n  return {\r\n    generateReport,\r\n    getReport,\r\n    loading,\r\n    error\r\n  };\r\n};"
+        }
+    ]
+}

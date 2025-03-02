@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 1,
+            "activePatchIndex": 3,
             "patches": [
                 {
                     "date": 1739013294861,
@@ -12,6 +12,14 @@
                 {
                     "date": 1739013340555,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -28,23 +28,21 @@\n           await new Promise(resolve => setTimeout(resolve, INIT_RETRY_DELAY * retries));\r\n           continue;\r\n         }\r\n \r\n-        logger.error('Database health check failed after all retries', {\r\n-          source: 'Database'\r\n-        });\r\n+        logger.error('Database health check failed after all retries', 'Database');\r\n         return false;\r\n+\r\n       }\r\n \r\n       return false;\r\n     } catch (err) {\r\n-      logger.error('Database health check failed', {\r\n-        context: { error: err },\r\n-        source: 'Database'\r\n-      });\r\n-      return false;\r\n+      logger.error('Database health check failed', 'Database', err);\r\n+      return false; \r\n     }\r\n   }\r\n };\r\n \r\n+\r\n+\r\n // Export all database utilities\r\n export { dbConnection , checkDatabaseHealth };\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1740852697630,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -23,9 +23,9 @@\n         }\r\n \r\n         retries++;\r\n         if (retries < MAX_INIT_RETRIES) {\r\n-          logger.warn(`Database health check failed, attempt ${retries}/${MAX_INIT_RETRIES}`, 'Database');\r\n+          logger.warn(`Database health check failed, attempt ${retries}/${MAX_INIT_RETRIES}`, { source: \"database\" });\r\n           await new Promise(resolve => setTimeout(resolve, INIT_RETRY_DELAY * retries));\r\n           continue;\r\n         }\r\n \r\n"
+                },
+                {
+                    "date": 1740852702921,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -28,16 +28,16 @@\n           await new Promise(resolve => setTimeout(resolve, INIT_RETRY_DELAY * retries));\r\n           continue;\r\n         }\r\n \r\n-        logger.error('Database health check failed after all retries', 'Database');\r\n+        logger.error('Database health check failed after all retries', { source: \"database\" });\r\n         return false;\r\n \r\n       }\r\n \r\n       return false;\r\n     } catch (err) {\r\n-      logger.error('Database health check failed', 'Database', err);\r\n+      logger.error('Database health check failed', { source: \"database\", error: err });\r\n       return false; \r\n     }\r\n   }\r\n };\r\n"
                 }
             ],
             "date": 1739013294861,

@@ -39,14 +39,13 @@ import { Extension } from '@tiptap/core'
 
 // Disable the table extension from StarterKit since we're adding it separately
 const customStarterKit = StarterKit.configure({
-  table: false, // Disable table in StarterKit
   // Configure other StarterKit extensions as needed
   heading: {
     levels: [1, 2, 3]
   }
 })
 
-// Configure table extensions
+// Add custom table extensions instead
 const tableExtensions = [
   Table.configure({
     resizable: true,

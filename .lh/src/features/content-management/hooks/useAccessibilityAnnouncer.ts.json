@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/features/content-management/hooks/useAccessibilityAnnouncer.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1740089758491,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1740089758491,
+            "name": "Commit-0",
+            "content": "import { useCallback } from 'react';\r\n\r\nexport const useAccessibilityAnnouncer = () => {\r\n  const announce = useCallback((message: string, type: 'polite' | 'assertive' = 'polite') => {\r\n    const announcer = document.createElement('div');\r\n    announcer.setAttribute('aria-live', type);\r\n    announcer.setAttribute('aria-atomic', 'true');\r\n    announcer.className = 'sr-only';\r\n    document.body.appendChild(announcer);\r\n    \r\n    // Set the message after a small delay to ensure screen readers catch it\r\n    setTimeout(() => {\r\n      announcer.textContent = message;\r\n      \r\n      // Remove the announcer after it's been read\r\n      setTimeout(() => {\r\n        document.body.removeChild(announcer);\r\n      }, 1000);\r\n    }, 100);\r\n  }, []);\r\n\r\n  return { announce };\r\n}; "
+        }
+    ]
+}

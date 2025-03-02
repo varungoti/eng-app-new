@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Settings as SettingsIcon, Shield, Bell, Globe, Clock, LayoutDashboard, Mic2, Volume2 } from 'lucide-react';
+import { useState } from 'react';
+import { Settings as Bell, Globe, Clock, LayoutDashboard, Mic2, Volume2 } from 'lucide-react';
 import RoleManagement from '../components/RoleManagement';
 import DashboardCustomization from '../components/DashboardCustomization';
 import { VoiceManagement } from '../components/admin/VoiceManagement';

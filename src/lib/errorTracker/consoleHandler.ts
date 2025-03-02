@@ -2,8 +2,8 @@ import { ErrorTracker } from './ErrorTracker';
 import { ErrorSeverity } from './types';
 import type { ConsoleError } from './types';
 
-
-
+// Define a more specific type for console arguments
+type ConsoleArgument = string | number | boolean | null | undefined | Error | object;
 
 class ConsoleHandler {
   private static instance: ConsoleHandler;
@@ -27,19 +27,19 @@ class ConsoleHandler {
 
   private setupConsoleOverrides() {
     // Override console.error
-    console.error = (...args: any[]) => {
+    console.error = (...args: ConsoleArgument[]) => {
       this.handleConsoleError(args);
       this.originalConsole.error(...args);
     };
 
     // Override console.warn
-    console.warn = (...args: any[]) => {
+    console.warn = (...args: ConsoleArgument[]) => {
       this.handleConsoleWarning(args);
       this.originalConsole.warn(...args);
     };
   }
 
-  private handleConsoleError(args: any[]) {
+  private handleConsoleError(args: ConsoleArgument[]) {
     const error: ConsoleError = {
       message: this.formatErrorMessage(args),
       stack: this.extractStack(args),
@@ -48,14 +48,16 @@ class ConsoleHandler {
     };
 
     // Extract context from error arguments
-    const context = args.length > 1 && typeof args[1] === 'object' ? args[1] : {};
+    const context = args.length > 1 && typeof args[1] === 'object' && args[1] !== null 
+      ? args[1] as Record<string, unknown> 
+      : undefined;
 
     this.bufferError(error);
     this.trackError(error, ErrorSeverity.HIGH, context);
   }
 
 
-  private handleConsoleWarning(args: any[]) {
+  private handleConsoleWarning(args: ConsoleArgument[]) {
     const warning: ConsoleError = {
       message: this.formatErrorMessage(args),
       timestamp: Date.now(),
@@ -67,7 +69,7 @@ class ConsoleHandler {
 
   }
 
-  private formatErrorMessage(args: any[]): string {
+  private formatErrorMessage(args: ConsoleArgument[]): string {
     return args
       .map(arg => {
         if (arg instanceof Error) {
@@ -85,7 +87,7 @@ class ConsoleHandler {
       .join(' ');
   }
 
-  private extractStack(args: any[]): string | undefined {
+  private extractStack(args: ConsoleArgument[]): string | undefined {
     const error = args.find(arg => arg instanceof Error);
     return error?.stack;
   }
@@ -97,13 +99,13 @@ class ConsoleHandler {
     }
   }
 
-  private trackError(error: ConsoleError, severity: ErrorSeverity, context?: Record<string, any>) {
+  private trackError(error: ConsoleError, severity: ErrorSeverity, context?: Record<string, unknown>) {
     this.errorTracker.trackError({
       message: error.message,
       severity,
       source: 'Console',
       context: {
-        ...context,
+        ...(context || {}),
         stack: error.stack,
         arguments: error.args,
         timestamp: error.timestamp

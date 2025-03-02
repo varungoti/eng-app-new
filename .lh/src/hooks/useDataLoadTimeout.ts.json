@@ -1,0 +1,22 @@
+{
+    "sourceFile": "src/hooks/useDataLoadTimeout.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1740922943553,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1740922955414,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -16,9 +16,9 @@\n   const startTime = useRef(Date.now());\r\n   const retryCount = useRef(0);\r\n   const MAX_RETRIES = 3;\r\n \r\n-  const clearTimeout = useCallback(() => {\r\n+  const clearLoadTimeout = useCallback(() => {\r\n     if (timeoutRef.current) {\r\n       window.clearTimeout(timeoutRef.current);\r\n       timeoutRef.current = undefined;\r\n       logger.info('Data load completed successfully', {\r\n@@ -56,12 +56,12 @@\n \r\n     // Cleanup timeout\r\n     return () => {\r\n       if (timeoutRef.current) {\r\n-        clearTimeout(timeoutRef.current);\r\n+        window.clearTimeout(timeoutRef.current);\r\n         timeoutRef.current = undefined;\r\n       }\r\n     };\r\n-  }, [timeout, source, cleareTimeoput, onTimeout]);\r\n+  }, [timeout, source, onTimeout]);\r\n \r\n-  return { clearTimeout };\r\n+  return { clearTimeout: clearLoadTimeout };\r\n };\n\\ No newline at end of file\n"
+                }
+            ],
+            "date": 1740922943553,
+            "name": "Commit-0",
+            "content": "import { useEffect, useRef, useCallback } from 'react';\r\nimport { logger } from '../lib/logger';\r\n\r\ninterface DataLoadTimeoutOptions {\r\n  timeout?: number; \r\n  source: string;\r\n  onTimeout?: () => void;\r\n}\r\n\r\nexport const useDataLoadTimeout = ({\r\n  timeout = 60000, // Increased from 30s to 60s\r\n  source,\r\n  onTimeout\r\n}: DataLoadTimeoutOptions) => {\r\n  const timeoutRef = useRef<NodeJS.Timeout>();\r\n  const startTime = useRef(Date.now());\r\n  const retryCount = useRef(0);\r\n  const MAX_RETRIES = 3;\r\n\r\n  const clearTimeout = useCallback(() => {\r\n    if (timeoutRef.current) {\r\n      window.clearTimeout(timeoutRef.current);\r\n      timeoutRef.current = undefined;\r\n      logger.info('Data load completed successfully', {\r\n        context: {\r\n          loadTime: Date.now() - startTime.current\r\n        },\r\n        source\r\n      });\r\n    }\r\n  }, [source]);\r\n\r\n  useEffect(() => {\r\n    // Set timeout for data load\r\n    timeoutRef.current = setTimeout(() => {\r\n      // Only trigger timeout if still loading\r\n      if (startTime.current === 0) return;\r\n\r\n      // Check if we should retry\r\n      if (retryCount.current < MAX_RETRIES) {\r\n        retryCount.current++;\r\n        logger.info('Retrying data load', { source });\r\n        startTime.current = Date.now(); // Reset timer\r\n        timeoutRef.current = setTimeout(() => {\r\n          if (onTimeout) {\r\n            onTimeout();\r\n          }\r\n        }, timeout);\r\n        return;\r\n      }\r\n      \r\n      if (onTimeout) {\r\n        onTimeout();\r\n      }\r\n    }, timeout);\r\n\r\n    // Cleanup timeout\r\n    return () => {\r\n      if (timeoutRef.current) {\r\n        clearTimeout(timeoutRef.current);\r\n        timeoutRef.current = undefined;\r\n      }\r\n    };\r\n  }, [timeout, source, cleareTimeoput, onTimeout]);\r\n\r\n  return { clearTimeout };\r\n};"
+        }
+    ]
+}

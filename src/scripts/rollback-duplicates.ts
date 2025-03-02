@@ -43,7 +43,7 @@ const logger = {
   divider: () => console.log('\n' + '─'.repeat(50) + '\n')
 };
 
-interface QuestionRecord {
+export interface QuestionRecord {
   id: string;
   original_id: string;
   created_at: string;

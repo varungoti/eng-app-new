@@ -8,7 +8,7 @@ interface LessonManagementContextType<T> {
   lessons: Lesson[];
   selectedGrade: string | null;
   selectedTopic: string | null;
-  setSelectedGrade: (gradeId: T | null) => void;
+  setSelectedGrade: (gradeId: string | null) => void;
   setSelectedTopic: (topicId: string | null) => void;
   isLoading: boolean;
   error: Error | null;
@@ -20,7 +20,7 @@ export function LessonManagementProvider({ children }: { children: React.ReactNo
   const [selectedGrade, setSelectedGrade] = useState<string | null>(null);
   const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
 
-  const { grades, topics, lessons, isLoading, error } = useLessonManagement({
+  const result = useLessonManagement({
     gradeId: selectedGrade,
     topicId: selectedTopic,
   });
@@ -28,15 +28,15 @@ export function LessonManagementProvider({ children }: { children: React.ReactNo
   return (
     <LessonManagementContext.Provider
       value={{
-        grades,
-        topics,
-        lessons,
+        grades: result.data?.grades || [],
+        topics: result.data?.topics || [],
+        lessons: result.data?.lessons || [],
         selectedGrade,
         selectedTopic,
         setSelectedGrade,
         setSelectedTopic,
-        isLoading,
-        error,
+        isLoading: result.isLoading,
+        error: result.error,
       }}
     >
       {children}

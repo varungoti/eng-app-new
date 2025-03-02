@@ -35,6 +35,7 @@ const EventFilters: React.FC<EventFiltersProps> = ({ onFilterChange, filters }) 
             Type
           </label>
           <select
+            title="Type"
             value={filters.type}
             onChange={(e) => onFilterChange({ ...filters, type: e.target.value })}
             className="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
@@ -54,6 +55,7 @@ const EventFilters: React.FC<EventFiltersProps> = ({ onFilterChange, filters }) 
             Status
           </label>
           <select
+            title="Status"
             value={filters.status}
             onChange={(e) => onFilterChange({ ...filters, status: e.target.value })}
             className="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
@@ -72,6 +74,7 @@ const EventFilters: React.FC<EventFiltersProps> = ({ onFilterChange, filters }) 
             Date Range
           </label>
           <select
+            title="Date Range"
             value={filters.dateRange}
             onChange={(e) => onFilterChange({ ...filters, dateRange: e.target.value as EventFilters['dateRange'] })}
             className="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"

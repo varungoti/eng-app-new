@@ -1,4 +1,4 @@
-```typescript
+
 import { logger } from '../logger';
 
 interface CacheEntry<T> {
@@ -125,4 +125,3 @@ class CacheManager {
 }
 
 export const cacheManager = CacheManager.getInstance();
-```

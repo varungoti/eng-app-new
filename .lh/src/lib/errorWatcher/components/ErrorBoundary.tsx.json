@@ -1,0 +1,22 @@
+{
+    "sourceFile": "src/lib/errorWatcher/components/ErrorBoundary.tsx",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1740901370112,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1740901376048,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -33,9 +33,9 @@\n         name: error.name,\r\n         stack: error.stack,\r\n         isSimulated: isSimulatedError\r\n       },\r\n-      componentStack: errorInfo.componentStack,\r\n+      componentStack: errorInfo.componentStack || '',\r\n       source: this.props.source,\r\n     });\r\n   }\r\n \r\n"
+                }
+            ],
+            "date": 1740901370112,
+            "name": "Commit-0",
+            "content": "import  { Component, ErrorInfo, ReactNode } from 'react';\r\nimport { ErrorWatcher } from '../ErrorWatcher';\r\n\r\ninterface Props {\r\n  children: ReactNode;\r\n  fallback?: ReactNode;\r\n  source: string;\r\n}\r\n\r\ninterface State {\r\n  hasError: boolean;\r\n}\r\n\r\nexport class ErrorBoundary extends Component<Props, State> {\r\n  public state: State = {\r\n    hasError: false\r\n  };\r\n\r\n  public static getDerivedStateFromError(): State {\r\n    return { hasError: true };\r\n  }\r\n\r\n  public componentDidCatch(error: Error, errorInfo: ErrorInfo) {\r\n    // Handle simulated errors differently\r\n    const isSimulatedError = error.message.includes('simulated') || \r\n                            this.props.source === 'BuggyComponent' ||\r\n                            this.props.source === 'ErrorTest';\r\n    \r\n    ErrorWatcher.getInstance().trackError({\r\n      message: error.message,\r\n      severity: isSimulatedError ? 'info' : 'error',\r\n      context: {\r\n        name: error.name,\r\n        stack: error.stack,\r\n        isSimulated: isSimulatedError\r\n      },\r\n      componentStack: errorInfo.componentStack,\r\n      source: this.props.source,\r\n    });\r\n  }\r\n\r\n  public render() {\r\n    if (this.state.hasError) {\r\n      const isTestError = this.props.source === 'BuggyComponent';\r\n      return this.props.fallback || (\r\n        <div className={`p-4 ${isTestError ? 'bg-blue-50 border-blue-200' : 'bg-red-50 border-red-200'} border rounded-lg`}>\r\n          <h2 className={`text-lg font-medium ${isTestError ? 'text-blue-800' : 'text-red-800'}`}>\r\n            {isTestError ? 'Test Error Caught' : 'Something went wrong'}\r\n          </h2>\r\n          <p className={`mt-2 text-sm ${isTestError ? 'text-blue-600' : 'text-red-600'}`}>\r\n            An error occurred while rendering this component. Please try refreshing the page.\r\n          </p>\r\n        </div>\r\n      );\r\n    }\r\n\r\n    return this.props.children;\r\n  }\r\n}"
+        }
+    ]
+}

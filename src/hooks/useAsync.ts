@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { logger } from '../logger';
+import { logger } from '@/lib/logger';
 
 interface AsyncState<T> {
   data: T | null;

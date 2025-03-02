@@ -1,5 +1,5 @@
 import { dbConfig } from '../config/db-config'
-import type { Topic, Subtopic, Lesson, Question, ExercisePrompt, Activity } from '@/types/index';
+//import type { Topic, Subtopic, Lesson, Question, ExercisePrompt, Activity } from '@/types/index';
 
 export class ValidationError extends Error {
   constructor(message: string) {

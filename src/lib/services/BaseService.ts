@@ -18,7 +18,7 @@ export interface ServiceConfig {
 export abstract class BaseService {
   protected retryStrategy: RetryStrategy;
   protected loadingStrategy: LoadingStrategy;
-  protected cacheStrategy: CacheStrategy;
+  protected cacheStrategy: CacheStrategy<any>;
 
   constructor(protected config: ServiceConfig) {
     this.retryStrategy = new RetryStrategy(config.retryConfig || {
@@ -27,7 +27,7 @@ export abstract class BaseService {
       maxDelay: 1000
     });
     this.loadingStrategy = new LoadingStrategy(config.name);
-    this.cacheStrategy = new CacheStrategy(config.cacheConfig?.ttl);
+    this.cacheStrategy = new CacheStrategy<any>({ ttl: config.cacheConfig?.ttl });
   }
 
   protected async executeWithRetry<T>(

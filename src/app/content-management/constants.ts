@@ -6,8 +6,8 @@ export const QUESTION_TYPES = {
     description: 'Basic speaking practice with optional sample answers and teacher scripts.',
     defaultData: {
       prompt: '',
-      teacherScript: '',
-      sampleAnswer: ''
+      teacher_script: '',
+      sample_answer: ''
     }
   },
   storytelling: {
@@ -15,7 +15,7 @@ export const QUESTION_TYPES = {
     description: 'Practice storytelling with keywords, hints, and structured prompts.',
     defaultData: {
       prompt: '',
-      teacherScript: '',
+      teacher_script: '',
       storyPrompt: '',
       keywords: [] as string[],
       hints: [] as string[]
@@ -26,7 +26,7 @@ export const QUESTION_TYPES = {
     description: 'Listen to audio content and answer related questions.',
     defaultData: {
       prompt: '',
-      teacherScript: '',
+      teacher_script: '',
       audioContent: '',
       transcript: '',
       questions: [] as string[]
@@ -37,7 +37,7 @@ export const QUESTION_TYPES = {
     description: 'Practice pronunciation by listening and repeating phrases.',
     defaultData: {
       prompt: '',
-      teacherScript: '',
+      teacher_script: '',
       phrases: [] as string[],
       translations: [] as string[]
     }
@@ -47,9 +47,9 @@ export const QUESTION_TYPES = {
     description: 'Answer questions by selecting from multiple options.',
     defaultData: {
       prompt: '',
-      teacherScript: '',
+      teacher_script: '',
       options: [] as string[],
-      correctAnswer: null
+      correct_answer: null
     }
   },
   grammarSpeaking: {
@@ -57,7 +57,7 @@ export const QUESTION_TYPES = {
     description: 'Practice grammar points through speaking exercises.',
     defaultData: {
       prompt: '',
-      teacherScript: '',
+      teacher_script: '',
       grammarPoint: '',
       example: ''
     }
@@ -67,7 +67,7 @@ export const QUESTION_TYPES = {
     description: 'Learn and practice using English idioms in context.',
     defaultData: {
       prompt: '',
-      teacherScript: '',
+      teacher_script: '',
       idiom: '',
       meaning: '',
       example: '',
@@ -79,7 +79,7 @@ export const QUESTION_TYPES = {
     description: 'Describe images and practice vocabulary.',
     defaultData: {
       prompt: '',
-      teacherScript: '',
+      teacher_script: '',
       imageUrl: '',
       imageCaption: '',
       helpfulVocabulary: [] as string[]
@@ -90,7 +90,7 @@ export const QUESTION_TYPES = {
     description: 'Watch videos and discuss their content.',
     defaultData: {
       prompt: '',
-      teacherScript: '',
+      teacher_script: '',
       videoUrl: '',
       discussionPoints: [] as string[]
     }
@@ -100,7 +100,7 @@ export const QUESTION_TYPES = {
     description: 'Practice argumentation and persuasive speaking.',
     defaultData: {
       prompt: '',
-      teacherScript: '',
+      teacher_script: '',
       topic: '',
       position: '',
       keyPoints: [] as string[]
@@ -111,7 +111,7 @@ export const QUESTION_TYPES = {
     description: 'Prepare and deliver structured presentations.',
     defaultData: {
       prompt: '',
-      teacherScript: '',
+      teacher_script: '',
       topic: '',
       duration: '',
       structure: [] as Array<{ title: string; points: string[] }>,
@@ -123,7 +123,7 @@ export const QUESTION_TYPES = {
     description: 'Match items with their corresponding descriptions.',
     defaultData: {
       prompt: '',
-      teacherScript: '',
+      teacher_script: '',
       items: [] as string[],
       descriptions: [] as string[]
     }
@@ -133,7 +133,7 @@ export const QUESTION_TYPES = {
     description: 'Fill in the missing words in a sentence.',
     defaultData: {
       prompt: '',
-      teacherScript: '',
+      teacher_script: '',
       sentence: '',
       blanks: [] as string[]
     }
@@ -143,9 +143,9 @@ export const QUESTION_TYPES = {
     description: 'Determine if a statement is true or false.',
     defaultData: {
       prompt: '',
-      teacherScript: '',
+      teacher_script: '',
       statement: '',
-      correctAnswer: ''
+      correct_answer: ''
     }
   },
   reading: {
@@ -153,7 +153,7 @@ export const QUESTION_TYPES = {
     description: 'Read a passage and answer related questions.',
     defaultData: {
       prompt: '',
-      teacherScript: '',
+      teacher_script: '',
       passage: '',
       questions: [] as string[]
     }
@@ -163,7 +163,7 @@ export const QUESTION_TYPES = {
     description: 'Write a response to a prompt.',
     defaultData: {
       prompt: '',
-      teacherScript: '',
+      teacher_script: '',
       response: ''
     }
   },
@@ -172,7 +172,7 @@ export const QUESTION_TYPES = {
     description: 'Practice speaking and writing in a structured format.',
     defaultData: {
       prompt: '',
-      teacherScript: '',
+      teacher_script: '',
       speakingPrompt: '',
       writingPrompt: ''
     }
@@ -182,7 +182,7 @@ export const QUESTION_TYPES = {
     description: 'Practice listening and speaking in a structured format.',
     defaultData: {
       prompt: '',
-      teacherScript: '',
+      teacher_script: '',
       listeningPrompt: '',
       speakingPrompt: ''
     }
@@ -192,7 +192,7 @@ export const QUESTION_TYPES = {
     description: 'Practice reading and speaking in a structured format.',
     defaultData: {
       prompt: '',
-      teacherScript: '',
+      teacher_script: '',
       readingPrompt: '',
       speakingPrompt: ''
     }
@@ -202,7 +202,7 @@ export const QUESTION_TYPES = {
     description: 'Practice speaking and speaking in a structured format.',
     defaultData: {
       prompt: '',
-      teacherScript: '',
+      teacher_script: '',
       speakingPrompt: '',
       speakingPrompt2: ''
     }
@@ -212,7 +212,7 @@ export const QUESTION_TYPES = {
     description: 'Practice speaking with a partner in a structured format.',
     defaultData: {
       prompt: '',
-      teacherScript: '',
+      teacher_script: '',
       speakingPrompt: '',
       partnerPrompt: ''
     }
@@ -222,7 +222,7 @@ export const QUESTION_TYPES = {
     description: 'Practice speaking with a partner in a structured format.',
     defaultData: {
       prompt: '',
-      teacherScript: '',
+      teacher_script: '',
       speakingPrompt: '',
       actionPrompt: ''
     }
@@ -232,7 +232,7 @@ export const QUESTION_TYPES = {
     description: 'Practice speaking with an object in a structured format.',
     defaultData: {
       prompt: '',
-      teacherScript: '',
+      teacher_script: '',
       speakingPrompt: '',
       objectPrompt: ''
     }
@@ -242,7 +242,7 @@ export const QUESTION_TYPES = {
     description: 'Practice speaking with an object and action in a structured format.',
     defaultData: {
       prompt: '',
-      teacherScript: '',
+      teacher_script: '',
       speakingPrompt: '',
       objectPrompt: '',
       actionPrompt: ''
@@ -253,7 +253,7 @@ export const QUESTION_TYPES = {
     description: 'Practice speaking with vocabulary in a structured format.',
     defaultData: {
       prompt: '',
-      teacherScript: '',
+      teacher_script: '',
       speakingPrompt: '',
       vocabularyPrompt: ''
     },
@@ -263,7 +263,7 @@ export const QUESTION_TYPES = {
     description: 'Practice speaking with vocabulary and wordlist in a structured format.',
     defaultData: {
         prompt: '',
-        teacherScript: '',
+        teacher_script: '',
         wordlistPrompt: [] as Array<{ word: string; definition: string; correctPronunciation: string; phoneticGuide: string; pronunciationAudio: string; example: string; usageNotes: string; synonyms: string[]; antonyms: string[] }>,
         vocabularyPrompt: ''
     }
@@ -275,8 +275,8 @@ export const QUESTION_TYPES = {
       prompt: '',
       originalSentence: '',
       hint: [] as string[] ,
-      correctAnswer: '',
-      teacherScript: ''
+      correct_answer: '',
+      teacher_script: ''
     }
   },
   sentenceTransformation: {
@@ -287,8 +287,8 @@ export const QUESTION_TYPES = {
       originalSentence: '',
       tenseToTransform: '',
       hint: [] as string[],
-      correctAnswer: '',
-      teacherScript: ''
+      correct_answer: '',
+      teacher_script: ''
     }
   },
   sentenceCompletion: {
@@ -298,8 +298,8 @@ export const QUESTION_TYPES = {
       prompt: '',
       sentence: '',
       hint: [] as string[],
-      correctAnswer: '',
-      teacherScript: ''
+      correct_answer: '',
+      teacher_script: ''
     }
   },
   sentenceTransformationAndCompletion: {
@@ -310,8 +310,8 @@ export const QUESTION_TYPES = {
       originalSentence: '',
       tenseToTransform: '',
       hint: [] as string[],
-      correctAnswer: '',
-      teacherScript: ''
+      correct_answer: '',
+      teacher_script: ''
     }
   }
 } as const;

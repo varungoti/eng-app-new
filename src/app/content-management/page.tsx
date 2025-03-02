@@ -4,7 +4,7 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 import { Toaster } from 'sonner';
 import Link from 'next/link';
-import {  Activity as ActivityIcon,  ArrowLeft,  BookOpen,  ChevronDown,  ChevronRight,  Check,  Edit,  Eye,  EyeOff,  HelpCircle,  Layers,  List,  MessageSquare,  Plus,  Save,  Trash as Trash2, X, Pencil, Lock, Unlock, RefreshCw, Clock, Bell, Moon, GraduationCap, MoreHorizontal, Loader2 } from 'lucide-react';
+import {  Activity as ActivityIcon,  ArrowLeft,  BookOpen,  ChevronDown,  ChevronRight,  Check,  Edit,  Eye,  EyeOff,  HelpCircle,  Layers,  List,  MessageSquare,  Plus,  Save,  Trash as Trash2, X, Pencil, Lock, Unlock, RefreshCw } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -27,23 +27,10 @@ import { contentService } from '@/lib/content/ContentService';
 import { MediaPreview } from '@/components/ui/media-preview';
 import { QuestionTypeSelect } from './components/question-type-select';
 import { RichTextEditor } from '@/components/ui/rich-text-editor';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+
 import { debounce, isNull } from 'lodash';
 import { PostgrestError } from '@supabase/supabase-js';
 import { Question as ContentQuestion } from './types';  // Import the specific type
-import { Trash } from "lucide-react";
-import { AnimatePresence, motion } from 'framer-motion';
-import { useQueryClient } from 'react-query';
 
 
 // Update the API endpoint to match your backend route
@@ -107,8 +94,8 @@ const getQuestionTypeFields = (type: string) => {
         fields: {
           prompt: '',
           options: [],
-          correct_answer: '',
-          teacher_script: '',
+          correctAnswer: '',
+          teacherScript: '',
           explanation: ''
         }
       };
@@ -118,7 +105,7 @@ const getQuestionTypeFields = (type: string) => {
         fields: {
           prompt: '',
           blanks: [],
-          teacher_script: '',
+          teacherScript: '',
           explanation: ''
         }
       };
@@ -127,8 +114,8 @@ const getQuestionTypeFields = (type: string) => {
         required: ['prompt', 'correctAnswer'],
         fields: {
           prompt: '',
-          correct_answer: null,
-          teacher_script: '',
+          correctAnswer: null,
+          teacherScript: '',
           explanation: ''
         }
       };
@@ -138,7 +125,7 @@ const getQuestionTypeFields = (type: string) => {
         fields: {
           prompt: '',
           pairs: [],
-          teacher_script: '',
+          teacherScript: '',
           explanation: ''
         }
       };
@@ -149,7 +136,7 @@ const getQuestionTypeFields = (type: string) => {
           prompt: '',
           items: [],
           correctOrder: [],
-          teacher_script: '',
+          teacherScript: '',
           explanation: ''
         }
       };
@@ -159,7 +146,7 @@ const getQuestionTypeFields = (type: string) => {
         fields: {
           prompt: '',
           sampleAnswer: '',
-          teacher_script: '',
+          teacherScript: '',
           explanation: '',
           keywords: []
         }
@@ -170,7 +157,7 @@ const getQuestionTypeFields = (type: string) => {
         fields: {
           prompt: '',
           sampleAnswer: '',
-          teacher_script: '',
+          teacherScript: '',
           audioPrompt: '',
           pronunciation: ''
         }
@@ -193,7 +180,7 @@ const getQuestionTypeFields = (type: string) => {
           prompt: '',
           audioContent: '',
           targetPhrase: '',
-          teacher_script: '',
+          teacherScript: '',
           pronunciation: ''
         }
       };
@@ -202,7 +189,7 @@ const getQuestionTypeFields = (type: string) => {
         required: ['prompt'],
         fields: {
           prompt: '',
-          teacher_script: ''
+          teacherScript: ''
         }
       };
   }
@@ -219,10 +206,8 @@ interface Question {
   type: string;
   lesson_id: string;
   title: string;
-  content: string;
   metadata: Record<string, any>;
   data: Record<string, any>; // This allows dynamic field access
-  correct_answer: string;
   exercisePrompts: ExercisePrompt[];
   isDraft?: boolean;
 }
@@ -263,18 +248,18 @@ interface QuestionData {
   id?: string;
   content?: string;
   type?: string;
+  sampleAnswer?: string | null;
   data?: {
     prompt?: string;
-    teacher_script?: string;
+    teacherScript?: string;
     followup_prompt?: string[];
-    sample_answer?: string;
+    sampleAnswer?: string;
     answer?: string;
   } | null;
   prompt: string;
-  teacher_script: string;
+  teacherScript: string;
   followup_prompt: string[];
   answer?: string;
-  correct_answer?: string;
 }
 
 // In your component where you handle questions
@@ -283,12 +268,12 @@ const handleQuestionData = (question: QuestionData) => {
     ...question,
     data: {
       prompt: question?.data?.prompt || '',
-      teacher_script: question?.data?.teacher_script || '',
+      teacherScript: question?.data?.teacherScript || '',
       followup_prompt: question?.data?.followup_prompt || [],
-      sample_answer: question?.data?.sample_answer || undefined,  // Convert null to undefined
+      sampleAnswer: question?.data?.sampleAnswer || undefined,  // Convert null to undefined
       answer: question?.data?.answer || undefined  // Convert null to undefined
     } as const,
-    sampleAnswer: question?.correct_answer || ''
+    sampleAnswer: question?.sampleAnswer || ''
   };
 };
 
@@ -378,44 +363,6 @@ export default function LessonManagementPage() {
   // Add this state to track dropdown state
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  // Add these states
-  const [isLoadingSubtopics, setIsLoadingSubtopics] = useState(false);
-  const [isLoadingLessons, setIsLoadingLessons] = useState(false);
-
-  // Add these state variables
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [itemToDelete, setItemToDelete] = useState<{
-    id: string;
-    type: 'topic' | 'subtopic' | 'lesson';
-    title: string;
-  } | null>(null);
-
-  // Add these state variables
-  const [deleteError, setDeleteError] = useState<string | null>(null);
-
-  // Add this validation function
-  const canDeleteItem = async (type: 'topic' | 'subtopic' | 'lesson', id: string) => {
-    switch (type) {
-      case 'topic':
-        const subtopicsInTopic = subtopics.filter(s => s.topic_id === id);
-        return subtopicsInTopic.length === 0;
-        
-      case 'subtopic':
-        const lessonsInSubtopic = lessons.filter(l => l.subtopic_id === id);
-        return lessonsInSubtopic.length === 0;
-        
-      case 'lesson':
-        const { data: questions } = await supabase
-          .from('questions')
-          .select('id')
-          .eq('lesson_id', id);
-        return !questions || questions.length === 0;
-        
-      default:
-        return false;
-    }
-  };
-
   // Event handlers
   const handleQuestionTypeChange = useCallback((type: string) => {
     if (isQuestionType(type)) {
@@ -430,19 +377,15 @@ export default function LessonManagementPage() {
     const newQuestion: Question = {
       id: crypto.randomUUID(),
       type: selectedQuestionType,
-      //data: {},
+      data: {},
       title: 'New Question',
-      content: '',
       lesson_id: currentLessonId || '',
       metadata: {},
-      data: {
-        ...defaultData,
-        prompt: '',
-        teacher_script: '',
-        followup_prompt: [],
-        sample_answer: ''
-      },
-      correct_answer: '',
+      // data: {
+      //   ...defaultData,
+      //   prompt: '',
+      //   teacherScript: ''
+      // },
       exercisePrompts: [],
       isDraft: true
     };
@@ -454,53 +397,6 @@ export default function LessonManagementPage() {
     ]);
     setSelectedQuestionType('');
   }, [selectedQuestionType, currentLessonId]);
-
-  const checkDeletability = async (type: 'topic' | 'subtopic' | 'lesson', id: string) => {
-    try {
-      switch (type) {
-        case 'lesson':
-          const { data: questions } = await supabase
-            .from('questions')
-            .select('count')
-            .eq('lesson_id', id);
-          return { 
-            canDelete: questions?.[0]?.count === 0,
-            message: questions?.[0]?.count ?? 0> 0 
-              ? `Please delete ${questions?.[0]?.count} questions first` 
-              : null
-          };
-
-        case 'subtopic':
-          const { data: lessons } = await supabase
-            .from('lessons')
-            .select('id, questions(count)')
-            .eq('subtopic_id', id);
-          const hasQuestions = lessons?.some(l => l.questions?.[0]?.count > 0);
-          return {
-            canDelete: !hasQuestions && !lessons?.length,
-            message: hasQuestions ? 'Delete questions from lessons first' : 
-                     lessons?.length ? 'Delete all lessons first' : null
-          };
-
-        case 'topic':
-          const { data: subtopics } = await supabase
-            .from('subtopics')
-            .select('id, lessons(questions(count))')
-            .eq('topic_id', id);
-          const hasContent = subtopics?.some(s => 
-            s.lessons?.some(l => l.questions?.[0]?.count > 0)
-          );
-          return {
-            canDelete: !hasContent && !subtopics?.length,
-            message: hasContent ? 'Delete all content first' : 
-                     subtopics?.length ? 'Delete all subtopics first' : null
-          };
-      }
-    } catch (error) {
-      console.error('Error checking deletability:', error);
-      return { canDelete: false, message: 'Error checking item' };
-    }
-  };
 
   const handleRemoveQuestion = async (index: number) => {
     try {
@@ -556,11 +452,12 @@ export default function LessonManagementPage() {
               type: 'image',
               narration: 'Your turn',
               saytext: 'Say: ',
-              metadata: {
-                estimatedTime: 0
-              },
               created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString()
+              updated_at: new Date().toISOString(),
+              metadata: {
+                difficulty: 'beginner',
+                estimatedTime: 10
+              }
             }
           ]
         };
@@ -673,7 +570,7 @@ export default function LessonManagementPage() {
 
   const [isSaving, setIsSaving] = useState(false);
 
-  const handleSaveLesson = async () => {
+  const handleSaveLesson = useCallback(async () => {
     try {
       if (!currentLessonId || !selectedSubtopicId) {
         toast.error('Please select a subtopic and lesson first');
@@ -853,7 +750,7 @@ export default function LessonManagementPage() {
 
 
     }
-  };
+  }, [currentLessonId, selectedSubtopicId, selectedGradeId, selectedTopicId, lessonTitle, lessonContent, contentHeading, questions, activities]);
 
   const handleSaveQuestion = async (question: Question, index: number) => {
     const loadingToast = toast.loading(`Saving question ${index + 1}...`);
@@ -947,8 +844,16 @@ export default function LessonManagementPage() {
           throw new Error('No data returned from Supabase');
         }
 
+        // Define interface for database grade structure
+        interface DbGrade {
+          id: string;
+          name: string;
+          level?: number;
+          order_index?: number;
+        }
+
         // Map the grades to match your interface
-        const validGrades = data.map((grade: any) => ({
+        const validGrades = data.map((grade: DbGrade) => ({
           _id: grade.id,
           id: grade.id,
           name: grade.name,
@@ -983,8 +888,15 @@ export default function LessonManagementPage() {
           throw error;
         }
 
+        // Define interface for database topic structure
+        interface DbTopic {
+          id: string;
+          title: string;
+          grade_id: string;
+        }
+
         // Map the topics to match your interface
-        const validTopics = (data || []).map((topic: any) => ({
+        const validTopics = (data || []).map((topic: DbTopic) => ({
           _id: topic.id,
           id: topic.id,
           name: topic.title,
@@ -1013,7 +925,16 @@ export default function LessonManagementPage() {
         const subtopicsData = await contentService.fetchSubtopics(selectedTopicId);
         console.log('Fetched subtopics:', subtopicsData);
 
-        const validSubtopics = subtopicsData.map((subtopic: any) => ({
+        // Define interface for database subtopic structure
+        interface DbSubtopic {
+          id: string;
+          title: string;
+          description?: string;
+          topic_id: string;
+          order_index?: number;
+        }
+
+        const validSubtopics = subtopicsData.map((subtopic: DbSubtopic) => ({
           id: subtopic.id,
           title: subtopic.title,
           description: subtopic.description,
@@ -1058,11 +979,21 @@ export default function LessonManagementPage() {
       }
       
       // Map the lessons to ensure they have _id
-      const validLessons = (data || []).map((lesson: any) => ({
+      interface DbLesson {
+        id: string;
+        _id?: string;
+        title?: string;
+        subtopic_id: string;
+        order_index?: number;
+        // For other properties spread with ...lesson
+        [key: string]: unknown;
+      }
+
+      const validLessons = (data || []).map((lesson: DbLesson) => ({
         ...lesson,
         _id: lesson._id || lesson.id, // Use _id if available, otherwise use id
         title: lesson.title || 'Untitled Lesson'
-      })).filter((lesson: any) => lesson._id); // Only include lessons with valid IDs
+      })).filter((lesson: DbLesson) => lesson._id); // Only include lessons with valid IDs
       
       setLessons(validLessons);
     } catch (error) {
@@ -1181,7 +1112,7 @@ export default function LessonManagementPage() {
       if (timeoutId) clearTimeout(timeoutId);
       if (isLoading.current) isLoading.current = false;
     };
-  }, [currentLessonId]); // Remove loadLessonContent from dependencies
+  }, [currentLessonId, loadLessonContent]); // Include loadLessonContent in dependencies
 
   useEffect(() => {
     console.log('Current lessons state:', lessons);
@@ -1335,53 +1266,12 @@ export default function LessonManagementPage() {
   };
 
   // Update the expansion handlers
-  const handleTopicExpand = async (topicId: string) => {
+  const handleTopicExpand = (topicId: string | null) => {
     setExpandedTopic(expandedTopic === topicId ? null : topicId);
-    setSelectedTopicId(topicId);
-    
-    // Load subtopics when topic is expanded
-    if (topicId) {
-      setIsLoadingSubtopics(true);
-      try {
-        const { data: subtopicsData, error } = await supabase
-          .from('subtopics')
-          .select('*')
-          .eq('topic_id', topicId)
-          .order('order_index');
-
-        if (error) throw error;
-        setSubtopics(subtopicsData || []);
-      } catch (error) {
-        console.error('Error loading subtopics:', error);
-        toast.error('Failed to load subtopics');
-      } finally {
-        setIsLoadingSubtopics(false);
-      }
-    }
   };
 
-  const handleSubtopicExpand = async (subtopicId: string) => {
+  const handleSubtopicExpand = (subtopicId: string | null) => {
     setExpandedSubtopic(expandedSubtopic === subtopicId ? null : subtopicId);
-    setSelectedSubtopicId(subtopicId);
-    
-    if (subtopicId) {
-      setIsLoadingLessons(true);
-      try {
-        const { data: lessonsData, error } = await supabase
-          .from('lessons')
-          .select('*')
-          .eq('subtopic_id', subtopicId)
-          .order('order_index');
-
-        if (error) throw error;
-        setLessons(lessonsData || []);
-      } catch (error) {
-        console.error('Error loading lessons:', error);
-        toast.error('Failed to load lessons');
-      } finally {
-        setIsLoadingLessons(false);
-      }
-    }
   };
 
   const handleQuestionExpand = (index: number) => {
@@ -1534,8 +1424,6 @@ export default function LessonManagementPage() {
         .from('lessons')
         .insert({
           title: newItemData.name,
-          duration: 0,
-          topic_id: selectedTopicId,
           subtopic_id: selectedSubtopicId,
           content: '', // Empty rich text content initially
           status: 'draft'
@@ -2195,7 +2083,7 @@ export default function LessonManagementPage() {
                         variant="outline" 
                         size="sm" 
                         className="w-full gap-2"
-                        onClick={() => setModalState({ ...modalState, showAddGrade: false })}
+                        onClick={() => setModalState({ ...modalState, showAddGrade: true })}
                       >
                         <Plus className="h-4 w-4" />
                         Add New Grade
@@ -2204,175 +2092,70 @@ export default function LessonManagementPage() {
                     </div>
 
                     {/* Content Tree View in View Mode */}
-                    {isViewMode && selectedGrade && (
-  <div className="grid grid-cols-1 gap-6 p-6">
-    <Card className="border-primary/10">
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle>Content Structure</CardTitle>
-          <Badge variant="outline" className="text-primary">
-            {topics.length} Topics
-          </Badge>
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        {topics.map((topic) => (
-          <Card 
-            key={topic.id} 
-            className={cn(
-              "border-l-4 transition-all duration-200",
-              "border-l-primary/40 hover:border-l-primary"
-            )}
-          >
-            <CardHeader className="py-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Layers className="h-5 w-5 text-primary" />
-                  <div>
-                    <h3 className="font-medium">{topic.title}</h3>
-                    <p className="text-sm text-muted-foreground">
-                      {subtopics.filter(s => s.topic_id === topic.id).length} Subtopics
-                    </p>
-                  </div>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="hover:bg-destructive/10"
-                  onClick={async () => {
-                    const { canDelete, message } = await checkDeletability('topic', topic.id);
-                    if (!canDelete) {
-                      toast.error(message);
-                      return;
-                    }
-                    setItemToDelete({
-                      id: topic.id,
-                      type: 'topic',
-                      title: topic.title
-                    });
-                    setDeleteDialogOpen(true);
-                  }}
-                >
-                  <Trash className="h-4 w-4" />
-                </Button>
-              </div>
-
-              <div className="mt-4 pl-4 space-y-4">
-                {subtopics
-                  .filter(subtopic => subtopic.topic_id === topic.id)
-                  .map((subtopic) => {
-                    const subtopicLessons = lessons.filter(l => l.subtopic_id === subtopic.id);
-                    const isEmpty = subtopicLessons.length === 0;
-                    
-                    return (
-                      <Card key={subtopic.id} className="border-l-2 border-l-primary/20">
-                        <CardHeader className="py-3">
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                              <BookOpen className="h-4 w-4 text-primary" />
-                              <div>
-                                <h4 className="font-medium">{subtopic.title}</h4>
-                                <div className="flex items-center gap-2">
-                                  <Badge variant="outline">
-                                    {subtopicLessons.length} Lessons
-                                  </Badge>
-                                  {isEmpty && (
-                                    <Badge variant="outline" className="text-yellow-500">
-                                      Empty
-                                    </Badge>
-                                  )}
-                                </div>
+                    {isViewMode && expandedGrade && (
+                      <div className="mt-4 space-y-4">
+                        {topics.map((topic: Topic) => (
+                          <Card key={topic.id} className="border-l-4 border-l-primary">
+                            <CardHeader className="py-3">
+                              <div className="flex items-center justify-between">
+                                <h4 className="font-medium">{topic.title}</h4>
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm" 
+                                  onClick={() => handleTopicExpand(topic.id || '')}
+                                >
+                                  {expandedTopic === topic.id ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                                </Button>
                               </div>
-                            </div>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="hover:bg-destructive/10"
-                              onClick={async () => {
-                                const { canDelete, message } = await checkDeletability('subtopic', subtopic.id);
-                                if (!canDelete) {
-                                  toast.error(message);
-                                  return;
-                                }
-                                setItemToDelete({
-                                  id: subtopic.id,
-                                  type: 'subtopic',
-                                  title: subtopic.title
-                                });
-                                setDeleteDialogOpen(true);
-                              }}
-                            >
-                              <Trash className="h-4 w-4" />
-                            </Button>
-                          </div>
-
-                          <div className="pl-4 mt-2 space-y-2">
-                            {subtopicLessons.map((lesson) => {
-                              const questionCount = lesson.questions?.length || 0;
-                              const isEmpty = questionCount === 0;
-                              
-                              return (
-                                <Card key={lesson.id} className="border-l border-l-primary/10">
-                                  <CardHeader className="py-2">
-                                    <div className="flex items-center justify-between">
-                                      <div className="flex items-center gap-2">
-                                        <div className="flex flex-col">
-                                          <span className="text-sm font-medium">
-                                            {lesson.title}
-                                          </span>
-                                          <div className="flex items-center gap-2">
-                                            <span className="text-xs text-muted-foreground">
-                                              {lesson.duration || 0} mins • {questionCount} Questions
-                                            </span>
-                                            {isEmpty && (
-                                              <Badge 
-                                                variant="outline" 
-                                                className="text-yellow-500"
-                                              >
-                                                Empty
-                                              </Badge>
-                                            )}
-                                          </div>
-                                        </div>
+                            </CardHeader>
+                            {expandedTopic === topic.id && (
+                              <CardContent className="py-0 pl-4">
+                                {subtopics
+                                  .filter(subtopic => subtopic.topic_id === topic.id)
+                                  .map((subtopic: SubTopic) => (
+                                    <div key={subtopic.id} className="mb-3 last:mb-0">
+                                      <div className="flex items-center justify-between py-2">
+                                        <span className="text-sm font-medium">{subtopic.name}</span>
+                                        <Button 
+                                          variant="ghost" 
+                                          size="sm" 
+                                          onClick={() => handleSubtopicExpand(subtopic.id || '')}
+                                        >
+                                          {expandedSubtopic === subtopic.id ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                                        </Button>
                                       </div>
-                                      <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        className="hover:bg-destructive/10"
-                                        onClick={async () => {
-                                          const { canDelete, message } = await checkDeletability('lesson', lesson.id);
-                                          if (!canDelete) {
-                                            toast.error(message);
-                                            return;
-                                          }
-                                          setItemToDelete({
-                                            id: lesson.id,
-                                            type: 'lesson',
-                                            title: lesson.title
-                                          });
-                                          setDeleteDialogOpen(true);
-                                        }}
-                                      >
-                                        <Trash className="h-4 w-4" />
-                                      </Button>
+                                      {expandedSubtopic === subtopic.id && (
+                                        <div className="pl-4 space-y-2">
+                                          {lessons
+                                            .filter(lesson => lesson.subtopic_id === subtopic.id)
+                                            .map((lesson: Lesson) => (
+                                              <div
+                                                key={lesson.id}
+                                                className="flex items-center gap-2 py-1 px-2 rounded-md hover:bg-accent cursor-pointer"
+                                                onClick={() => {
+                                                  const lessonId = lesson.id || '';
+                                                  const topicId = topic.id || '';
+                                                  const subtopicId = subtopic.id || '';
+                                                  
+                                                  setCurrentLessonId(lessonId);
+                                                  setSelectedTopicId(topicId);
+                                                  setSelectedSubtopicId(subtopicId);
+                                                }}
+                                              >
+                                                <BookOpen className="h-4 w-4 text-muted-foreground" />
+                                                <span className="text-sm">{lesson.title}</span>
+                                              </div>
+                                            ))}
+                                        </div>
+                                      )}
                                     </div>
-                                  </CardHeader>
-                                </Card>
-                              );
-                            })}
-                          </div>
-                        </CardHeader>
-                      </Card>
-                    );
-                  })}
-              </div>
-            </CardHeader>
-          </Card>
-        ))}
-      </CardContent>
-    </Card>
-  </div>
-)}
+                                  ))}
+                              </CardContent>
+                            )}
+                          </Card>
+                        ))}
+                      </div>
+                    )}
 
                     {/* Regular Edit Mode Content */}
                     {!isViewMode && (
@@ -2683,7 +2466,7 @@ export default function LessonManagementPage() {
                                                 currentLessonId === lesson.id && "border-primary bg-accent/50 shadow-md",
                                                 "group" // Enable group hover effects
                                               )}
-                                              onClick={() => handleLessonSelect(lesson.id)}
+                                              onClick={() => handleLessonSelect(lesson.id || '')}
                                             >
                                               <CardHeader className="p-4">
                                                 <div className="flex flex-col gap-2">
@@ -2868,7 +2651,7 @@ export default function LessonManagementPage() {
                                   </div>
                                       {expandedQuestion !== index && (
                                         <div className="text-sm text-muted-foreground truncate">
-                                          {question.title || 'No question text'} - {question.data?.content || 'No question texts'}
+                                          {question.metadata?.prompt || 'No question text'}
                                         </div>
                                       )}
                                     </div>
@@ -2915,10 +2698,8 @@ export default function LessonManagementPage() {
                                             teacher_script: updatedQuestion.data?.teacher_script ?? '',
                                             followup_prompt: updatedQuestion.data?.followup_prompt ?? [],
                                             sample_answer: updatedQuestion.data?.sample_answer ?? '',
-                                            metadata: updatedQuestion.metadata ?? {},
-                                            },
-                                            correct_answer: updatedQuestion.correct_answer ?? '',
-                                            content: updatedQuestion.content ?? ''  // Add default value
+                                            
+                                          }
                                         });
                                       }}
                                       onRemove={handleRemoveQuestion}
@@ -3224,8 +3005,8 @@ export default function LessonManagementPage() {
         )}
         <SaveFeedback />
 
-        {/* Add Grade Modal - do not delete */}
-        {/* {modalState.showAddGrade && (
+        {/* Add Grade Modal */}
+        {modalState.showAddGrade && (
           <Dialog 
             open={modalState.showAddGrade} 
             onOpenChange={(open) => handleModalStateChange('showAddGrade', open)}
@@ -3261,7 +3042,7 @@ export default function LessonManagementPage() {
               </DialogFooter>
             </DialogContent>
           </Dialog>
-        )} */}
+        )}
 
         {/* Add Topic Modal */}
         {modalState.showAddTopic && (

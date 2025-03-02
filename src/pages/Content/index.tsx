@@ -8,7 +8,7 @@ import { ContentView } from '@/components/content/ContentView';
 import { lazy } from 'react';
 import { logger } from '@/lib/logger';
 
-const LessonManagement = lazy(() => {
+const LessonManagement = lazy(async() => {
   return import('@/components/content/lesson-management/page')
     .then(module => {
       logger.debug('LessonManagement loaded successfully', {

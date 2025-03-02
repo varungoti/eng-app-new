@@ -1,5 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { MonitoringConfig } from './types';
+import { logger } from '../logger';
 
 export class BaseMonitor {
   constructor(
@@ -13,7 +14,7 @@ export class BaseMonitor {
 
   protected log(level: 'info' | 'warn' | 'error', message: string, data?: any) {
     if (this.config.enableLogging) {
-      console[level](message, data);
+      logger[level](message, { source: this.constructor.name, context: data });
     }
   }
 }

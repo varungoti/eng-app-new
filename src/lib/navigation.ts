@@ -3,15 +3,13 @@ import {
   LayoutDashboard,
   Settings,
   Users,
-  BookOpen,
   FolderPlus,
-  GraduationCap,
   FileText,
   BarChart,
   type LucideIcon 
 } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
-import {   Home,   DollarSign, Eye, Code, Server, Calendar, AlertTriangle, FileBarChart, CalendarDays, Building,} from 'lucide-react';
+//import { useQuery } from '@tanstack/react-query';
+import { DollarSign, Eye, Code, Server, Calendar, AlertTriangle, CalendarDays, Building,} from 'lucide-react';
 import { TEACHER_ROUTES } from './content/routes';
   // ... import other icons you need
 
@@ -125,9 +123,9 @@ export const getNavigationItems = (role: string, pathname: string = ''): Sidebar
   } else if (permissions.content_editor) {
     navigationItems.push({
       label: 'Lessons',
-      href: '/content/lessons',
+      href: '/src/features/content-management/ContentManagementPage.tsx',
       icon: FileText,
-      isActive: pathname === '/content/lessons'
+      isActive: pathname === '/src/features/content-management/ContentManagementPage.tsx'
     });
   }
 

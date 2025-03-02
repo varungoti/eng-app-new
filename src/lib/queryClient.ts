@@ -22,15 +22,26 @@ export const queryClient = new QueryClient({
     mutations: {
       onSuccess: (data: unknown, variables: unknown, context: unknown) => {
         if (DEBUG_CONFIG.enabled) {
-          logger.debug('Query succeeded', 
-            (context as { meta?: { source: string } })?.meta?.source || 'unknown'
-          );
+          const source = (context as { meta?: { source: string } })?.meta?.source || 'unknown';
+          const queryKey = (variables as { queryKey?: string[] })?.queryKey || 'unknown';
+          const queryName = queryKey[0] || 'unknown';
+          
+          logger.debug(`Query "${queryName}" succeeded`, { 
+            source,
+            context: {
+              queryKey,
+              variables,
+              data
+            }
+          });
         }
       },
       onError: (error: Error, variables: unknown, context: unknown) => {
-        logger.error(`Query error: ${error.message}`, 
-          (context as { meta?: { source: string } })?.meta?.source || 'unknown'
-        );
+        const source = (context as { meta?: { source: string } })?.meta?.source || 'unknown';
+        const queryKey = (variables as { queryKey?: string[] })?.queryKey || 'unknown';
+        const queryName = queryKey[0] || 'unknown';
+
+        logger.error(`Query "${queryName}" failed: ${error.message}`, { source, error });
       }
     }
   }

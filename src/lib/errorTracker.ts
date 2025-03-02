@@ -1,4 +1,5 @@
 import { debounce } from './utils';
+import { logger } from './logger';
 
 export type ErrorSeverity = 'error' | 'warning' | 'info';
 
@@ -75,13 +76,14 @@ class ErrorTracker {
 
     // Log to console in development
     if (import.meta.env.DEV) {
-      console.group(`🔴 Error Tracked: ${error.source}`);
-      console.error(error.message);
-      console.log('Context:', error.context);
-      if (error.componentStack) {
-        console.log('Component Stack:', error.componentStack);
-      }
-      console.groupEnd();
+      logger.error(`🔴 Error Tracked: ${error.source} - ${error.message}`, { 
+        source: 'ErrorTracker',
+        error: {
+          ...error,
+          context: error.context,
+          componentStack: error.componentStack
+        }
+      });
     }
   }
 

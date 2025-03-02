@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 1,
+            "activePatchIndex": 2,
             "patches": [
                 {
                     "date": 1738876565750,
@@ -12,6 +12,10 @@
                 {
                     "date": 1738876674900,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,25 +1,25 @@\n import { createBrowserClient } from '@supabase/ssr'\r\n import { createClient } from '@supabase/supabase-js';\r\n \r\n-export const createClient = () => {\r\n-  return createBrowserClient(\r\n-    process.env.NEXT_PUBLIC_SUPABASE_URL!,\r\n-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!\r\n-  )\r\n-} \r\n+// export const createClient = () => {\r\n+//   return createBrowserClient(\r\n+//     process.env.NEXT_PUBLIC_SUPABASE_URL!,\r\n+//     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!\r\n+//   )\r\n+// } \r\n \r\n-// const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;\r\n-// const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;\r\n+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;\r\n+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;\r\n \r\n-// if (!supabaseUrl || !supabaseAnonKey) {\r\n-//   throw new Error('Missing Supabase environment variables');\r\n-// }\r\n+if (!supabaseUrl || !supabaseAnonKey) {\r\n\\ No newline at end of file\n+  throw new Error('Missing Supabase environment variables');\r\n+}\r\n \r\n-// export const supabase = createClient(supabaseUrl, supabaseAnonKey, {\r\n-//   auth: {\r\n-//     persistSession: true,\r\n-//     autoRefreshToken: true,\r\n-//   },\r\n-// });\r\n+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {\r\n+  auth: {\r\n+    persistSession: true,\r\n+    autoRefreshToken: true,\r\n+  },\r\n+});\r\n \r\n-// export default supabase; \n+export default supabase; \n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1740899530634,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,5 +1,5 @@\n-import { createBrowserClient } from '@supabase/ssr'\r\n+//import { createBrowserClient } from '@supabase/ssr'\r\n import { createClient } from '@supabase/supabase-js';\r\n \r\n // export const createClient = () => {\r\n //   return createBrowserClient(\r\n"
                 }
             ],
             "date": 1738876565750,

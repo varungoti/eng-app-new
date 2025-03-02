@@ -1,3 +1,4 @@
+import { ImagePreview } from "../common/ImagePreview";
 import {
   InteractiveSentence,
   ListenButton,
@@ -586,8 +587,8 @@ const LookAndSpeakFormat = ({
     <div className="space-y-4">
       {question.imageUrl && (
         <div className="rounded-xl overflow-hidden border dark:border-primary/30 border-primary/40">
-          <img
-            src={question.imageUrl}
+          <ImagePreview
+            imageUrl={question.imageUrl}
             alt="Speaking prompt"
             className="w-full h-auto object-cover"
           />
@@ -726,18 +727,19 @@ const DebateFormat = ({
           <h3 className="font-semibold mb-2">Key Points:</h3>
           <ul className="space-y-2">
             {question.keyPoints.map((point, index) => (
-              <motion.li
-                key={index}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: index * 0.1 }}
-                className="flex items-start gap-2"
-              >
-                <span className="w-6 h-6 flex items-center justify-center rounded-full bg-primary/10 text-sm">
-                  {index + 1}
-                </span>
-                <span>{point}</span>
-              </motion.li>
+              <li key={index}>
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  className="flex items-start gap-2"
+                >
+                  <span className="w-6 h-6 flex items-center justify-center rounded-full bg-primary/10 text-sm">
+                    {index + 1}
+                  </span>
+                  <span>{point}</span>
+                </motion.div>
+              </li>
             ))}
           </ul>
         </div>
@@ -826,8 +828,8 @@ const PresentationFormat = ({
               transition={{ delay: index * 0.2 }}
               className="rounded-xl overflow-hidden border dark:border-primary/30 border-primary/40"
             >
-              <img
-                src={aid.url}
+              <ImagePreview
+                imageUrl={aid.url}
                 alt={aid.description}
                 className="w-full h-48 object-cover"
               />

@@ -136,4 +136,4 @@ export class CacheStrategy<T> {
   }
 }
 
-export const authCache = new CacheStrategy<any>();
+export const authCache = new CacheStrategy<unknown>();

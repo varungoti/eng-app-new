@@ -392,16 +392,17 @@ export function RealTimePronunciationTrainer({
               <CardContent className="p-6">
                 <ul className="space-y-2">
                   {feedback.map((item, index) => (
-                    <motion.li
-                      key={index}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.1 }}
-                      className="flex items-start gap-2"
-                    >
-                      <ArrowRight className="h-5 w-5 text-primary mt-0.5" />
-                      <span>{item}</span>
-                    </motion.li>
+                    <li key={index}>
+                      <motion.div
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                        className="flex items-start gap-2"
+                      >
+                        <ArrowRight className="h-5 w-5 text-primary mt-0.5" />
+                        <span>{item}</span>
+                      </motion.div>
+                    </li>
                   ))}
                 </ul>
               </CardContent>

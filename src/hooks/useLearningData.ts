@@ -3,7 +3,11 @@ import { useLearning } from '@/contexts/LearningContext';
 import { fetchLearningPath, fetchUserActivities } from '@/lib/api/learning';
 import { useToast } from '@/components/ui/use-toast';
 
-export function useLearningData(userId: string) {
+// Use ReturnType to infer the state type from useLearning
+type LearningReturnType = ReturnType<typeof useLearning>;
+type LearningStateType = LearningReturnType['state']; 
+
+export function useLearningData(userId: string): LearningStateType {
   const { state, dispatch } = useLearning();
   const { toast } = useToast();
 
@@ -11,7 +15,7 @@ export function useLearningData(userId: string) {
     async function loadData() {
       dispatch({ type: 'SET_LOADING', payload: true });
       try {
-        const [topics, activities] = await Promise.all([
+        const [topics, _activities] = await Promise.all([
           fetchLearningPath(),
           fetchUserActivities(userId)
         ]);
@@ -22,8 +26,7 @@ export function useLearningData(userId: string) {
         console.error('Error loading learning data:', error);
         toast({
           title: "Error",
-          description: "Failed to load learning content",
-          variant: "destructive"
+          description: "Failed to load learning content"
         });
         dispatch({ type: 'SET_ERROR', payload: error as Error });
       } finally {

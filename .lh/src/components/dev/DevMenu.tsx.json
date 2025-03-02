@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/components/dev/DevMenu.tsx",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1740772526620,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1740772526620,
+            "name": "Commit-0",
+            "content": "import { useState, lazy, Suspense } from 'react';\r\nimport { Button } from '../../components/ui/button';\r\nimport { Loader2 } from 'lucide-react';\r\n\r\nconst DatabaseMonitor = lazy(() => import('./DatabaseMonitor'));\r\n\r\nexport function DevMenu() {\r\n  const [showDatabaseMonitor, setShowDatabaseMonitor] = useState(false);\r\n\r\n  return (\r\n    <div className=\"fixed bottom-4 left-4 p-4 bg-white rounded-lg shadow-lg\">\r\n      <h3 className=\"text-sm font-medium mb-2\">Development Tools</h3>\r\n      <Button\r\n        title=\"Database Monitor\"\r\n        variant=\"outline\"\r\n        size=\"sm\"\r\n        onClick={() => setShowDatabaseMonitor(!showDatabaseMonitor)}\r\n      >\r\n        {showDatabaseMonitor ? 'Hide' : 'Show'} Database Monitor\r\n      </Button>\r\n\r\n      {showDatabaseMonitor && (\r\n        <Suspense fallback={\r\n          <div className=\"mt-4 flex items-center gap-2\">\r\n            <Loader2 className=\"h-4 w-4 animate-spin\" />\r\n            Loading monitor...\r\n          </div>\r\n        }>\r\n          <DatabaseMonitor />\r\n        </Suspense>\r\n      )}\r\n    </div>\r\n  );\r\n} "
+        }
+    ]
+}

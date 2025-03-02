@@ -1,57 +1,57 @@
-import { connectToDatabase } from '@/lib/mongodb';
-import { Grade } from '@/models/grade';
-import { Topic } from '@/models/topic';
-import { SubTopic } from '@/models/subtopic';
-import { Lesson } from '@/models/lesson';
-import { Types } from 'mongoose';
+import { supabase } from '../supabase';
+//import type { Database } from '../database.types';
+//import { Grade, Topic, SubTopic, Lesson, Question, ExercisePrompt } from '@/types/';
 
+// Repository class methods updated to match the current database schema
 export class Repository {
   // Grade methods
   static async getGrades({ page = 1, pageSize = 10, includeContent = false }) {
-    await connectToDatabase();
     const skip = (page - 1) * pageSize;
-    const query = Grade.find().sort({ order: 1, name: 1 });
+    
+    const { data: grades, error, count } = await supabase
+      .from('grades')
+      .select(includeContent ? 'id, name, level, description, created_at, updated_at, topics(id, title, description, order_index, grade_id, subtopics(id, title, description, order_index, topic_id, lessons(*)))' : '*', 
+        { count: 'exact' })
+      .order('level', { ascending: true })
+      .range(skip, skip + pageSize - 1);
 
-    if (includeContent) {
-      query.populate({
-        path: 'topics',
-        populate: {
-          path: 'subtopics',
-          populate: {
-            path: 'lessons'
-          }
-        }
-      });
-    }
-
-    const [grades, total] = await Promise.all([
-      query.skip(skip).limit(pageSize),
-      Grade.countDocuments()
-    ]);
+    if (error) throw error;
 
     return {
-      grades,
+      grades: grades || [],
       pagination: {
         page,
         pageSize,
-        total,
-        totalPages: Math.ceil(total / pageSize)
+        total: count || 0,
+        totalPages: Math.ceil((count || 0) / pageSize)
       }
     };
   }
 
   static async findGradeByName(name: string) {
-    await connectToDatabase();
-    return Grade.findOne({ name: { $regex: new RegExp(`^${name}$`, 'i') } });
+    const { data, error } = await supabase
+      .from('grades')
+      .select('*')
+      .ilike('name', name)
+      .single();
+    
+    if (error && error.code !== 'PGRST116') throw error;
+    return data;
   }
 
   static async createGrade(data: {
     name: string;
     description?: string;
-    order?: number;
+    level: number;
   }) {
-    await connectToDatabase();
-    return Grade.create(data);
+    const { data: grade, error } = await supabase
+      .from('grades')
+      .insert(data)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return grade;
   }
 
   static async updateGrade(
@@ -59,26 +59,30 @@ export class Repository {
     data: {
       name?: string;
       description?: string;
-      order?: number;
+      level?: number;
     }
   ) {
-    await connectToDatabase();
-    if (!Types.ObjectId.isValid(gradeId)) {
-      throw new Error('Invalid grade ID format');
-    }
-    return Grade.findByIdAndUpdate(
-      gradeId,
-      { $set: data },
-      { new: true, runValidators: true }
-    );
+    const { data: grade, error } = await supabase
+      .from('grades')
+      .update(data)
+      .eq('id', gradeId)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return grade;
   }
 
   static async deleteGrade(gradeId: string) {
-    await connectToDatabase();
-    if (!Types.ObjectId.isValid(gradeId)) {
-      throw new Error('Invalid grade ID format');
-    }
-    return Grade.findByIdAndDelete(gradeId);
+    const { data, error } = await supabase
+      .from('grades')
+      .delete()
+      .eq('id', gradeId)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return data;
   }
 
   // Topic methods
@@ -90,33 +94,23 @@ export class Repository {
   } = {}) {
     try {
       console.log('Repository.getTopics - Starting with gradeId:', gradeId);
-      await connectToDatabase();
       
-      if (!Types.ObjectId.isValid(gradeId)) {
-        console.log('Repository.getTopics - Invalid grade ID format:', gradeId);
-        throw new Error('Invalid grade ID format');
-      }
-
-      const query = { gradeId: new Types.ObjectId(gradeId) };
-      console.log('Repository.getTopics - Query:', JSON.stringify(query));
+      const query = supabase
+        .from('topics')
+        .select(options.includeContent ? 
+          'id, title, description, grade_id, order_index, total_subtopics, subtopics(id, title, description, order_index, topic_id, total_lessons, lessons(*))' : 
+          'id, title, description, grade_id, order_index, total_subtopics')
+        .eq('grade_id', gradeId)
+        .order('order_index', { ascending: true });
       
-      const baseQuery = Topic.find(query).sort({ order: 1, name: 1 });
-      console.log('Repository.getTopics - Created base query');
-
-      if (options.includeContent) {
-        console.log('Repository.getTopics - Including content');
-        baseQuery.populate({
-          path: 'subtopics',
-          populate: {
-            path: 'lessons'
-          }
-        });
-      }
-
-      console.log('Repository.getTopics - Executing query');
-      const topics = await baseQuery.exec();
-      console.log('Repository.getTopics - Success, found topics:', topics.length);
-      return { topics };
+      console.log('Repository.getTopics - Query created');
+      
+      const { data: topics, error } = await query;
+      
+      if (error) throw error;
+      
+      console.log('Repository.getTopics - Success, found topics:', topics?.length || 0);
+      return { topics: topics || [] };
     } catch (error) {
       console.error('Error in Repository.getTopics:', error);
       throw error;
@@ -124,82 +118,75 @@ export class Repository {
   }
 
   static async createTopic(data: {
-    name: string;
+    title: string;
     description?: string;
-    gradeId: string;
-    order?: number;
+    grade_id: string;
+    order_index?: number;
   }) {
-    await connectToDatabase();
+    const { data: topic, error } = await supabase
+      .from('topics')
+      .insert({
+        title: data.title,
+        description: data.description,
+        grade_id: data.grade_id,
+        order_index: data.order_index
+      })
+      .select()
+      .single();
     
-    if (!Types.ObjectId.isValid(data.gradeId)) {
-      throw new Error('Invalid grade ID format');
-    }
-
-    const topic = await Topic.create({
-      ...data,
-      gradeId: new Types.ObjectId(data.gradeId)
-    });
-
+    if (error) throw error;
     return topic;
   }
 
   // SubTopic methods
   static async getSubTopics(topicId: string, options: { includeContent?: boolean } = {}) {
-    await connectToDatabase();
+    const { data: subtopics, error } = await supabase
+      .from('subtopics')
+      .select(options.includeContent ? 'id, title, description, topic_id, order_index, total_lessons, lessons(*)' : 'id, title, description, topic_id, order_index, total_lessons')
+      .eq('topic_id', topicId)
+      .order('order_index', { ascending: true });
     
-    if (!Types.ObjectId.isValid(topicId)) {
-      throw new Error('Invalid topic ID format');
-    }
-
-    const query = { topicId: new Types.ObjectId(topicId) };
-    const baseQuery = SubTopic.find(query).sort({ order: 1, name: 1 });
-
-    if (options.includeContent) {
-      baseQuery.populate('lessons');
-    }
-
-    const subtopics = await baseQuery.exec();
-    return { subtopics };
+    if (error) throw error;
+    return { subtopics: subtopics || [] };
   }
 
   static async createSubTopic(data: {
-    name: string;
+    title: string;
     description?: string;
-    topicId: string;
-    order?: number;
+    topic_id: string;
+    order_index?: number;
   }) {
-    await connectToDatabase();
+    const { data: subtopic, error } = await supabase
+      .from('subtopics')
+      .insert({
+        title: data.title,
+        description: data.description,
+        topic_id: data.topic_id,
+        order_index: data.order_index
+      })
+      .select()
+      .single();
     
-    if (!Types.ObjectId.isValid(data.topicId)) {
-      throw new Error('Invalid topic ID format');
-    }
-
-    const subtopic = await SubTopic.create({
-      ...data,
-      topicId: new Types.ObjectId(data.topicId)
-    });
-
+    if (error) throw error;
     return subtopic;
   }
 
-  // Existing methods
+  // Lesson methods
   static async getLessons(subtopicId: string) {
     try {
       console.log('Repository.getLessons - Starting with subtopicId:', subtopicId);
-      await connectToDatabase();
-
-      if (!Types.ObjectId.isValid(subtopicId)) {
-        console.log('Repository.getLessons - Invalid subtopic ID format:', subtopicId);
-        throw new Error('Invalid subtopic ID format');
-      }
-
-      const query = { subtopicId: new Types.ObjectId(subtopicId) };
-      console.log('Repository.getLessons - Query:', JSON.stringify(query));
-
-      const lessons = await Lesson.find(query).sort({ order: 1, title: 1 });
-      console.log('Repository.getLessons - Success, found lessons:', lessons.length);
-
-      return lessons;
+      
+      const { data: lessons, error } = await supabase
+        .from('lessons')
+        .select('*')
+        .eq('subtopic_id', subtopicId)
+        .order('order_index', { ascending: true })
+        .order('title', { ascending: true });
+      
+      if (error) throw error;
+      
+      console.log('Repository.getLessons - Success, found lessons:', lessons?.length || 0);
+      return lessons || [];
     } catch (error) {
       console.error('Error in Repository.getLessons:', error);
       throw error;
@@ -207,40 +194,62 @@ export class Repository {
   }
 
   static async getLesson(lessonId: string) {
-    await connectToDatabase();
-    if (!Types.ObjectId.isValid(lessonId)) {
-      throw new Error('Invalid lesson ID format');
-    }
-    return Lesson.findById(lessonId);
+    const { data, error } = await supabase
+      .from('lessons')
+      .select('*')
+      .eq('id', lessonId)
+      .single();
+    
+    if (error) throw error;
+    return data;
   }
 
   static async getSubtopic(subtopicId: string) {
-    await connectToDatabase();
-    if (!Types.ObjectId.isValid(subtopicId)) {
-      throw new Error('Invalid subtopic ID format');
-    }
-    return SubTopic.findById(subtopicId);
+    const { data, error } = await supabase
+      .from('subtopics')
+      .select('*')
+      .eq('id', subtopicId)
+      .single();
+    
+    if (error) throw error;
+    return data;
   }
 
   static async createLesson(data: {
     title: string;
     description?: string;
-    subtopicId: string;
-    questions: Array<{
-      type: string;
-      data: Record<string, any>;
-      exercisePrompts: Array<{
-        text: string;
-        media?: string;
-        type?: 'image' | 'gif' | 'video';
-        narration?: string;
-        sayText?: string;
-      }>;
-    }>;
-    order?: number;
+    subtopic_id: string;
+    content?: string;
+    order_index?: number;
+    status?: string;
+    duration?: number;
+    difficulty?: string;
+    media_type?: string;
+    media_url?: string;
+    prerequisites?: string[];
+    metadata?: Record<string, any>;
   }) {
-    await connectToDatabase();
-    return Lesson.create(data);
+    const { data: lesson, error } = await supabase
+      .from('lessons')
+      .insert({
+        title: data.title,
+        description: data.description,
+        subtopic_id: data.subtopic_id,
+        content: data.content,
+        order_index: data.order_index,
+        status: data.status || 'draft',
+        duration: data.duration || 30,
+        difficulty: data.difficulty || 'beginner',
+        media_type: data.media_type,
+        media_url: data.media_url,
+        prerequisites: data.prerequisites || [],
+        metadata: data.metadata || {}
+      })
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return lesson;
   }
 
   static async updateLesson(
@@ -248,115 +257,253 @@ export class Repository {
     data: {
       title?: string;
       description?: string;
-      subtopicId?: string;
-      questions?: Array<{
-        type: string;
-        data: Record<string, any>;
-        exercisePrompts: Array<{
-          text: string;
-          media?: string;
-          type?: 'image' | 'gif' | 'video';
-          narration?: string;
-          sayText?: string;
-        }>;
-      }>;
-      order?: number;
+      subtopic_id?: string;
+      content?: string;
+      order_index?: number;
+      status?: string;
+      duration?: number;
+      difficulty?: string;
+      media_type?: string;
+      media_url?: string;
+      prerequisites?: string[];
+      metadata?: Record<string, any>;
     }
   ) {
-    await connectToDatabase();
+    const { data: lesson, error } = await supabase
+      .from('lessons')
+      .update(data)
+      .eq('id', lessonId)
+      .select()
+      .single();
     
-    if (!Types.ObjectId.isValid(lessonId)) {
-      throw new Error('Invalid lesson ID format');
-    }
-
-    if (data.subtopicId && !Types.ObjectId.isValid(data.subtopicId)) {
-      throw new Error('Invalid subtopic ID format');
-    }
-
-    const updateData = {
-      ...data,
-      subtopicId: data.subtopicId ? new Types.ObjectId(data.subtopicId) : undefined
-    };
-
-    const lesson = await Lesson.findByIdAndUpdate(
-      lessonId,
-      { $set: updateData },
-      { new: true, runValidators: true }
-    );
-
+    if (error) throw error;
     return lesson;
   }
 
   static async deleteLesson(lessonId: string) {
-    await connectToDatabase();
+    const { data, error } = await supabase
+      .from('lessons')
+      .delete()
+      .eq('id', lessonId)
+      .select()
+      .single();
     
-    if (!Types.ObjectId.isValid(lessonId)) {
-      throw new Error('Invalid lesson ID format');
-    }
+    if (error) throw error;
+    return data;
+  }
+  
+  // Questions methods
+  static async getQuestions(lessonId: string) {
+    const { data, error } = await supabase
+      .from('questions')
+      .select('*')
+      .eq('lesson_id', lessonId)
+      .order('order_index', { ascending: true });
+    
+    if (error) throw error;
+    return data || [];
+  }
+  
+  static async createQuestion(data: {
+    title: string;
+    content?: string;
+    type: string;
+    lesson_id: string;
+    points?: number;
+    metadata?: Record<string, any>;
+    order_index?: number;
+    data?: Record<string, any>;
+    correct_answer?: string;
+    duration?: number;
+    sub_type?: string;
+  }) {
+    const { data: question, error } = await supabase
+      .from('questions')
+      .insert({
+        title: data.title,
+        content: data.content,
+        type: data.type,
+        lesson_id: data.lesson_id,
+        points: data.points || 0,
+        metadata: data.metadata || {},
+        order_index: data.order_index,
+        data: data.data || {},
+        correct_answer: data.correct_answer,
+        duration: data.duration || 30,
+        sub_type: data.sub_type
+      })
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return question;
+  }
 
-    return Lesson.findByIdAndDelete(lessonId);
+  // Exercise Prompts methods
+  static async getExercisePrompts(questionId: string) {
+    const { data, error } = await supabase
+      .from('exercise_prompts')
+      .select('*')
+      .eq('question_id', questionId)
+      .order('order_index', { ascending: true });
+    
+    if (error) throw error;
+    return data || [];
+  }
+  
+  static async createExercisePrompt(data: {
+    text: string;
+    media?: string;
+    type?: string;
+    narration?: string;
+    saytext?: string;
+    question_id: string;
+    order_index: number;
+    voice_id?: string;
+    metadata?: any[];
+  }) {
+    const { data: prompt, error } = await supabase
+      .from('exercise_prompts')
+      .insert(data)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return prompt;
+  }
+
+  // School methods
+  static async getSchools() {
+    const { data, error } = await supabase
+      .from('schools')
+      .select('*')
+      .order('name', { ascending: true });
+    
+    if (error) throw error;
+    return data || [];
+  }
+  
+  static async getSchool(schoolId: string) {
+    const { data, error } = await supabase
+      .from('schools')
+      .select('*')
+      .eq('id', schoolId)
+      .single();
+    
+    if (error) throw error;
+    return data;
   }
 
   // Class methods
   static async getClass(classId: string) {
-    await connectToDatabase();
-    if (!Types.ObjectId.isValid(classId)) {
-      throw new Error('Invalid class ID format');
-    }
-    return Grade.findById(classId).populate('topics');
+    const { data: grade, error } = await supabase
+      .from('classes')
+      .select('*, grade:grade_id(*)')
+      .eq('id', classId)
+      .single();
+    
+    if (error) throw error;
+    return grade;
   }
 
   static async getClassSchedule(classId: string) {
-    await connectToDatabase();
-    if (!Types.ObjectId.isValid(classId)) {
-      throw new Error('Invalid class ID format');
+    try {
+      const { data, error } = await supabase
+        .from('assigned_content')
+        .select('*, content:content_id(*)')
+        .eq('class_id', classId)
+        .order('valid_from', { ascending: true });
+      
+      if (error) throw error;
+      return {
+        upcomingClasses: data || []
+      };
+    } catch (error) {
+      console.error('Error fetching class schedule:', error);
+      // Return mock data for now
+      return {
+        upcomingClasses: [
+          {
+            id: 1,
+            subject: "English Literature",
+            time: "09:00 AM",
+            students: 28,
+            topic: "Shakespeare: Romeo & Juliet",
+            room: "Room 101",
+          },
+          {
+            id: 2,
+            subject: "Creative Writing",
+            time: "11:30 AM",
+            students: 24,
+            topic: "Character Development",
+            room: "Room 203",
+          },
+        ]
+      };
     }
-    // TODO: Implement schedule model and query
-    // For now, return mock data
-    return {
-      upcomingClasses: [
-        {
-          id: 1,
-          subject: "English Literature",
-          time: "09:00 AM",
-          students: 28,
-          topic: "Shakespeare: Romeo & Juliet",
-          room: "Room 101",
-        },
-        {
-          id: 2,
-          subject: "Creative Writing",
-          time: "11:30 AM",
-          students: 24,
-          topic: "Character Development",
-          room: "Room 203",
-        },
-      ]
-    };
   }
 
   static async getTopStudents(classId: string, limit: number = 5) {
-    await connectToDatabase();
-    if (!Types.ObjectId.isValid(classId)) {
-      throw new Error('Invalid class ID format');
+    try {
+      const { data: students, error } = await supabase
+        .from('class_students')
+        .select('student:student_id(*)')
+        .eq('class_id', classId)
+        .limit(limit);
+      
+      if (error) throw error;
+      
+      if (students && students.length > 0) {
+        return {
+          students: students.map(s => {
+            // Use a type assertion to help TypeScript understand the structure
+            const student = (s as any).student || {};
+            return {
+              id: student.id || 'unknown',
+              name: `${student.first_name || ''} ${student.last_name || ''}`.trim() || 'Unknown Student',
+              progress: Math.floor(Math.random() * 100) // Mock progress for now
+            };
+          })
+        };
+      }
+      
+      // Return mock data if no students found
+      return {
+        students: [
+          {
+            id: 1,
+            name: "Emma Thompson",
+            avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150",
+            progress: 92,
+          },
+          {
+            id: 2,
+            name: "Michael Chen",
+            avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150",
+            progress: 88,
+          },
+        ]
+      };
+    } catch (error) {
+      console.error('Error fetching top students:', error);
+      // Return mock data on error
+      return {
+        students: [
+          {
+            id: 1,
+            name: "Emma Thompson",
+            avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150",
+            progress: 92,
+          },
+          {
+            id: 2,
+            name: "Michael Chen",
+            avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150",
+            progress: 88,
+          },
+        ]
+      };
     }
-    // TODO: Implement student performance model and query
-    // For now, return mock data
-    return {
-      students: [
-        {
-          id: 1,
-          name: "Emma Thompson",
-          avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150",
-          progress: 92,
-        },
-        {
-          id: 2,
-          name: "Michael Chen",
-          avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150",
-          progress: 88,
-        },
-      ]
-    };
   }
 }

@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/lib/features/reports.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1740900507151,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1740900507151,
+            "name": "Commit-0",
+            "content": "// Reports feature implementation\r\nimport { reportGenerator } from '../reports/ReportGenerator';\r\n\r\nexport interface ReportFeature {\r\n  generateReport: (reportType: string, params: any) => Promise<string>;\r\n  getReportStatus: (reportId: string) => Promise<string>;\r\n}\r\n\r\nexport const reportsFeature: ReportFeature = {\r\n  generateReport: async (reportType, params) => {\r\n    return reportGenerator.generateReport({\r\n      type: reportType as any,\r\n      dateRange: params.dateRange,\r\n      filters: params.filters,\r\n      format: params.format || 'pdf'\r\n    });\r\n  },\r\n  \r\n  getReportStatus: async (reportId) => {\r\n    const report = await reportGenerator.getReport(reportId);\r\n    return report?.status || 'not_found';\r\n  }\r\n}; "
+        }
+    ]
+}

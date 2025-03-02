@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 1,
+            "activePatchIndex": 13,
             "patches": [
                 {
                     "date": 1739016057046,
@@ -12,6 +12,54 @@
                 {
                     "date": 1739016076218,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -27,11 +27,11 @@\n           );\r\n         }\r\n       },\r\n       onError: (error: Error, variables: unknown, context: unknown) => {\r\n-        logger.error(`Query error: ${error.message}`, {\r\n-          source: (context as { meta?: { source: string } })?.meta?.source || 'unknown'\r\n-        });\r\n+        logger.error(`Query error: ${error.message}`, \r\n+          (context as { meta?: { source: string } })?.meta?.source || 'unknown'\r\n+        );\r\n       }\r\n     }\r\n   }\r\n });\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1740852605951,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,6 @@\n import { QueryClient } from '@tanstack/react-query';\r\n-import { logger } from './logger';\r\n+import { logger, LogContext } from './logger';\r\n import { DEBUG_CONFIG } from './config';\r\n \r\n export const queryClient = new QueryClient({\r\n   defaultOptions: {\r\n@@ -21,17 +21,15 @@\n     },\r\n     mutations: {\r\n       onSuccess: (data: unknown, variables: unknown, context: unknown) => {\r\n         if (DEBUG_CONFIG.enabled) {\r\n-          logger.debug('Query succeeded', \r\n-            (context as { meta?: { source: string } })?.meta?.source || 'unknown'\r\n-          );\r\n+          const source = (context as { meta?: { source: string } })?.meta?.source || 'unknown';\r\n+          logger.debug('Query succeeded', { source });\r\n         }\r\n       },\r\n       onError: (error: Error, variables: unknown, context: unknown) => {\r\n-        logger.error(`Query error: ${error.message}`, \r\n-          (context as { meta?: { source: string } })?.meta?.source || 'unknown'\r\n-        );\r\n+        const source = (context as { meta?: { source: string } })?.meta?.source || 'unknown';\r\n+        logger.error(`Query error: ${error.message}`, { source, error });\r\n       }\r\n     }\r\n   }\r\n });\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1740898991993,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,6 @@\n import { QueryClient } from '@tanstack/react-query';\r\n-import { logger, LogContext } from './logger';\r\n+import { logger} from './logger';\r\n import { DEBUG_CONFIG } from './config';\r\n \r\n export const queryClient = new QueryClient({\r\n   defaultOptions: {\r\n"
+                },
+                {
+                    "date": 1740899010124,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -19,9 +19,9 @@\n         source: 'unknown'\r\n       }\r\n     },\r\n     mutations: {\r\n-      onSuccess: (data: unknown, variables: unknown, context: unknown) => {\r\n+      onSuccess: ( context: unknown) => {\r\n         if (DEBUG_CONFIG.enabled) {\r\n           const source = (context as { meta?: { source: string } })?.meta?.source || 'unknown';\r\n           logger.debug('Query succeeded', { source });\r\n         }\r\n"
+                },
+                {
+                    "date": 1740899020681,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -19,9 +19,9 @@\n         source: 'unknown'\r\n       }\r\n     },\r\n     mutations: {\r\n-      onSuccess: ( context: unknown) => {\r\n+      onSuccess: (data: unknown, variables: unknown, context: unknown) => {\r\n         if (DEBUG_CONFIG.enabled) {\r\n           const source = (context as { meta?: { source: string } })?.meta?.source || 'unknown';\r\n           logger.debug('Query succeeded', { source });\r\n         }\r\n"
+                },
+                {
+                    "date": 1740899030238,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -22,8 +22,10 @@\n     mutations: {\r\n       onSuccess: (data: unknown, variables: unknown, context: unknown) => {\r\n         if (DEBUG_CONFIG.enabled) {\r\n           const source = (context as { meta?: { source: string } })?.meta?.source || 'unknown';\r\n+          \r\n+\r\n           logger.debug('Query succeeded', { source });\r\n         }\r\n       },\r\n       onError: (error: Error, variables: unknown, context: unknown) => {\r\n"
+                },
+                {
+                    "date": 1740899039464,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -22,8 +22,9 @@\n     mutations: {\r\n       onSuccess: (data: unknown, variables: unknown, context: unknown) => {\r\n         if (DEBUG_CONFIG.enabled) {\r\n           const source = (context as { meta?: { source: string } })?.meta?.source || 'unknown';\r\n+          const queryKey = (variables as { queryKey?: string[] })?.queryKey || 'unknown';\r\n           \r\n \r\n           logger.debug('Query succeeded', { source });\r\n         }\r\n"
+                },
+                {
+                    "date": 1740899049849,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -23,11 +23,11 @@\n       onSuccess: (data: unknown, variables: unknown, context: unknown) => {\r\n         if (DEBUG_CONFIG.enabled) {\r\n           const source = (context as { meta?: { source: string } })?.meta?.source || 'unknown';\r\n           const queryKey = (variables as { queryKey?: string[] })?.queryKey || 'unknown';\r\n-          \r\n+          const queryName = queryKey[0] || 'unknown';\r\n \r\n-          logger.debug('Query succeeded', { source });\r\n+          logger.debug(`Query \"${queryName}\" succeeded`, { source });\r\n         }\r\n       },\r\n       onError: (error: Error, variables: unknown, context: unknown) => {\r\n         const source = (context as { meta?: { source: string } })?.meta?.source || 'unknown';\r\n"
+                },
+                {
+                    "date": 1740899056795,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -23,16 +23,20 @@\n       onSuccess: (data: unknown, variables: unknown, context: unknown) => {\r\n         if (DEBUG_CONFIG.enabled) {\r\n           const source = (context as { meta?: { source: string } })?.meta?.source || 'unknown';\r\n           const queryKey = (variables as { queryKey?: string[] })?.queryKey || 'unknown';\r\n+          \r\n           const queryName = queryKey[0] || 'unknown';\r\n \r\n           logger.debug(`Query \"${queryName}\" succeeded`, { source });\r\n         }\r\n       },\r\n       onError: (error: Error, variables: unknown, context: unknown) => {\r\n         const source = (context as { meta?: { source: string } })?.meta?.source || 'unknown';\r\n-        logger.error(`Query error: ${error.message}`, { source, error });\r\n+        const queryKey = (variables as { queryKey?: string[] })?.queryKey || 'unknown';\r\n+        const queryName = queryKey[0] || 'unknown';\r\n+\r\n+        logger.error(`Query \"${queryName}\" failed: ${error.message}`, { source, error });\r\n       }\r\n     }\r\n   }\r\n });\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1740899062110,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -23,8 +23,9 @@\n       onSuccess: (data: unknown, variables: unknown, context: unknown) => {\r\n         if (DEBUG_CONFIG.enabled) {\r\n           const source = (context as { meta?: { source: string } })?.meta?.source || 'unknown';\r\n           const queryKey = (variables as { queryKey?: string[] })?.queryKey || 'unknown';\r\n+          console.log('queryKey', queryKey);\r\n           \r\n           const queryName = queryKey[0] || 'unknown';\r\n \r\n           logger.debug(`Query \"${queryName}\" succeeded`, { source });\r\n"
+                },
+                {
+                    "date": 1740899068958,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -24,9 +24,11 @@\n         if (DEBUG_CONFIG.enabled) {\r\n           const source = (context as { meta?: { source: string } })?.meta?.source || 'unknown';\r\n           const queryKey = (variables as { queryKey?: string[] })?.queryKey || 'unknown';\r\n           console.log('queryKey', queryKey);\r\n+          console.log('variables', variables);\r\n           \r\n+          console.log('context', context);\r\n           const queryName = queryKey[0] || 'unknown';\r\n \r\n           logger.debug(`Query \"${queryName}\" succeeded`, { source });\r\n         }\r\n"
+                },
+                {
+                    "date": 1740899084570,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -25,9 +25,9 @@\n           const source = (context as { meta?: { source: string } })?.meta?.source || 'unknown';\r\n           const queryKey = (variables as { queryKey?: string[] })?.queryKey || 'unknown';\r\n           console.log('queryKey', queryKey);\r\n           console.log('variables', variables);\r\n-          \r\n+          console.log('data', data);\r\n           console.log('context', context);\r\n           const queryName = queryKey[0] || 'unknown';\r\n \r\n           logger.debug(`Query \"${queryName}\" succeeded`, { source });\r\n"
+                },
+                {
+                    "date": 1740899260208,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,6 @@\n import { QueryClient } from '@tanstack/react-query';\r\n-import { logger} from './logger';\r\n+import { logger } from './logger';\r\n import { DEBUG_CONFIG } from './config';\r\n \r\n export const queryClient = new QueryClient({\r\n   defaultOptions: {\r\n@@ -23,15 +23,18 @@\n       onSuccess: (data: unknown, variables: unknown, context: unknown) => {\r\n         if (DEBUG_CONFIG.enabled) {\r\n           const source = (context as { meta?: { source: string } })?.meta?.source || 'unknown';\r\n           const queryKey = (variables as { queryKey?: string[] })?.queryKey || 'unknown';\r\n-          console.log('queryKey', queryKey);\r\n-          console.log('variables', variables);\r\n-          console.log('data', data);\r\n-          console.log('context', context);\r\n           const queryName = queryKey[0] || 'unknown';\r\n-\r\n-          logger.debug(`Query \"${queryName}\" succeeded`, { source });\r\n+          \r\n+          logger.debug(`Query \"${queryName}\" succeeded`, { \r\n+            source,\r\n+            context: {\r\n+              queryKey,\r\n+              variables,\r\n+              data\r\n+            }\r\n+          });\r\n         }\r\n       },\r\n       onError: (error: Error, variables: unknown, context: unknown) => {\r\n         const source = (context as { meta?: { source: string } })?.meta?.source || 'unknown';\r\n"
                 }
             ],
             "date": 1739016057046,

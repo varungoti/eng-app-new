@@ -9,7 +9,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/components/ui/use-toast";
 import {
   Mic,
-  Volume2,
   Music,
   Play,
   Pause,
@@ -369,7 +368,7 @@ export function LanguageLearningFeedback({
         title: "Analysis Failed",
         description: "Failed to analyze audio. Please try again.",
         variant: "destructive"
-      });
+      } as any);
     }
   };
 
@@ -429,6 +428,8 @@ export function LanguageLearningFeedback({
                 <div className="flex gap-2">
                   {visualizationStyles.map(style => (
                     <Button
+                      title={style.name}
+                      aria-label={style.name}
                       key={style.name}
                       variant={visualizationStyle === style.name ? "default" : "outline"}
                       size="sm"

@@ -45,6 +45,7 @@ import confetti from 'canvas-confetti';
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSound } from 'use-sound';
+import { ImagePreview } from '@/components/common/ImagePreview';
 //import { Question } from '@/types/index.ts';
 
 // Types
@@ -65,9 +66,9 @@ interface LessonState {
       type: string;
       data: {
         prompt?: string;
-        teacherScript?: string;
-        followupPrompt?: string[];
-        sampleAnswer?: string;
+        teacher_script?: string;
+        followup_prompt?: string[];
+        sample_answer?: string;
       };
       metadata: QuestionMetadata;
       exercise_prompts: ExercisePrompt[];
@@ -117,9 +118,9 @@ interface Question {
   type: string;
   data: {
     prompt?: string;
-    teacherScript?: string;
-    followupPrompt?: string[];
-    sampleAnswer?: string;
+    teacher_script?: string;
+    followup_prompt?: string[];
+    sample_answer?: string;
   };
   metadata: QuestionMetadata;
   exercise_prompts: ExercisePrompt[];
@@ -287,7 +288,7 @@ const LessonPage: React.FC = () => {
         });
       }
     }
-  }, [exerciseProgress, lessonState?.lesson.exercise_prompts, overallProgress, toast]);
+  }, [exerciseProgress, lessonState?.lesson.exercise_prompts, overallProgress, toast, activeExerciseIndex]);
 
   // Update the fetchLessonData function to properly structure the data
   const fetchLessonData = async () => {
@@ -336,9 +337,9 @@ const LessonPage: React.FC = () => {
             ...question,
             data: {
               prompt: question.data?.prompt || '',
-              teacherScript: question.data?.teacherScript || '',
-              followupPrompt: question.data?.followupPrompt || [],
-              sampleAnswer: question.data?.sampleAnswer || '',
+              teacher_script: question.data?.teacher_script || '',
+              followup_prompt: question.data?.followup_prompt || [],
+              sample_answer: question.data?.sample_answer || '',
             },
             exercise_prompts: promptsData || []
           };
@@ -774,18 +775,18 @@ const LessonPage: React.FC = () => {
           )}
 
           {/* Teacher Script */}
-          {question.data.teacherScript && (
+          {question.data.teacher_script && (
             <div className="bg-muted p-4 rounded-lg mt-4">
               <h4 className="font-medium mb-2">Teacher Script:</h4>
-              <p>{question.data.teacherScript}</p>
+              <p>{question.data.teacher_script}</p>
             </div>
           )}
 
           {/* Sample Answer */}
-          {question.data.sampleAnswer && (
+          {question.data.sample_answer && (
             <div className="bg-primary/5 p-4 rounded-lg mt-4">
               <h4 className="font-medium mb-2">Sample Answer:</h4>
-              <p>{question.data.sampleAnswer}</p>
+              <p>{question.data.sample_answer}</p>
             </div>
           )}
         </div>
@@ -820,8 +821,8 @@ const LessonPage: React.FC = () => {
                   {prompt.media && (
                     <div className="mt-4">
                       {prompt.type === 'image' && (
-                        <img 
-                          src={prompt.media} 
+                        <ImagePreview 
+                          imageUrl={prompt.media} 
                           alt={prompt.text}
                           className="rounded-lg max-h-48 object-cover"
                         />
@@ -1174,8 +1175,8 @@ const LessonPage: React.FC = () => {
                                               >
                                                 <Card className="overflow-hidden">
                                                   {transformedPrompt.type === 'image' && (
-                                                    <img
-                                                      src={transformedPrompt.media}
+                                                    <ImagePreview
+                                                      imageUrl={transformedPrompt.media}
                                                       alt={transformedPrompt.text}
                                                       className="w-full h-48 object-cover transition-transform hover:scale-105"
                                                       loading="lazy"
@@ -1370,8 +1371,8 @@ const LessonPage: React.FC = () => {
                               className="cursor-pointer"
                             >
                               <Card className="overflow-hidden">
-                                <img
-                                  src={question.metadata.imageUrl}
+                                <ImagePreview
+                                  imageUrl={question.metadata.imageUrl}
                                   alt={`Media ${index + 1}`}
                                   className="w-full h-48 object-cover transition-transform hover:scale-105"
                                   loading="lazy"

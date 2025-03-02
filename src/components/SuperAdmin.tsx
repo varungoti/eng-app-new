@@ -118,15 +118,12 @@ const SuperAdmin = () => {
                     <div className="flex items-center space-x-2">
                       <div className="w-24 h-2 bg-gray-200 rounded-full">
                         <div
-                          className="h-full bg-green-500 rounded-full"
-                          style={{
-                            width: `${Math.min(
-                              100,
-                              ((school.capacity?.current || 0) /
-                                (school.capacity?.total || 1)) *
-                                100
-                            )}%`,
-                          }}
+                          className={`h-full bg-green-500 rounded-full w-[${Math.min(
+                            100,
+                            ((school.capacity?.current || 0) /
+                              (school.capacity?.total || 1)) *
+                              100
+                          )}%]`}
                         />
                       </div>
                       <span className="text-sm text-gray-600">

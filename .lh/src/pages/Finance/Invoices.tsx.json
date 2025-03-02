@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/pages/Finance/Invoices.tsx",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1740927540179,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1740927540179,
+            "name": "Commit-0",
+            "content": "//import React from 'react';\r\nimport { usePermissions } from '../../hooks/usePermissions';\r\nimport { InvoiceGenerator } from '../../components/invoice/InvoiceGenerator';\r\n\r\nconst Invoices = () => {\r\n  const { can } = usePermissions();\r\n\r\n  if (!can('finance')) {\r\n    return (\r\n      <div className=\"p-4 bg-red-50 border border-red-200 rounded-lg\">\r\n        <h3 className=\"text-lg font-medium text-red-800\">Access Denied</h3>\r\n        <p className=\"mt-2 text-sm text-red-600\">\r\n          You do not have permission to access invoice features.\r\n        </p>\r\n      </div>\r\n    );\r\n  }\r\n\r\n  return (\r\n    <div className=\"space-y-6\">\r\n      <div className=\"flex justify-between items-center\">\r\n        <h1 className=\"text-2xl font-semibold text-gray-900\">School Invoices</h1>\r\n      </div>\r\n      <InvoiceGenerator />\r\n    </div>\r\n  );\r\n};\r\n\r\nexport default Invoices;"
+        }
+    ]
+}

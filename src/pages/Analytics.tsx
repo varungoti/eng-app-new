@@ -1,12 +1,12 @@
-import React from 'react';
-import { IPermissions, usePermissions } from '../hooks/usePermissions';
+//import React from 'react';
+import { usePermissions } from '../hooks/usePermissions';
 import { BarChart, LineChart, PieChart, TrendingUp } from 'lucide-react';
-import { Permissions as RolePermissions } from '../types/roles';
+//import { Permissions as RolePermissions } from '../types/roles';
 
 const Analytics = () => {
   const { can } = usePermissions();
 
-  if (!can('analytics' as keyof RolePermissions)) {
+  if (!can("staff")) {
     return (
       <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
         <h3 className="text-lg font-medium text-red-800">Access Denied</h3>

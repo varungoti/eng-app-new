@@ -9,7 +9,7 @@ import { logger } from '../lib/logger';
 const Content: React.FC = () => {
   const { showToast } = useToast();
 
-  const handleContentUpload = async (data: any) => {
+  const _handleContentUpload = async (_data: any) => {
     try {
       // Handle content upload logic here
       showToast('Content uploaded successfully', { type: 'success' });

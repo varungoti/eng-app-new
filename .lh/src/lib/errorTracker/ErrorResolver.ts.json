@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 15,
+            "activePatchIndex": 45,
             "patches": [
                 {
                     "date": 1739007386467,
@@ -68,6 +68,126 @@
                 {
                     "date": 1739008842636,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,8 +1,8 @@\n \"use client\";\r\n \r\n import { ErrorSeverity } from './types';\r\n-import type { ErrorEvent } from './types';\r\n+import type { ErrorEvent, ErrorWatcherConfig } from './types';\r\n import type { MonitorConfig } from '../monitoring';\r\n import { logger } from '../logger';\r\n import { DEBUG_CONFIG } from '../config';\r\n \r\n@@ -39,15 +39,15 @@\n     errorPatterns: new Map(),\r\n     performanceMetrics: new Map()\r\n   };\r\n \r\n-  private constructor(config?: MonitorConfig) {\r\n+  private constructor(config?: ErrorWatcherConfig) {\r\n     this.setupConsoleMonitoring();\r\n     this.initializeApplicationIndex();\r\n     this.interceptLogger();\r\n   }\r\n \r\n-  public static getInstance(config?: MonitorConfig): ErrorResolver {\r\n+  public static getInstance(config?: ErrorWatcherConfig): ErrorResolver {\r\n     if (!ErrorResolver.instance) {\r\n       ErrorResolver.instance = new ErrorResolver(config);\r\n     }\r\n     return ErrorResolver.instance;\r\n"
+                },
+                {
+                    "date": 1740693847529,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -252,9 +252,9 @@\n         }\r\n       }\r\n \r\n       if (DEBUG_CONFIG.enabled) {\r\n-        logger.info(`AI Error Analysis: ${errorMessage}`, 'ErrorResolver');\r\n+        logger.info(`AI Error Analysis: ${errorMessage}`, { source: 'ErrorResolver' });\r\n       }\r\n \r\n       return suggestion;\r\n     } catch (err) {\r\n"
+                },
+                {
+                    "date": 1740693854348,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -257,9 +257,9 @@\n       }\r\n \r\n       return suggestion;\r\n     } catch (err) {\r\n-      logger.error(`Error in AI analysis: ${err instanceof Error ? err.message : 'Unknown error'}`, 'ErrorResolver');\r\n+      logger.error(`Error in AI analysis: ${err instanceof Error ? err.message : 'Unknown error'}`, { source: 'ErrorResolver' });\r\n       return 'Error analysis failed';\r\n     }\r\n   }\r\n \r\n@@ -288,9 +288,9 @@\n         resolved: true,\r\n         resolvedAt: Date.now()\r\n       });\r\n \r\n-      logger.info(`Error resolved: ${error.id} - ${errorResolution.resolution}`, 'ErrorResolver');\r\n+      logger.info(`Error resolved: ${error.id} - ${errorResolution.resolution}`, { source: 'ErrorResolver' });\r\n \r\n     } catch (err) {\r\n       logger.error(`Failed to resolve error: ${err instanceof Error ? err.message : 'Unknown error'}`, 'ErrorResolver');\r\n       throw err;\r\n"
+                },
+                {
+                    "date": 1740693860699,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -291,9 +291,9 @@\n \r\n       logger.info(`Error resolved: ${error.id} - ${errorResolution.resolution}`, { source: 'ErrorResolver' });\r\n \r\n     } catch (err) {\r\n-      logger.error(`Failed to resolve error: ${err instanceof Error ? err.message : 'Unknown error'}`, 'ErrorResolver');\r\n+      logger.error(`Failed to resolve error: ${err instanceof Error ? err.message : 'Unknown error'}`, { source: 'ErrorResolver' });\r\n       throw err;\r\n     }\r\n   }\r\n \r\n@@ -326,9 +326,9 @@\n     return recommendations;\r\n   }\r\n \r\n   private async handleCriticalError(error: ErrorEvent, resolution: ErrorResolution): Promise<void> {\r\n-    logger.warn(`Critical error detected: ${error.message}`, 'ErrorResolver');\r\n+    logger.warn(`Critical error detected: ${error.message}`, { source: 'ErrorResolver' });\r\n \r\n     let attempts = 0;\r\n     while (attempts < this.MAX_RETRY_ATTEMPTS) {\r\n       try {\r\n"
+                },
+                {
+                    "date": 1740693938984,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -333,9 +333,9 @@\n     while (attempts < this.MAX_RETRY_ATTEMPTS) {\r\n       try {\r\n         await this.attemptErrorRecovery(error);\r\n         break;\r\n-      } catch (err) {\r\n+      } catch (_err) {\r\n         attempts++;\r\n         if (attempts === this.MAX_RETRY_ATTEMPTS) {\r\n           throw new Error(`Failed to resolve critical error after ${attempts} attempts`);\r\n         }\r\n@@ -370,9 +370,9 @@\n   }\r\n \r\n   private handleComponentError(error: ErrorEvent): void {\r\n     if (error.componentStack) {\r\n-      logger.warn(`Component error detected: ${error.message}`, 'ErrorResolver');\r\n+      logger.warn(`Component error detected: ${error.message}`, { source: 'ErrorResolver' });\r\n     }\r\n   }\r\n \r\n   public getApplicationInsights(): ApplicationIndex {\r\n"
+                },
+                {
+                    "date": 1740694089580,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -195,9 +195,9 @@\n       perfObserver.observe({ entryTypes: ['largest-contentful-paint', 'first-input', 'layout-shift'] });\r\n     }\r\n   }\r\n \r\n-  private handleConsoleLog(level: 'error' | 'warning' | 'info', args: any[]) {\r\n+  private handleConsoleLog(level: 'error' | 'warning' | 'info', args: (string | number | boolean | null | undefined | Error | object)[]) {\r\n     const logMessage = args.map(arg => \r\n       arg instanceof Error ? `${arg.name}: ${arg.message}\\n${arg.stack}` : String(arg)\r\n     ).join(' ');\r\n \r\n"
+                },
+                {
+                    "date": 1740694179290,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -156,24 +156,28 @@\n     };\r\n   }\r\n \r\n   private setupConsoleMonitoring() {\r\n+    // eslint-disable-next-line no-console\r\n     if (typeof window === 'undefined') return;\r\n \r\n     const originalConsoleError = console.error;\r\n     const originalConsoleWarn = console.warn;\r\n     const originalConsoleInfo = console.info;\r\n \r\n+    // eslint-disable-next-line no-console\r\n     console.error = (...args) => {\r\n       this.handleConsoleLog('error', args);\r\n       originalConsoleError.apply(console, args);\r\n     };\r\n \r\n+    // eslint-disable-next-line no-console\r\n     console.warn = (...args) => {\r\n       this.handleConsoleLog('warning', args);\r\n       originalConsoleWarn.apply(console, args);\r\n     };\r\n \r\n+    // eslint-disable-next-line no-console\r\n     console.info = (...args) => {\r\n       this.handleConsoleLog('info', args);\r\n       originalConsoleInfo.apply(console, args);\r\n     };\r\n"
+                },
+                {
+                    "date": 1740694342129,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -58,9 +58,13 @@\n     const originalError = logger.error;\r\n     const originalWarn = logger.warn;\r\n     const originalInfo = logger.info;\r\n \r\n-    logger.error = (message: string, options: any = {}) => {\r\n+    logger.error = (message: string, options: { \r\n+      context?: Record<string, unknown>;\r\n+      source?: string;\r\n+      [key: string]: unknown;\r\n+    } = {}) => {\r\n       // Create an error event from logger call\r\n       const errorEvent: ErrorEvent = {\r\n         id: `error_${Date.now()}`,\r\n         message,\r\n"
+                },
+                {
+                    "date": 1740694358812,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -61,9 +61,9 @@\n \r\n     logger.error = (message: string, options: { \r\n       context?: Record<string, unknown>;\r\n       source?: string;\r\n-      [key: string]: unknown;\r\n+      [key: string]: unknown | Record<string, unknown> | string;\r\n     } = {}) => {\r\n       // Create an error event from logger call\r\n       const errorEvent: ErrorEvent = {\r\n         id: `error_${Date.now()}`,\r\n"
+                },
+                {
+                    "date": 1740694373813,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -24,8 +24,13 @@\n   errorPatterns: Map<string, number>;\r\n   performanceMetrics: Map<string, number[]>;\r\n }\r\n \r\n+interface LoggerOptions {\r\n+  context?: Record<string, unknown>;\r\n+  source?: string;\r\n+}\r\n+\r\n export class ErrorResolver {\r\n   private static instance: ErrorResolver;\r\n   private resolvedErrors: Map<string, ErrorResolution> = new Map();\r\n   private readonly MAX_RETRY_ATTEMPTS = 3;\r\n@@ -58,13 +63,9 @@\n     const originalError = logger.error;\r\n     const originalWarn = logger.warn;\r\n     const originalInfo = logger.info;\r\n \r\n-    logger.error = (message: string, options: { \r\n-      context?: Record<string, unknown>;\r\n-      source?: string;\r\n-      [key: string]: unknown | Record<string, unknown> | string;\r\n-    } = {}) => {\r\n+    logger.error = (message: string, options: LoggerOptions = {}) => {\r\n       // Create an error event from logger call\r\n       const errorEvent: ErrorEvent = {\r\n         id: `error_${Date.now()}`,\r\n         message,\r\n"
+                },
+                {
+                    "date": 1740694463646,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -71,10 +71,10 @@\n         message,\r\n         severity: ErrorSeverity.HIGH,\r\n         timestamp: Date.now(),\r\n         source: options.source || 'logger',\r\n-        context: options.context,\r\n-        componentStack: options.context?.componentStack\r\n+        context: options.context as Record<string, any>,\r\n+        componentStack: options.context?.componentStack as string | undefined\r\n       };\r\n \r\n       // Attempt to resolve the error\r\n       this.resolveError(errorEvent).catch(err => {\r\n"
+                },
+                {
+                    "date": 1740694535654,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -71,10 +71,10 @@\n         message,\r\n         severity: ErrorSeverity.HIGH,\r\n         timestamp: Date.now(),\r\n         source: options.source || 'logger',\r\n-        context: options.context as Record<string, any>,\r\n-        componentStack: options.context?.componentStack as string | undefined\r\n+        context: options.context,\r\n+        componentStack: options.context?.componentStack\r\n       };\r\n \r\n       // Attempt to resolve the error\r\n       this.resolveError(errorEvent).catch(err => {\r\n"
+                },
+                {
+                    "date": 1740694552507,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -71,10 +71,10 @@\n         message,\r\n         severity: ErrorSeverity.HIGH,\r\n         timestamp: Date.now(),\r\n         source: options.source || 'logger',\r\n-        context: options.context,\r\n-        componentStack: options.context?.componentStack\r\n+        context: options.context as Record<string, any>,\r\n+        componentStack: options.context?.componentStack as string | undefined\r\n       };\r\n \r\n       // Attempt to resolve the error\r\n       this.resolveError(errorEvent).catch(err => {\r\n"
+                },
+                {
+                    "date": 1740694778047,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -71,9 +71,9 @@\n         message,\r\n         severity: ErrorSeverity.HIGH,\r\n         timestamp: Date.now(),\r\n         source: options.source || 'logger',\r\n-        context: options.context as Record<string, any>,\r\n+        context: options.context as Record<string, unknown>,\r\n         componentStack: options.context?.componentStack as string | undefined\r\n       };\r\n \r\n       // Attempt to resolve the error\r\n"
+                },
+                {
+                    "date": 1740694803413,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -84,9 +84,9 @@\n       // Call original logger\r\n       originalError.call(logger, message, options);\r\n     };\r\n \r\n-    logger.warn = (message: string, options: any = {}) => {\r\n+    logger.warn = (message: string, options: LoggerOptions = {}) => {\r\n       const errorEvent: ErrorEvent = {\r\n         id: `warn_${Date.now()}`,\r\n         message,\r\n         severity: ErrorSeverity.MEDIUM,\r\n"
+                },
+                {
+                    "date": 1740694808752,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -91,9 +91,9 @@\n         message,\r\n         severity: ErrorSeverity.MEDIUM,\r\n         timestamp: Date.now(),\r\n         source: options.source || 'logger',\r\n-        context: options.context\r\n+        context: options.context as Record<string, unknown>\r\n       };\r\n \r\n       this.resolveError(errorEvent).catch(err => {\r\n         console.error('Failed to resolve warning:', err);\r\n"
+                },
+                {
+                    "date": 1740694814620,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -101,18 +101,18 @@\n \r\n       originalWarn.call(logger, message, options);\r\n     };\r\n \r\n-    logger.info = (message: string, options: any = {}) => {\r\n+    logger.info = (message: string, options: LoggerOptions = {}) => {\r\n       // Only track info messages that indicate errors/issues\r\n       if (message.toLowerCase().includes('error') || message.toLowerCase().includes('fail')) {\r\n         const errorEvent: ErrorEvent = {\r\n           id: `info_${Date.now()}`,\r\n           message,\r\n           severity: ErrorSeverity.LOW,\r\n           timestamp: Date.now(),\r\n           source: options.source || 'logger',\r\n-          context: options.context\r\n+          context: options.context as Record<string, unknown>\r\n         };\r\n \r\n         this.resolveError(errorEvent).catch(err => {\r\n           console.error('Failed to resolve info:', err);\r\n"
+                },
+                {
+                    "date": 1740694857716,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -164,10 +164,13 @@\n   private setupConsoleMonitoring() {\r\n     // eslint-disable-next-line no-console\r\n     if (typeof window === 'undefined') return;\r\n \r\n+    // eslint-disable-next-line no-console\r\n     const originalConsoleError = console.error;\r\n+    // eslint-disable-next-line no-console\r\n     const originalConsoleWarn = console.warn;\r\n+    // eslint-disable-next-line no-console\r\n     const originalConsoleInfo = console.info;\r\n \r\n     // eslint-disable-next-line no-console\r\n     console.error = (...args) => {\r\n"
+                },
+                {
+                    "date": 1740694932167,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -251,15 +251,15 @@\n         }]\r\n       ]);\r\n \r\n       let suggestion = 'Unable to determine resolution';\r\n-      let performanceImpact = '';\r\n+      let _performanceImpact = '';\r\n       let uiRecommendations: string[] = [];\r\n \r\n       for (const [pattern, solutions] of errorPatterns) {\r\n         if (errorMessage.includes(pattern)) {\r\n           suggestion = solutions.fix;\r\n-          performanceImpact = solutions.performance;\r\n+          _performanceImpact = solutions.performance;\r\n           uiRecommendations = solutions.ui;\r\n           break;\r\n         }\r\n       }\r\n"
+                },
+                {
+                    "date": 1740695002135,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -355,9 +355,9 @@\n       }\r\n     }\r\n   }\r\n \r\n-  private async handleNormalError(error: ErrorEvent, resolution: ErrorResolution): Promise<void> {\r\n+  private async handleNormalError(error: ErrorEvent, _resolution: ErrorResolution): Promise<void> {\r\n     if (error.retryCount && error.retryCount > 0) {\r\n       await this.attemptErrorRecovery(error);\r\n     }\r\n   }\r\n"
+                },
+                {
+                    "date": 1740901392148,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,9 +1,9 @@\n \"use client\";\r\n \r\n import { ErrorSeverity } from './types';\r\n import type { ErrorEvent, ErrorWatcherConfig } from './types';\r\n-import type { MonitorConfig } from '../monitoring';\r\n+//import type { MonitorConfig } from '../monitoring';\r\n import { logger } from '../logger';\r\n import { DEBUG_CONFIG } from '../config';\r\n \r\n interface ErrorResolution {\r\n"
+                },
+                {
+                    "date": 1740901400793,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -252,9 +252,9 @@\n       ]);\r\n \r\n       let suggestion = 'Unable to determine resolution';\r\n       let _performanceImpact = '';\r\n-      let uiRecommendations: string[] = [];\r\n+      let _uiRecommendations: string[] = [];\r\n \r\n       for (const [pattern, solutions] of errorPatterns) {\r\n         if (errorMessage.includes(pattern)) {\r\n           suggestion = solutions.fix;\r\n"
+                },
+                {
+                    "date": 1740901407260,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -252,9 +252,9 @@\n       ]);\r\n \r\n       let suggestion = 'Unable to determine resolution';\r\n       let _performanceImpact = '';\r\n-      let _uiRecommendations: string[] = [];\r\n+      let uiRecommendations: string[] = [];\r\n \r\n       for (const [pattern, solutions] of errorPatterns) {\r\n         if (errorMessage.includes(pattern)) {\r\n           suggestion = solutions.fix;\r\n"
+                },
+                {
+                    "date": 1740901424114,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -252,9 +252,9 @@\n       ]);\r\n \r\n       let suggestion = 'Unable to determine resolution';\r\n       let _performanceImpact = '';\r\n-      let uiRecommendations: string[] = [];\r\n+      const uiRecommendations: string[] = [];\r\n \r\n       for (const [pattern, solutions] of errorPatterns) {\r\n         if (errorMessage.includes(pattern)) {\r\n           suggestion = solutions.fix;\r\n"
+                },
+                {
+                    "date": 1740901433306,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -258,9 +258,9 @@\n       for (const [pattern, solutions] of errorPatterns) {\r\n         if (errorMessage.includes(pattern)) {\r\n           suggestion = solutions.fix;\r\n           _performanceImpact = solutions.performance;\r\n-          uiRecommendations = solutions.ui;\r\n+          uiRecommendations.push(...solutions.ui);\r\n           break;\r\n         }\r\n       }\r\n \r\n"
+                },
+                {
+                    "date": 1740901458250,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -308,9 +308,9 @@\n       throw err;\r\n     }\r\n   }\r\n \r\n-  private analyzePerformanceImpact(error: ErrorEvent): string {\r\n+  private analyzePerformanceImpact(_error: ErrorEvent): string {\r\n     const metrics = Array.from(this.applicationIndex.performanceMetrics.entries());\r\n     const highImpactThreshold = 1000; // 1 second\r\n \r\n     for (const [metric, values] of metrics) {\r\n"
+                },
+                {
+                    "date": 1740901472213,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -337,10 +337,10 @@\n \r\n     return recommendations;\r\n   }\r\n \r\n-  private async handleCriticalError(error: ErrorEvent, resolution: ErrorResolution): Promise<void> {\r\n-    logger.warn(`Critical error detected: ${error.message}`, { source: 'ErrorResolver' });\r\n+  private async handleCriticalError(_error: ErrorEvent, _resolution: ErrorResolution): Promise<void> {\r\n+    logger.warn(`Critical error detected: ${_error.message}`, { source: 'ErrorResolver' });\r\n \r\n     let attempts = 0;\r\n     while (attempts < this.MAX_RETRY_ATTEMPTS) {\r\n       try {\r\n"
+                },
+                {
+                    "date": 1740901477355,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -337,9 +337,9 @@\n \r\n     return recommendations;\r\n   }\r\n \r\n-  private async handleCriticalError(_error: ErrorEvent, _resolution: ErrorResolution): Promise<void> {\r\n+  private async handleCriticalError(error: ErrorEvent, _resolution: ErrorResolution): Promise<void> {\r\n     logger.warn(`Critical error detected: ${_error.message}`, { source: 'ErrorResolver' });\r\n \r\n     let attempts = 0;\r\n     while (attempts < this.MAX_RETRY_ATTEMPTS) {\r\n"
+                },
+                {
+                    "date": 1740901498885,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -251,9 +251,9 @@\n         }]\r\n       ]);\r\n \r\n       let suggestion = 'Unable to determine resolution';\r\n-      let _performanceImpact = '';\r\n+      let performanceImpact = '';\r\n       const uiRecommendations: string[] = [];\r\n \r\n       for (const [pattern, solutions] of errorPatterns) {\r\n         if (errorMessage.includes(pattern)) {\r\n@@ -338,9 +338,9 @@\n     return recommendations;\r\n   }\r\n \r\n   private async handleCriticalError(error: ErrorEvent, _resolution: ErrorResolution): Promise<void> {\r\n-    logger.warn(`Critical error detected: ${_error.message}`, { source: 'ErrorResolver' });\r\n+    logger.warn(`Critical error detected: ${error.message}`, { source: 'ErrorResolver' });\r\n \r\n     let attempts = 0;\r\n     while (attempts < this.MAX_RETRY_ATTEMPTS) {\r\n       try {\r\n"
+                },
+                {
+                    "date": 1740901511357,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -44,9 +44,9 @@\n     errorPatterns: new Map(),\r\n     performanceMetrics: new Map()\r\n   };\r\n \r\n-  private constructor(config?: ErrorWatcherConfig) {\r\n+  private constructor(_config?: ErrorWatcherConfig) {\r\n     this.setupConsoleMonitoring();\r\n     this.initializeApplicationIndex();\r\n     this.interceptLogger();\r\n   }\r\n@@ -257,9 +257,9 @@\n \r\n       for (const [pattern, solutions] of errorPatterns) {\r\n         if (errorMessage.includes(pattern)) {\r\n           suggestion = solutions.fix;\r\n-          _performanceImpact = solutions.performance;\r\n+          performanceImpact = solutions.performance;\r\n           uiRecommendations.push(...solutions.ui);\r\n           break;\r\n         }\r\n       }\r\n"
+                },
+                {
+                    "date": 1740901541256,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -251,15 +251,15 @@\n         }]\r\n       ]);\r\n \r\n       let suggestion = 'Unable to determine resolution';\r\n-      let performanceImpact = '';\r\n+      let _performanceImpact = '';\r\n       const uiRecommendations: string[] = [];\r\n \r\n       for (const [pattern, solutions] of errorPatterns) {\r\n         if (errorMessage.includes(pattern)) {\r\n           suggestion = solutions.fix;\r\n-          performanceImpact = solutions.performance;\r\n+          _performanceImpact = solutions.performance;\r\n           uiRecommendations.push(...solutions.ui);\r\n           break;\r\n         }\r\n       }\r\n"
                 }
             ],
             "date": 1739007386467,

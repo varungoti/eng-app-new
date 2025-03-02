@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/pages/api/auth/google/token.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1740752776489,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1740752776489,
+            "name": "Commit-0",
+            "content": "import { NextApiRequest, NextApiResponse } from 'next';\r\n\r\nexport default async function handler(req: NextApiRequest, res: NextApiResponse) {\r\n  if (req.method !== 'POST') {\r\n    return res.status(405).json({ error: 'Method not allowed' });\r\n  }\r\n\r\n  const { code } = req.body;\r\n\r\n  if (!code) {\r\n    return res.status(400).json({ error: 'Authorization code is required' });\r\n  }\r\n\r\n  try {\r\n    const CLIENT_ID = process.env.GOOGLE_CLIENT_ID;\r\n    const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;\r\n    const REDIRECT_URI = `${process.env.NEXT_PUBLIC_BASE_URL}/auth/google/callback`;\r\n\r\n    if (!CLIENT_ID || !CLIENT_SECRET) {\r\n      return res.status(500).json({\r\n        error: 'Google Calendar API credentials are not configured',\r\n      });\r\n    }\r\n\r\n    // Exchange code for tokens\r\n    const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {\r\n      method: 'POST',\r\n      headers: {\r\n        'Content-Type': 'application/x-www-form-urlencoded',\r\n      },\r\n      body: new URLSearchParams({\r\n        code,\r\n        client_id: CLIENT_ID,\r\n        client_secret: CLIENT_SECRET,\r\n        redirect_uri: REDIRECT_URI,\r\n        grant_type: 'authorization_code',\r\n      }),\r\n    });\r\n\r\n    if (!tokenResponse.ok) {\r\n      const errorData = await tokenResponse.json();\r\n      console.error('Token exchange error:', errorData);\r\n      return res.status(400).json({\r\n        error: 'Failed to exchange authorization code for tokens',\r\n        details: errorData,\r\n      });\r\n    }\r\n\r\n    const tokenData = await tokenResponse.json();\r\n    \r\n    // Store tokens securely - in a real app, you would store these in a secure way\r\n    // For example, you might encrypt and store the refresh token in your database\r\n    // associated with the user, and only send the access token to the client\r\n    \r\n    return res.status(200).json({\r\n      access_token: tokenData.access_token,\r\n      expires_in: tokenData.expires_in,\r\n      token_type: tokenData.token_type,\r\n    });\r\n  } catch (error) {\r\n    console.error('Google token exchange error:', error);\r\n    return res.status(500).json({ \r\n      error: 'Failed to exchange token',\r\n      details: error instanceof Error ? error.message : 'Unknown error'\r\n    });\r\n  }\r\n} "
+        }
+    ]
+}

@@ -12,8 +12,8 @@ interface LazyLoadOptions {
   name?: string;
 }
 
-export const lazyLoad = (
-  importFn: () => Promise<{ default: React.ComponentType<any> }>,
+export const lazyLoad = <T extends Record<string, unknown> = Record<string, unknown>>(
+  importFn: () => Promise<{ default: React.ComponentType<T> }>,
   options: LazyLoadOptions = {}
 ) => {
   const {
@@ -29,19 +29,6 @@ export const lazyLoad = (
   const ComponentErrorBoundary = ({ children }: { children: React.ReactNode }) => (
     <ErrorBoundary 
       source={name}
-      fallback={
-        <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-          <h3 className="text-lg font-medium text-red-800">
-            Failed to load {name.toLowerCase()}
-          </h3>
-          <button
-            onClick={() => window.location.reload()}
-            className="mt-4 text-sm text-indigo-600 hover:text-indigo-800 underline"
-          >
-            Retry loading
-          </button>
-        </div>
-      }
     >
       {children}
     </ErrorBoundary>
@@ -50,13 +37,13 @@ export const lazyLoad = (
     const startTime = Date.now();
     let attempts = 0;
     
-    const loadComponent = async (): Promise<{ default: React.ComponentType<any> }> => {
+    const loadComponent = async (): Promise<{ default: React.ComponentType<T> }> => {
       try {
-        const module = await importFn();
-        if (!module?.default) {
+        const componentModule = await importFn();
+        if (!componentModule?.default) {
           throw new Error(`Module ${name} does not have a default export`);
         }
-        return module;
+        return componentModule;
       } catch (err) {
         attempts++;
         if (attempts >= retryCount) {
@@ -68,7 +55,7 @@ export const lazyLoad = (
       }
     };
 
-    return new Promise((resolve) => {
+    return new Promise<{ default: React.ComponentType<T> }>((resolve) => {
       const timeoutId = setTimeout(() => {
         resolve({
           default: () => (
@@ -83,13 +70,13 @@ export const lazyLoad = (
       }, timeout);
 
       loadComponent()
-        .then(module => {
+        .then(componentModule => {
           clearTimeout(timeoutId);
           logger.debug(`${name} loaded successfully`, {
             context: { loadTime: Date.now() - startTime },
             source: 'lazyLoad'
           });
-          resolve(module);
+          resolve(componentModule);
         })
         .catch(err => {
           clearTimeout(timeoutId);
@@ -111,14 +98,16 @@ export const lazyLoad = (
     });
   });
 
-  return function WrappedComponent(props: any) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return function WrappedComponent(props: T) {
     const Wrapper = errorBoundary ? ErrorBoundary : React.Fragment;
     const wrapperProps = errorBoundary ? { source: name } : {};
 
     return (
       <Wrapper {...wrapperProps}>
         <Suspense fallback={fallback || <LoadingSpinner message={`Loading ${name.toLowerCase()}...`} />}>
-          <LazyComponent {...props} />
+          {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+          <LazyComponent {...props as any} />
         </Suspense>
       </Wrapper>
     );

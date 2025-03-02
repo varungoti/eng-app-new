@@ -3,11 +3,47 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 0,
+            "activePatchIndex": 9,
             "patches": [
                 {
                     "date": 1739015866068,
                     "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1740852742399,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,6 @@\n import { supabase } from './supabase';\r\n-import { logger } from './logger';\r\n+import { logger, LogContext } from './logger';\r\n import { errorHandler } from './errorHandler';\r\n \r\n interface PoolConfig {\r\n   maxConnections: number;\r\n@@ -56,12 +56,12 @@\n       connections.forEach(conn => {\r\n         if (conn) this.idleConnections.set(conn.id, conn);\r\n       });\r\n \r\n-      logger.info('Connection pool initialized', 'ConnectionPool');\r\n+      logger.info('Connection pool initialized', { source: 'ConnectionPool' });\r\n \r\n     } catch (err) {\r\n-      logger.error('Failed to initialize connection pool', 'ConnectionPool', err);\r\n+      logger.error('Failed to initialize connection pool', { source: 'ConnectionPool', error: err });\r\n     }\r\n   }\r\n \r\n \r\n@@ -79,9 +79,9 @@\n         lastUsed: Date.now(),\r\n         isHealthy: true\r\n       };\r\n     } catch (err) {\r\n-      logger.error('Failed to create connection', 'ConnectionPool', err);\r\n+      logger.error('Failed to create connection', { source: 'ConnectionPool', error: err });\r\n       return null;\r\n     }\r\n \r\n   }\r\n@@ -129,12 +129,12 @@\n           if (conn) this.idleConnections.set(conn.id, conn);\r\n         });\r\n       }\r\n \r\n-      logger.info('Health check completed', 'ConnectionPool');\r\n+      logger.info('Health check completed', { source: 'ConnectionPool' });\r\n \r\n     } catch (err) {\r\n-      logger.error('Health check failed', 'ConnectionPool', err);\r\n+      logger.error('Health check failed', { source: 'ConnectionPool', error: err });\r\n     }\r\n   }\r\n \r\n \r\n@@ -162,9 +162,9 @@\n \r\n       // Return default client if no connections available\r\n       return supabase;\r\n     } catch (err) {\r\n-      logger.error('Failed to get connection', 'ConnectionPool', err);\r\n+      logger.error('Failed to get connection', { source: 'ConnectionPool', error: err });\r\n       return supabase; // Fallback to default client\r\n \r\n     }\r\n   }\r\n@@ -182,9 +182,9 @@\n \r\n       // Clean up old idle connections\r\n       this.cleanupIdleConnections();\r\n     } catch (err) {\r\n-      logger.error('Failed to release connection', 'ConnectionPool', err);\r\n+      logger.error('Failed to release connection', { source: 'ConnectionPool', error: err });\r\n     }\r\n   }\r\n \r\n   private cleanupIdleConnections() {\r\n"
+                },
+                {
+                    "date": 1740899309176,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -80,8 +80,9 @@\n         isHealthy: true\r\n       };\r\n     } catch (err) {\r\n       logger.error('Failed to create connection', { source: 'ConnectionPool', error: err });\r\n+      \r\n       return null;\r\n     }\r\n \r\n   }\r\n"
+                },
+                {
+                    "date": 1740899314547,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -80,9 +80,9 @@\n         isHealthy: true\r\n       };\r\n     } catch (err) {\r\n       logger.error('Failed to create connection', { source: 'ConnectionPool', error: err });\r\n-      \r\n+      lo\r\n       return null;\r\n     }\r\n \r\n   }\r\n"
+                },
+                {
+                    "date": 1740899320141,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,7 +1,8 @@\n import { supabase } from './supabase';\r\n import { logger, LogContext } from './logger';\r\n import { errorHandler } from './errorHandler';\r\n+import { logError } from 'ckeditor5';\r\n \r\n interface PoolConfig {\r\n   maxConnections: number;\r\n   minConnections: number;\r\n@@ -80,9 +81,9 @@\n         isHealthy: true\r\n       };\r\n     } catch (err) {\r\n       logger.error('Failed to create connection', { source: 'ConnectionPool', error: err });\r\n-      lo\r\n+      logError.data()\r\n       return null;\r\n     }\r\n \r\n   }\r\n"
+                },
+                {
+                    "date": 1740899340144,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -81,9 +81,9 @@\n         isHealthy: true\r\n       };\r\n     } catch (err) {\r\n       logger.error('Failed to create connection', { source: 'ConnectionPool', error: err });\r\n-      logError.data()\r\n+      )\r\n       return null;\r\n     }\r\n \r\n   }\r\n"
+                },
+                {
+                    "date": 1740899345320,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -81,9 +81,9 @@\n         isHealthy: true\r\n       };\r\n     } catch (err) {\r\n       logger.error('Failed to create connection', { source: 'ConnectionPool', error: err });\r\n-      )\r\n+  \r\n       return null;\r\n     }\r\n \r\n   }\r\n"
+                },
+                {
+                    "date": 1740899380586,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,8 +1,8 @@\n import { supabase } from './supabase';\r\n import { logger, LogContext } from './logger';\r\n import { errorHandler } from './errorHandler';\r\n-import { logError } from 'ckeditor5';\r\n+//import { logError } from 'ckeditor5';\r\n \r\n interface PoolConfig {\r\n   maxConnections: number;\r\n   minConnections: number;\r\n@@ -81,9 +81,8 @@\n         isHealthy: true\r\n       };\r\n     } catch (err) {\r\n       logger.error('Failed to create connection', { source: 'ConnectionPool', error: err });\r\n-  \r\n       return null;\r\n     }\r\n \r\n   }\r\n"
+                },
+                {
+                    "date": 1740899391936,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,8 +1,8 @@\n import { supabase } from './supabase';\r\n-import { logger, LogContext } from './logger';\r\n+import { logger, } from './logger';\r\n import { errorHandler } from './errorHandler';\r\n-//import { logError } from 'ckeditor5';\r\n+import { logError } from 'ckeditor5';\r\n \r\n interface PoolConfig {\r\n   maxConnections: number;\r\n   minConnections: number;\r\n@@ -64,14 +64,12 @@\n       logger.error('Failed to initialize connection pool', { source: 'ConnectionPool', error: err });\r\n     }\r\n   }\r\n \r\n-\r\n-\r\n   private async createConnection(): Promise<PoolConnection | null> {\r\n     try {\r\n       // Check connection health using RPC call\r\n-      const { data, error } = await supabase.rpc('update_health_check');\r\n+      const { error } = await supabase.rpc('update_health_check');\r\n       \r\n       if (error) throw error;\r\n \r\n       return {\r\n@@ -83,9 +81,8 @@\n     } catch (err) {\r\n       logger.error('Failed to create connection', { source: 'ConnectionPool', error: err });\r\n       return null;\r\n     }\r\n-\r\n   }\r\n \r\n   private startHealthChecks() {\r\n     if (this.healthCheckTimer) {\r\n@@ -137,9 +134,8 @@\n       logger.error('Health check failed', { source: 'ConnectionPool', error: err });\r\n     }\r\n   }\r\n \r\n-\r\n   public async getConnection() {\r\n     try {\r\n       // Get available idle connection\r\n       for (const [id, conn] of this.idleConnections.entries()) {\r\n@@ -165,9 +161,8 @@\n       return supabase;\r\n     } catch (err) {\r\n       logger.error('Failed to get connection', { source: 'ConnectionPool', error: err });\r\n       return supabase; // Fallback to default client\r\n-\r\n     }\r\n   }\r\n \r\n   public releaseConnection(client: any) {\r\n"
+                },
+                {
+                    "date": 1740899403260,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,8 +1,8 @@\n import { supabase } from './supabase';\r\n-import { logger, } from './logger';\r\n-import { errorHandler } from './errorHandler';\r\n-import { logError } from 'ckeditor5';\r\n+import { logger} from './logger';\r\n+// import { errorHandler } from './errorHandler';\r\n+// import { logError } from 'ckeditor5';\r\n \r\n interface PoolConfig {\r\n   maxConnections: number;\r\n   minConnections: number;\r\n"
                 }
             ],
             "date": 1739015866068,

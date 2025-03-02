@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from 'react';
-import { toast } from '@/components/ui/toast';
+import { toast } from '@/components/ui/Toast';
 
 export function useFormError() {
   const [error, setError] = useState<string | null>(null);

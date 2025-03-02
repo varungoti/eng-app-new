@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/modules/lesson-management/components/LessonList.tsx",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1740925755707,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1740925755707,
+            "name": "Commit-0",
+            "content": "import { Card } from '../../../components/ui/card';\r\nimport { Button } from '../../../components/ui/button';\r\nimport { Icon } from '@/components/ui/icons';\r\nimport { useLessonManagementContext } from '../context/LessonManagementContext';\r\nimport { Spinner as LoadingSpinner } from '../../../components/ui/spinner';\r\n\r\nexport function LessonList() {\r\n  const { lessons, isLoading, error, selectedGrade, selectedTopic } = useLessonManagementContext();\r\n\r\n  if (!selectedGrade) {\r\n    return (\r\n      <Card className=\"p-8 text-center\">\r\n        <h3 className=\"text-lg font-medium\">Select a Grade</h3>\r\n        <p className=\"text-muted-foreground mt-2\">\r\n          Choose a grade level to view its lessons\r\n        </p>\r\n      </Card>\r\n    );\r\n  }\r\n\r\n  if (!selectedTopic) {\r\n    return (\r\n      <Card className=\"p-8 text-center\">\r\n        <h3 className=\"text-lg font-medium\">Select a Topic</h3>\r\n        <p className=\"text-muted-foreground mt-2\">\r\n          Choose a topic to view its lessons\r\n        </p>\r\n      </Card>\r\n    );\r\n  }\r\n\r\n  if (isLoading) {\r\n    return <LoadingSpinner />;\r\n  }\r\n\r\n  if (error) {\r\n    return (\r\n      <div className=\"p-4 text-red-500\">\r\n        Error loading lessons: {error.message}\r\n      </div>\r\n    );\r\n  }\r\n\r\n  if (lessons.length === 0) {\r\n    return (\r\n      <Card className=\"p-8 text-center\">\r\n        <h3 className=\"text-lg font-medium\">No Lessons Found</h3>\r\n        <p className=\"text-muted-foreground mt-2\">\r\n          No lessons available for the selected grade and topic\r\n        </p>\r\n      </Card>\r\n    );\r\n  }\r\n\r\n  return (\r\n    <div className=\"grid gap-4 md:grid-cols-2 lg:grid-cols-3\">\r\n      {lessons.map((lesson) => (\r\n        <Card key={lesson.id} className=\"p-4\">\r\n          <div className=\"flex flex-col gap-4\">\r\n            <div>\r\n              <h3 className=\"font-medium\">{lesson.title}</h3>\r\n              <p className=\"text-sm text-muted-foreground mt-1\">\r\n                {lesson.title || \"No description available\"}\r\n              </p>\r\n            </div>\r\n            \r\n            <div className=\"flex justify-between items-center\">\r\n              <div className=\"text-sm text-muted-foreground\">\r\n                {0} Objectives\r\n              </div>\r\n              <div className=\"flex gap-2\">\r\n                <Button variant=\"ghost\" size=\"sm\">\r\n                  <Icon type=\"phosphor\" name=\"EYE_SLASH\" className=\"w-4 h-4\" />\r\n                </Button>\r\n                <Button variant=\"ghost\" size=\"sm\">\r\n                  <Icon type=\"phosphor\" name=\"PENCIL_SIMPLE\" className=\"w-4 h-4\" />\r\n                </Button>\r\n                <Button variant=\"ghost\" size=\"sm\" className=\"text-destructive\">\r\n                  <Icon type=\"phosphor\" name=\"TRASH_SIMPLE\" className=\"w-4 h-4\" />\r\n                </Button>\r\n              </div>\r\n            </div>\r\n          </div>\r\n        </Card>\r\n      ))}\r\n    </div>\r\n  );\r\n} "
+        }
+    ]
+}

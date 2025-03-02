@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { Plus, Phone, Mail, Calendar, FileText, Users, DollarSign, Table, List, TrendingUp, Target, Activity } from 'lucide-react';
-import { formatCurrency, formatPercent, formatNumber } from '../lib/utils/format';
+import React, { useState} from 'react';
+import { Plus, Phone, Mail, Calendar, Users, DollarSign, Table, List, Target, Activity } from 'lucide-react';
+import { formatCurrency} from '../lib/utils/format';
 import { useSales } from '../hooks/useSales';
-import { useDashboard } from '../hooks/useDashboard';
+//import { useDashboard } from '../hooks/useDashboard';
 import LoadingSpinner from '../components/LoadingSpinner';
 import type { SalesLead } from '../types/sales';
 import {
@@ -12,7 +12,8 @@ import {
   AccordionTrigger,
 } from '../components/ui/accordion';
 import SalesTable from '../components/SalesTable';
-import { StatsWidget, ChartWidget, ListWidget } from '../components/widgets';
+import { StatsWidget, ListWidget } from '../components/widgets';
+import { StatItem } from '../components/StatItem';
 
 const LEAD_STATUS_COLORS = {
   new: 'bg-blue-100 text-blue-800',
@@ -22,15 +23,31 @@ const LEAD_STATUS_COLORS = {
   negotiation: 'bg-pink-100 text-pink-800',
   won: 'bg-green-100 text-green-800',
   lost: 'bg-red-100 text-red-800',
+  closed: 'bg-green-100 text-green-800',
+  cancelled: 'bg-red-100 text-red-800',
+  on_hold: 'bg-gray-100 text-gray-800',
+  demo_scheduled: 'bg-purple-100 text-purple-800',
+  demo_completed: 'bg-indigo-100 text-indigo-800',
+  proposal_sent: 'bg-pink-100 text-pink-800',
+  negotiation_started: 'bg-pink-100 text-pink-800',
 };
 
 const Sales: React.FC = () => {
-  // Hooks
-  const { leads = [], activities = [], opportunities = [], stats, loading, createLead, updateLead, addActivity } = useSales();
-  const [isAddLeadOpen, setIsAddLeadOpen] = useState<boolean>(false);
-  const [selectedLead, setSelectedLead] = useState<SalesLead | null>(null); 
+  const { 
+    leads = [], 
+    activities = [], 
+    opportunities = [], 
+    stats, 
+    loading,
+    //_createLead: createLead,
+    //_updateLead: updateLead,
+    //_addActivity: addActivity
+  } = useSales();
+  
+  const [_isAddLeadOpen, setIsAddLeadOpen] = useState<boolean>(false);
+  const [_selectedLead, setSelectedLead] = useState<SalesLead | null>(null);
   const [viewMode, setViewMode] = useState<'list' | 'table'>('list');
-  const [loadError, setLoadError] = useState<string | null>(null);
+  const [loadError, _setLoadError] = useState<string | null>(null);
 
   if (loading) {
     return (
@@ -49,6 +66,7 @@ const Sales: React.FC = () => {
         <h3 className="text-lg font-medium text-red-800">Error</h3>
         <p className="mt-2 text-sm text-red-600">{loadError}</p>
         <button
+          type="button"
           onClick={() => window.location.reload()}
           className="mt-4 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200"
         >
@@ -70,6 +88,7 @@ const Sales: React.FC = () => {
         <div className="flex items-center space-x-4">
           <div className="flex items-center bg-gray-100 rounded-lg p-1">
             <button
+              type="button"
               onClick={() => setViewMode('list')}
               title="List View"
               aria-label="Switch to List View"
@@ -82,6 +101,7 @@ const Sales: React.FC = () => {
               <List className="h-5 w-5" />
             </button>
             <button
+              type="button"
               onClick={() => setViewMode('table')}
               title="Table View"
               aria-label="Switch to Table View"
@@ -95,6 +115,7 @@ const Sales: React.FC = () => {
             </button>
           </div>
           <button
+            type="button"
             onClick={() => setIsAddLeadOpen(true)}
             className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700"
           >
@@ -114,29 +135,25 @@ const Sales: React.FC = () => {
               icon: Users,
               label: "Total Leads",
               value: stats?.totalLeads || 0,
-              trend: "up",
-              subtext: `${stats?.qualifiedLeads || 0} qualified`
+              _trend: "up"
             },
             {
               icon: DollarSign,
               label: "Pipeline Value",
               value: formatCurrency(stats?.pipelineValue || 0),
-              trend: "up",
-              subtext: "Current pipeline"
+              _trend: "up"
             },
             {
               icon: Target,
-              label: "Won Deals",
-              value: stats?.wonDeals || 0,
-              trend: "up",
-              subtext: formatCurrency(stats?.pipelineValue || 0)
+              label: "Qualified Leads",
+              value: stats?.qualifiedLeads || 0,
+              _trend: "up"
             },
             {
-              icon: TrendingUp,
+              icon: Activity,
               label: "Conversion Rate",
-              value: `${(stats?.conversionRate || 0).toFixed(1)}%`,
-              trend: stats?.conversionRate > 30 ? "up" : "down",
-              subtext: "Last 30 days"
+              value: `${stats?.conversionRate || 0}%`,
+              _trend: stats?.conversionRate > 30 ? "up" : "down"
             }
           ]}
         />
@@ -149,8 +166,8 @@ const Sales: React.FC = () => {
           title="Recent Activities"
           items={activities.slice(0, 5).map(activity => ({
             icon: Activity,
-            title: activity.subject,
-            subtitle: activity.description,
+            title: activity.description,
+            subtitle: activity.type,
             timestamp: new Date(activity.createdAt).toLocaleDateString(),
             status: {
               label: activity.type,
@@ -168,7 +185,7 @@ const Sales: React.FC = () => {
             const stageLeads = leads.filter(lead => lead.status === status);
             const stageValue = opportunities
               .filter(opp => stageLeads.some(lead => lead.id === opp.leadId))
-              .reduce((sum, opp) => sum + (opp.amount || 0), 0);
+              .reduce((sum, opp) => sum + (opp.value || 0), 0);
 
             return (
               <div key={status} className="bg-white rounded-lg shadow p-4">
@@ -212,10 +229,10 @@ const Sales: React.FC = () => {
                       <div className="flex items-center">
                         <div className="min-w-0 flex-1">
                           <h4 className="text-sm font-medium text-gray-900">
-                            {lead.companyName}
+                            {lead.schoolname}
                           </h4>
                           <p className="text-sm text-gray-500">
-                            {lead.contactName}
+                            {lead.name}
                           </p>
                         </div>
                       </div>
@@ -247,8 +264,8 @@ const Sales: React.FC = () => {
                           </div>
                           <div className="flex items-center text-sm text-gray-500">
                             <Calendar className="h-4 w-4 mr-2 text-gray-400" />
-                            {lead.expectedCloseDate
-                              ? new Date(lead.expectedCloseDate).toLocaleDateString()
+                            {lead.createdAt
+                              ? new Date(lead.createdAt).toLocaleDateString()
                               : 'N/A'}
                           </div>
                         </div>
@@ -258,14 +275,21 @@ const Sales: React.FC = () => {
                           Lead Details
                         </h4>
                         <div className="mt-2">
-                          <p className="text-sm text-gray-500">
-                            Value: {formatCurrency(lead.estimatedValue)}
-                          </p>
-                          {lead.expectedCloseDate && (
-                            <p className="text-sm text-gray-900">
-                              Expected Close: {new Date(lead.expectedCloseDate).toLocaleDateString()}
-                            </p>
-                          )}
+                          {(() => {
+                            const relatedOpp = opportunities.find(opp => opp.leadId === lead.id);
+                            return (
+                              <>
+                                <p className="text-sm text-gray-500">
+                                  Value: {formatCurrency(relatedOpp?.value || 0)}
+                                </p>
+                                {relatedOpp?.expectedCloseDate && (
+                                  <p className="text-sm text-gray-900">
+                                    Expected Close: {new Date(relatedOpp.expectedCloseDate).toLocaleDateString()}
+                                  </p>
+                                )}
+                              </>
+                            );
+                          })()}
                         </div>
                       </div>
                     </div>
@@ -275,16 +299,16 @@ const Sales: React.FC = () => {
                           Notes
                         </h4>
                         <p className="text-sm text-gray-500">
-                          {lead.notes || 'No notes available'}
+                          {lead.source || 'No notes available'}
                         </p>
                       </div>
                       <div className="text-right">
                         <p className="text-sm font-medium text-gray-900">
-                          {formatCurrency(lead.estimatedValue)}
+                          {formatCurrency(opportunities.find(opp => opp.leadId === lead.id)?.value || 0)}
                         </p>
                         <span className={`text-xs font-medium px-2 py-1 rounded-full ${
-                          lead.status === 'won' ? 'bg-green-100 text-green-800' :
-                          lead.status === 'lost' ? 'bg-red-100 text-red-800' :
+                          lead.status === 'closed' ? 'bg-green-100 text-green-800' :
+                          lead.status === 'proposal' ? 'bg-red-100 text-red-800' :
                           'bg-yellow-100 text-yellow-800'
                         }`}>
                           {lead.status.charAt(0).toUpperCase() + lead.status.slice(1)}
@@ -298,6 +322,21 @@ const Sales: React.FC = () => {
           </div>
         </div>
       )}
+
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <StatItem
+          title="Pipeline Value"
+          value={stats.pipelineValue}
+          icon={DollarSign}
+          className="bg-blue-500"
+        />
+        <StatItem
+          title="Qualified Leads"
+          value={stats.qualifiedLeads}
+          icon={Target}
+          className="bg-green-500"
+        />
+      </div>
     </div>
   );
 };

@@ -3,11 +3,39 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 0,
+            "activePatchIndex": 7,
             "patches": [
                 {
                     "date": 1739349249493,
                     "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1740090442409,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -23,18 +23,9 @@\n   icon: LucideIcon;\r\n   isActive: boolean;\r\n }\r\n \r\n-// Cache for navigation items\r\n-const navigationCache = new Map<string, SidebarItem[]>();\r\n-\r\n export const getNavigationItems = (role: string, pathname: string = ''): SidebarItem[] => {\r\n-  // Check cache first\r\n-  const cacheKey = `${role}-${pathname}`;\r\n-  if (navigationCache.has(cacheKey)) {\r\n-    return navigationCache.get(cacheKey)!;\r\n-  }\r\n-\r\n   const permissions = ROLE_PERMISSIONS[role]?.permissions;\r\n   if (!permissions) return [];\r\n   \r\n   // Debug permissions\r\n@@ -133,9 +124,9 @@\n     });\r\n   } else if (permissions.content_editor) {\r\n     navigationItems.push({\r\n       label: 'Lessons',\r\n-      href: '/content/lessons',\r\n+      href: '/',\r\n       icon: FileText,\r\n       isActive: pathname === '/content/lessons'\r\n     });\r\n   }\r\n@@ -225,14 +216,6 @@\n     href: item.href,\r\n     hasPermission: permissions[item.label.toLowerCase().replace(' ', '_') as keyof typeof permissions]\r\n   })));\r\n \r\n-  // Cache the result\r\n-  navigationCache.set(cacheKey, navigationItems);\r\n-  \r\n   return navigationItems;\r\n-}\r\n-\r\n-// Clear cache when needed (e.g., on role change or logout)\r\n-export const clearNavigationCache = () => {\r\n-  navigationCache.clear();\r\n-};\n\\ No newline at end of file\n+}\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1740090448327,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -124,11 +124,11 @@\n     });\r\n   } else if (permissions.content_editor) {\r\n     navigationItems.push({\r\n       label: 'Lessons',\r\n-      href: '/',\r\n+      href: '/src/features/content-management/ContentManagementPage.tsx',\r\n       icon: FileText,\r\n-      isActive: pathname === '/content/lessons'\r\n+      isActive: pathname === '/src/features/content-management/ContentManagementPage.tsx'\r\n     });\r\n   }\r\n \r\n   if (permissions.development) {\r\n"
+                },
+                {
+                    "date": 1740852668926,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -9,9 +9,9 @@\n   FileText,\r\n   BarChart,\r\n   type LucideIcon \r\n } from 'lucide-react';\r\n-import { useQuery } from '@tanstack/react-query';\r\n+//import { useQuery } from '@tanstack/react-query';\r\n import {   Home,   DollarSign, Eye, Code, Server, Calendar, AlertTriangle, FileBarChart, CalendarDays, Building,} from 'lucide-react';\r\n import { TEACHER_ROUTES } from './content/routes';\r\n   // ... import other icons you need\r\n \r\n"
+                },
+                {
+                    "date": 1740899094987,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -2,9 +2,9 @@\n import { \r\n   LayoutDashboard,\r\n   Settings,\r\n   Users,\r\n-  BookOpen,\r\n+  \r\n   FolderPlus,\r\n   GraduationCap,\r\n   FileText,\r\n   BarChart,\r\n"
+                },
+                {
+                    "date": 1740899102259,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -2,11 +2,10 @@\n import { \r\n   LayoutDashboard,\r\n   Settings,\r\n   Users,\r\n+  FolderPlus,\r\n   \r\n-  FolderPlus,\r\n-  GraduationCap,\r\n   FileText,\r\n   BarChart,\r\n   type LucideIcon \r\n } from 'lucide-react';\r\n"
+                },
+                {
+                    "date": 1740899111167,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -3,15 +3,14 @@\n   LayoutDashboard,\r\n   Settings,\r\n   Users,\r\n   FolderPlus,\r\n-  \r\n   FileText,\r\n   BarChart,\r\n   type LucideIcon \r\n } from 'lucide-react';\r\n //import { useQuery } from '@tanstack/react-query';\r\n-import {   Home,   DollarSign, Eye, Code, Server, Calendar, AlertTriangle, FileBarChart, CalendarDays, Building,} from 'lucide-react';\r\n+import {   Home,   DollarSign, Eye, Code, Server, Calendar, AlertTriangle, CalendarDays, Building,} from 'lucide-react';\r\n import { TEACHER_ROUTES } from './content/routes';\r\n   // ... import other icons you need\r\n \r\n \r\n"
+                },
+                {
+                    "date": 1740899116759,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -8,9 +8,9 @@\n   BarChart,\r\n   type LucideIcon \r\n } from 'lucide-react';\r\n //import { useQuery } from '@tanstack/react-query';\r\n-import {   Home,   DollarSign, Eye, Code, Server, Calendar, AlertTriangle, CalendarDays, Building,} from 'lucide-react';\r\n+import { DollarSign, Eye, Code, Server, Calendar, AlertTriangle, CalendarDays, Building,} from 'lucide-react';\r\n import { TEACHER_ROUTES } from './content/routes';\r\n   // ... import other icons you need\r\n \r\n \r\n"
                 }
             ],
             "date": 1739349249493,

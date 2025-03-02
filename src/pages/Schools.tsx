@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { School, Plus, Edit, Trash2, MapPin, Phone, Mail, User } from 'lucide-react';
 import type { School as SchoolType } from '../types';
 import LocationSearch from '../components/LocationSearch';
@@ -10,7 +9,7 @@ import GradeSelector from '../components/GradeSelector';
 import { useSchools } from '../hooks/useSchools';
 import { useToast } from '@/components/ui/use-toast';
 import LoadingSpinner from '../components/LoadingSpinner';
-import { Dialog } from '@/components/ui/dialog';
+//import { Dialog } from '@/components/ui/dialog';
 
 const isSchool = (school: unknown): school is SchoolType => {
   return typeof school === 'object' && school !== null && 'type' in school && 'id' in school;
@@ -25,7 +24,7 @@ const Schools = () => {
   const [isAddBranchOpen, setIsAddBranchOpen] = useState(false);
   const [editingSchool, setEditingSchool] = useState<SchoolType | null>(null);
   const [selectedGrades, setSelectedGrades] = useState<string[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [_isLoading, setIsLoading] = useState(false);
 
   const handleEditSchool = (updatedSchool: SchoolType) => {
     console.log('Updating school:', updatedSchool);
@@ -125,7 +124,6 @@ const Schools = () => {
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to add school');
       toast({
-        variant: "destructive",
         title: "Error",
         description: "Failed to add school",
       });
@@ -192,6 +190,8 @@ const Schools = () => {
         <h1 className="text-2xl font-semibold text-gray-900">Schools</h1>
         <div className="flex space-x-4">
           <button
+            title="Add School"
+            type="button"
             onClick={() => setIsAddModalOpen(true)}
             className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700"
           >
@@ -240,17 +240,20 @@ const Schools = () => {
                   <div className="mt-4 flex-shrink-0 sm:mt-0">
                     <div className="flex space-x-4">
                       <button
+                        title="Add branch school"
+                        type="button"
                         onClick={() => {
                           setSelectedSchool(school);
                           setIsAddBranchOpen(true);
                         }}
                         className="text-indigo-600 hover:text-indigo-700"
                         aria-label="Add branch school"
-                        title="Add branch school"
                       >
                         <Plus className="h-5 w-5" />
                       </button>
                       <button
+                        title="Edit school"
+                        type="button"
                         onClick={() => {
                           setEditingSchool(school);
                           setSelectedGrades(school.grades || []);
@@ -263,6 +266,7 @@ const Schools = () => {
                         onClick={() => {
                           deleteSchool.mutate(school.id);
                         }}
+                        title="Delete school"
                         className="text-red-400 hover:text-red-500"
                       >
                         <Trash2 className="h-5 w-5" />
@@ -295,6 +299,8 @@ const Schools = () => {
                           </div>
                           <div className="flex space-x-2">
                             <button
+                              title="Edit branch school"
+                              type="button"
                               onClick={() => {
                                 setEditingSchool(branch);
                                 setSelectedGrades(branch.grades || []);
@@ -304,6 +310,8 @@ const Schools = () => {
                               <Edit className="h-4 w-4" />
                             </button>
                             <button
+                              title="Delete branch school"
+                              type="button"
                               onClick={() => {
                                 deleteSchool.mutate(branch.id);
                               }}
@@ -502,6 +510,7 @@ const Schools = () => {
             <div className="p-6 border-t border-gray-200 bg-gray-50">
               <div className="flex space-x-3">
                 <button
+                  title="Add School"
                   type="submit"
                   form="addSchoolForm"
                   className="inline-flex justify-center w-full rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:text-sm"
@@ -509,6 +518,7 @@ const Schools = () => {
                   Add School
                 </button>
                 <button
+                  title="Cancel"
                   type="button"
                   onClick={() => setIsAddModalOpen(false)}
                   className="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:text-sm"
@@ -663,6 +673,7 @@ const Schools = () => {
             <div className="p-6 border-t border-gray-200 bg-gray-50">
               <div className="flex space-x-3">
                 <button
+                  title="Add Branch"
                   type="submit"
                   form="addBranchForm"
                   className="inline-flex justify-center w-full rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:text-sm"
@@ -670,6 +681,7 @@ const Schools = () => {
                   Add Branch
                 </button>
                 <button
+                  title="Cancel"
                   type="button"
                   onClick={() => {
                     setIsAddBranchOpen(false);

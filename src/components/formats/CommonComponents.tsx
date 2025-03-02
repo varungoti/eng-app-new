@@ -11,6 +11,7 @@ interface ListenButtonProps {
 
 export const ListenButton = ({ text, onListen, isPlaying, className, small }: ListenButtonProps) => (
   <button 
+    title="Listen"
     className={`rounded-2xl flex space-x-2 border dark:border-primary/30 border-primary/40 
       items-center text-left hover:shadow-md transition-all ${className}`}
     onClick={() => onListen(text)}
@@ -33,6 +34,7 @@ interface SpeakButtonProps {
 
 export const SpeakButton = ({ onSpeak, isListening, isProcessing, customText }: SpeakButtonProps) => (
   <button 
+    title="Speak"
     className="rounded-2xl flex space-x-2 border dark:border-primary/30 border-primary/40 
       items-center text-left hover:shadow-md transition-all"
     onClick={onSpeak}
@@ -69,6 +71,7 @@ export const WordPopover = ({ word, definition, phonetic, onListen }: WordPopove
     <Popover.Root>
       <Popover.Trigger asChild>
         <button 
+          title="Listen"
           className="inline-block hover:bg-primary/5 rounded px-1 
             transition-colors duration-200 cursor-pointer"
         >
@@ -91,6 +94,7 @@ export const WordPopover = ({ word, definition, phonetic, onListen }: WordPopove
             <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
               <span>{phonetic}</span>
               <button 
+                title="Listen"
                 onClick={() => onListen(word)}
                 className="p-1 rounded-lg hover:bg-primary/10 text-primary"
               >

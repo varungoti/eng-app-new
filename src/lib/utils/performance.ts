@@ -1,8 +1,5 @@
 import { useCallback, useEffect, useRef } from 'react';
-import { logger } from '../logger';
 import { performanceMonitor } from '../monitoring/PerformanceMonitor';
-
-const PERFORMANCE_SAMPLE_RATE = 0.1; // Sample 10% of performance measurements
 
 export const measurePerformance = (name: string, metadata?: Record<string, any>) => {
   const id = performanceMonitor.startOperation(name, 'Performance', metadata);
@@ -33,13 +30,13 @@ export const throttle = <T extends (...args: any[]) => any>(
   let waiting = false;
   
   return function throttledFunction(...args: Parameters<T>) {
-    if (!waiting) {
-      func(...args);
-      waiting = true;
-      setTimeout(() => {
-        waiting = false;
-      }, limit);
-    }
+    if (waiting) return;
+    
+    func(...args);
+    waiting = true;
+    setTimeout(() => {
+      waiting = false;
+    }, limit);
   };
 };
 
@@ -47,20 +44,34 @@ export const useThrottledCallback = <T extends (...args: any[]) => any>(
   callback: T,
   delay: number
 ) => {
-  return useCallback(
-    throttle(callback, delay),
-    [callback, delay]
-  );
+  const throttledCallbackRef = useRef<((...args: Parameters<T>) => void) | null>(null);
+  
+  // Create or update the throttled callback when dependencies change
+  useEffect(() => {
+    throttledCallbackRef.current = throttle(callback, delay);
+  }, [callback, delay]);
+
+  // Return a stable function reference that calls the current throttled function
+  return useCallback((...args: Parameters<T>) => {
+    throttledCallbackRef.current?.(...args);
+  }, []);
 };
 
 export const useDebouncedCallback = <T extends (...args: any[]) => any>(
   callback: T,
   delay: number
 ) => {
-  return useCallback(
-    debounce(callback, delay),
-    [callback, delay]
-  );
+  const debouncedCallbackRef = useRef<((...args: Parameters<T>) => void) | null>(null);
+  
+  // Create or update the debounced callback when dependencies change
+  useEffect(() => {
+    debouncedCallbackRef.current = debounce(callback, delay);
+  }, [callback, delay]);
+
+  // Return a stable function reference that calls the current debounced function
+  return useCallback((...args: Parameters<T>) => {
+    debouncedCallbackRef.current?.(...args);
+  }, []);
 };
 
 export const useIsFirstRender = () => {

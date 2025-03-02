@@ -1,0 +1,22 @@
+{
+    "sourceFile": "src/lib/db/DatabaseMonitor.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1740692455463,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1740692461947,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -111,5 +111,4 @@\n   }\r\n }\r\n \r\n export const databaseMonitor = DatabaseMonitor.getInstance();\r\n-```\n\\ No newline at end of file\n"
+                }
+            ],
+            "date": 1740692455463,
+            "name": "Commit-0",
+            "content": "\r\nimport { logger } from '../logger';\r\nimport { WarningCache } from '../monitoring/WarningCache';\r\nimport { connectionManager } from './ConnectionManager';\r\nimport { cacheManager } from './CacheManager';\r\n\r\ninterface DatabaseMetrics {\r\n  queryCount: number;\r\n  errorCount: number;\r\n  averageResponseTime: number;\r\n  slowQueries: number;\r\n  cacheHitRate: number;\r\n}\r\n\r\nclass DatabaseMonitor {\r\n  private static instance: DatabaseMonitor;\r\n  private warningCache = new WarningCache(30000);\r\n  private metrics: DatabaseMetrics = {\r\n    queryCount: 0,\r\n    errorCount: 0,\r\n    averageResponseTime: 0,\r\n    slowQueries: 0,\r\n    cacheHitRate: 0\r\n  };\r\n\r\n  private constructor() {\r\n    this.startMonitoring();\r\n  }\r\n\r\n  public static getInstance(): DatabaseMonitor {\r\n    if (!DatabaseMonitor.instance) {\r\n      DatabaseMonitor.instance = new DatabaseMonitor();\r\n    }\r\n    return DatabaseMonitor.instance;\r\n  }\r\n\r\n  private startMonitoring() {\r\n    setInterval(() => this.checkHealth(), 60000); // Every minute\r\n    setInterval(() => this.logMetrics(), 300000); // Every 5 minutes\r\n  }\r\n\r\n  private async checkHealth() {\r\n    const isHealthy = await connectionManager.executeWithRetry(\r\n      async () => {\r\n        const response = await fetch('/api/health');\r\n        return response.ok;\r\n      }\r\n    );\r\n\r\n    if (!isHealthy && this.warningCache.shouldLog('health_check')) {\r\n      logger.warn('Database health check failed', {\r\n        context: { metrics: this.getMetrics() },\r\n        source: 'DatabaseMonitor'\r\n      });\r\n    }\r\n  }\r\n\r\n  private logMetrics() {\r\n    const metrics = this.getMetrics();\r\n    const cacheStats = cacheManager.getStats();\r\n    const connectionStats = connectionManager.getStats();\r\n\r\n    logger.info('Database metrics', {\r\n      context: {\r\n        metrics,\r\n        cache: cacheStats,\r\n        connections: connectionStats\r\n      },\r\n      source: 'DatabaseMonitor'\r\n    });\r\n  }\r\n\r\n  public trackQuery(duration: number, success: boolean) {\r\n    this.metrics.queryCount++;\r\n    \r\n    if (!success) {\r\n      this.metrics.errorCount++;\r\n    }\r\n\r\n    // Update average response time\r\n    this.metrics.averageResponseTime = (\r\n      (this.metrics.averageResponseTime * (this.metrics.queryCount - 1) + duration) /\r\n      this.metrics.queryCount\r\n    );\r\n\r\n    // Track slow queries (>100ms)\r\n    if (duration > 100) {\r\n      this.metrics.slowQueries++;\r\n      \r\n      if (this.warningCache.shouldLog('slow_query')) {\r\n        logger.warn('Slow query detected', {\r\n          context: { duration },\r\n          source: 'DatabaseMonitor'\r\n        });\r\n      }\r\n    }\r\n  }\r\n\r\n  public getMetrics(): DatabaseMetrics {\r\n    return { ...this.metrics };\r\n  }\r\n\r\n  public resetMetrics() {\r\n    this.metrics = {\r\n      queryCount: 0,\r\n      errorCount: 0,\r\n      averageResponseTime: 0,\r\n      slowQueries: 0,\r\n      cacheHitRate: 0\r\n    };\r\n  }\r\n}\r\n\r\nexport const databaseMonitor = DatabaseMonitor.getInstance();\r\n```"
+        }
+    ]
+}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useContext, useEffect, useState, useCallback, useRef } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../contexts/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { QueryClient } from '@tanstack/query-core';
@@ -11,11 +11,12 @@ import { ROLE_PERMISSIONS } from '../types/roles';
 import { sessionManager } from '../lib/auth/sessionManager';
 import type { UserRole } from '../types/roles';
 import { supabaseClient } from '../lib/supabaseClient';
-import { supabase } from '../lib/supabase';
-import { AuthLoader } from '../lib/auth/AuthLoader';
-import type { AuthError } from '@supabase/supabase-js';
+  // import { supabase } from '../lib/supabase';
+  // import { AuthLoader } from '../lib/auth/AuthLoader';
+  // import type { AuthError } from '@supabase/supabase-js';
 import { sessionMonitor } from '@/lib/auth/SessionMonitor';
-import type { SessionState } from '@/lib/auth/sessionManager';
+//import type { SessionState } from '@/lib/auth/sessionManager';
+import type { User } from '../types';
 
 interface LoginCredentials {
   email: string;
@@ -28,45 +29,64 @@ interface SignUpCredentials extends LoginCredentials {
 
 interface ResetPasswordCredentials {
   email: string;
-}
-
-export function useAuth() {
-  const context = useContext(AuthContext);
-  
-  if (!context) {
-    console.warn('useAuth must be used within an AuthProvider');
-    return { user: null, loading: false };
   }
 
-  const { user, loading } = context;
-
-  // Add debug logging
-  console.log('Auth Context:', {
-    hasUser: !!user,
-    userRole: user?.role,
-    userId: user?.id,
-    isLoading: loading,
-    fullUser: user // Log the full user object for debugging
-  });
-
+export function useAuth() {
+  // 1. CONTEXT AND STATE - All state declarations first
+  const context = useContext(AuthContext);
   const { isTransitioning } = useRoleStore();
   const navigate = useNavigate();
-  const queryClient = new QueryClient();
   const location = useLocation();
+  const [_authState, setAuthState] = useState(sessionMonitor.getState());
+  const queryClient = new QueryClient();
   
-  // Add loading state check
+  // 2. Compute derived state - These must come before hooks that depend on them
+  const user = context?.user;
+  const loading = context?.loading || false;
+  //const _isAuthenticated = !!user;
+
+  // 3. ALL EFFECTS - Always called, regardless of context
+  // Session monitor subscription
   useEffect(() => {
+    const unsubscribe = sessionMonitor.subscribeToStateUpdates(setAuthState);
+    return () => unsubscribe();
+  }, []);
+
+  // Auth state monitoring
+  useEffect(() => {
+    // Only execute the inner logic if we have context
+    if (!context) return;
+    
     if (loading) {
-      logger.info('Auth loading state active', {
-        source: 'useAuth',
-        context: { loading }
+      logger.info('Auth loading state active', { 
+        source: 'useAuth', 
+        context: { loading } 
       });
     }
-  }, [loading]);
+    
+    if (user && !loading && !isTransitioning) {
+      logger.debug('Auth state check on route change', {
+        source: 'useAuth',
+        context: { 
+          role: user.role, 
+          path: location.pathname,
+          permissions: ROLE_PERMISSIONS[user.role]?.permissions 
+        }
+      });
+      
+      logger.info('Auth Context:', { 
+        context: {
+          hasUser: !!user,
+          userRole: user.role
+        }
+      });
+    }
+  }, [context, user, loading, isTransitioning, location.pathname]);
 
-  // Auto-refresh session when it's about to expire
+  // Session refresh effect
   useEffect(() => {
     if (!user) return;
+    
     const refreshInterval = setInterval(async () => {
       try {
         await sessionManager.refreshSession();
@@ -76,31 +96,21 @@ export function useAuth() {
           context: { error: err }
         });
       }
-    }, 4 * 60 * 1000); // Check every 4 minutes
+    }, 4 * 60 * 1000);
     
-    return () => {
-      if (refreshInterval) {
-        clearInterval(refreshInterval);
-      }
-    };
+    return () => clearInterval(refreshInterval);
   }, [user]);
 
-  useEffect(() => {
-    if (user) {
-      logger.debug('Auth state check on route change', {
-        source: 'useAuth',
-        context: {
-          role: user.role,
-          path: location.pathname,
-          permissions: ROLE_PERMISSIONS[user.role]?.permissions
-        }
-      });
-    }
-  }, [user, location.pathname]);
+  // 4. CONDITIONAL RETURN - Only after all hooks are defined
+  if (!context) {
+    logger.warn('useAuth must be used within an AuthProvider');
+    return { user: null, loading: false };
+  }
 
+  // 5. REGULAR FUNCTIONS - These don't contain hooks
   const changeRole = async (newRole: UserRole): Promise<void> => {
-    if (!context.user || isTransitioning) return;
-
+    if (!user || isTransitioning) return;
+    
     try {
       await roleTransitionManager.transitionRole(newRole);
       
@@ -108,11 +118,12 @@ export function useAuth() {
       queryClient.clear();
       await queryClient.resetQueries();
       
-      // Update context user
+      // Update context user with explicit type assertion to fix the error
       context.setUser({
-        ...context.user,
-        role: newRole
-      });
+        ...user,
+        role: newRole,
+        id: user.id || '', // Ensure id is not undefined
+      } as User & { role: UserRole }); // Using proper type instead of any
 
       // Navigate to home with fresh data
       navigate('/', { replace: true });
@@ -127,9 +138,11 @@ export function useAuth() {
 
   const login = async (credentials: LoginCredentials) => {
     try {
-      console.log('[Auth] Attempting login:', {
-        email: credentials.email,
-        timestamp: new Date().toISOString()
+      logger.info('[Auth] Attempting login:', { 
+        context: {
+          email: credentials.email,
+          timestamp: new Date().toISOString()
+        }
       });
       
       const { data, error } = await supabaseClient.auth.signInWithPassword({
@@ -138,11 +151,12 @@ export function useAuth() {
       });
 
       if (error) {
-        console.error('[Auth] Supabase login error:', {
-          message: error.message,
-          status: error.status,
-          name: error.name,
-          timestamp: new Date().toISOString()
+        logger.error('[Auth] Supabase login error:', { 
+          context: {
+            message: error.message,
+            status: error.status
+          },
+          error
         });
         
         // Provide more specific error messages
@@ -160,12 +174,11 @@ export function useAuth() {
         throw new Error(error.message);
       }
 
-      console.log('[Auth] Login response:', {
-        hasUser: !!data.user,
-        userId: data.user?.id,
-        userEmail: data.user?.email,
-        metadata: data.user?.user_metadata,
-        timestamp: new Date().toISOString()
+      logger.info('[Auth] Login response:', { 
+        context: {
+          hasUser: !!data.user,
+          userId: data.user?.id
+        }
       });
 
       if (!data.user) {
@@ -181,7 +194,7 @@ export function useAuth() {
         photoUrl: data.user.user_metadata?.avatar_url,
       };
 
-      console.log('[Auth] Mapped user:', mappedUser);
+      logger.info('[Auth] Mapped user:', { context: mappedUser });
 
       context.setUser(mappedUser);
       return { user: mappedUser };
@@ -192,9 +205,11 @@ export function useAuth() {
         stack: error.stack
       } : error;
 
-      console.error('[Auth] Login error details:', {
-        error: errorDetails,
-        timestamp: new Date().toISOString()
+      logger.error('[Auth] Login error details:', { 
+        context: {
+          timestamp: new Date().toISOString()
+        },
+        error: errorDetails
       });
 
       logger.error('Login failed', {
@@ -235,9 +250,11 @@ export function useAuth() {
 
   const signUp = async (credentials: SignUpCredentials) => {
     try {
-      console.log('[Auth] Attempting signup:', {
-        email: credentials.email,
-        timestamp: new Date().toISOString()
+      logger.info('[Auth] Attempting signup:', { 
+        context: {
+          email: credentials.email,
+          timestamp: new Date().toISOString()
+        }
       });
       
       const { data, error } = await supabaseClient.auth.signUp({
@@ -252,11 +269,12 @@ export function useAuth() {
       });
 
       if (error) {
-        console.error('[Auth] Supabase signup error:', {
-          message: error.message,
-          status: error.status,
-          name: error.name,
-          timestamp: new Date().toISOString()
+        logger.error('[Auth] Supabase signup error:', { 
+          context: {
+            message: error.message,
+            status: error.status
+          },
+          error
         });
         
         logger.error('Signup failed', {
@@ -269,12 +287,11 @@ export function useAuth() {
         throw new Error(error.message);
       }
 
-      console.log('[Auth] Signup response:', {
-        hasUser: !!data.user,
-        userId: data.user?.id,
-        userEmail: data.user?.email,
-        metadata: data.user?.user_metadata,
-        timestamp: new Date().toISOString()
+      logger.info('[Auth] Signup response:', { 
+        context: {
+          hasUser: !!data.user,
+          userId: data.user?.id
+        }
       });
 
       if (!data.user) {
@@ -290,7 +307,7 @@ export function useAuth() {
         photoUrl: data.user.user_metadata?.avatar_url,
       };
 
-      console.log('[Auth] Mapped user:', mappedUser);
+      logger.info('[Auth] Mapped user:', { context: mappedUser });
 
       context.setUser(mappedUser);
       return { user: mappedUser };
@@ -301,9 +318,11 @@ export function useAuth() {
         stack: error.stack
       } : error;
 
-      console.error('[Auth] Signup error details:', {
-        error: errorDetails,
-        timestamp: new Date().toISOString()
+      logger.error('[Auth] Signup error details:', { 
+        context: {
+          timestamp: new Date().toISOString()
+        },
+        error: errorDetails
       });
 
       logger.error('Signup failed', {
@@ -324,9 +343,11 @@ export function useAuth() {
 
   const resetPassword = async (credentials: ResetPasswordCredentials) => {
     try {
-      console.log('[Auth] Attempting password reset:', {
-        email: credentials.email,
-        timestamp: new Date().toISOString()
+      logger.info('[Auth] Attempting password reset:', { 
+        context: {
+          email: credentials.email,
+          timestamp: new Date().toISOString()
+        }
       });
       
       const { data, error } = await supabaseClient.auth.resetPasswordForEmail(
@@ -335,11 +356,12 @@ export function useAuth() {
       );
 
       if (error) {
-        console.error('[Auth] Supabase password reset error:', {
-          message: error.message,
-          status: error.status,
-          name: error.name,
-          timestamp: new Date().toISOString()
+        logger.error('[Auth] Supabase password reset error:', { 
+          context: {
+            message: error.message,
+            status: error.status
+          },
+          error
         });
         
         logger.error('Password reset failed', {
@@ -360,9 +382,11 @@ export function useAuth() {
         stack: error.stack
       } : error;
 
-      console.error('[Auth] Password reset error details:', {
-        error: errorDetails,
-        timestamp: new Date().toISOString()
+      logger.error('[Auth] Password reset error details:', { 
+        context: {
+          timestamp: new Date().toISOString()
+        },
+        error: errorDetails
       });
 
       logger.error('Password reset failed', {
@@ -381,23 +405,16 @@ export function useAuth() {
     }
   };
 
-  const [authState, setAuthState] = useState(sessionMonitor.getState());
-
-  useEffect(() => {
-    const unsubscribe = sessionMonitor.subscribeToStateUpdates(setAuthState);
-    return () => unsubscribe();
-  }, []);
-
-  const checkAndRefreshSession = async (): Promise<void> => {
-    try {
-      await sessionManager.checkAndRefreshSession();
-    } catch (error) {
-      logger.error('Failed to check and refresh session', {
-        context: { error },
-        source: 'useAuth'
-      });
-    }
-  };
+  // const checkAndRefreshSession = async (): Promise<void> => {
+  //   try {
+  //     await sessionManager.checkAndRefreshSession();
+  //   } catch (error) {
+  //     logger.error('Failed to check and refresh session', {
+  //       context: { error },
+  //       source: 'useAuth'
+  //     });
+  //   }
+  // };
 
   return {
     user: user ? {

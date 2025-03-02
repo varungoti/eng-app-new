@@ -3,11 +3,35 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 0,
+            "activePatchIndex": 6,
             "patches": [
                 {
                     "date": 1739009281641,
                     "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1740902025146,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -18,8 +18,15 @@\n   private constructor(config: ErrorWatcherConfig = {}) {\r\n     this.config = { ...this.config, ...config };\r\n   }\r\n \r\n+  public static getInstance(config?: ErrorWatcherConfig): ErrorWatcher {\r\n+    if (!ErrorWatcher.instance) {\r\n+      ErrorWatcher.instance = new ErrorWatcher(config);\r\n+    }\r\n+    return ErrorWatcher.instance;\r\n+  }\r\n+\r\n   public trackError(error: ErrorEvent): void {\r\n     this.errors = [error, ...this.errors].slice(0, this.config.maxErrors);\r\n     \r\n     if (this.config.logToConsole) {\r\n"
+                },
+                {
+                    "date": 1740902061838,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -33,8 +33,8 @@\n       const logLevel = error.severity === ErrorSeverity.CRITICAL ? 'error' :\r\n                       error.severity === ErrorSeverity.HIGH ? 'error' :\r\n                       error.severity === ErrorSeverity.MEDIUM ? 'warn' : 'info';\r\n       \r\n-      logger[logLevel](error.message, error.source);\r\n+      logger[logLevel](error.message, { source: error.source });\r\n     }\r\n   }\r\n }\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1740902068395,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -33,8 +33,8 @@\n       const logLevel = error.severity === ErrorSeverity.CRITICAL ? 'error' :\r\n                       error.severity === ErrorSeverity.HIGH ? 'error' :\r\n                       error.severity === ErrorSeverity.MEDIUM ? 'warn' : 'info';\r\n       \r\n-      logger[logLevel](error.message, { source: error.source });\r\n+      logger[logLevel](error.message, { source: error.source } as LogContext);\r\n     }\r\n   }\r\n }\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1740902079162,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,7 +1,7 @@\n import { ErrorEvent, ErrorResolution, ErrorSeverity, ErrorWatcherConfig } from './types';\r\n-import { ErrorResolver } from './ErrorResolver';\r\n-import { logger } from '../logger';\r\n+//import { ErrorResolver } from './ErrorResolver';\r\n+import { LogContext, logger } from '../logger';\r\n import { DEBUG_CONFIG } from '../config';\r\n \r\n export class ErrorWatcher {\r\n   private static instance: ErrorWatcher;\r\n"
+                },
+                {
+                    "date": 1740902088660,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,5 +1,5 @@\n-import { ErrorEvent, ErrorResolution, ErrorSeverity, ErrorWatcherConfig } from './types';\r\n+import { ErrorEvent, ErrorResolution, ErrorType, ErrorSeverity, ErrorWatcherConfig } from './types';\r\n //import { ErrorResolver } from './ErrorResolver';\r\n import { LogContext, logger } from '../logger';\r\n import { DEBUG_CONFIG } from '../config';\r\n \r\n"
+                },
+                {
+                    "date": 1740902095080,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,5 +1,5 @@\n-import { ErrorEvent, ErrorResolution, ErrorType, ErrorSeverity, ErrorWatcherConfig } from './types';\r\n+import { ErrorEvent, ErrorSeverity, ErrorWatcherConfig } from './types';\r\n //import { ErrorResolver } from './ErrorResolver';\r\n import { LogContext, logger } from '../logger';\r\n import { DEBUG_CONFIG } from '../config';\r\n \r\n"
                 }
             ],
             "date": 1739009281641,

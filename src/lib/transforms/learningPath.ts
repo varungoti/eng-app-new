@@ -10,7 +10,7 @@ const transformQuestionsToSubLessons = (questions: Question[] = [], progress?: L
       description: question.content,
       duration: question.data?.metadata?.duration,
       unlocked: true, // Questions are unlocked by default
-      exercises: question.data?.metadata?.questions?.map((exercisePrompt, promptIndex) => ({
+      exercises: question.data?.metadata?.questions?.map((exercisePrompt: string, promptIndex: number) => ({
         id: `${question.id}-prompt-${promptIndex}`,
         prompt: exercisePrompt,
         completed: progress?.progress_data?.answers?.[`${question.id}-prompt-${promptIndex}`] != null,
@@ -43,7 +43,11 @@ const getDifficultyLevel = (lesson: Lesson) => {
   const hasMedia = lesson.media_url ? 1 : 0;
   const hasActivities = (lesson.activities?.length || 0) > 0 ? 1 : 0;
   const hasPrerequisites = (lesson.prerequisites?.length || 0) > 0 ? 1 : 0;
-  difficultyScore += hasMedia + hasActivities + hasPrerequisites;
+  
+  // Use separate increment expressions instead of compound assignment
+  difficultyScore += hasMedia;
+  difficultyScore += hasActivities;
+  difficultyScore += hasPrerequisites;
 
   // Duration contribution (0-2 points)
   const duration = lesson.duration || 0;

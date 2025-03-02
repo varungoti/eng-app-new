@@ -1,0 +1,22 @@
+{
+    "sourceFile": "src/components/ui/textarea.tsx",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1740765597934,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1740765612370,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,9 +1,8 @@\n import * as React from \"react\";\r\n import { cn } from \"@/lib/utils\";\r\n \r\n-export interface TextareaPropsTextareaProps\r\n-  extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {}\r\n+export type TextareaProps = React.TextareaHTMLAttributes<HTMLTextAreaElement>;\r\n \r\n const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(\r\n   ({ className, ...props }, ref) => {\r\n     return (\r\n"
+                }
+            ],
+            "date": 1740765597934,
+            "name": "Commit-0",
+            "content": "import * as React from \"react\";\r\nimport { cn } from \"@/lib/utils\";\r\n\r\nexport interface TextareaPropsTextareaProps\r\n  extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {}\r\n\r\nconst Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(\r\n  ({ className, ...props }, ref) => {\r\n    return (\r\n      <textarea\r\n        className={cn(\r\n          \"flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50\",\r\n          className\r\n        )}\r\n        ref={ref}\r\n        {...props}\r\n      />\r\n    );\r\n  }\r\n);\r\nTextarea.displayName = \"Textarea\";\r\n\r\nexport { Textarea };\r\n"
+        }
+    ]
+}

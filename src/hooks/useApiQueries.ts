@@ -2,22 +2,22 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { api } from '@/lib/api';
 import { supabase } from '@/lib/supabase';
 
-interface Student {
+export interface Student {
   id: string;
-  first_name: string;
-  last_name: string;
-  roll_number: string;
+  firstName: string;
+  lastName: string;
+  rollNumber: string;
   gender?: string;
-  date_of_birth?: string;
-  contact_number?: string;
+  dateOfBirth?: string;
+  contactNumber?: string;
   email?: string;
-  guardian_name?: string;
-  guardian_contact?: string;
+  guardianName?: string;
+  guardianContact?: string;
 }
 
 interface ClassStudent {
-  student_id: any;
-  assigned_at: any;
+  student_id: string;
+  assigned_at: string;
   student: SupabaseStudent;
 }
 
@@ -28,20 +28,20 @@ interface ClassAttributes {
     id: string;
     firstName: string;
     lastName: string;
+    email: string;
     rollNumber: string;
-    gender?: string;
-    dateOfBirth?: string;
-    contactNumber?: string;
-    email?: string;
-    guardianName?: string;
-    guardianContact?: string;
   }[];
   lessons?: any[];
+  topics?: any[];
+  subtopics?: any[];
   courses?: { data: any[] };
   grade?: {
     id: string;
     name: string;
+    level?: number;
   };
+  created_at?: string;
+  updated_at?: string;
 }
 
 interface ClassData {
@@ -49,19 +49,25 @@ interface ClassData {
   attributes: ClassAttributes;
 }
 
-interface ClassesResponse {
+export interface ClassesResponse {
   data: ClassData[];
 }
 
 interface SupabaseGrade {
   id: string;
   name: string;
+  level: number;
+  description?: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 interface SupabaseStudent {
-  id: any;
-  name: any;
-  email: any;
+  id: string;
+  first_name: string;
+  last_name: string;
+  email?: string;
+  roll_number?: string;
 }
 
 interface SupabaseClassStudent {
@@ -74,32 +80,36 @@ interface SupabaseContent {
   id: string;
   content_type: string;
   content_id: string;
-  valid_until: string | null;
+  valid_from?: string;
+  valid_until?: string;
 }
 
-interface SupabaseClass {
+export interface SupabaseClass {
   id: string;
   name: string;
   description: string | null;
   created_at: string;
+  updated_at?: string;
   created_by: string;
-  grade: SupabaseGrade;
-  class_students: SupabaseClassStudent[];
-  assigned_content: SupabaseContent[];
+  grade_id?: string;
+  grade?: SupabaseGrade;
+  class_students?: SupabaseClassStudent[];
+  assigned_content?: SupabaseContent[];
+  max_students?: number;
 }
 
-interface RawGrade {
+export interface RawGrade {
   id: string;
   name: string;
 }
 
-interface RawStudent {
+export interface RawStudent {
   id: string;
   name: string;
   email: string;
 }
 
-interface RawClassStudent {
+export interface RawClassStudent {
   student_id: any;
   assigned_at: any;
   student: {
@@ -109,91 +119,169 @@ interface RawClassStudent {
   }[];
 }
 
-interface RawContent {
+export interface RawContent {
   id: string;
   content_type: string;
   content_id: string;
   valid_until: string;
 }
 
-interface RawClass {
+export interface RawClass {
   id: string;
   name: string;
   description: string | null;
   created_at: string;
   created_by: string;
-  grade: RawGrade | null;
-  class_students: RawClassStudent[] | null;
-  assigned_content: RawContent[] | null;
+  grade?: SupabaseGrade;
+  class_students?: any[];
+  assigned_content?: any[];
 }
 
-interface ClassGrade {
+export interface ClassGrade {
   id: string;
   name: string;
 }
 
-interface AssignedContent {
+export interface AssignedContent {
   id: string;
   content_type: string;
   content_id: string;
   valid_until: string;
 }
 
-interface ClassRecord {
+export interface ClassRecord {
   id: string;
   name: string;
   description: string | null;
   created_at: string;
   created_by: string;
-  grade: ClassGrade | null;
-  class_students: ClassStudent[] | null;
-  assigned_content: AssignedContent[] | null;
+  grade?: SupabaseGrade;
+  class_students?: ClassStudent[];
+  assigned_content?: SupabaseContent[];
 }
-export const useTopics = (topicID: string) => {
+
+export const useTopics = (gradeId: string) => {
   return useQuery({
-    queryKey: ['topics', topicID],
-    queryFn: () => api.get(`/topics/${topicID}`),
-    enabled: !!topicID
+    queryKey: ['topics', gradeId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('topics')
+        .select('*')
+        .eq('grade_id', gradeId)
+        .order('order_index');
+        
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!gradeId
   });
 };
 
-export const useSubTopics = (topicID: string) => {
+export const useSubTopics = (topicId: string) => {
   return useQuery({
-    queryKey: ['subtopics', topicID],
-    queryFn: () => api.get(`/subtopics/${topicID}`),
-    enabled: !!topicID
+    queryKey: ['subtopics', topicId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('subtopics')
+        .select('*')
+        .eq('topic_id', topicId)
+        .order('order_index');
+        
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!topicId
   });
 };
 
 export const useLesson = (lessonId: string) => {
   return useQuery({
     queryKey: ['lesson', lessonId],
-    queryFn: () => api.get(`/lessons/${lessonId}`),
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('lessons')
+        .select(`
+          *,
+          questions(*)
+        `)
+        .eq('id', lessonId)
+        .single();
+        
+      if (error) throw error;
+      return data;
+    },
     enabled: !!lessonId
   });
 };
 
-export const useQuestions = (questionsId: string) => {
+export const useLessons = (subtopicId: string) => {
   return useQuery({
-    queryKey: ['questions', questionsId],
-    queryFn: () => api.get(`/questions/${questionsId}`),
-    enabled: !!questionsId
+    queryKey: ['lessons', subtopicId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('lessons')
+        .select('*')
+        .eq('subtopic_id', subtopicId)
+        .order('order_index');
+        
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!subtopicId
   });
 };
 
-export const useExercisePrompts = (exercise_promptsId: string) => {
+export const useQuestions = (lessonId: string) => {
   return useQuery({
-    queryKey: ['exercise_prompts', exercise_promptsId],
-    queryFn: () => api.get(`/exercise_prompts/${exercise_promptsId}`),
-    enabled: !!exercise_promptsId
+    queryKey: ['questions', lessonId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('questions')
+        .select(`
+          *,
+          exercise_prompts(*)
+        `)
+        .eq('lesson_id', lessonId)
+        .order('order_index');
+        
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!lessonId
   });
 };
 
-export const useActivities = (activitiesId: string) => {
+export const useExercisePrompts = (questionId: string) => {
   return useQuery({
-    queryKey: ['activities', activitiesId],
-    queryFn: () => api.get(`/activities/${activitiesId}`),
-    enabled: !!activitiesId
+    queryKey: ['exercise_prompts', questionId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('exercise_prompts')
+        .select('*')
+        .eq('question_id', questionId)
+        .order('order_index');
+        
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!questionId
+  });
+};
+
+export const useActivities = (lessonId: string) => {
+  return useQuery({
+    queryKey: ['activities', lessonId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('activities')
+        .select('*')
+        .eq('lesson_id', lessonId)
+        .order('order_index');
+        
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!lessonId
   });
 };
 
@@ -205,7 +293,7 @@ export const useUpdateTeacherProgress = () => {
 };
 
 export function useClasses(userId: string) {
-  return useQuery<ClassesResponse, Error>({
+  return useQuery<any, Error>({
     queryKey: ['classes', userId],
     queryFn: async () => {
       try {
@@ -218,30 +306,34 @@ export function useClasses(userId: string) {
         const userRole = session.user.user_metadata?.role?.toUpperCase();
         console.log('Fetching classes for role:', userRole);
 
-        // Base query for all roles - using explicit foreign key references
+        // Updated query for the new schema
         const baseQuery = `
           id,
           name,
           description,
           created_at,
           created_by,
-          grade:grades (
+          grade:grade_id (
             id,
-            name
+            name,
+            level
           ),
           class_students!left (
             student_id,
             assigned_at,
-            student:student_id!inner (
+            student:students!inner (
               id,
-              name,
-              email
+              first_name,
+              last_name,
+              email,
+              roll_number
             )
           ),
           assigned_content!left (
             id,
             content_type,
             content_id,
+            valid_from,
             valid_until
           )
         `;
@@ -275,55 +367,42 @@ export function useClasses(userId: string) {
         // Transform the data to match the expected format with safe access
         const transformedData = {
           data: rawData.map(cls => {
-            // Type guard for grade
-            const isValidGrade = (grade: any): grade is SupabaseGrade => {
-              return grade && typeof grade === 'object' && 'id' in grade && 'name' in grade;
-            };
-
-            // Type guard for student
-            const isValidStudent = (student: any): student is SupabaseStudent => {
-              return student && typeof student === 'object' && 'id' in student && 'name' in student && 'email' in student;
-            };
-
-            // Type guard for class student
-            const isValidClassStudent = (cs: any): cs is { student: SupabaseStudent } => {
-              return cs && typeof cs === 'object' && cs.student && isValidStudent(cs.student);
-            };
-
-            // Type guard for content
-            const isValidContent = (content: any): content is SupabaseContent => {
-              return content && typeof content === 'object' && 'id' in content && 'content_type' in content && 'content_id' in content;
-            };
-
+            // Type assertions to help TypeScript understand the structure
+            const gradeData = cls.grade as any;
+            const classStudents = cls.class_students as any[] || [];
+            
             // Safely access grade data
-            const grade = isValidGrade(cls.grade) ? {
-              id: String(cls.grade.id),
-              name: String(cls.grade.name)
+            const grade = gradeData ? {
+              id: String(gradeData.id || ''),
+              name: String(gradeData.name || ''),
+              level: gradeData.level
             } : undefined;
 
-            // Safely transform students with proper type assertions
-            const students = Array.isArray(cls.class_students) 
-              ? cls.class_students
-                  .filter((cs): cs is RawClassStudent => 
-                    cs?.student?.[0] && 'id' in cs.student[0] && 'name' in cs.student[0] && 'email' in cs.student[0]
-                  )
-                  .map((cs) => ({
-                    id: String(cs.student[0].id),
-                    firstName: String(cs.student[0].name).split(' ')[0] || '',
-                    lastName: String(cs.student[0].name).split(' ')[1] || '',
-                    email: String(cs.student[0].email),
-                    rollNumber: String(cs.student[0].id)
-                  }))
+            // Safely transform students
+            const students = Array.isArray(classStudents) 
+              ? classStudents
+                  .filter(cs => cs?.student && typeof cs.student === 'object')
+                  .map(cs => {
+                    const studentData = cs.student as any;
+                    return {
+                      id: String(studentData.id || ''),
+                      firstName: String(studentData.first_name || ''),
+                      lastName: String(studentData.last_name || ''),
+                      email: String(studentData.email || ''),
+                      rollNumber: String(studentData.roll_number || studentData.id || '')
+                    };
+                  })
               : [];
 
-            // Safely transform lessons with proper type assertions
-            const lessons = Array.isArray(cls.assigned_content)
-              ? cls.assigned_content
-                  .filter(isValidContent)
-                  .filter(content => content.content_type === 'LESSON')
+            // Safely transform lessons
+            const assignedContent = cls.assigned_content as any[] || [];
+            const lessons = Array.isArray(assignedContent)
+              ? assignedContent
+                  .filter(content => content && content.content_type === 'LESSON')
                   .map(lesson => ({
-                    id: String(lesson.content_id),
+                    id: String(lesson.content_id || ''),
                     title: `Lesson ${lesson.id}`,
+                    validFrom: lesson.valid_from,
                     validUntil: lesson.valid_until
                   }))
               : [];
@@ -336,7 +415,8 @@ export function useClasses(userId: string) {
                 grade,
                 students,
                 lessons,
-                courses: { data: [] }
+                courses: { data: [] },
+                created_at: cls.created_at
               }
             };
           })
@@ -371,4 +451,51 @@ export const useCourse = (courseId: string) => {
     queryFn: () => api.get(`/courses/${courseId}`),
     enabled: !!courseId
   }); 
+};
+
+export const useGrades = () => {
+  return useQuery({
+    queryKey: ['grades'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('grades')
+        .select('*')
+        .order('level');
+        
+      if (error) throw error;
+      return data || [];
+    }
+  });
+};
+
+export const useStudents = (classId?: string) => {
+  return useQuery({
+    queryKey: ['students', classId],
+    queryFn: async () => {
+      let query = supabase
+        .from('students')
+        .select('*');
+        
+      if (classId) {
+        const { data: classStudents, error: csError } = await supabase
+          .from('class_students')
+          .select('student_id')
+          .eq('class_id', classId);
+          
+        if (csError) throw csError;
+        
+        if (classStudents && classStudents.length > 0) {
+          const studentIds = classStudents.map(cs => cs.student_id);
+          query = query.in('id', studentIds);
+        } else {
+          return [];
+        }
+      }
+      
+      const { data, error } = await query;
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: true
+  });
 }; 

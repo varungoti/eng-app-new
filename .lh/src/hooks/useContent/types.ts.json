@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/hooks/useContent/types.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1740918323689,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1740918323689,
+            "name": "Commit-0",
+            "content": "//import type { Tables } from './mappers';\r\nimport type { Grade, Topic, SubTopic, Lesson } from '../../types';\r\n\r\nexport interface ContentState {\r\n  grades: Grade[];\r\n  topics: Topic[];\r\n  subTopics: SubTopic[];\r\n  lessons: Lesson[];\r\n  loading: boolean;\r\n  error: string | null;\r\n}\r\n\r\nexport interface ContentActions {\r\n  upsertTopic: (topic: Partial<Topic>) => Promise<Topic | null>;\r\n  upsertSubTopic: (subTopic: Partial<SubTopic>) => Promise<SubTopic | null>;\r\n  upsertLesson: (lesson: Partial<Lesson>) => Promise<Lesson | null>;\r\n  deleteTopic: (id: string) => Promise<void>;\r\n  deleteSubTopic: (id: string) => Promise<void>;\r\n  deleteLesson: (id: string) => Promise<void>;\r\n  refresh: () => Promise<void>;\r\n}"
+        }
+    ]
+}

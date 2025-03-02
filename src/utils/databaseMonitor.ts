@@ -1,3 +1,5 @@
+import { logger } from '../lib/logger';
+
 interface QueryPattern {
     query: string;
     collection?: string;
@@ -30,8 +32,8 @@ error: string | null;
 }
 
 interface QueryCacheInterface {
-get: (key: string) => any;
-set: (key: string, value: any) => void;
+get: <T = unknown>(key: string) => T | null;
+set: <T = unknown>(key: string, value: T) => void;
 stats: () => { hits: number; misses: number; evictions: number };
 }
 
@@ -132,8 +134,8 @@ async optimizeQueries() {
     const queryPatterns = await this.analyzeQueryPatterns();
     const slowQueries = queryPatterns.filter(query => query.executionTime > 100);
     const frequentQueries = queryPatterns.filter(query => query.frequency > 10);
-    console.log('Slow queries identified:', slowQueries);
-    console.log('Frequently executed queries:', frequentQueries);
+    logger.info('Slow queries identified', { context: { slowQueries }});
+    logger.info('Frequently executed queries', { context: { frequentQueries }});
 
     // Suggest indexes based on query analysis
     const suggestedIndexes = this.generateIndexSuggestions(slowQueries);
@@ -142,7 +144,7 @@ async optimizeQueries() {
       fields: index.fields,
       impact: index.estimatedImpact
     }));
-    console.log('Index recommendations:', indexRecommendations);
+    logger.info('Index recommendations', { context: { indexRecommendations }});
 
     // Cache frequently accessed data
     const cacheConfig: CacheConfig = {
@@ -197,7 +199,7 @@ async optimizeQueries() {
             cacheStats.misses++;
             return null;
         },
-        set: (key: string, value: any) => {
+        set: (key: string, value: unknown) => {
             queryCache.set(key, {
             value,
             timestamp: Date.now()
@@ -214,13 +216,15 @@ async optimizeQueries() {
     }
     const cacheStatus = await this.configureQueryCache(cacheConfig);
     if (cacheStatus.success) {
-    console.log('Query cache configured successfully:', {
-        ttl: cacheConfig.ttl,
-        maxEntries: cacheConfig.maxSize,
-        evictionStrategy: cacheConfig.strategy
+    logger.info('Query cache configured successfully', {
+        context: {
+            ttl: cacheConfig.ttl,
+            maxEntries: cacheConfig.maxSize,
+            evictionStrategy: cacheConfig.strategy
+        }
     });
     } else {
-    console.warn('Cache configuration failed:', cacheStatus.error);
+    logger.warn('Cache configuration failed', { context: { error: cacheStatus.error }});
     }
     return {
         success: true,

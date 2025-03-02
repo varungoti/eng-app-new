@@ -10,8 +10,7 @@ export default function DatabaseMonitor() {
 
   useEffect(() => {
     const monitoringService = DatabaseMonitoringService.getInstance();
-    let interval: NodeJS.Timeout;
-
+    
     const fetchMetrics = async () => {
       const data = await monitoringService.getMetrics();
       setMetrics(data);
@@ -22,7 +21,7 @@ export default function DatabaseMonitor() {
     fetchMetrics();
 
     // Poll for updates
-    interval = setInterval(fetchMetrics, 5000);
+    const interval = setInterval(fetchMetrics, 5000);
 
     return () => {
       clearInterval(interval);

@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ExercisePrompt } from './ExercisePrompt';
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import type { Question, ExercisePrompt as ExercisePromptType } from '@/types/learning';
+import type { Question, ExercisePrompt as ExercisePromptType } from '@/types/';
 
 interface QuestionProps {
   question: Question & {
@@ -33,7 +33,7 @@ export function QuestionComponent({ question, onComplete }: QuestionProps) {
   return (
     <Card className="w-full max-w-3xl mx-auto">
       <CardHeader>
-        <CardTitle>{question.text}</CardTitle>
+        <CardTitle>{question.title}</CardTitle>
         <Progress 
           value={(currentPromptIndex / question.exercise_prompts.length) * 100} 
           className="w-full"

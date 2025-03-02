@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 3,
+            "activePatchIndex": 6,
             "patches": [
                 {
                     "date": 1738876137975,
@@ -20,6 +20,18 @@
                 {
                     "date": 1739016021844,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -45,14 +45,12 @@\n       } else {\r\n         throw new Error('Failed to establish initial connection');\r\n       }\r\n     } catch (err) {\r\n-      logger.error('Failed to initialize connection manager', {\r\n-        context: { error: err },\r\n-        source: 'ConnectionManager'\r\n-      });\r\n+      logger.error('Failed to initialize connection manager', 'ConnectionManager', err);\r\n       throw err;\r\n     }\r\n+\r\n   }\r\n \r\n   public startMonitoring() {\r\n     this.setupConnectionMonitoring();\r\n"
+                },
+                {
+                    "date": 1740852762640,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -45,9 +45,9 @@\n       } else {\r\n         throw new Error('Failed to establish initial connection');\r\n       }\r\n     } catch (err) {\r\n-      logger.error('Failed to initialize connection manager', 'ConnectionManager', err);\r\n+      logger.error('Failed to initialize connection manager', { source: 'ConnectionManager', error: err });\r\n       throw err;\r\n     }\r\n \r\n   }\r\n"
+                },
+                {
+                    "date": 1740852768260,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -88,16 +88,16 @@\n         this.updateState({ \r\n           lastConnected: new Date(),\r\n           reconnectAttempts: 0\r\n         });\r\n-        logger.info('Connection check successful', 'ConnectionManager');\r\n+        logger.info('Connection check successful', { source: 'ConnectionManager' });\r\n \r\n       }\r\n \r\n       return isConnected;\r\n     } catch (err) {\r\n       this.updateState({ isConnected: false });\r\n-      logger.error('Connection check failed', 'ConnectionManager', err);\r\n+      logger.error('Connection check failed', { source: 'ConnectionManager', error: err });\r\n       return false;\r\n \r\n     }\r\n   }\r\n"
+                },
+                {
+                    "date": 1740899446389,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,7 +1,7 @@\n import { supabase } from './supabase';\r\n import { logger } from './logger';\r\n-import { errorHandler } from './errorHandler';\r\n+//import { errorHandler } from './errorHandler';\r\n \r\n interface ConnectionState {\r\n   isConnected: boolean;\r\n   lastConnected: Date | null;\r\n@@ -102,22 +102,22 @@\n     }\r\n   }\r\n \r\n   private async handleOnline() {\r\n-    logger.info('Device came online', 'ConnectionManager');\r\n+    logger.info('Device came online', { source: 'ConnectionManager' });\r\n     await this.attemptReconnect();\r\n   }\r\n \r\n \r\n   private handleOffline() {\r\n-    logger.warn('Device went offline', 'ConnectionManager');\r\n+    logger.warn('Device went offline', { source: 'ConnectionManager' });\r\n     this.updateState({ isConnected: false });\r\n   }\r\n \r\n \r\n   private async attemptReconnect(): Promise<boolean> {\r\n     if (this.state.reconnectAttempts >= this.MAX_RECONNECT_ATTEMPTS) {\r\n-      logger.error(`Max reconnection attempts reached: ${this.state.reconnectAttempts}`, 'ConnectionManager');\r\n+      logger.error(`Max reconnection attempts reached: ${this.state.reconnectAttempts}`, { source: 'ConnectionManager' });\r\n       return false;\r\n     }\r\n \r\n     this.state.reconnectAttempts++;\r\n"
                 }
             ],
             "date": 1738876137975,

@@ -1,6 +1,47 @@
 import { LessonProgress } from "@/types";
-
 import { CustomLesson } from "@/types";
+
+// Define the interface to match the structure used in the code
+interface DbLesson {
+  id: string | number;
+  title: string;
+  status: string;
+  difficulty?: string;
+  duration?: number;
+  prerequisites?: string[];
+  topics?: Array<{
+    grade_id: string;
+    [key: string]: any;
+  }>;
+  subtopics?: Array<{
+    topic_id: string;
+    grade_id: string;
+    [key: string]: any;
+  }>;
+  content?: Array<{
+    subtopic_id: string;
+    topic_id: string;
+    grade_id: string;
+    [key: string]: any;
+  }>;
+  questions?: Array<{
+    id: string | number;
+    title: string;
+    description?: string;
+    duration?: number;
+    subtopic_id: string;
+    topic_id: string;
+    grade_id: string;
+    exercise_prompts?: string[];
+    [key: string]: any;
+  }>;
+  activities?: Array<{
+    subtopic_id: string;
+    topic_id: string;
+    grade_id: string;
+    [key: string]: any;
+  }>;
+}
 
 export const getColorForIndex = (index: number): string => {
   const colors = [
@@ -18,7 +59,7 @@ export const isLessonUnlocked = (
   progress: LessonProgress[]
 ): boolean => {
   if (!lesson.prerequisites?.length) return true;
-  return lesson.prerequisites.every(prereqId => 
+  return lesson.prerequisites.every((prereqId: string) => 
     progress.some(p => p.lesson_id === prereqId && p.status === 'completed')
   );
 };

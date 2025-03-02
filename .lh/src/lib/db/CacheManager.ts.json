@@ -1,0 +1,22 @@
+{
+    "sourceFile": "src/lib/db/CacheManager.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1740041545791,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1740041551613,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -124,5 +124,4 @@\n   }\r\n }\r\n \r\n export const cacheManager = CacheManager.getInstance();\r\n-```\n\\ No newline at end of file\n"
+                }
+            ],
+            "date": 1740041545791,
+            "name": "Commit-0",
+            "content": "\r\nimport { logger } from '../logger';\r\n\r\ninterface CacheEntry<T> {\r\n  data: T;\r\n  timestamp: number;\r\n  size: number;\r\n}\r\n\r\nclass CacheManager {\r\n  private static instance: CacheManager;\r\n  private cache = new Map<string, CacheEntry<any>>();\r\n  private maxSize = 50 * 1024 * 1024; // 50MB\r\n  private currentSize = 0;\r\n\r\n  private constructor() {\r\n    this.startCleanup();\r\n  }\r\n\r\n  public static getInstance(): CacheManager {\r\n    if (!CacheManager.instance) {\r\n      CacheManager.instance = new CacheManager();\r\n    }\r\n    return CacheManager.instance;\r\n  }\r\n\r\n  private startCleanup() {\r\n    setInterval(() => this.cleanup(), 5 * 60 * 1000); // Cleanup every 5 minutes\r\n  }\r\n\r\n  private calculateSize(data: any): number {\r\n    const str = JSON.stringify(data);\r\n    return new Blob([str]).size;\r\n  }\r\n\r\n  private cleanup() {\r\n    const now = Date.now();\r\n    let freedSpace = 0;\r\n\r\n    for (const [key, entry] of this.cache.entries()) {\r\n      if (now - entry.timestamp > 30 * 60 * 1000) { // 30 minutes TTL\r\n        this.cache.delete(key);\r\n        this.currentSize -= entry.size;\r\n        freedSpace += entry.size;\r\n      }\r\n    }\r\n\r\n    if (freedSpace > 0) {\r\n      logger.info('Cache cleanup completed', {\r\n        context: { freedSpace: `${(freedSpace / 1024 / 1024).toFixed(2)}MB` },\r\n        source: 'CacheManager'\r\n      });\r\n    }\r\n  }\r\n\r\n  public set<T>(key: string, data: T, ttl: number = 5 * 60 * 1000): void {\r\n    try {\r\n      const size = this.calculateSize(data);\r\n\r\n      // Check if adding this item would exceed max size\r\n      if (size > this.maxSize) {\r\n        throw new Error('Data too large to cache');\r\n      }\r\n\r\n      // Make room if needed\r\n      while (this.currentSize + size > this.maxSize) {\r\n        const oldestKey = Array.from(this.cache.entries())\r\n          .sort(([, a], [, b]) => a.timestamp - b.timestamp)[0][0];\r\n        const oldEntry = this.cache.get(oldestKey);\r\n        if (oldEntry) {\r\n          this.currentSize -= oldEntry.size;\r\n          this.cache.delete(oldestKey);\r\n        }\r\n      }\r\n\r\n      this.cache.set(key, {\r\n        data,\r\n        timestamp: Date.now(),\r\n        size\r\n      });\r\n      this.currentSize += size;\r\n    } catch (err) {\r\n      logger.error('Failed to cache data', {\r\n        context: { error: err, key },\r\n        source: 'CacheManager'\r\n      });\r\n    }\r\n  }\r\n\r\n  public get<T>(key: string): T | null {\r\n    try {\r\n      const entry = this.cache.get(key);\r\n      if (!entry) return null;\r\n\r\n      const now = Date.now();\r\n      if (now - entry.timestamp > 30 * 60 * 1000) { // 30 minutes TTL\r\n        this.cache.delete(key);\r\n        this.currentSize -= entry.size;\r\n        return null;\r\n      }\r\n\r\n      return entry.data as T;\r\n    } catch (err) {\r\n      logger.error('Failed to retrieve cached data', {\r\n        context: { error: err, key },\r\n        source: 'CacheManager'\r\n      });\r\n      return null;\r\n    }\r\n  }\r\n\r\n  public clear(): void {\r\n    this.cache.clear();\r\n    this.currentSize = 0;\r\n  }\r\n\r\n  public getStats() {\r\n    return {\r\n      entries: this.cache.size,\r\n      currentSize: `${(this.currentSize / 1024 / 1024).toFixed(2)}MB`,\r\n      maxSize: `${(this.maxSize / 1024 / 1024).toFixed(2)}MB`,\r\n      utilization: `${((this.currentSize / this.maxSize) * 100).toFixed(1)}%`\r\n    };\r\n  }\r\n}\r\n\r\nexport const cacheManager = CacheManager.getInstance();\r\n```"
+        }
+    ]
+}

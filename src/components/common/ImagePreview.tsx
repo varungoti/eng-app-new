@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Skeleton } from '@/components/ui/skeleton';
+import Image from 'next/image';
 
 interface ImagePreviewProps {
 imageUrl: string;
@@ -10,20 +11,25 @@ width?: number;
 height?: number;
 className?: string;
 priority?: boolean;
+alt?: string;
+loading?: "lazy" | "eager";
 }
+
 
 export const ImagePreview: React.FC<ImagePreviewProps> = ({
 imageUrl,
 width = 400,
 height = 300,
 className = '',
-priority = false
+priority = false,
+alt = "Preview",
+loading
 }) => {
 const [processedUrl, setProcessedUrl] = useState<string>('');
 const [isLoading, setIsLoading] = useState(true);
 
 const processImageWithCanvas = async (blob: Blob): Promise<Blob> => {
-const img = new Image();
+const img = document.createElement('img');
 const canvas = document.createElement('canvas');
 const ctx = canvas.getContext('2d');
 
@@ -123,14 +129,15 @@ if (isLoading) {
 }
 
 return (
-    <img
-    src={processedUrl || imageUrl}
-    alt="Preview"
-    width={width}
-    height={height}
-    className={className}
-    loading={priority ? 'eager' : 'lazy'}
-    crossOrigin="anonymous"
+    <Image
+        src={processedUrl || imageUrl}
+        alt={alt}
+        width={width}
+        height={height}
+        className={className}
+        priority={priority}
+        loading={loading}
+        crossOrigin="anonymous"
     />
 );
 };

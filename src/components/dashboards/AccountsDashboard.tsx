@@ -174,8 +174,7 @@ const MetricBar: React.FC<{
       </div>
       <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
         <div 
-          className="h-full bg-indigo-600 rounded-full"
-          style={{ width: `${percentage}%` }}
+          className={`h-full bg-indigo-600 rounded-full w-[${percentage}%]`}
         />
       </div>
       <div className="text-xs text-gray-500 text-right">

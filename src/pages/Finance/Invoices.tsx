@@ -1,11 +1,11 @@
-import React from 'react';
+//import React from 'react';
 import { usePermissions } from '../../hooks/usePermissions';
 import { InvoiceGenerator } from '../../components/invoice/InvoiceGenerator';
 
 const Invoices = () => {
   const { can } = usePermissions();
 
-  if (!can('finance')) {
+  if (!can('staff')) {
     return (
       <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
         <h3 className="text-lg font-medium text-red-800">Access Denied</h3>

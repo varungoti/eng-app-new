@@ -1,0 +1,30 @@
+{
+    "sourceFile": "src/components/learning/ExercisePrompt.tsx",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 3,
+            "patches": [
+                {
+                    "date": 1740775957136,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1740776230300,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,8 +1,8 @@\n import { useState } from 'react';\r\n import { Card, CardContent } from \"@/components/ui/card\";\r\n import { Button } from \"@/components/ui/button\";\r\n-import { Speaker } from \"@/components/common/speaker\";\r\n+import AnimatedSpeakerIcon from \"@/components/common/speaker\";\r\n \r\n interface ExercisePromptProps {\r\n   prompt: {\r\n     text: string;\r\n@@ -36,9 +36,9 @@\n               size=\"icon\"\r\n               onClick={handleNarration}\r\n               className=\"rounded-full\"\r\n             >\r\n-              <Speaker isPlaying={isPlaying} />\r\n+              <AnimatedSpeakerIcon isPlaying={isPlaying} />\r\n             </Button>\r\n           )}\r\n           <p className=\"text-lg\">{prompt.text}</p>\r\n         </div>\r\n"
+                },
+                {
+                    "date": 1740776240781,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -44,9 +44,9 @@\n         </div>\r\n         \r\n         {prompt.media && (\r\n           <div className=\"mb-4\">\r\n-            <img \r\n+            <ImageP \r\n               src={prompt.media} \r\n               alt=\"Exercise media\"\r\n               className=\"rounded-lg max-w-full\" \r\n             />\r\n"
+                },
+                {
+                    "date": 1740776250810,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,8 +1,9 @@\n import { useState } from 'react';\r\n import { Card, CardContent } from \"@/components/ui/card\";\r\n import { Button } from \"@/components/ui/button\";\r\n import AnimatedSpeakerIcon from \"@/components/common/speaker\";\r\n+import { ImagePreview } from '../common/ImagePreview';\r\n \r\n interface ExercisePromptProps {\r\n   prompt: {\r\n     text: string;\r\n@@ -44,10 +45,10 @@\n         </div>\r\n         \r\n         {prompt.media && (\r\n           <div className=\"mb-4\">\r\n-            <ImageP \r\n-              src={prompt.media} \r\n+            <ImagePreview \r\n+              imageUrl={prompt.media} \r\n               alt=\"Exercise media\"\r\n               className=\"rounded-lg max-w-full\" \r\n             />\r\n           </div>\r\n"
+                }
+            ],
+            "date": 1740775957135,
+            "name": "Commit-0",
+            "content": "import { useState } from 'react';\r\nimport { Card, CardContent } from \"@/components/ui/card\";\r\nimport { Button } from \"@/components/ui/button\";\r\nimport { Speaker } from \"@/components/common/speaker\";\r\n\r\ninterface ExercisePromptProps {\r\n  prompt: {\r\n    text: string;\r\n    saytext?: string;\r\n    narration?: string;\r\n    media?: string;\r\n    type: string;\r\n  };\r\n  onComplete: (answer?: any) => void;\r\n}\r\n\r\nexport function ExercisePrompt({ prompt, onComplete }: ExercisePromptProps) {\r\n  const [isPlaying, setIsPlaying] = useState(false);\r\n\r\n  const handleNarration = async () => {\r\n    if (prompt.narration) {\r\n      setIsPlaying(true);\r\n      // Add audio playback logic here\r\n      await new Promise(resolve => setTimeout(resolve, 2000));\r\n      setIsPlaying(false);\r\n    }\r\n  };\r\n\r\n  return (\r\n    <Card>\r\n      <CardContent className=\"p-6\">\r\n        <div className=\"flex items-center gap-4 mb-4\">\r\n          {prompt.narration && (\r\n            <Button\r\n              variant=\"outline\"\r\n              size=\"icon\"\r\n              onClick={handleNarration}\r\n              className=\"rounded-full\"\r\n            >\r\n              <Speaker isPlaying={isPlaying} />\r\n            </Button>\r\n          )}\r\n          <p className=\"text-lg\">{prompt.text}</p>\r\n        </div>\r\n        \r\n        {prompt.media && (\r\n          <div className=\"mb-4\">\r\n            <img \r\n              src={prompt.media} \r\n              alt=\"Exercise media\"\r\n              className=\"rounded-lg max-w-full\" \r\n            />\r\n          </div>\r\n        )}\r\n        \r\n        <Button onClick={() => onComplete({})} className=\"mt-4\">\r\n          Continue\r\n        </Button>\r\n      </CardContent>\r\n    </Card>\r\n  );\r\n} "
+        }
+    ]
+}

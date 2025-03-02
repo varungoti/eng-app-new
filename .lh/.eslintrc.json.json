@@ -1,0 +1,118 @@
+{
+    "sourceFile": ".eslintrc.json",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 25,
+            "patches": [
+                {
+                    "date": 1740093062120,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1740093561871,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -11,9 +11,24 @@\n       {\r\n         \"argsIgnorePattern\": \"^_\",\r\n         \"varsIgnorePattern\": \"^_\",\r\n         \"caughtErrorsIgnorePattern\": \"^_\",\r\n-        \"destructuredArrayIgnorePattern\": \"^_\"\r\n+        \"destructuredArrayIgnorePattern\": \"^_\",\r\n+        \"ignoreRestSiblings\": true\r\n       }\r\n-    ]\r\n-  }\r\n+    ],\r\n+    \"@typescript-eslint/no-explicit-any\": \"warn\",\r\n+    \"@typescript-eslint/ban-ts-comment\": \"off\",\r\n+    \"@typescript-eslint/no-non-null-assertion\": \"off\",\r\n+    \"react/no-unescaped-entities\": \"off\",\r\n+    \"no-console\": [\"warn\", { \"allow\": [\"warn\", \"error\"] }],\r\n+    \"react-hooks/exhaustive-deps\": \"warn\"\r\n+  },\r\n+  \"overrides\": [\r\n+    {\r\n+      \"files\": [\"src/types/**/*.ts\"],\r\n+      \"rules\": {\r\n+        \"@typescript-eslint/no-unused-vars\": \"off\"\r\n+      }\r\n+    }\r\n+  ]\r\n } \n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1740093764236,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -12,9 +12,10 @@\n         \"argsIgnorePattern\": \"^_\",\r\n         \"varsIgnorePattern\": \"^_\",\r\n         \"caughtErrorsIgnorePattern\": \"^_\",\r\n         \"destructuredArrayIgnorePattern\": \"^_\",\r\n-        \"ignoreRestSiblings\": true\r\n+        \"ignoreRestSiblings\": true,\r\n+        \"args\": \"after-used\"\r\n       }\r\n     ],\r\n     \"@typescript-eslint/no-explicit-any\": \"warn\",\r\n     \"@typescript-eslint/ban-ts-comment\": \"off\",\r\n@@ -24,11 +25,52 @@\n     \"react-hooks/exhaustive-deps\": \"warn\"\r\n   },\r\n   \"overrides\": [\r\n     {\r\n-      \"files\": [\"src/types/**/*.ts\"],\r\n+      \"files\": [\"src/types/**/*.ts\", \"src/types/**/*.tsx\"],\r\n       \"rules\": {\r\n         \"@typescript-eslint/no-unused-vars\": \"off\"\r\n       }\r\n+    },\r\n+    {\r\n+      \"files\": [\"src/pages/**/*.tsx\", \"src/app/**/*.tsx\"],\r\n+      \"rules\": {\r\n+        \"react/react-in-jsx-scope\": \"off\",\r\n+        \"@typescript-eslint/no-unused-vars\": [\r\n+          \"warn\",\r\n+          {\r\n+            \"varsIgnorePattern\": \"^(React|_)\",\r\n+            \"argsIgnorePattern\": \"^_\",\r\n+            \"ignoreRestSiblings\": true\r\n+          }\r\n+        ]\r\n+      }\r\n+    },\r\n+    {\r\n+      \"files\": [\"src/components/**/*.tsx\"],\r\n+      \"rules\": {\r\n+        \"@typescript-eslint/no-unused-vars\": [\r\n+          \"warn\",\r\n+          {\r\n+            \"varsIgnorePattern\": \"^(React|_)\",\r\n+            \"argsIgnorePattern\": \"^_\",\r\n+            \"ignoreRestSiblings\": true\r\n+          }\r\n+        ]\r\n+      }\r\n+    },\r\n+    {\r\n+      \"files\": [\"src/hooks/**/*.ts\", \"src/hooks/**/*.tsx\"],\r\n+      \"rules\": {\r\n+        \"@typescript-eslint/no-unused-vars\": [\r\n+          \"warn\",\r\n+          {\r\n+            \"varsIgnorePattern\": \"^_\",\r\n+            \"argsIgnorePattern\": \"^_\",\r\n+            \"ignoreRestSiblings\": true,\r\n+            \"args\": \"after-used\"\r\n+          }\r\n+        ]\r\n+      }\r\n     }\r\n   ]\r\n } \n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1740094575204,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -9,9 +9,9 @@\n     \"@typescript-eslint/no-unused-vars\": [\r\n       \"warn\",\r\n       {\r\n         \"argsIgnorePattern\": \"^_\",\r\n-        \"varsIgnorePattern\": \"^_\",\r\n+        \"varsIgnorePattern\": \"^(React|_)\",\r\n         \"caughtErrorsIgnorePattern\": \"^_\",\r\n         \"destructuredArrayIgnorePattern\": \"^_\",\r\n         \"ignoreRestSiblings\": true,\r\n         \"args\": \"after-used\"\r\n@@ -39,9 +39,10 @@\n           \"warn\",\r\n           {\r\n             \"varsIgnorePattern\": \"^(React|_)\",\r\n             \"argsIgnorePattern\": \"^_\",\r\n-            \"ignoreRestSiblings\": true\r\n+            \"ignoreRestSiblings\": true,\r\n+            \"args\": \"after-used\"\r\n           }\r\n         ]\r\n       }\r\n     },\r\n@@ -52,9 +53,10 @@\n           \"warn\",\r\n           {\r\n             \"varsIgnorePattern\": \"^(React|_)\",\r\n             \"argsIgnorePattern\": \"^_\",\r\n-            \"ignoreRestSiblings\": true\r\n+            \"ignoreRestSiblings\": true,\r\n+            \"args\": \"after-used\"\r\n           }\r\n         ]\r\n       }\r\n     },\r\n"
+                },
+                {
+                    "date": 1740747011529,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -20,9 +20,9 @@\n     \"@typescript-eslint/no-explicit-any\": \"warn\",\r\n     \"@typescript-eslint/ban-ts-comment\": \"off\",\r\n     \"@typescript-eslint/no-non-null-assertion\": \"off\",\r\n     \"react/no-unescaped-entities\": \"off\",\r\n-    \"no-console\": [\"warn\", { \"allow\": [\"warn\", \"error\"] }],\r\n+    \"no-console\": [\"warn\", { \"allow\": [\"warn\", \"error\", \"log\", \"info\", \"debug\"] }],\r\n     \"react-hooks/exhaustive-deps\": \"warn\"\r\n   },\r\n   \"overrides\": [\r\n     {\r\n"
+                },
+                {
+                    "date": 1740750720974,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -16,9 +16,9 @@\n         \"ignoreRestSiblings\": true,\r\n         \"args\": \"after-used\"\r\n       }\r\n     ],\r\n-    \"@typescript-eslint/no-explicit-any\": \"warn\",\r\n+    \"@typescript-eslint/no-explicit-any\": \"off\",\r\n     \"@typescript-eslint/ban-ts-comment\": \"off\",\r\n     \"@typescript-eslint/no-non-null-assertion\": \"off\",\r\n     \"react/no-unescaped-entities\": \"off\",\r\n     \"no-console\": [\"warn\", { \"allow\": [\"warn\", \"error\", \"log\", \"info\", \"debug\"] }],\r\n"
+                },
+                {
+                    "date": 1740751104960,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -21,9 +21,13 @@\n     \"@typescript-eslint/ban-ts-comment\": \"off\",\r\n     \"@typescript-eslint/no-non-null-assertion\": \"off\",\r\n     \"react/no-unescaped-entities\": \"off\",\r\n     \"no-console\": [\"warn\", { \"allow\": [\"warn\", \"error\", \"log\", \"info\", \"debug\"] }],\r\n-    \"react-hooks/exhaustive-deps\": \"warn\"\r\n+    \"react-hooks/exhaustive-deps\": \"warn\",\r\n+    \"no-unused-vars\": [\"error\", { \r\n+      \"varsIgnorePattern\": \"^(React|_|future|tmp)\", \r\n+      \"argsIgnorePattern\": \"^_\" \r\n+    }]\r\n   },\r\n   \"overrides\": [\r\n     {\r\n       \"files\": [\"src/types/**/*.ts\", \"src/types/**/*.tsx\"],\r\n"
+                },
+                {
+                    "date": 1740751363844,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -21,13 +21,9 @@\n     \"@typescript-eslint/ban-ts-comment\": \"off\",\r\n     \"@typescript-eslint/no-non-null-assertion\": \"off\",\r\n     \"react/no-unescaped-entities\": \"off\",\r\n     \"no-console\": [\"warn\", { \"allow\": [\"warn\", \"error\", \"log\", \"info\", \"debug\"] }],\r\n-    \"react-hooks/exhaustive-deps\": \"warn\",\r\n-    \"no-unused-vars\": [\"error\", { \r\n-      \"varsIgnorePattern\": \"^(React|_|future|tmp)\", \r\n-      \"argsIgnorePattern\": \"^_\" \r\n-    }]\r\n+    \"react-hooks/exhaustive-deps\": \"warn\"\r\n   },\r\n   \"overrides\": [\r\n     {\r\n       \"files\": [\"src/types/**/*.ts\", \"src/types/**/*.tsx\"],\r\n"
+                },
+                {
+                    "date": 1740751426548,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -21,9 +21,9 @@\n     \"@typescript-eslint/ban-ts-comment\": \"off\",\r\n     \"@typescript-eslint/no-non-null-assertion\": \"off\",\r\n     \"react/no-unescaped-entities\": \"off\",\r\n     \"no-console\": [\"warn\", { \"allow\": [\"warn\", \"error\", \"log\", \"info\", \"debug\"] }],\r\n-    \"react-hooks/exhaustive-deps\": \"warn\"\r\n+    \"react-hooks/exhaustive-deps\": \"off\"\r\n   },\r\n   \"overrides\": [\r\n     {\r\n       \"files\": [\"src/types/**/*.ts\", \"src/types/**/*.tsx\"],\r\n"
+                },
+                {
+                    "date": 1740751447162,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -21,9 +21,9 @@\n     \"@typescript-eslint/ban-ts-comment\": \"off\",\r\n     \"@typescript-eslint/no-non-null-assertion\": \"off\",\r\n     \"react/no-unescaped-entities\": \"off\",\r\n     \"no-console\": [\"warn\", { \"allow\": [\"warn\", \"error\", \"log\", \"info\", \"debug\"] }],\r\n-    \"react-hooks/exhaustive-deps\": \"off\"\r\n+    \"react-hooks/exhaustive-deps\": \"warn\"\r\n   },\r\n   \"overrides\": [\r\n     {\r\n       \"files\": [\"src/types/**/*.ts\", \"src/types/**/*.tsx\"],\r\n"
+                },
+                {
+                    "date": 1740751457616,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -21,9 +21,13 @@\n     \"@typescript-eslint/ban-ts-comment\": \"off\",\r\n     \"@typescript-eslint/no-non-null-assertion\": \"off\",\r\n     \"react/no-unescaped-entities\": \"off\",\r\n     \"no-console\": [\"warn\", { \"allow\": [\"warn\", \"error\", \"log\", \"info\", \"debug\"] }],\r\n-    \"react-hooks/exhaustive-deps\": \"warn\"\r\n+    \"react-hooks/exhaustive-deps\": \"warn\",\r\n+    \"no-unused-vars\": [\"error\", { \r\n+      \"varsIgnorePattern\": \"^(React|_|future|tmp)\", \r\n+      \"argsIgnorePattern\": \"^_\" \r\n+    }]\r\n   },\r\n   \"overrides\": [\r\n     {\r\n       \"files\": [\"src/types/**/*.ts\", \"src/types/**/*.tsx\"],\r\n"
+                },
+                {
+                    "date": 1740751466652,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -21,13 +21,9 @@\n     \"@typescript-eslint/ban-ts-comment\": \"off\",\r\n     \"@typescript-eslint/no-non-null-assertion\": \"off\",\r\n     \"react/no-unescaped-entities\": \"off\",\r\n     \"no-console\": [\"warn\", { \"allow\": [\"warn\", \"error\", \"log\", \"info\", \"debug\"] }],\r\n-    \"react-hooks/exhaustive-deps\": \"warn\",\r\n-    \"no-unused-vars\": [\"error\", { \r\n-      \"varsIgnorePattern\": \"^(React|_|future|tmp)\", \r\n-      \"argsIgnorePattern\": \"^_\" \r\n-    }]\r\n+    \"react-hooks/exhaustive-deps\": \"warn\"\r\n   },\r\n   \"overrides\": [\r\n     {\r\n       \"files\": [\"src/types/**/*.ts\", \"src/types/**/*.tsx\"],\r\n"
+                },
+                {
+                    "date": 1740751507078,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -35,9 +35,9 @@\n       \"files\": [\"src/pages/**/*.tsx\", \"src/app/**/*.tsx\"],\r\n       \"rules\": {\r\n         \"react/react-in-jsx-scope\": \"off\",\r\n         \"@typescript-eslint/no-unused-vars\": [\r\n-          \"warn\",\r\n+          \"off\",\r\n           {\r\n             \"varsIgnorePattern\": \"^(React|_)\",\r\n             \"argsIgnorePattern\": \"^_\",\r\n             \"ignoreRestSiblings\": true,\r\n"
+                },
+                {
+                    "date": 1740751560206,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -37,9 +37,9 @@\n         \"react/react-in-jsx-scope\": \"off\",\r\n         \"@typescript-eslint/no-unused-vars\": [\r\n           \"off\",\r\n           {\r\n-            \"varsIgnorePattern\": \"^(React|_)\",\r\n+            \"varsIgnorePattern\": \"^(React|_|)\",\r\n             \"argsIgnorePattern\": \"^_\",\r\n             \"ignoreRestSiblings\": true,\r\n             \"args\": \"after-used\"\r\n           }\r\n"
+                },
+                {
+                    "date": 1740775303946,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -37,9 +37,9 @@\n         \"react/react-in-jsx-scope\": \"off\",\r\n         \"@typescript-eslint/no-unused-vars\": [\r\n           \"off\",\r\n           {\r\n-            \"varsIgnorePattern\": \"^(React|_|)\",\r\n+            \"varsIgnorePattern\": \"^(React|_|params|query|ctx)$\",\r\n             \"argsIgnorePattern\": \"^_\",\r\n             \"ignoreRestSiblings\": true,\r\n             \"args\": \"after-used\"\r\n           }\r\n"
+                },
+                {
+                    "date": 1740775312846,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -37,9 +37,9 @@\n         \"react/react-in-jsx-scope\": \"off\",\r\n         \"@typescript-eslint/no-unused-vars\": [\r\n           \"off\",\r\n           {\r\n-            \"varsIgnorePattern\": \"^(React|_|params|query|ctx)$\",\r\n+            \"varsIgnorePattern\": \"^(React|_|params|query|ctx|)$\",\r\n             \"argsIgnorePattern\": \"^_\",\r\n             \"ignoreRestSiblings\": true,\r\n             \"args\": \"after-used\"\r\n           }\r\n"
+                },
+                {
+                    "date": 1740775319719,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -37,9 +37,9 @@\n         \"react/react-in-jsx-scope\": \"off\",\r\n         \"@typescript-eslint/no-unused-vars\": [\r\n           \"off\",\r\n           {\r\n-            \"varsIgnorePattern\": \"^(React|_|params|query|ctx|)$\",\r\n+            \"varsIgnorePattern\": \"^(React|_|params|query|ctx|error|useError|)$\",\r\n             \"argsIgnorePattern\": \"^_\",\r\n             \"ignoreRestSiblings\": true,\r\n             \"args\": \"after-used\"\r\n           }\r\n"
+                },
+                {
+                    "date": 1740775330023,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -37,9 +37,9 @@\n         \"react/react-in-jsx-scope\": \"off\",\r\n         \"@typescript-eslint/no-unused-vars\": [\r\n           \"off\",\r\n           {\r\n-            \"varsIgnorePattern\": \"^(React|_|params|query|ctx|error|useError|)$\",\r\n+            \"varsIgnorePattern\": \"^(React|_|params|query|ctx|error|useError| )$\",\r\n             \"argsIgnorePattern\": \"^_\",\r\n             \"ignoreRestSiblings\": true,\r\n             \"args\": \"after-used\"\r\n           }\r\n"
+                },
+                {
+                    "date": 1740775337685,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -37,9 +37,9 @@\n         \"react/react-in-jsx-scope\": \"off\",\r\n         \"@typescript-eslint/no-unused-vars\": [\r\n           \"off\",\r\n           {\r\n-            \"varsIgnorePattern\": \"^(React|_|params|query|ctx|error|useError| )$\",\r\n+            \"varsIgnorePattern\": \"^(React|_|params|query|ctx|error|useError)$\",\r\n             \"argsIgnorePattern\": \"^_\",\r\n             \"ignoreRestSiblings\": true,\r\n             \"args\": \"after-used\"\r\n           }\r\n"
+                },
+                {
+                    "date": 1740775859599,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -37,9 +37,9 @@\n         \"react/react-in-jsx-scope\": \"off\",\r\n         \"@typescript-eslint/no-unused-vars\": [\r\n           \"off\",\r\n           {\r\n-            \"varsIgnorePattern\": \"^(React|_|params|query|ctx|error|useError)$\",\r\n+            \"varsIgnorePattern\": \"^(React|_|params|query|ctx|error||useError)$\",\r\n             \"argsIgnorePattern\": \"^_\",\r\n             \"ignoreRestSiblings\": true,\r\n             \"args\": \"after-used\"\r\n           }\r\n"
+                },
+                {
+                    "date": 1740776544670,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -34,12 +34,13 @@\n     {\r\n       \"files\": [\"src/pages/**/*.tsx\", \"src/app/**/*.tsx\"],\r\n       \"rules\": {\r\n         \"react/react-in-jsx-scope\": \"off\",\r\n-        \"@typescript-eslint/no-unused-vars\": [\r\n+        \"@typescript-eslint/no-unused-vars\": \r\n+        [\r\n           \"off\",\r\n           {\r\n-            \"varsIgnorePattern\": \"^(React|_|params|query|ctx|error||useError)$\",\r\n+            \"varsIgnorePattern\": \"^(React|_|params|query|ctx|error|err|useError)$\",\r\n             \"argsIgnorePattern\": \"^_\",\r\n             \"ignoreRestSiblings\": true,\r\n             \"args\": \"after-used\"\r\n           }\r\n"
+                },
+                {
+                    "date": 1740776556960,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -34,18 +34,18 @@\n     {\r\n       \"files\": [\"src/pages/**/*.tsx\", \"src/app/**/*.tsx\"],\r\n       \"rules\": {\r\n         \"react/react-in-jsx-scope\": \"off\",\r\n-        \"@typescript-eslint/no-unused-vars\": \r\n-        [\r\n-          \"off\",\r\n-          {\r\n-            \"varsIgnorePattern\": \"^(React|_|params|query|ctx|error|err|useError)$\",\r\n-            \"argsIgnorePattern\": \"^_\",\r\n-            \"ignoreRestSiblings\": true,\r\n-            \"args\": \"after-used\"\r\n-          }\r\n-        ]\r\n+        \"@typescript-eslint/no-unused-vars\": \"off\"\r\n+        // [\r\n+        //   \"off\",\r\n+        //   {\r\n+        //     \"varsIgnorePattern\": \"^(React|_|params|query|ctx|error|err|useError)$\",\r\n+        //     \"argsIgnorePattern\": \"^_\",\r\n+        //     \"ignoreRestSiblings\": true,\r\n+        //     \"args\": \"after-used\"\r\n+        //   }\r\n+        // ]\r\n       }\r\n     },\r\n     {\r\n       \"files\": [\"src/components/**/*.tsx\"],\r\n"
+                },
+                {
+                    "date": 1740776603512,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -34,18 +34,18 @@\n     {\r\n       \"files\": [\"src/pages/**/*.tsx\", \"src/app/**/*.tsx\"],\r\n       \"rules\": {\r\n         \"react/react-in-jsx-scope\": \"off\",\r\n-        \"@typescript-eslint/no-unused-vars\": \"off\"\r\n-        // [\r\n-        //   \"off\",\r\n-        //   {\r\n-        //     \"varsIgnorePattern\": \"^(React|_|params|query|ctx|error|err|useError)$\",\r\n-        //     \"argsIgnorePattern\": \"^_\",\r\n-        //     \"ignoreRestSiblings\": true,\r\n-        //     \"args\": \"after-used\"\r\n-        //   }\r\n-        // ]\r\n+        \"@typescript-eslint/no-unused-vars\": \r\n+        [\r\n+          \"off\",\r\n+          {\r\n+            \"varsIgnorePattern\": \"^(React|_|params|query|ctx|error|err|useError)$\",\r\n+            \"argsIgnorePattern\": \"^_\",\r\n+            \"ignoreRestSiblings\": true,\r\n+            \"args\": \"after-used\"\r\n+          }\r\n+        ]\r\n       }\r\n     },\r\n     {\r\n       \"files\": [\"src/components/**/*.tsx\"],\r\n"
+                },
+                {
+                    "date": 1740776611019,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -34,10 +34,9 @@\n     {\r\n       \"files\": [\"src/pages/**/*.tsx\", \"src/app/**/*.tsx\"],\r\n       \"rules\": {\r\n         \"react/react-in-jsx-scope\": \"off\",\r\n-        \"@typescript-eslint/no-unused-vars\": \r\n-        [\r\n+        \"@typescript-eslint/no-unused-vars\": [\r\n           \"off\",\r\n           {\r\n             \"varsIgnorePattern\": \"^(React|_|params|query|ctx|error|err|useError)$\",\r\n             \"argsIgnorePattern\": \"^_\",\r\n@@ -50,9 +49,9 @@\n     {\r\n       \"files\": [\"src/components/**/*.tsx\"],\r\n       \"rules\": {\r\n         \"@typescript-eslint/no-unused-vars\": [\r\n-          \"warn\",\r\n+          \"off\",\r\n           {\r\n             \"varsIgnorePattern\": \"^(React|_)\",\r\n             \"argsIgnorePattern\": \"^_\",\r\n             \"ignoreRestSiblings\": true,\r\n"
+                },
+                {
+                    "date": 1740776620174,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -63,9 +63,9 @@\n     {\r\n       \"files\": [\"src/hooks/**/*.ts\", \"src/hooks/**/*.tsx\"],\r\n       \"rules\": {\r\n         \"@typescript-eslint/no-unused-vars\": [\r\n-          \"warn\",\r\n+          \"off\",\r\n           {\r\n             \"varsIgnorePattern\": \"^_\",\r\n             \"argsIgnorePattern\": \"^_\",\r\n             \"ignoreRestSiblings\": true,\r\n"
+                },
+                {
+                    "date": 1740776662301,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -6,9 +6,9 @@\n   \"parser\": \"@typescript-eslint/parser\",\r\n   \"plugins\": [\"@typescript-eslint\"],\r\n   \"rules\": {\r\n     \"@typescript-eslint/no-unused-vars\": [\r\n-      \"warn\",\r\n+      \"off\",\r\n       {\r\n         \"argsIgnorePattern\": \"^_\",\r\n         \"varsIgnorePattern\": \"^(React|_)\",\r\n         \"caughtErrorsIgnorePattern\": \"^_\",\r\n"
+                }
+            ],
+            "date": 1740093062120,
+            "name": "Commit-0",
+            "content": "{\r\n  \"extends\": [\r\n    \"next/core-web-vitals\",\r\n    \"plugin:@typescript-eslint/recommended\"\r\n  ],\r\n  \"parser\": \"@typescript-eslint/parser\",\r\n  \"plugins\": [\"@typescript-eslint\"],\r\n  \"rules\": {\r\n    \"@typescript-eslint/no-unused-vars\": [\r\n      \"warn\",\r\n      {\r\n        \"argsIgnorePattern\": \"^_\",\r\n        \"varsIgnorePattern\": \"^_\",\r\n        \"caughtErrorsIgnorePattern\": \"^_\",\r\n        \"destructuredArrayIgnorePattern\": \"^_\"\r\n      }\r\n    ]\r\n  }\r\n} "
+        }
+    ]
+}

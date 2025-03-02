@@ -37,7 +37,7 @@ export class SessionMonitor {
         throw new Error('Failed to refresh session');
       }
 
-      const { token, expiresAt } = await response.json();
+      const { expiresAt } = await response.json();
 
       // Clear stale data from storage
       localStorage.removeItem('staleSessionData');

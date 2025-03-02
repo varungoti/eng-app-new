@@ -1,0 +1,22 @@
+{
+    "sourceFile": "src/modules/lesson-management/types/index.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1740929001499,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1740929045304,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,10 +1,23 @@\n import type { Database } from '../../../lib/database.types';\r\n \r\n export type Grade = Database['public']['Tables']['grades']['Row'];\r\n export type Topic = Database['public']['Tables']['topics']['Row'];\r\n-export type Lesson = Database['public']['Tables']['lesson']['Row'];\r\n \r\n+// Define custom Lesson interface since it's not in Database type definition\r\n+export interface Lesson {\r\n+  id: string;\r\n+  title: string;\r\n+  description?: string | null;\r\n+  content?: string | null;\r\n+  subtopic_id: string;\r\n+  topic_id?: string;\r\n+  order_index?: number;\r\n+  created_at: string;\r\n+  updated_at?: string;\r\n+  status?: string;\r\n+}\r\n+\r\n export interface LessonManagementState {\r\n   grades: Grade[];\r\n   topics: Topic[];\r\n   lessons: Lesson[];\r\n"
+                }
+            ],
+            "date": 1740929001499,
+            "name": "Commit-0",
+            "content": "import type { Database } from '../../../lib/database.types';\r\n\r\nexport type Grade = Database['public']['Tables']['grades']['Row'];\r\nexport type Topic = Database['public']['Tables']['topics']['Row'];\r\nexport type Lesson = Database['public']['Tables']['lesson']['Row'];\r\n\r\nexport interface LessonManagementState {\r\n  grades: Grade[];\r\n  topics: Topic[];\r\n  lessons: Lesson[];\r\n  isLoading: boolean;\r\n  error: Error | null;\r\n}\r\n\r\nexport interface LessonManagementParams {\r\n  gradeId: string | null;\r\n  topicId: string | null;\r\n} "
+        }
+    ]
+}

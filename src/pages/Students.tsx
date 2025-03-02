@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Plus, Upload, Users, Search } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Plus, Upload, Search, Trash, Edit } from 'lucide-react';
 import { useStudents } from '../hooks/useStudents';
 import BulkImportDialog from '../components/BulkImport/BulkImportDialog';
 import { useSchools } from '../hooks/useSchools';
@@ -11,6 +11,17 @@ import {
   SelectValue,
 } from '../components/ui/select';
 import LoadingSpinner from '../components/LoadingSpinner';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "../components/ui/alert-dialog";
+import { toast } from "../components/ui/use-toast";
 
 const Students = () => {
   const { students, loading, error, addStudent, deleteStudent } = useStudents();
@@ -18,9 +29,11 @@ const Students = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedSchool, setSelectedSchool] = useState<string>('');
   const [selectedGrade, setSelectedGrade] = useState<string>('');
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [_isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [studentToDelete, setStudentToDelete] = useState<string | null>(null);
 
   useEffect(() => {
     if (!loading) {
@@ -65,6 +78,30 @@ const Students = () => {
     setIsImportModalOpen(false);
   };
 
+  const handleDeleteClick = (studentId: string) => {
+    setStudentToDelete(studentId);
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (studentToDelete) {
+      try {
+        await deleteStudent.mutateAsync(studentToDelete);
+        toast({
+          title: "Student deleted",
+          description: "The student has been successfully removed from the system."
+        });
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to delete student. Please try again."
+        });
+      }
+    }
+    setDeleteDialogOpen(false);
+    setStudentToDelete(null);
+  };
+
   if (isLoading) {
     return (
       <LoadingSpinner message="Loading students..." />
@@ -87,6 +124,8 @@ const Students = () => {
         <h1 className="text-2xl font-semibold text-gray-900">Students</h1>
         <div className="flex space-x-4">
           <button
+            title="Import Students"
+            type="button"
             onClick={() => setIsImportModalOpen(true)}
             className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
           >
@@ -94,6 +133,8 @@ const Students = () => {
             Import Students
           </button>
           <button
+            title="Add Student"
+            type="button"
             onClick={() => setIsAddModalOpen(true)}
             className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700"
           >
@@ -220,9 +261,25 @@ const Students = () => {
                   {student.guardianContact}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <button className="text-indigo-600 hover:text-indigo-900">
-                    Edit
-                  </button>
+                  <div className="flex items-center justify-end space-x-3">
+                    <button 
+                      title="Edit Student"
+                      type="button"
+                      className="text-indigo-600 hover:text-indigo-900 flex items-center"
+                    >
+                      <Edit className="h-4 w-4 mr-1" />
+                      Edit
+                    </button>
+                    <button 
+                      title="Delete Student"
+                      type="button"
+                      onClick={() => handleDeleteClick(student.id)}
+                      className="text-red-600 hover:text-red-900 flex items-center"
+                    >
+                      <Trash className="h-4 w-4 mr-1" />
+                      Delete
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
@@ -278,6 +335,22 @@ const Students = () => {
             };
           }}
         />
+      )}
+
+      {/* Delete Dialog */}
+      {deleteDialogOpen && (
+        <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Are you sure you want to delete this student?</AlertDialogTitle>
+              <AlertDialogDescription>This action cannot be undone.</AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel onClick={() => setDeleteDialogOpen(false)}>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={confirmDelete}>Delete</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       )}
     </div>
   );

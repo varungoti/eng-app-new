@@ -1,4 +1,4 @@
-import React, { Component, ErrorInfo, ReactNode } from 'react';
+import  { Component, ErrorInfo, ReactNode } from 'react';
 import { ErrorWatcher } from '../ErrorWatcher';
 
 interface Props {
@@ -34,7 +34,7 @@ export class ErrorBoundary extends Component<Props, State> {
         stack: error.stack,
         isSimulated: isSimulatedError
       },
-      componentStack: errorInfo.componentStack,
+      componentStack: errorInfo.componentStack || '',
       source: this.props.source,
     });
   }

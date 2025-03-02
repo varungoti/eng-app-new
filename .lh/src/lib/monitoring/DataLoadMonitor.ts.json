@@ -1,0 +1,38 @@
+{
+    "sourceFile": "src/lib/monitoring/DataLoadMonitor.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 5,
+            "patches": [
+                {
+                    "date": 1740693660455,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1740900095609,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,8 +1,8 @@\n import type { SupabaseClient } from '@supabase/supabase-js';\r\n import { supabase } from '../supabase';\r\n import { logger } from '../logger';\r\n-import type { MonitoringConfig, DataLoadMetrics } from './types';\r\n+import type { MonitoringConfig } from './types';\r\n \r\n interface LoadMetric {\r\n   duration: number;\r\n   operation: string;\r\n"
+                },
+                {
+                    "date": 1740900146210,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -16,9 +16,8 @@\n   errorCount: number;\r\n }\r\n \r\n export class DataLoadMonitor {\r\n-  private client: SupabaseClient;\r\n   private metrics: LoadMetric[] = [];\r\n   private aggregateMetrics: AggregateMetrics = {\r\n     recordCount: 0,\r\n     averageDuration: 0,\r\n@@ -34,9 +33,9 @@\n \r\n   constructor(\r\n     private config: MonitoringConfig\r\n   ) {\r\n-    this.client = supabase;\r\n+    // Removed unused client initialization\r\n   }\r\n \r\n   async recordDataLoad(table: string, records: number, duration: number, success: boolean) {\r\n     try {\r\n"
+                },
+                {
+                    "date": 1740900159834,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -33,9 +33,9 @@\n \r\n   constructor(\r\n     private config: MonitoringConfig\r\n   ) {\r\n-    // Removed unused client initialization\r\n+    this.client = supabase;\r\n   }\r\n \r\n   async recordDataLoad(table: string, records: number, duration: number, success: boolean) {\r\n     try {\r\n"
+                },
+                {
+                    "date": 1740900172595,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -16,8 +16,9 @@\n   errorCount: number;\r\n }\r\n \r\n export class DataLoadMonitor {\r\n+  private client: SupabaseClient;\r\n   private metrics: LoadMetric[] = [];\r\n   private aggregateMetrics: AggregateMetrics = {\r\n     recordCount: 0,\r\n     averageDuration: 0,\r\n"
+                },
+                {
+                    "date": 1740900222305,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -16,9 +16,9 @@\n   errorCount: number;\r\n }\r\n \r\n export class DataLoadMonitor {\r\n-  private client: SupabaseClient;\r\n+  private _client: SupabaseClient;\r\n   private metrics: LoadMetric[] = [];\r\n   private aggregateMetrics: AggregateMetrics = {\r\n     recordCount: 0,\r\n     averageDuration: 0,\r\n"
+                }
+            ],
+            "date": 1740693660455,
+            "name": "Commit-0",
+            "content": "import type { SupabaseClient } from '@supabase/supabase-js';\r\nimport { supabase } from '../supabase';\r\nimport { logger } from '../logger';\r\nimport type { MonitoringConfig, DataLoadMetrics } from './types';\r\n\r\ninterface LoadMetric {\r\n  duration: number;\r\n  operation: string;\r\n  source: string;\r\n  success: boolean;\r\n}\r\n\r\ninterface AggregateMetrics {\r\n  recordCount: number;\r\n  averageDuration: number;\r\n  errorCount: number;\r\n}\r\n\r\nexport class DataLoadMonitor {\r\n  private client: SupabaseClient;\r\n  private metrics: LoadMetric[] = [];\r\n  private aggregateMetrics: AggregateMetrics = {\r\n    recordCount: 0,\r\n    averageDuration: 0,\r\n    errorCount: 0\r\n  };\r\n\r\n  private loads: Map<string, { \r\n    startTime: number;\r\n    source: string;\r\n    operation: string;\r\n    queryKey?: string[];\r\n  }> = new Map();\r\n\r\n  constructor(\r\n    private config: MonitoringConfig\r\n  ) {\r\n    this.client = supabase;\r\n  }\r\n\r\n  async recordDataLoad(table: string, records: number, duration: number, success: boolean) {\r\n    try {\r\n      this.aggregateMetrics.recordCount += records;\r\n      this.aggregateMetrics.averageDuration = (this.aggregateMetrics.averageDuration + duration) / 2;\r\n      \r\n      if (!success) {\r\n        this.aggregateMetrics.errorCount++;\r\n      }\r\n\r\n      if (this.config.enableLogging) {\r\n        logger.info(`Data load: ${table}, Records: ${records}, Duration: ${duration}ms`, {\r\n          source: 'DataLoadMonitor',\r\n          context: { table, records, duration, success }\r\n        });\r\n      }\r\n    } catch (error) {\r\n      logger.warn('Failed to record data load:', {\r\n        source: 'DataLoadMonitor',\r\n        context: { error, table }\r\n      });\r\n    }\r\n  }\r\n\r\n  getMetrics(): LoadMetric[] {\r\n    return this.metrics;\r\n  }\r\n\r\n  startLoad(source: string, operation: string, queryKey?: string[]): string {\r\n    const loadId = crypto.randomUUID();\r\n    this.loads.set(loadId, {\r\n      startTime: Date.now(),\r\n      source,\r\n      operation,\r\n      queryKey\r\n    });\r\n    return loadId;\r\n  }\r\n\r\n  endLoad(loadId: string, success: boolean): void {\r\n    const load = this.loads.get(loadId);\r\n    if (load) {\r\n      const duration = Date.now() - load.startTime;\r\n      this.loads.delete(loadId);\r\n      this.metrics.push({\r\n        duration,\r\n        operation: load.operation,\r\n        source: load.source,\r\n        success\r\n      });\r\n    }\r\n  }\r\n}"
+        }
+    ]
+}

@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/features/content-management/components/layout/ContentModals.tsx",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1740087474829,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1740087474829,
+            "name": "Commit-0",
+            "content": "import { AddItemModal } from '../shared/AddItemModal';\r\n\r\ninterface ContentModalsProps {\r\n  modals: {\r\n    addGrade: boolean;\r\n    addTopic: boolean;\r\n    addSubtopic: boolean;\r\n    addLesson: boolean;\r\n  };\r\n  onClose: (modalKey: keyof ContentModalsProps['modals']) => void;\r\n  onSubmit: {\r\n    grade: (data: { title: string; description?: string }) => Promise<void>;\r\n    topic: (data: { title: string; description?: string }) => Promise<void>;\r\n    subtopic: (data: { title: string; description?: string }) => Promise<void>;\r\n    lesson: (data: { title: string; description?: string }) => Promise<void>;\r\n  };\r\n}\r\n\r\nexport const ContentModals = ({\r\n  modals,\r\n  onClose,\r\n  onSubmit\r\n}: ContentModalsProps) => {\r\n  return (\r\n    <>\r\n      {/* Add Grade Modal */}\r\n      <AddItemModal\r\n        title=\"Add New Grade\"\r\n        description=\"Create a new grade level for organizing content.\"\r\n        isOpen={modals.addGrade}\r\n        onClose={() => onClose('addGrade')}\r\n        onSubmit={onSubmit.grade}\r\n        submitLabel=\"Create Grade\"\r\n        showDescription={false}\r\n      />\r\n\r\n      {/* Add Topic Modal */}\r\n      <AddItemModal\r\n        title=\"Add New Topic\"\r\n        description=\"Create a new topic within the selected grade.\"\r\n        isOpen={modals.addTopic}\r\n        onClose={() => onClose('addTopic')}\r\n        onSubmit={onSubmit.topic}\r\n        submitLabel=\"Create Topic\"\r\n        showDescription={true}\r\n      />\r\n\r\n      {/* Add Subtopic Modal */}\r\n      <AddItemModal\r\n        title=\"Add New Subtopic\"\r\n        description=\"Create a new subtopic within the selected topic.\"\r\n        isOpen={modals.addSubtopic}\r\n        onClose={() => onClose('addSubtopic')}\r\n        onSubmit={onSubmit.subtopic}\r\n        submitLabel=\"Create Subtopic\"\r\n        showDescription={true}\r\n      />\r\n\r\n      {/* Add Lesson Modal */}\r\n      <AddItemModal\r\n        title=\"Add New Lesson\"\r\n        description=\"Create a new lesson within the selected subtopic.\"\r\n        isOpen={modals.addLesson}\r\n        onClose={() => onClose('addLesson')}\r\n        onSubmit={onSubmit.lesson}\r\n        submitLabel=\"Create Lesson\"\r\n        showDescription={true}\r\n      />\r\n    </>\r\n  );\r\n}; "
+        }
+    ]
+}

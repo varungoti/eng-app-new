@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/components/StatItem.tsx",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1740095356274,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1740095356274,
+            "name": "Commit-0",
+            "content": "import { LucideIcon } from 'lucide-react';\r\nimport { cn } from '../lib/utils';\r\n\r\ninterface StatItemProps {\r\n  title: string;\r\n  value: number;\r\n  icon: LucideIcon;\r\n  className?: string;\r\n}\r\n\r\nexport const StatItem = ({ title, value, icon: Icon, className }: StatItemProps) => {\r\n  return (\r\n    <div className={cn('rounded-lg p-4 text-white', className)}>\r\n      <div className=\"flex items-center justify-between\">\r\n        <div>\r\n          <p className=\"text-sm font-medium\">{title}</p>\r\n          <h3 className=\"text-2xl font-bold\">{value}</h3>\r\n        </div>\r\n        <Icon className=\"h-6 w-6\" />\r\n      </div>\r\n    </div>\r\n  );\r\n}; "
+        }
+    ]
+}

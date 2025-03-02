@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 18,
+            "activePatchIndex": 19,
             "patches": [
                 {
                     "date": 1739791839926,
@@ -80,6 +80,10 @@
                 {
                     "date": 1739909500961,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -465,9 +465,9 @@\n     logger.error(`Failed to list backups: ${error instanceof Error ? error.message : 'Unknown error'}`);\r\n   }\r\n }\r\n \r\n-// Modified main function with command handling\r\n+// Modified main function to include the actual rollback\r\n async function main() {\r\n   const command = process.argv[2];\r\n   const timestamp = process.argv[3];\r\n \r\n@@ -480,14 +480,18 @@\n       break;\r\n     case 'list':\r\n       await listBackups();\r\n       break;\r\n+    case 'rollback':\r\n+      await rollbackDuplicates();\r\n+      break;\r\n     default:\r\n       console.log(`\r\n Usage:\r\n-  npx ts-node src/scripts/rollback-duplicates.ts backup    # Create backup and remove duplicates\r\n+  npx ts-node src/scripts/rollback-duplicates.ts rollback   # Remove duplicates with backup\r\n+  npx ts-node src/scripts/rollback-duplicates.ts backup     # Only create backup\r\n   npx ts-node src/scripts/rollback-duplicates.ts restore [timestamp]  # Restore from backup\r\n-  npx ts-node src/scripts/rollback-duplicates.ts list     # List available backups\r\n+  npx ts-node src/scripts/rollback-duplicates.ts list      # List available backups\r\n       `);\r\n   }\r\n }\r\n \r\n"
+                },
+                {
+                    "date": 1740925815767,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -42,9 +42,9 @@\n   error: (msg: string) => console.log(`${colors.red}✖ ${msg}${colors.reset}`),\r\n   divider: () => console.log('\\n' + '─'.repeat(50) + '\\n')\r\n };\r\n \r\n-interface QuestionRecord {\r\n+export interface QuestionRecord {\r\n   id: string;\r\n   original_id: string;\r\n   created_at: string;\r\n }\r\n"
                 }
             ],
             "date": 1739791839926,

@@ -1,4 +1,4 @@
-import type { Tables } from './mappers';
+//import type { Tables } from './mappers';
 import type { Grade, Topic, SubTopic, Lesson } from '../../types';
 
 export interface ContentState {

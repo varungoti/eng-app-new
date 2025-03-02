@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/lib/utils.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1740095370450,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1740095370450,
+            "name": "Commit-0",
+            "content": "import { type ClassValue, clsx } from \"clsx\";\nimport { twMerge } from \"tailwind-merge\";\n\nexport function cn(...inputs: ClassValue[]) {\n  return twMerge(clsx(inputs));\n}\n\nexport function debounce<T extends (...args: any[]) => any>(\n  func: T,\n  wait: number\n): (...args: Parameters<T>) => void {\n  let timeout: NodeJS.Timeout;\n\n  return function executedFunction(...args: Parameters<T>) {\n    const later = () => {\n      clearTimeout(timeout);\n      func(...args);\n    };\n\n    clearTimeout(timeout);\n    timeout = setTimeout(later, wait);\n  };\n}"
+        }
+    ]
+}

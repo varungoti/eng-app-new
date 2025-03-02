@@ -1,0 +1,22 @@
+{
+    "sourceFile": "src/pages/Content/index.tsx",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1740927772771,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1740927782655,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -7,9 +7,9 @@\n import { ContentView } from '@/components/content/ContentView';\r\n import { lazy } from 'react';\r\n import { logger } from '@/lib/logger';\r\n \r\n-const LessonManagement = lazy(asy() => {\r\n+const LessonManagement = lazy(async() => {\r\n   return import('@/components/content/lesson-management/page')\r\n     .then(module => {\r\n       logger.debug('LessonManagement loaded successfully', {\r\n         source: 'Content'\r\n"
+                }
+            ],
+            "date": 1740927772771,
+            "name": "Commit-0",
+            "content": "import React from 'react';\r\nimport { Routes, Route, Navigate } from 'react-router-dom';\r\nimport ErrorBoundary from '@/components/ErrorBoundary';\r\nimport LoadingSpinner from '@/components/LoadingSpinner';\r\nimport { useAuth } from '@/hooks/useAuth';\r\nimport { CONTENT_ROUTES } from '@/lib/content/routes';\r\nimport { ContentView } from '@/components/content/ContentView';\r\nimport { lazy } from 'react';\r\nimport { logger } from '@/lib/logger';\r\n\r\nconst LessonManagement = lazy(asy() => {\r\n  return import('@/components/content/lesson-management/page')\r\n    .then(module => {\r\n      logger.debug('LessonManagement loaded successfully', {\r\n        source: 'Content'\r\n      });\r\n      return { default: module.default };\r\n    })\r\n    .catch(error => {\r\n      logger.error('Failed to load LessonManagement', {\r\n        context: { error },\r\n        source: 'Content'\r\n      });\r\n      throw error;\r\n    });\r\n});\r\n\r\nconst Content: React.FC = () => {\r\n  const { user } = useAuth();\r\n  const canAccessLessonManagement = user && (\r\n    ['super_admin', 'admin', 'content_head', 'content_editor'].includes(user.role)\r\n  );\r\n\r\n  return (\r\n    <ErrorBoundary source=\"Content\">\r\n      <Routes>\r\n        <Route \r\n          path={CONTENT_ROUTES.VIEW} \r\n          element={\r\n            <ErrorBoundary source=\"ContentView\">\r\n              <React.Suspense fallback={<LoadingSpinner message=\"Loading content view...\" />}>\r\n                <ContentView mode=\"view\" />\r\n              </React.Suspense>\r\n            </ErrorBoundary>\r\n          }\r\n        />\r\n        <Route \r\n          path={CONTENT_ROUTES.EDIT} \r\n          element={\r\n            <ErrorBoundary source=\"ContentEditor\">\r\n              <React.Suspense fallback={<LoadingSpinner message=\"Loading content editor...\" />}>\r\n                <ContentView mode=\"edit\" />\r\n              </React.Suspense>\r\n            </ErrorBoundary>\r\n          }\r\n        />\r\n        {canAccessLessonManagement && (\r\n          <Route \r\n            path={CONTENT_ROUTES.LESSON_MANAGEMENT} \r\n            element={\r\n              <ErrorBoundary source=\"LessonManagement\">\r\n                <LessonManagement />\r\n              </ErrorBoundary>\r\n            }\r\n          />\r\n        )}\r\n        <Route index element={<Navigate to={CONTENT_ROUTES.VIEW} replace />} />\r\n      </Routes>\r\n    </ErrorBoundary>\r\n  );\r\n};\r\n\r\nexport default Content;"
+        }
+    ]
+}

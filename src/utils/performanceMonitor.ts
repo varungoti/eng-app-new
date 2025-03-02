@@ -8,6 +8,9 @@ type LargestContentfulPaint = {
   loadTime: number;
 };
 
+// Define a Record type for window functions instead of using any
+type WindowWithFunctions = Record<string, (event: Event) => void>;
+
 export class PerformanceMonitor {
   private metrics = {
     lcp: 0,
@@ -96,8 +99,11 @@ export class PerformanceMonitor {
       const actionElement = target.closest('[data-action]');
       if (actionElement) {
         const action = actionElement.getAttribute('data-action');
-        if (action && typeof (window as any)[action] === 'function') {
-          (window as any)[action](event);
+        if (action) {
+          const fn = (window as unknown as WindowWithFunctions)[action];
+          if (typeof fn === 'function') {
+            fn(event);
+          }
         }
       }
     };
@@ -112,10 +118,10 @@ export class PerformanceMonitor {
           try {
             // Add @vite-ignore comment to suppress the warning
             /* @vite-ignore */
-            const module = await import(`../components/${componentName}.tsx`);
-            if (module.default) {
+            const componentModule = await import(`../components/${componentName}.tsx`);
+            if (componentModule.default) {
               // Replace placeholder with actual component
-              const componentInstance = new module.default(element);
+              const componentInstance = new componentModule.default(element);
               componentInstance.render();
             }
           } catch (error) {

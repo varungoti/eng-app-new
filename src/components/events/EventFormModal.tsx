@@ -172,6 +172,7 @@ const EventFormModal: React.FC<EventFormModalProps> = ({
 
           <div className="mt-6 flex justify-end space-x-3 pt-4 border-t">
             <button
+              title="Cancel"
               type="button"
               onClick={onClose}
               className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
@@ -179,6 +180,7 @@ const EventFormModal: React.FC<EventFormModalProps> = ({
               Cancel
             </button>
             <button
+              title={event ? 'Update Event' : 'Add Event'}
               type="submit"
               className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 transition-colors"
             >

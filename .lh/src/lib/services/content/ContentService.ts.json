@@ -1,0 +1,58 @@
+{
+    "sourceFile": "src/lib/services/content/ContentService.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 10,
+            "patches": [
+                {
+                    "date": 1740899861874,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1740899871888,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -45,8 +45,9 @@\n       },\r\n       'topics'\r\n     );\r\n   }\r\n-  \r\n \r\n+  a\r\n+\r\n   // Add other content-related methods...\r\n }\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1740899879408,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -46,8 +46,15 @@\n       'topics'\r\n     );\r\n   }\r\n \r\n-  a\r\n+  async getSubTopics(): Promise<SubTopic[]> {\r\n+    return this.executeWithRetry(\r\n+      async () => {\r\n+        const { data, error } = await supabase\r\n+          .from('subtopics')\r\n+          .select('*')\r\n+          \r\n+  \r\n \r\n   // Add other content-related methods...\r\n }\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1740899888608,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -52,9 +52,21 @@\n       async () => {\r\n         const { data, error } = await supabase\r\n           .from('subtopics')\r\n           .select('*')\r\n-          \r\n+          .order('order');\r\n+\r\n+        if (error) throw error;\r\n+        return data;\r\n+      },\r\n+      'subtopics'\r\n+    );\r\n+  }\r\n+\r\n+  async getLessons(): Promise<Lesson[]> {\r\n+    return this.executeWithRetry(\r\n+      async () => {\r\n+        const { data, error } = await supabase\r\n+          .from('lessons')\r\n   \r\n-\r\n   // Add other content-related methods...\r\n }\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1740899895214,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -66,7 +66,15 @@\n     return this.executeWithRetry(\r\n       async () => {\r\n         const { data, error } = await supabase\r\n           .from('lessons')\r\n-  \r\n+          .select('*')\r\n+          .order('order');\r\n+\r\n+        if (error) throw error;\r\n+        return data;\r\n+      },\r\n+      'lessons'\r\n+      \r\n+\r\n   // Add other content-related methods...\r\n }\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1740899904483,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,7 +1,7 @@\n import { supabase } from '../../supabase';\r\n import { BaseService } from '../BaseService';\r\n-import type { Grade, Topic, SubTopic, Lesson } from '../../../types';\r\n+import type { Grade, Topic, SubTopic, Lesson, Question } from '../../../types';\r\n \r\n export class ContentService extends BaseService {\r\n   constructor() {\r\n     super({\r\n@@ -73,8 +73,22 @@\n         if (error) throw error;\r\n         return data;\r\n       },\r\n       'lessons'\r\n-      \r\n+    );\r\n+  }\r\n \r\n+  async getQuestions(): Promise<Question[]> {\r\n+    return this.executeWithRetry(\r\n+      async () => {\r\n+        const { data, error } = await supabase\r\n+          .from('questions')\r\n+          .select('*')\r\n+          .order('order');\r\n+\r\n+        if (error) throw error;\r\n+        return data;\r\n+      },\r\n+  \r\n+\r\n   // Add other content-related methods...\r\n }\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1740899910761,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -87,8 +87,20 @@\n \r\n         if (error) throw error;\r\n         return data;\r\n       },\r\n+      'questions'\r\n+    );\r\n+  }\r\n+\r\n+  async getQuestion(id: string): Promise<Question> {\r\n+    return this.executeWithRetry(\r\n+      async () => {\r\n+        const { data, error } = await supabase\r\n+          .from('questions')\r\n+          .select('*')\r\n+          .eq('id', id)\r\n+          .single();\r\n   \r\n \r\n   // Add other content-related methods...\r\n }\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1740899933720,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -98,9 +98,21 @@\n         const { data, error } = await supabase\r\n           .from('questions')\r\n           .select('*')\r\n           .eq('id', id)\r\n-          .single();\r\n+          .single();  \r\n+\r\n+        if (error) throw error;\r\n+        return data;\r\n+      },\r\n+      `question_${id}`\r\n+    );\r\n+  }\r\n+\r\n+  async createQuestion(question: Omit<Question, 'id' | 'created_at'>): Promise<Question> {\r\n+    return this.executeWithRetry(\r\n+      async () => {\r\n+        const { data, error } = await supabase\r\n+          .from('questions')\r\n   \r\n-\r\n   // Add other content-related methods...\r\n }\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1740899940355,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -112,7 +112,21 @@\n     return this.executeWithRetry(\r\n       async () => {\r\n         const { data, error } = await supabase\r\n           .from('questions')\r\n+          .insert(question)\r\n+          .select()\r\n+          .single();\r\n+\r\n+        if (error) throw error;\r\n+        return data;\r\n+      }\r\n+    );\r\n+  }\r\n+\r\n+  async updateQuestion(id: string, question: Partial<Question>): Promise<Question> {\r\n+    return this.executeWithRetry(\r\n+      async () => {\r\n   \r\n+\r\n   // Add other content-related methods...\r\n }\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1740899948482,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -125,8 +125,15 @@\n \r\n   async updateQuestion(id: string, question: Partial<Question>): Promise<Question> {\r\n     return this.executeWithRetry(\r\n       async () => {\r\n-  \r\n+        const { data, error } = await supabase\r\n+          .from('questions')\r\n+          .update(question)\r\n+          .eq('id', id)\r\n+          .select()\r\n+          .single();\r\n+          \r\n \r\n+\r\n   // Add other content-related methods...\r\n }\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1740899954853,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -131,9 +131,15 @@\n           .update(question)\r\n           .eq('id', id)\r\n           .select()\r\n           .single();\r\n-          \r\n \r\n+        if (error) throw error;\r\n+        return data;\r\n+      }\r\n+    );\r\n+  }\r\n \r\n+\r\n+\r\n   // Add other content-related methods...\r\n }\n\\ No newline at end of file\n"
+                }
+            ],
+            "date": 1740899861874,
+            "name": "Commit-0",
+            "content": "import { supabase } from '../../supabase';\r\nimport { BaseService } from '../BaseService';\r\nimport type { Grade, Topic, SubTopic, Lesson } from '../../../types';\r\n\r\nexport class ContentService extends BaseService {\r\n  constructor() {\r\n    super({\r\n      name: 'ContentService',\r\n      retryConfig: {\r\n        maxRetries: 2,\r\n        baseDelay: 300,\r\n        maxDelay: 1000\r\n      },\r\n      cacheConfig: {\r\n        ttl: 5 * 60 * 1000 // 5 minutes\r\n      }\r\n    });\r\n  }\r\n\r\n  async getGrades(): Promise<Grade[]> {\r\n    return this.executeWithRetry(\r\n      async () => {\r\n        const { data, error } = await supabase\r\n          .from('grades')\r\n          .select('*')\r\n          .order('level');\r\n\r\n        if (error) throw error;\r\n        return data;\r\n      },\r\n      'grades'\r\n    );\r\n  }\r\n\r\n  async getTopics(): Promise<Topic[]> {\r\n    return this.executeWithRetry(\r\n      async () => {\r\n        const { data, error } = await supabase\r\n          .from('topics')\r\n          .select('*')\r\n          .order('order');\r\n\r\n        if (error) throw error;\r\n        return data;\r\n      },\r\n      'topics'\r\n    );\r\n  }\r\n  \r\n\r\n  // Add other content-related methods...\r\n}"
+        }
+    ]
+}

@@ -237,8 +237,8 @@ export interface Lesson {
   grade_id?: string | null;
   topic_id?: string | null;
   subtopic_id: string;
-  questions?: Question[];
-  activities?: Activity[];
+  questions?: QuestionExtended[];
+  activities?: ActivityExtended[];
   order_index?: number | null;
   duration?: number | null;
   subjectId?: string | null;
@@ -290,7 +290,7 @@ export interface Exercise {
   mediaUrl?: string;
   mediaType?: 'image' | 'video' | 'gif';
   sayText: string;
-  questions: Question[];
+  questions: QuestionExtended[];
 }
 
 export interface ContentModule {
@@ -301,12 +301,16 @@ export interface ContentModule {
   learningObjectives: string[];
   type: 'vocabulary' | 'pronunciation' | 'conversation' | 'grammar';
   content: {
-    questions: Question[];
-    activities: Activity[];
+    questions: QuestionExtended[];
+    activities: ActivityExtended[];
   };
 }
 
-export interface Question {
+// This interface extends the QuestionExtended type from declarations.d.ts with additional properties
+// This interface extends the QuestionExtended type from declarations.d.ts with additional properties
+// This interface extends the QuestionExtended type from declarations.d.ts with additional properties
+// TODO: Resolve type conflict with declarations.d.ts
+export interface QuestionExtended {
   id: string;
   title: string;
   content?: string;
@@ -392,7 +396,11 @@ export interface Question {
   correct?: boolean;
 }
 
-export interface Activity {
+// This interface extends the ActivityExtended type from declarations.d.ts with additional properties
+// This interface extends the ActivityExtended type from declarations.d.ts with additional properties
+// This interface extends the ActivityExtended type from declarations.d.ts with additional properties
+// TODO: Resolve type conflict with declarations.d.ts
+export interface ActivityExtended {
   id: string;
   created_at?: string;
   lesson_id: string;
@@ -439,7 +447,7 @@ export interface Quiz {
   title: string;
   classId: string;
   moduleId: string;
-  questions: Question[];
+  questions: QuestionExtended[];
   dueDate: string;
   status: 'pending' | 'active' | 'completed';
 }
@@ -501,9 +509,9 @@ export interface ExercisePromptCardProps {
 }
 
 export interface QuestionFormProps {
-  question: Question;
+  question: QuestionExtended;
   index: number;
-  onUpdate: (index: number, updatedQuestion: Question) => Promise<void>;
+  onUpdate: (index: number, updatedQuestionExtended: QuestionExtended) => Promise<void>;
   onRemove: (index: number) => void;
   onAddExercisePrompt: (questionIndex: number) => void;
   onRemoveExercisePrompt: (questionIndex: number, promptIndex: number) => void;

@@ -84,6 +84,7 @@ export const InvoiceGenerator: React.FC = () => {
           <div>
             <label className="block text-sm font-medium text-gray-700">School</label>
             <select
+              title="Select School"
               value={invoiceData.schoolId}
               onChange={(e) => setInvoiceData({ ...invoiceData, schoolId: e.target.value })}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
@@ -102,6 +103,7 @@ export const InvoiceGenerator: React.FC = () => {
             <div>
               <label className="block text-sm font-medium text-gray-700">Invoice Date</label>
               <input
+                title="Invoice Date"
                 type="date"
                 value={invoiceData.date}
                 onChange={(e) => setInvoiceData({ ...invoiceData, date: e.target.value })}
@@ -112,6 +114,7 @@ export const InvoiceGenerator: React.FC = () => {
             <div>
               <label className="block text-sm font-medium text-gray-700">Due Date</label>
               <input
+                title="Due Date"
                 type="date"
                 value={invoiceData.dueDate}
                 onChange={(e) => setInvoiceData({ ...invoiceData, dueDate: e.target.value })}
@@ -151,6 +154,7 @@ export const InvoiceGenerator: React.FC = () => {
                   <tr key={index}>
                     <td className="px-6 py-4">
                       <input
+                        title="Description"
                         type="text"
                         value={item.description}
                         onChange={(e) => handleItemChange(index, 'description', e.target.value)}
@@ -160,6 +164,7 @@ export const InvoiceGenerator: React.FC = () => {
                     </td>
                     <td className="px-6 py-4">
                       <input
+                        title="Quantity"
                         type="number"
                         min="1"
                         value={item.quantity}
@@ -170,6 +175,7 @@ export const InvoiceGenerator: React.FC = () => {
                     </td>
                     <td className="px-6 py-4">
                       <input
+                        title="Rate"
                         type="number"
                         min="0"
                         step="0.01"
@@ -210,6 +216,7 @@ export const InvoiceGenerator: React.FC = () => {
         <div>
           <label className="block text-sm font-medium text-gray-700">Notes</label>
           <textarea
+            title="Notes"
             value={invoiceData.notes}
             onChange={(e) => setInvoiceData({ ...invoiceData, notes: e.target.value })}
             rows={3}

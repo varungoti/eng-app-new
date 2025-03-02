@@ -3,11 +3,55 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 0,
+            "activePatchIndex": 11,
             "patches": [
                 {
                     "date": 1739911900314,
                     "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1740091709169,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -88,9 +88,9 @@\n             </div>\r\n           )}\r\n \r\n           {/* Title and Description */}\r\n-          <div className={cn(\"space-y-2\", prompt.media && \"mt-4\")}>\r\n+          <div className={cn(\"space-y-6\", prompt.media && \"mt-4\")}>\r\n             <CardTitle className=\"text-lg font-semibold leading-tight\">\r\n               {prompt.text}\r\n             </CardTitle>\r\n             {prompt.content?.instructions && (\r\n"
+                },
+                {
+                    "date": 1740091777849,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -88,9 +88,9 @@\n             </div>\r\n           )}\r\n \r\n           {/* Title and Description */}\r\n-          <div className={cn(\"space-y-6\", prompt.media && \"mt-4\")}>\r\n+          <div className={cn(\"space-y-4\", prompt.media && \"mt-4\")}>\r\n             <CardTitle className=\"text-lg font-semibold leading-tight\">\r\n               {prompt.text}\r\n             </CardTitle>\r\n             {prompt.content?.instructions && (\r\n"
+                },
+                {
+                    "date": 1740091895208,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -88,9 +88,9 @@\n             </div>\r\n           )}\r\n \r\n           {/* Title and Description */}\r\n-          <div className={cn(\"space-y-4\", prompt.media && \"mt-4\")}>\r\n+          <div className={cn(\"space-y-4\", prompt.media && \"mt-\")}>\r\n             <CardTitle className=\"text-lg font-semibold leading-tight\">\r\n               {prompt.text}\r\n             </CardTitle>\r\n             {prompt.content?.instructions && (\r\n"
+                },
+                {
+                    "date": 1740091967624,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -37,9 +37,9 @@\n     >\r\n       <Card className=\"overflow-hidden border-primary/10 bg-card/50 backdrop-blur-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1\">\r\n         <CardHeader className=\"relative overflow-hidden\">\r\n           {/* Floating badge with shine effect */}\r\n-          <div className=\"absolute top-4 left-4 z-10 flex gap-2\">\r\n+          <div className=\"absolute top-4 -4 z-10 flex gap-2\">\r\n             <Badge \r\n               variant=\"outline\" \r\n               className=\"bg-background/80 backdrop-blur-sm border-primary/20\"\r\n             >\r\n@@ -88,9 +88,9 @@\n             </div>\r\n           )}\r\n \r\n           {/* Title and Description */}\r\n-          <div className={cn(\"space-y-4\", prompt.media && \"mt-\")}>\r\n+          <div className={cn(\"space-y-4\", prompt.media && \"mt-40\")}>\r\n             <CardTitle className=\"text-lg font-semibold leading-tight\">\r\n               {prompt.text}\r\n             </CardTitle>\r\n             {prompt.content?.instructions && (\r\n"
+                },
+                {
+                    "date": 1740091975586,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -37,9 +37,9 @@\n     >\r\n       <Card className=\"overflow-hidden border-primary/10 bg-card/50 backdrop-blur-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1\">\r\n         <CardHeader className=\"relative overflow-hidden\">\r\n           {/* Floating badge with shine effect */}\r\n-          <div className=\"absolute top-4 -4 z-10 flex gap-2\">\r\n+          <div className=\"absolute top-4 right-4 z-10 flex gap-2\">\r\n             <Badge \r\n               variant=\"outline\" \r\n               className=\"bg-background/80 backdrop-blur-sm border-primary/20\"\r\n             >\r\n"
+                },
+                {
+                    "date": 1740092072045,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -107,9 +107,9 @@\n           {prompt.narration && (\r\n             <div className=\"relative p-4 rounded-lg border border-primary/10 bg-background/50 backdrop-blur-sm group-hover:border-primary/20 transition-colors duration-300\">\r\n               <div className=\"flex items-center gap-2 mb-2 text-primary\">\r\n                 <Volume2 className=\"h-4 w-4\" />\r\n-                <h4 className=\"font-medium\">Narration</h4>\r\n+                <h4 className=\"font-medium\">Narration:</h4>\r\n               </div>\r\n               <p className=\"text-muted-foreground\">{prompt.narration}</p>\r\n             </div>\r\n           )}\r\n"
+                },
+                {
+                    "date": 1740092087216,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -109,9 +109,9 @@\n               <div className=\"flex items-center gap-2 mb-2 text-primary\">\r\n                 <Volume2 className=\"h-4 w-4\" />\r\n                 <h4 className=\"font-medium\">Narration:</h4>\r\n               </div>\r\n-              <p className=\"text-muted-foreground\">{prompt.narration}</p>\r\n+              < className=\"text-muted-foreground\">{prompt.narration}</p>\r\n             </div>\r\n           )}\r\n \r\n           {/* Say Text Section */}\r\n"
+                },
+                {
+                    "date": 1740092096253,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -109,9 +109,9 @@\n               <div className=\"flex items-center gap-2 mb-2 text-primary\">\r\n                 <Volume2 className=\"h-4 w-4\" />\r\n                 <h4 className=\"font-medium\">Narration:</h4>\r\n               </div>\r\n-              < className=\"text-muted-foreground\">{prompt.narration}</p>\r\n+              <div className=\"text-muted-foreground\">{prompt.narration}</p>\r\n             </div>\r\n           )}\r\n \r\n           {/* Say Text Section */}\r\n"
+                },
+                {
+                    "date": 1740092103065,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -109,9 +109,9 @@\n               <div className=\"flex items-center gap-2 mb-2 text-primary\">\r\n                 <Volume2 className=\"h-4 w-4\" />\r\n                 <h4 className=\"font-medium\">Narration:</h4>\r\n               </div>\r\n-              <div className=\"text-muted-foreground\">{prompt.narration}</p>\r\n+              <div className=\"text-muted-foreground\">{prompt.narration}</div>\r\n             </div>\r\n           )}\r\n \r\n           {/* Say Text Section */}\r\n"
+                },
+                {
+                    "date": 1740092222294,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -37,9 +37,9 @@\n     >\r\n       <Card className=\"overflow-hidden border-primary/10 bg-card/50 backdrop-blur-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1\">\r\n         <CardHeader className=\"relative overflow-hidden\">\r\n           {/* Floating badge with shine effect */}\r\n-          <div className=\"absolute top-4 right-4 z-10 flex gap-2\">\r\n+          <div className=\"absolute top-4 right-10 z-10 flex gap-2\">\r\n             <Badge \r\n               variant=\"outline\" \r\n               className=\"bg-background/80 backdrop-blur-sm border-primary/20\"\r\n             >\r\n"
+                },
+                {
+                    "date": 1740092601757,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -37,9 +37,9 @@\n     >\r\n       <Card className=\"overflow-hidden border-primary/10 bg-card/50 backdrop-blur-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1\">\r\n         <CardHeader className=\"relative overflow-hidden\">\r\n           {/* Floating badge with shine effect */}\r\n-          <div className=\"absolute top-4 right-10 z-10 flex gap-2\">\r\n+          <div className=\"absolute top-4 right-4 z-10 flex gap-2\">\r\n             <Badge \r\n               variant=\"outline\" \r\n               className=\"bg-background/80 backdrop-blur-sm border-primary/20\"\r\n             >\r\n"
                 }
             ],
             "date": 1739911900314,

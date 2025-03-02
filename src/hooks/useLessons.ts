@@ -21,12 +21,6 @@ export function useLessons(subtopicId?: string): UseQueryResult<Lesson[]> {
     },
     enabled: !!subtopicId,
     retry: API_CONFIG.RETRY_COUNT,
-    staleTime: API_CONFIG.STALE_TIME,
-    onError: (error: Error) => {
-      logger.error('Error in lessons query', { 
-        context: { error: String(error) },
-        source: 'useLessons'
-      });
-    }
+    staleTime: API_CONFIG.STALE_TIME
   });
 } 

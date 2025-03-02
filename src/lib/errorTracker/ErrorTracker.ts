@@ -1,8 +1,8 @@
 import { ErrorEvent, ErrorResolution, ErrorWatcherConfig } from './types';
 import { ErrorResolver } from './ErrorResolver';
 import { logger } from '../logger';
-import { consoleHandler } from './consoleHandler';
-import { networkHandler } from './networkHandler';
+//import { consoleHandler } from './consoleHandler';
+//import { networkHandler } from './networkHandler';
 import { ErrorSeverity } from './types';
 
 
@@ -26,9 +26,9 @@ export class ErrorTracker {
     this.resolver = ErrorResolver.getInstance(this.config);
 
     // Initialize handlers
-    consoleHandler;
-    networkHandler;
-
+    // Register handlers without using non-existent init methods
+    //const handlers = [consoleHandler, networkHandler];
+    
     // Set up global error handlers
     window.addEventListener('error', (event) => {
       this.trackError({
@@ -84,7 +84,10 @@ export class ErrorTracker {
     }
     
     if (this.config.logToConsole) {
-      logger.error(error.message, 'ErrorTracker');
+      logger.error(error.message, { 
+        source: 'ErrorTracker',
+        context: { severity: error.severity }
+      });
     }
 
     if (this.config.autoResolve) {

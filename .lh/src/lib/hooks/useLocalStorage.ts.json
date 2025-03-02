@@ -3,11 +3,15 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 0,
+            "activePatchIndex": 1,
             "patches": [
                 {
                     "date": 1739015386184,
                     "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1740900339146,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -6,21 +6,19 @@\n     try {\r\n       const item = window.localStorage.getItem(key);\r\n       return item ? JSON.parse(item) : initialValue;\r\n     } catch (error) {\r\n-      logger.error(`Failed to read from localStorage for key ${key}: ${error}`, 'useLocalStorage');\r\n+      logger.error(`Failed to read from localStorage for key ${key}: ${error}`, { source: 'useLocalStorage' });\r\n       return initialValue;\r\n     }\r\n   });\r\n \r\n   useEffect(() => {\r\n     try {\r\n       window.localStorage.setItem(key, JSON.stringify(storedValue));\r\n     } catch (error) {\r\n-      logger.error('Failed to write to localStorage', {\r\n-        context: { key, error },\r\n-        source: 'useLocalStorage'\r\n-      });\r\n+      logger.error(`Failed to write to localStorage for key ${key}: ${error}`, 'useLocalStorage');\r\n+\r\n     }\r\n   }, [key, storedValue]);\r\n \r\n   return [storedValue, setStoredValue] as const;\r\n"
                 }
             ],
             "date": 1739015386184,

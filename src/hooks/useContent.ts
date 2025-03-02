@@ -16,21 +16,21 @@ export const useContent = () => {
   // Fetch topics
   const { data: topics = [], isLoading: topicsLoading } = useQuery({
     queryKey: ['topics'],
-    queryFn: () => contentService.fetchTopics(),
+    queryFn: () => contentService.fetchTopics("all"),
     staleTime: 5 * 60 * 1000,
   });
 
   // Fetch sub-topics
   const { data: subTopics = [], isLoading: subTopicsLoading } = useQuery({
     queryKey: ['sub_topics'],
-    queryFn: () => contentService.fetchSubTopics(),
+    queryFn: () => contentService.fetchSubtopics("all"),
     staleTime: 5 * 60 * 1000,
   });
 
   // Fetch lessons
   const { data: lessons = [], isLoading: lessonsLoading } = useQuery({
     queryKey: ['lessons'],
-    queryFn: () => contentService.fetchLessons(),
+    queryFn: () => contentService.fetchLessons("all"),
     staleTime: 5 * 60 * 1000,
   });
 

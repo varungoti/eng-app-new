@@ -8,7 +8,7 @@ export interface PerformanceMetric {
   duration?: number;
   source: string;
   status: 'pending' | 'success' | 'error';
-  context?: Record<string, any>;
+  context?: Record<string, unknown>;
 }
 
 class PerformanceMonitor {
@@ -29,7 +29,7 @@ class PerformanceMonitor {
     return PerformanceMonitor.instance;
   }
 
-  public startOperation(operation: string, source: string, context?: Record<string, any>): string {
+  public startOperation(operation: string, source: string, context?: Record<string, unknown>): string {
     const id = crypto.randomUUID();
     const metric: PerformanceMetric = {
       id,

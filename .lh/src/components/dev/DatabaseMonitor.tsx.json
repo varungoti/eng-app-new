@@ -1,0 +1,22 @@
+{
+    "sourceFile": "src/components/dev/DatabaseMonitor.tsx",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1740772470887,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1740772492800,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -9,10 +9,9 @@\n   const [loading, setLoading] = useState(true);\r\n \r\n   useEffect(() => {\r\n     const monitoringService = DatabaseMonitoringService.getInstance();\r\n-    let interval: NodeJS.Timeout;\r\n-\r\n+    \r\n     const fetchMetrics = async () => {\r\n       const data = await monitoringService.getMetrics();\r\n       setMetrics(data);\r\n       setLoading(false);\r\n"
+                }
+            ],
+            "date": 1740772470887,
+            "name": "Commit-0",
+            "content": "import { useEffect, useState } from 'react';\r\nimport { DatabaseMonitoringService } from '../../../src/lib/monitoring/services/DatabaseMonitoringService';\r\nimport type { DatabaseMetrics } from '../../../src/lib/monitoring/types';\r\nimport { Card } from '../../../src/components/ui/card';\r\nimport { Loader2 } from 'lucide-react';\r\n\r\nexport default function DatabaseMonitor() {\r\n  const [metrics, setMetrics] = useState<DatabaseMetrics | null>(null);\r\n  const [loading, setLoading] = useState(true);\r\n\r\n  useEffect(() => {\r\n    const monitoringService = DatabaseMonitoringService.getInstance();\r\n    let interval: NodeJS.Timeout;\r\n\r\n    const fetchMetrics = async () => {\r\n      const data = await monitoringService.getMetrics();\r\n      setMetrics(data);\r\n      setLoading(false);\r\n    };\r\n\r\n    // Initial fetch\r\n    fetchMetrics();\r\n\r\n    // Poll for updates\r\n    const interval = setInterval(fetchMetrics, 5000);\r\n\r\n    return () => {\r\n      clearInterval(interval);\r\n      monitoringService.cleanup();\r\n    };\r\n  }, []);\r\n\r\n  if (loading) {\r\n    return (\r\n      <div className=\"flex items-center gap-2\">\r\n        <Loader2 className=\"h-4 w-4 animate-spin\" />\r\n        Initializing monitor...\r\n      </div>\r\n    );\r\n  }\r\n\r\n  return (\r\n    <Card className=\"mt-4 p-4\">\r\n      <h4 className=\"text-sm font-medium mb-2\">Database Metrics</h4>\r\n      <div className=\"space-y-2 text-sm\">\r\n        <div>Status: {metrics?.connectionStatus}</div>\r\n        <div>Response Time: {metrics?.responseTime}ms</div>\r\n        <div>Error Count: {metrics?.errorCount}</div>\r\n        <div>Last Check: {metrics?.lastCheckTime.toLocaleTimeString()}</div>\r\n      </div>\r\n    </Card>\r\n  );\r\n} "
+        }
+    ]
+}

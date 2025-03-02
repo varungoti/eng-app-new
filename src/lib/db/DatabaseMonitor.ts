@@ -1,4 +1,4 @@
-```typescript
+
 import { logger } from '../logger';
 import { WarningCache } from '../monitoring/WarningCache';
 import { connectionManager } from './ConnectionManager';
@@ -112,4 +112,3 @@ class DatabaseMonitor {
 }
 
 export const databaseMonitor = DatabaseMonitor.getInstance();
-```

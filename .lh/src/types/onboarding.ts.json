@@ -1,0 +1,26 @@
+{
+    "sourceFile": "src/types/onboarding.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 2,
+            "patches": [
+                {
+                    "date": 1740095813600,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1740923912524,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,37 +1,43 @@\n-export interface OnboardingTask {\r\n-  id: string;\r\n-  school_id: string;\r\n-  title: string;\r\n-  description: string;\r\n-  order: number;\r\n-  required: boolean;\r\n-  created_at: string;\r\n-  updated_at: string;\r\n-}\r\n-\r\n-export interface OnboardingProgress {\r\n-  id: string;\r\n-  school_id: string;\r\n-  task_id: string;\r\n-  completed: boolean;\r\n-  completed_by: string;\r\n-  completed_at: string;\r\n-  created_at: string;\r\n-  updated_at: string;\r\n-}\r\n-\r\n-export interface SchoolDocument {\r\n-  id: string;\r\n-  school_id: string;\r\n-  name: string;\r\n-  url: string;\r\n-  type: string;\r\n-  created_at: string;\r\n-  updated_at: string;\r\n-}\r\n-\r\n-export interface OnboardingStats {\r\n-  completedTasks: number;\r\n-  totalTasks: number;\r\n-  completionPercentage: number;\r\n+export interface OnboardingTask {\n+  id: string;\n+  school_id: string;\n+  title: string;\n+  description: string;\n+  order: number;\n+  required: boolean;\n+  created_at: string;\n+  updated_at: string;\n+}\n+\n+export interface OnboardingProgress {\n+  id: string;\n+  school_id: string;\n+  task_id: string;\n+  completed: boolean;\n+  completed_by: string;\n+  completed_at: string;\n+  created_at: string;\n+  updated_at: string;\n+}\n+\n+export interface SchoolDocument {\n+  id: string;\n+  school_id: string;\n+  name: string;\n+  url: string;\n+  type: string;\n+  status?: string;\n+  notes?: string;\n+  uploadedBy?: string;\n+  reviewedBy?: string;\n+  reviewedAt?: Date;\n+  validUntil?: Date;\n+  created_at: string;\n+  updated_at: string;\n+}\n+\n+export interface OnboardingStats {\n+  completedTasks: number;\n+  totalTasks: number;\n+  completionPercentage: number;\n }\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1740926747916,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -25,14 +25,8 @@\n   school_id: string;\n   name: string;\n   url: string;\n   type: string;\n-  status?: string;\n-  notes?: string;\n-  uploadedBy?: string;\n-  reviewedBy?: string;\n-  reviewedAt?: Date;\n-  validUntil?: Date;\n   created_at: string;\n   updated_at: string;\n }\n \n"
+                }
+            ],
+            "date": 1740095813600,
+            "name": "Commit-0",
+            "content": "export interface OnboardingTask {\r\n  id: string;\r\n  school_id: string;\r\n  title: string;\r\n  description: string;\r\n  order: number;\r\n  required: boolean;\r\n  created_at: string;\r\n  updated_at: string;\r\n}\r\n\r\nexport interface OnboardingProgress {\r\n  id: string;\r\n  school_id: string;\r\n  task_id: string;\r\n  completed: boolean;\r\n  completed_by: string;\r\n  completed_at: string;\r\n  created_at: string;\r\n  updated_at: string;\r\n}\r\n\r\nexport interface SchoolDocument {\r\n  id: string;\r\n  school_id: string;\r\n  name: string;\r\n  url: string;\r\n  type: string;\r\n  created_at: string;\r\n  updated_at: string;\r\n}\r\n\r\nexport interface OnboardingStats {\r\n  completedTasks: number;\r\n  totalTasks: number;\r\n  completionPercentage: number;\r\n}"
+        }
+    ]
+}

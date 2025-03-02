@@ -9,7 +9,29 @@ export const useContentMutation = () => {
 
   const createMutation = useMutation({
     mutationFn: async ({ type, data }: { type: string; data: any }) => {
-      const result = await contentService.createContent(type, data);
+      let result;
+      
+      // Call the appropriate creation method based on content type
+      switch (type) {
+        case 'topic':
+          result = await contentService.createTopic(data);
+          break;
+        case 'subtopic':
+          result = await contentService.createSubtopic(data);
+          break;
+        case 'lesson':
+          result = await contentService.createLesson(data);
+          break;
+        case 'question':
+          result = await contentService.createQuestion(data);
+          break;
+        case 'activity':
+          result = await contentService.createActivity(data);
+          break;
+        default:
+          throw new Error(`Unknown content type: ${type}`);
+      }
+      
       return result || null;
     },
     onSuccess: (data: any, variables: { type: string; data: any }) => {
@@ -43,7 +65,23 @@ export const useContentMutation = () => {
 
   const updateMutation = useMutation({
     mutationFn: async ({ type, id, data }: { type: string; id: string; data: any }) => {
-      const result = await contentService.updateContent(type, id, data);
+      let result;
+      
+      // Add id to data for update methods
+      const updateData = { ...data, id };
+      
+      // Call the appropriate update method based on content type
+      switch (type) {
+        case 'lesson':
+          result = await contentService.updateLesson(updateData);
+          break;
+        case 'activity':
+          result = await contentService.saveActivity(updateData);
+          break;
+        default:
+          throw new Error(`Updating ${type} is not implemented`);
+      }
+      
       return result;
     },
     onSuccess: (data: any, variables: { type: string; id: string; data: any }) => {

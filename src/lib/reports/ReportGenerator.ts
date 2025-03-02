@@ -136,7 +136,7 @@ class ReportGenerator {
     }
   }
 
-  private async generateReportFile(data: any[], config: ReportConfig): Promise<string> {
+  private async generateReportFile(_data: any[], config: ReportConfig): Promise<string> {
     // Implementation would handle actual file generation
     // For now, we'll just return a mock URL
     return `https://example.com/reports/${Date.now()}.${config.format}`;

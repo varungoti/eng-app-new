@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 16,
+            "activePatchIndex": 24,
             "patches": [
                 {
                     "date": 1739379811202,
@@ -72,6 +72,38 @@
                 {
                     "date": 1739387953677,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -111,9 +111,9 @@\n         if (componentName) {\r\n           try {\r\n             // Add @vite-ignore comment to suppress the warning\r\n             /* @vite-ignore */\r\n-            const module = await import(`../components/${componentName}`);\r\n+            const module = await import(`../components/${componentName}.tsx`);\r\n             if (module.default) {\r\n               // Replace placeholder with actual component\r\n               const componentInstance = new module.default(element);\r\n               componentInstance.render();\r\n"
+                },
+                {
+                    "date": 1740745791963,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -111,12 +111,12 @@\n         if (componentName) {\r\n           try {\r\n             // Add @vite-ignore comment to suppress the warning\r\n             /* @vite-ignore */\r\n-            const module = await import(`../components/${componentName}.tsx`);\r\n-            if (module.default) {\r\n+            const componentModule = await import(`../components/${componentName}.tsx`);\r\n+            if (componentModule.default) {\r\n               // Replace placeholder with actual component\r\n-              const componentInstance = new module.default(element);\r\n+              const componentInstance = new componentModule.default(element);\r\n               componentInstance.render();\r\n             }\r\n           } catch (error) {\r\n             console.error(`Failed to load component ${componentName}:`, error);\r\n"
+                },
+                {
+                    "date": 1740745828586,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -95,9 +95,9 @@\n       const target = event.target as HTMLElement;\r\n       const actionElement = target.closest('[data-action]');\r\n       if (actionElement) {\r\n         const action = actionElement.getAttribute('data-action');\r\n-        if (action && typeof (window as any)[action] === 'function') {\r\n+        if (action && typeof (window as anyy)[action] === 'function') {\r\n           (window as any)[action](event);\r\n         }\r\n       }\r\n     };\r\n"
+                },
+                {
+                    "date": 1740745837146,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -95,9 +95,9 @@\n       const target = event.target as HTMLElement;\r\n       const actionElement = target.closest('[data-action]');\r\n       if (actionElement) {\r\n         const action = actionElement.getAttribute('data-action');\r\n-        if (action && typeof (window as anyy)[action] === 'function') {\r\n+        if (action && typeof (window as unknown)[action] === 'function') {\r\n           (window as any)[action](event);\r\n         }\r\n       }\r\n     };\r\n"
+                },
+                {
+                    "date": 1740745843028,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -95,9 +95,9 @@\n       const target = event.target as HTMLElement;\r\n       const actionElement = target.closest('[data-action]');\r\n       if (actionElement) {\r\n         const action = actionElement.getAttribute('data-action');\r\n-        if (action && typeof (window as unknown)[action] === 'function') {\r\n+        if (action && typeof (window as )[action] === 'function') {\r\n           (window as any)[action](event);\r\n         }\r\n       }\r\n     };\r\n"
+                },
+                {
+                    "date": 1740745944862,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -95,11 +95,17 @@\n       const target = event.target as HTMLElement;\r\n       const actionElement = target.closest('[data-action]');\r\n       if (actionElement) {\r\n         const action = actionElement.getAttribute('data-action');\r\n-        if (action && typeof (window as )[action] === 'function') {\r\n-          (window as any)[action](event);\r\n+        \r\n+        // Define a more specific interface for window with dynamic action functions\r\n+        interface WindowWithActions extends Window {\r\n+          [key: string]: unknown;\r\n         }\r\n+        \r\n+        if (action && typeof (window as WindowWithActions)[action] === 'function') {\r\n+          ((window as WindowWithActions)[action] as Function)(event);\r\n+        }\r\n       }\r\n     };\r\n     document.addEventListener('click', eventDelegator);\r\n     document.addEventListener('change', eventDelegator);\r\n"
+                },
+                {
+                    "date": 1740745954009,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -95,17 +95,11 @@\n       const target = event.target as HTMLElement;\r\n       const actionElement = target.closest('[data-action]');\r\n       if (actionElement) {\r\n         const action = actionElement.getAttribute('data-action');\r\n-        \r\n-        // Define a more specific interface for window with dynamic action functions\r\n-        interface WindowWithActions extends Window {\r\n-          [key: string]: unknown;\r\n+        if (action && typeof (window as any)[action] === 'function') {\r\n+          (window as any)[action](event);\r\n         }\r\n-        \r\n-        if (action && typeof (window as WindowWithActions)[action] === 'function') {\r\n-          ((window as WindowWithActions)[action] as Function)(event);\r\n-        }\r\n       }\r\n     };\r\n     document.addEventListener('click', eventDelegator);\r\n     document.addEventListener('change', eventDelegator);\r\n"
+                },
+                {
+                    "date": 1740745976927,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -7,8 +7,13 @@\n   renderTime: number;\r\n   loadTime: number;\r\n };\r\n \r\n+// Define window interface with index signature for dynamic function access\r\n+interface WindowWithDynamicFunctions extends Window {\r\n+  [key: string]: unknown;\r\n+}\r\n+\r\n export class PerformanceMonitor {\r\n   private metrics = {\r\n     lcp: 0,\r\n     fid: 0,\r\n@@ -95,10 +100,10 @@\n       const target = event.target as HTMLElement;\r\n       const actionElement = target.closest('[data-action]');\r\n       if (actionElement) {\r\n         const action = actionElement.getAttribute('data-action');\r\n-        if (action && typeof (window as any)[action] === 'function') {\r\n-          (window as any)[action](event);\r\n+        if (action && typeof (window as WindowWithDynamicFunctions)[action] === 'function') {\r\n+          (window as WindowWithDynamicFunctions)[action](event);\r\n         }\r\n       }\r\n     };\r\n     document.addEventListener('click', eventDelegator);\r\n"
+                },
+                {
+                    "date": 1740746048497,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -7,12 +7,10 @@\n   renderTime: number;\r\n   loadTime: number;\r\n };\r\n \r\n-// Define window interface with index signature for dynamic function access\r\n-interface WindowWithDynamicFunctions extends Window {\r\n-  [key: string]: unknown;\r\n-}\r\n+// Define a Record type for window functions instead of using any\r\n+type WindowWithFunctions = Record<string, (event: Event) => void>;\r\n \r\n export class PerformanceMonitor {\r\n   private metrics = {\r\n     lcp: 0,\r\n@@ -100,10 +98,13 @@\n       const target = event.target as HTMLElement;\r\n       const actionElement = target.closest('[data-action]');\r\n       if (actionElement) {\r\n         const action = actionElement.getAttribute('data-action');\r\n-        if (action && typeof (window as WindowWithDynamicFunctions)[action] === 'function') {\r\n-          (window as WindowWithDynamicFunctions)[action](event);\r\n+        if (action) {\r\n+          const fn = (window as unknown as WindowWithFunctions)[action];\r\n+          if (typeof fn === 'function') {\r\n+            fn(event);\r\n+          }\r\n         }\r\n       }\r\n     };\r\n     document.addEventListener('click', eventDelegator);\r\n"
                 }
             ],
             "date": 1739379811202,

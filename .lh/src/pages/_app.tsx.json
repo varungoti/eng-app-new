@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 1,
+            "activePatchIndex": 4,
             "patches": [
                 {
                     "date": 1739379501573,
@@ -12,6 +12,18 @@
                 {
                     "date": 1739384079506,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -9,10 +9,14 @@\n   const { user } = useAuth();\r\n   const userPermissions = user ? ROLE_PERMISSIONS[user.role]?.permissions : null;\r\n \r\n   useEffect(() => {\r\n-    if (process.env.NODE_ENV === 'development') {\r\n-      ConsoleMonitor.getInstance();\r\n+    if (typeof window !== 'undefined') {\r\n+      // Initialize console monitoring\r\n+      const monitor = ConsoleMonitor.getInstance();\r\n+\r\n+      // Optional: Log initial page load\r\n+      console.log('Page loaded:', window.location.pathname);\r\n     }\r\n   }, []);\r\n \r\n   return (\r\n"
+                },
+                {
+                    "date": 1740927428571,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -11,9 +11,9 @@\n \r\n   useEffect(() => {\r\n     if (typeof window !== 'undefined') {\r\n       // Initialize console monitoring\r\n-      const monitor = ConsoleMonitor.getInstance();\r\n+      //const monitor = ConsoleMonitor.getInstance();\r\n \r\n       // Optional: Log initial page load\r\n       console.log('Page loaded:', window.location.pathname);\r\n     }\r\n"
+                },
+                {
+                    "date": 1740927473978,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -11,9 +11,9 @@\n \r\n   useEffect(() => {\r\n     if (typeof window !== 'undefined') {\r\n       // Initialize console monitoring\r\n-      //const monitor = ConsoleMonitor.getInstance();\r\n+      const _monitor = ConsoleMonitor.getInstance();\r\n \r\n       // Optional: Log initial page load\r\n       console.log('Page loaded:', window.location.pathname);\r\n     }\r\n"
+                },
+                {
+                    "date": 1740927843675,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,34 +1,34 @@\n-import { Providers } from '../providers/ToastProvider';\r\n-import { useAuth } from '../hooks/useAuth';\r\n-import { ROLE_PERMISSIONS } from '../types/roles';\r\n-import type { AppProps } from 'next/app';\r\n-import { useEffect } from 'react';\r\n-import { ConsoleMonitor } from '@/utils/consoleMonitor';\r\n-\r\n-function MyApp({ Component, pageProps }: AppProps) {\r\n-  const { user } = useAuth();\r\n-  const userPermissions = user ? ROLE_PERMISSIONS[user.role]?.permissions : null;\r\n-\r\n-  useEffect(() => {\r\n-    if (typeof window !== 'undefined') {\r\n-      // Initialize console monitoring\r\n-      const _monitor = ConsoleMonitor.getInstance();\r\n-\r\n-      // Optional: Log initial page load\r\n-      console.log('Page loaded:', window.location.pathname);\r\n-    }\r\n-  }, []);\r\n-\r\n-  return (\r\n-    <Providers>\r\n-      {process.env.NODE_ENV === 'development' && (\r\n-        <div className=\"fixed bottom-0 left-0 p-2 bg-black text-white text-xs\">\r\n-          Role: {user?.role}, Content Management: {String(userPermissions?.content_management)}\r\n-        </div>\r\n-      )}\r\n-      <Component {...pageProps} />\r\n-    </Providers>\r\n-  );\r\n-}\r\n-\r\n+import { Providers } from '../providers/ToastProvider';\n+import { useAuth } from '../hooks/useAuth';\n+import { ROLE_PERMISSIONS } from '../types/roles';\n+import type { AppProps } from 'next/app';\n+import { useEffect } from 'react';\n+import { ConsoleMonitor } from '@/utils/consoleMonitor';\n+\n+function MyApp({ Component, pageProps }: AppProps) {\n+  const { user } = useAuth();\n+  const userPermissions = user ? ROLE_PERMISSIONS[user.role]?.permissions : null;\n+\n+  useEffect(() => {\n+    if (typeof window !== 'undefined') {\n+      // Initialize console monitoring\n+      const _monitor = ConsoleMonitor.getInstance();\n+\n+      // Optional: Log initial page load\n+      console.log('Page loaded:', window.location.pathname);\n+    }\n+  }, []);\n+\n+  return (\n+    <Providers>\n+      {process.env.NODE_ENV === 'development' && (\n+        <div className=\"fixed bottom-0 left-0 p-2 bg-black text-white text-xs\">\n+          Role: {user?.role}, Content Management: {String(userPermissions?.content_management)}\n+        </div>\n+      )}\n+      <Component {...pageProps} />\n+    </Providers>\n+  );\n+}\n+\n export default MyApp; \n\\ No newline at end of file\n"
                 }
             ],
             "date": 1739379501573,

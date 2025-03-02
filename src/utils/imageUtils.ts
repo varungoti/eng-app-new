@@ -216,7 +216,7 @@ export function useRemoteImage(imageUrl: string | undefined) {
         URL.revokeObjectURL(localUrl);
       }
     };
-  }, [imageUrl]);
+  }, [imageUrl, localUrl]);
 
   return { localUrl, isLoading, error };
 }
@@ -279,7 +279,7 @@ export function useProcessedImage(imageUrl: string | undefined, options: ImagePr
         URL.revokeObjectURL(processedUrl);
       }
     };
-  }, [localUrl, error, options]);
+  }, [localUrl, error, options, processedUrl]);
 
   return {
     url: processedUrl || localUrl,

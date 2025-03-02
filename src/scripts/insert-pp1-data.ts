@@ -307,7 +307,7 @@ const QUESTION_TYPE_MAPPING: Record<string, QuestionType> = {
 };
 
 // Valid sub-types list (for reference and validation)
-const VALID_SUB_TYPES = [
+export const VALID_SUB_TYPES = [
   'speaking',
   'fun_speaking',
   'sharing',
@@ -821,7 +821,7 @@ class DatabaseInserter {
   }
 
   private async processActivities(activities: Activity[], lessonId: string) {
-    const activityIds = activities.map(activity => uuidv4())
+    const activityIds = activities.map(_activity => uuidv4())
     
     // Convert legacy activity types to new format
     const normalizedActivities = activities.map(activity => {

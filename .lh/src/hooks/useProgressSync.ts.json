@@ -1,0 +1,22 @@
+{
+    "sourceFile": "src/hooks/useProgressSync.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1740924159537,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1740924167087,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -18,9 +18,8 @@\n       console.error('Error syncing progress:', error);\r\n       toast({\r\n         title: \"Sync Error\",\r\n         description: \"Failed to save your progress\",\r\n-          \r\n       });\r\n     }\r\n   }, [dispatch, toast]);\r\n \r\n"
+                }
+            ],
+            "date": 1740924159537,
+            "name": "Commit-0",
+            "content": "import { useEffect, useCallback } from 'react';\r\nimport { useLearning } from '@/contexts/LearningContext';\r\nimport { updateLessonProgress } from '@/lib/api/learning';\r\nimport { useToast } from '@/components/ui/use-toast';\r\n\r\nexport function useProgressSync() {\r\n  const { state, dispatch } = useLearning();\r\n  const { toast } = useToast();\r\n\r\n  const syncProgress = useCallback(async (progressData: any) => {\r\n    try {\r\n      await updateLessonProgress(progressData.id, progressData);\r\n      dispatch({ \r\n        type: 'UPDATE_PROGRESS', \r\n        payload: progressData \r\n      });\r\n    } catch (error) {\r\n      console.error('Error syncing progress:', error);\r\n      toast({\r\n        title: \"Sync Error\",\r\n        description: \"Failed to save your progress\",\r\n          \r\n      });\r\n    }\r\n  }, [dispatch, toast]);\r\n\r\n  // Auto-sync on component unmount\r\n  useEffect(() => {\r\n    return () => {\r\n      if (state.currentLesson?.progress) {\r\n        syncProgress(state.currentLesson.progress);\r\n      }\r\n    };\r\n  }, [state.currentLesson, syncProgress]);\r\n\r\n  return { syncProgress };\r\n} "
+        }
+    ]
+}

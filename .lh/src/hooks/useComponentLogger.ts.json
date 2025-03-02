@@ -1,0 +1,22 @@
+{
+    "sourceFile": "src/hooks/useComponentLogger.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1740773654165,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1740773665900,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -2,17 +2,23 @@\n import { logger } from '@/lib/logger';\r\n \r\n export const useComponentLogger = (componentName: string) => {\r\n   useEffect(() => {\r\n-    logger.info(componentName, 'Component mounted successfully');\r\n+    logger.info('Component mounted successfully', { \r\n+      context: { component: componentName } \r\n+    });\r\n \r\n     return () => {\r\n-      logger.info(componentName, 'Component unmounted');\r\n+      logger.info('Component unmounted', { \r\n+        context: { component: componentName } \r\n+      });\r\n     };\r\n   }, [componentName]);\r\n \r\n   const logError = useCallback((error: any) => {\r\n-    logger.error(componentName, 'Component did not load and error is caught', src: error);\r\n+    logger.error('Component did not load and error is caught', { \r\n+      context: { component: componentName, error } \r\n+    });\r\n   }, [componentName]);\r\n \r\n   return { logError };\r\n }; \n\\ No newline at end of file\n"
+                }
+            ],
+            "date": 1740773654165,
+            "name": "Commit-0",
+            "content": "import { useEffect, useCallback } from 'react';\r\nimport { logger } from '@/lib/logger';\r\n\r\nexport const useComponentLogger = (componentName: string) => {\r\n  useEffect(() => {\r\n    logger.info(componentName, 'Component mounted successfully');\r\n\r\n    return () => {\r\n      logger.info(componentName, 'Component unmounted');\r\n    };\r\n  }, [componentName]);\r\n\r\n  const logError = useCallback((error: any) => {\r\n    logger.error(componentName, 'Component did not load and error is caught', src: error);\r\n  }, [componentName]);\r\n\r\n  return { logError };\r\n}; "
+        }
+    ]
+}

@@ -1,20 +1,15 @@
-import Classes from '@/app/teacher/classes/page';
+//import Classes from '@/app/teacher/classes/page';
 import type { UserRole } from '../types/roles';
 import { ROLE_PERMISSIONS } from '../types/roles';
-import { TEACHER_ROUTES } from './content/routes';
+//import { TEACHER_ROUTES } from './content/routes';
 import { 
-  Home, 
   Users, 
   Calendar, 
   Settings, 
   BookOpen, 
   BarChart2, 
-  FolderOpen,
-  GraduationCap,
-  School,
   FileText,
   DollarSign,
-  Bell,
   Bookmark,
   FolderPlus,
   Building,
@@ -26,7 +21,6 @@ import {
   CreditCard,
   FileBarChart,
   AlertTriangle,
-  LucideCloudHail,
   CloudHailIcon,
   Activity,
   Award,
@@ -225,7 +219,7 @@ export const getNavigationItems = (role: string): NavigationItem[] => {
         },
         {
           name: 'Lesson Management',
-          href: '/content/lesson-management',
+          href: '/src/features/content-management/ContentManagementPage.tsx',
           icon: BookOpen 
         }
       ]

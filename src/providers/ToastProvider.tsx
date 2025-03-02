@@ -1,5 +1,5 @@
 import React from 'react';
-import { ToastProvider as InternalToastProvider } from '@/components/ui/toast';
+import { ToastProvider as InternalToastProvider } from '@/components/ui/Toast';
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (

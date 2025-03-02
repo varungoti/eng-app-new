@@ -1,6 +1,6 @@
-import { ErrorEvent, ErrorResolution, ErrorSeverity, ErrorWatcherConfig } from './types';
-import { ErrorResolver } from './ErrorResolver';
-import { logger } from '../logger';
+import { ErrorEvent, ErrorSeverity, ErrorWatcherConfig } from './types';
+//import { ErrorResolver } from './ErrorResolver';
+import { LogContext, logger } from '../logger';
 import { DEBUG_CONFIG } from '../config';
 
 export class ErrorWatcher {
@@ -19,6 +19,13 @@ export class ErrorWatcher {
     this.config = { ...this.config, ...config };
   }
 
+  public static getInstance(config?: ErrorWatcherConfig): ErrorWatcher {
+    if (!ErrorWatcher.instance) {
+      ErrorWatcher.instance = new ErrorWatcher(config);
+    }
+    return ErrorWatcher.instance;
+  }
+
   public trackError(error: ErrorEvent): void {
     this.errors = [error, ...this.errors].slice(0, this.config.maxErrors);
     
@@ -27,7 +34,7 @@ export class ErrorWatcher {
                       error.severity === ErrorSeverity.HIGH ? 'error' :
                       error.severity === ErrorSeverity.MEDIUM ? 'warn' : 'info';
       
-      logger[logLevel](error.message, error.source);
+      logger[logLevel](error.message, { source: error.source } as LogContext);
     }
   }
 }

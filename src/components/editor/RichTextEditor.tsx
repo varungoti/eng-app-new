@@ -105,6 +105,7 @@ export function RichTextEditor({ value, onChange, maxLength, placeholder, classN
         {/* Text Style Controls */}
         <div className="flex gap-1">
           <Button
+            title="Bold"
             variant="ghost"
             size="sm"
             onClick={() => editor.chain().focus().toggleBold().run()}
@@ -113,6 +114,7 @@ export function RichTextEditor({ value, onChange, maxLength, placeholder, classN
             <Bold className="h-4 w-4" />
           </Button>
           <Button
+            title="Italic"
             variant="ghost"
             size="sm"
             onClick={() => editor.chain().focus().toggleItalic().run()}
@@ -121,6 +123,7 @@ export function RichTextEditor({ value, onChange, maxLength, placeholder, classN
             <Italic className="h-4 w-4" />
           </Button>
           <Button
+            title="Underline"
             variant="ghost"
             size="sm"
             onClick={() => editor.chain().focus().toggleUnderline().run()}
@@ -129,6 +132,7 @@ export function RichTextEditor({ value, onChange, maxLength, placeholder, classN
             <Underline className="h-4 w-4" />
           </Button>
           <Button
+            title="Strikethrough"
             variant="ghost"
             size="sm"
             onClick={() => editor.chain().focus().toggleStrike().run()}
@@ -137,6 +141,7 @@ export function RichTextEditor({ value, onChange, maxLength, placeholder, classN
             <Strikethrough className="h-4 w-4" />
           </Button>
           <Button
+            title="Subscript"
             variant="ghost"
             size="sm"
             onClick={() => editor.chain().focus().toggleSubscript().run()}
@@ -145,6 +150,7 @@ export function RichTextEditor({ value, onChange, maxLength, placeholder, classN
             <SubscriptIcon className="h-4 w-4" />
           </Button>
           <Button
+            title="Superscript"
             variant="ghost"
             size="sm"
             onClick={() => editor.chain().focus().toggleSuperscript().run()}
@@ -180,6 +186,7 @@ export function RichTextEditor({ value, onChange, maxLength, placeholder, classN
         {/* Lists */}
         <div className="flex gap-1">
           <Button
+            title="Bullet List"
             variant="ghost"
             size="sm"
             onClick={() => editor.chain().focus().toggleBulletList().run()}
@@ -188,6 +195,7 @@ export function RichTextEditor({ value, onChange, maxLength, placeholder, classN
             <List className="h-4 w-4" />
           </Button>
           <Button
+            title="Ordered List"
             variant="ghost"
             size="sm"
             onClick={() => editor.chain().focus().toggleOrderedList().run()}
@@ -196,6 +204,7 @@ export function RichTextEditor({ value, onChange, maxLength, placeholder, classN
             <ListOrdered className="h-4 w-4" />
           </Button>
           <Button
+            title="Task List"
             variant="ghost"
             size="sm"
             onClick={() => editor.chain().focus().toggleTaskList().run()}
@@ -208,6 +217,7 @@ export function RichTextEditor({ value, onChange, maxLength, placeholder, classN
         {/* Alignment */}
         <div className="flex gap-1">
           <Button
+            title="Align Left"
             variant="ghost"
             size="sm"
             onClick={() => editor.chain().focus().setTextAlign('left').run()}
@@ -216,6 +226,7 @@ export function RichTextEditor({ value, onChange, maxLength, placeholder, classN
             <AlignLeft className="h-4 w-4" />
           </Button>
           <Button
+            title="Align Center"
             variant="ghost"
             size="sm"
             onClick={() => editor.chain().focus().setTextAlign('center').run()}
@@ -224,6 +235,7 @@ export function RichTextEditor({ value, onChange, maxLength, placeholder, classN
             <AlignCenter className="h-4 w-4" />
           </Button>
           <Button
+            title="Align Right"
             variant="ghost"
             size="sm"
             onClick={() => editor.chain().focus().setTextAlign('right').run()}
@@ -232,6 +244,7 @@ export function RichTextEditor({ value, onChange, maxLength, placeholder, classN
             <AlignRight className="h-4 w-4" />
           </Button>
           <Button
+            title="Align Justify"
             variant="ghost"
             size="sm"
             onClick={() => editor.chain().focus().setTextAlign('justify').run()}
@@ -244,6 +257,7 @@ export function RichTextEditor({ value, onChange, maxLength, placeholder, classN
         {/* Special Formatting */}
         <div className="flex gap-1">
           <Button
+            title="Blockquote"
             variant="ghost"
             size="sm"
             onClick={() => editor.chain().focus().toggleBlockquote().run()}
@@ -252,6 +266,7 @@ export function RichTextEditor({ value, onChange, maxLength, placeholder, classN
             <Quote className="h-4 w-4" />
           </Button>
           <Button
+            title="Code"
             variant="ghost"
             size="sm"
             onClick={() => editor.chain().focus().toggleCode().run()}
@@ -270,6 +285,7 @@ export function RichTextEditor({ value, onChange, maxLength, placeholder, classN
 
         {/* Table */}
         <Button
+          title="Table"
           variant="ghost"
           size="sm"
           onClick={addTable}
@@ -280,6 +296,7 @@ export function RichTextEditor({ value, onChange, maxLength, placeholder, classN
         {/* Media */}
         <div className="flex gap-1">
           <Button
+            title="Image"
             variant="ghost"
             size="sm"
             onClick={addImage}
@@ -287,6 +304,7 @@ export function RichTextEditor({ value, onChange, maxLength, placeholder, classN
             <ImageIcon className="h-4 w-4" />
           </Button>
           <Button
+            title="Link"
             variant="ghost"
             size="sm"
             onClick={addLink}
@@ -299,6 +317,7 @@ export function RichTextEditor({ value, onChange, maxLength, placeholder, classN
         {/* History */}
         <div className="flex gap-1">
           <Button
+            title="Undo"
             variant="ghost"
             size="sm"
             onClick={() => editor.chain().focus().undo().run()}
@@ -306,6 +325,7 @@ export function RichTextEditor({ value, onChange, maxLength, placeholder, classN
             <Undo className="h-4 w-4" />
           </Button>
           <Button
+            title="Redo"
             variant="ghost"
             size="sm"
             onClick={() => editor.chain().focus().redo().run()}
@@ -319,6 +339,7 @@ export function RichTextEditor({ value, onChange, maxLength, placeholder, classN
           {[1, 2, 3].map((level) => (
             <Button
               key={level}
+              title={`Heading ${level}`}
               variant="ghost"
               size="sm"
               onClick={() => editor.chain().focus().toggleHeading({ level: level as 1 | 2 | 3 | 4 | 5 | 6 }).run()}
@@ -333,6 +354,7 @@ export function RichTextEditor({ value, onChange, maxLength, placeholder, classN
 
         {/* Code Block */}
         <Button
+          title="Code Block"
           variant="ghost"
           size="sm"
           onClick={() => editor.chain().focus().toggleCodeBlock().run()}
@@ -343,6 +365,7 @@ export function RichTextEditor({ value, onChange, maxLength, placeholder, classN
 
         {/* Highlight */}
         <Button
+          title="Highlight"
           variant="ghost"
           size="sm"
           onClick={() => editor.chain().focus().toggleHighlight().run()}
@@ -353,6 +376,7 @@ export function RichTextEditor({ value, onChange, maxLength, placeholder, classN
 
         {/* Hard Break */}
         <Button
+          title="Hard Break"
           variant="ghost"
           size="sm"
           onClick={() => editor.chain().focus().setHardBreak().run()}
@@ -363,13 +387,14 @@ export function RichTextEditor({ value, onChange, maxLength, placeholder, classN
         {/* Typography */}
         <Popover>
           <PopoverTrigger asChild>
-            <Button variant="ghost" size="sm">
+            <Button title="Typography" variant="ghost" size="sm">
               <TypographyIcon className="h-4 w-4" />
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-56">
             <div className="space-y-1">
               <Button
+                title="Hard Break"
                 variant="ghost"
                 size="sm"
                 className="w-full justify-start"
@@ -378,6 +403,7 @@ export function RichTextEditor({ value, onChange, maxLength, placeholder, classN
                 Hard Break
               </Button>
               <Button
+                title="Smart Quotes"
                 variant="ghost"
                 size="sm"
                 className="w-full justify-start"
@@ -389,6 +415,7 @@ export function RichTextEditor({ value, onChange, maxLength, placeholder, classN
                 Smart Quotes
               </Button>
               <Button
+                title="Em Dash"
                 variant="ghost"
                 size="sm"
                 className="w-full justify-start"
@@ -404,6 +431,7 @@ export function RichTextEditor({ value, onChange, maxLength, placeholder, classN
         </Popover>
 
         <Button
+          title="Clear Content"
           variant="ghost"
           size="sm"
           onClick={() => editor.chain().focus().clearContent().run()}

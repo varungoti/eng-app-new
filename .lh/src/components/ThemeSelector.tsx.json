@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/components/ThemeSelector.tsx",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1740825586634,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1740825586634,
+            "name": "Commit-0",
+            "content": "\"use client\";\r\n\r\n'use client';\r\n\r\nimport React from 'react';\r\nimport { useTheme } from 'next-themes';\r\nimport { Button } from '@/components/ui/button';\r\nimport { Icon } from '@/components/ui/icons';\r\n\r\nexport function ThemeSelector({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {\r\n  const { theme, setTheme } = useTheme();\r\n\r\n  return (\r\n    <div {...props} className={className}>\r\n      <Button\r\n        variant=\"ghost\"\r\n        size=\"sm\"\r\n        onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}\r\n        aria-label=\"Toggle theme\"\r\n      >\r\n        <Icon\r\n          type=\"phosphor\"\r\n          name={theme === 'dark' ? 'SUN' : 'MOON'}\r\n          className=\"h-5 w-5\"\r\n        />\r\n        <span className=\"sr-only\">Toggle theme</span>\r\n      </Button>\r\n    </div>\r\n  );\r\n}\r\n\r\nexport default ThemeSelector;"
+        }
+    ]
+}

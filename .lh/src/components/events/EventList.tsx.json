@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/components/events/EventList.tsx",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1740772148882,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1740772148882,
+            "name": "Commit-0",
+            "content": "import React from 'react';\r\nimport { Plus } from 'lucide-react';\r\nimport EventCard, { Event } from './EventCard';\r\nimport { VirtualList } from '../../lib/utils/virtualList';\r\n\r\ninterface EventListProps {\r\n  events: Event[];\r\n  onAddEvent?: () => void;\r\n  onEditEvent?: (event: Event) => void;\r\n  onDeleteEvent?: (id: string) => void;\r\n  canManageEvents?: boolean;\r\n  userRole: string;\r\n}\r\n\r\nconst EventList: React.FC<EventListProps> = ({\r\n  events,\r\n  onAddEvent,\r\n  onEditEvent,\r\n  onDeleteEvent,\r\n  canManageEvents = false\r\n}) => {\r\n  return (\r\n    <div className=\"space-y-6\">\r\n      <div className=\"flex justify-between items-center\">\r\n        <h2 className=\"text-lg font-medium text-gray-900\">Events</h2>\r\n        {canManageEvents && (\r\n          <button\r\n            title=\"Add Event\"\r\n            onClick={onAddEvent}\r\n            className=\"inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700\"\r\n          >\r\n            <Plus className=\"h-4 w-4 mr-2\" />\r\n            Add Event\r\n          </button>\r\n        )}\r\n      </div>\r\n\r\n      <VirtualList\r\n        items={events}\r\n        height={600}\r\n        itemHeight={200}\r\n        renderItem={(event) => (\r\n          <div className=\"p-3\">\r\n            <EventCard\r\n              key={event.id}\r\n              event={event}\r\n              onEdit={onEditEvent}\r\n              onDelete={onDeleteEvent}\r\n              canEdit={canManageEvents}\r\n            />\r\n          </div>\r\n        )}\r\n      />\r\n\r\n      {events.length === 0 && (\r\n        <div className=\"text-center py-12\">\r\n          <p className=\"text-gray-500\">No events found</p>\r\n        </div>\r\n      )}\r\n    </div>\r\n  );\r\n};\r\n\r\nexport default EventList;"
+        }
+    ]
+}

@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/components/editor/extensions.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1740772329565,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1740772329565,
+            "name": "Commit-0",
+            "content": "import StarterKit from '@tiptap/starter-kit'\r\nimport FontSize from '@tiptap/extension-font-size'\r\nimport FontFamily from '@tiptap/extension-font-family'\r\nimport TextStyle from '@tiptap/extension-text-style'\r\nimport TextAlign from '@tiptap/extension-text-align'\r\nimport Highlight from '@tiptap/extension-highlight'\r\nimport Typography from '@tiptap/extension-typography'\r\nimport Image from '@tiptap/extension-image'\r\nimport Link from '@tiptap/extension-link'\r\nimport Underline from '@tiptap/extension-underline'\r\nimport Subscript from '@tiptap/extension-subscript'\r\nimport Superscript from '@tiptap/extension-superscript'\r\nimport TaskList from '@tiptap/extension-task-list'\r\nimport TaskItem from '@tiptap/extension-task-item'\r\nimport Table from '@tiptap/extension-table'\r\nimport TableRow from '@tiptap/extension-table-row'\r\nimport TableCell from '@tiptap/extension-table-cell'\r\nimport TableHeader from '@tiptap/extension-table-header'\r\nimport TableBody from '@tiptap/extension-table'\r\nimport History from '@tiptap/extension-history'\r\nimport Strike from '@tiptap/extension-strike'\r\nimport Blockquote from '@tiptap/extension-blockquote'\r\nimport HardBreak from '@tiptap/extension-hard-break'\r\nimport HorizontalRule from '@tiptap/extension-horizontal-rule'\r\nimport Dropcursor from '@tiptap/extension-dropcursor'\r\nimport Gapcursor from '@tiptap/extension-gapcursor'\r\nimport Document from '@tiptap/extension-document'\r\nimport Paragraph from '@tiptap/extension-paragraph'\r\nimport Text from '@tiptap/extension-text'\r\nimport Heading from '@tiptap/extension-heading'\r\nimport ListItem from '@tiptap/extension-list-item'\r\nimport BulletList from '@tiptap/extension-bullet-list'\r\nimport OrderedList from '@tiptap/extension-ordered-list'\r\nimport Code from '@tiptap/extension-code'\r\nimport CodeBlock from '@tiptap/extension-code-block'\r\nimport CharacterCount from '@tiptap/extension-character-count'\r\nimport { Color } from '@tiptap/extension-color'\r\nimport { Extension } from '@tiptap/core'\r\n\r\n// Disable the table extension from StarterKit since we're adding it separately\r\nconst customStarterKit = StarterKit.configure({\r\n  // Configure other StarterKit extensions as needed\r\n  heading: {\r\n    levels: [1, 2, 3]\r\n  }\r\n})\r\n\r\n// Add custom table extensions instead\r\nconst tableExtensions = [\r\n  Table.configure({\r\n    resizable: true,\r\n    HTMLAttributes: {\r\n      class: 'border-collapse table-auto',\r\n    },\r\n  }),\r\n  TableRow,\r\n  TableCell,\r\n  TableHeader\r\n]\r\n\r\n// Configure other extensions\r\nconst otherExtensions = [\r\n  Underline,\r\n  Link.configure({\r\n    openOnClick: false,\r\n    HTMLAttributes: {\r\n      class: 'text-primary underline',\r\n    },\r\n  }),\r\n  Image.configure({\r\n    HTMLAttributes: {\r\n      class: 'max-w-full h-auto',\r\n    },\r\n  }),\r\n  TextAlign.configure({\r\n    types: ['heading', 'paragraph'],\r\n  }),\r\n  Subscript,\r\n  Superscript,\r\n  Highlight.configure({\r\n    multicolor: true,\r\n  }),\r\n  TextStyle,\r\n  FontFamily,\r\n  Color,\r\n]\r\n\r\n// Combine all extensions\r\nexport const extensions = [\r\n  customStarterKit,\r\n  ...tableExtensions,\r\n  ...otherExtensions,\r\n] as Extension[] "
+        }
+    ]
+}

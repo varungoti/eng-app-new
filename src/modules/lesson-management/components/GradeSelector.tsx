@@ -24,7 +24,7 @@ export function GradeSelector() {
             value={(selectedGrade as Grade | null)?.id} 
             onValueChange={(value: string) => {
               const grade = (grades as Grade[]).find(g => g.id === value);
-              setSelectedGrade(grade || null);
+              setSelectedGrade(value || null);
             }}
           >
             <SelectTrigger>

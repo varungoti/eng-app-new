@@ -143,7 +143,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   useEffect(() => {
-    let mounted = true;
+    const mounted = true;
 
     // Prevent multiple initializations
     if (initializeRef.current) {

@@ -109,7 +109,7 @@ export class ErrorResolver {
     };
   }
 
-  private async resolveWarning(error: ErrorEvent): Promise<{ action: string; details: string }> {
+  private async resolveWarning(_error: ErrorEvent): Promise<{ action: string; details: string }> {
     return {
       action: 'warning_logged',
       details: 'Warning logged for monitoring'

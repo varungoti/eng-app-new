@@ -1,12 +1,12 @@
-import React from 'react';
+//import React from 'react';
 import { Code, GitBranch, CheckCircle } from 'lucide-react';
 import { usePermissions } from '../hooks/usePermissions';
-import { Permissions } from '../types/roles';  // Import the type
+//import { Permissions } from '../types/roles';  // Import the type
 
 const Development = () => {
   const { can } = usePermissions();
 
-  if (!can('development' as keyof Permissions)) {
+  if (!can("staff")) {
     return (
       <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
         <h3 className="text-lg font-medium text-red-800">Access Denied</h3>
@@ -80,9 +80,8 @@ const Development = () => {
                         <span className="mr-2">{project.status}</span>
                         <div className="w-full bg-gray-200 rounded-full h-2.5">
                           <div 
-                            className="bg-indigo-600 h-2.5 rounded-full" 
-                            style={{ width: `${project.completion}%` }}
-                          ></div>
+                            className={`bg-indigo-600 h-2.5 rounded-full w-[${project.completion}%]`}
+                          />
                         </div>
                         <span className="ml-2">{project.completion}%</span>
                       </div>

@@ -6,7 +6,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    const { logs } = req.body;
+    const { _logs } = req.body;
     // Process bulk logs
     // Send to your Cursor integration
     res.status(200).json({ success: true });

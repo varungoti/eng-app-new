@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Plus, Upload, Shield } from 'lucide-react';
 import { usePermissions } from '../hooks/usePermissions';
 import { useStaff } from '../hooks/useStaff';

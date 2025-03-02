@@ -48,7 +48,10 @@ export function useUser() {
           });
         }
       } catch (err) {
-        logger.error(`Failed to load user: ${err instanceof Error ? err.message : String(err)}`, 'useUser');
+        logger.error(`Failed to load user: ${err instanceof Error ? err.message : String(err)}`, {
+          context: { error: err },
+          source: 'useUser'
+        });
         if (mounted) {
           setError(err instanceof Error ? err : new Error('Failed to load user'));
         }
@@ -61,7 +64,10 @@ export function useUser() {
 
     // Subscribe to auth changes using the singleton instance
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event) => {
-      logger.debug(`Auth state changed: ${event}`, 'useUser');
+      logger.debug(`Auth state changed: ${event}`, {
+        context: { event },
+        source: 'useUser'
+      });
       if (mounted) await loadUser();
     });
 

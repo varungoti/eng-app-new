@@ -11,6 +11,7 @@ export function DevMenu() {
     <div className="fixed bottom-4 left-4 p-4 bg-white rounded-lg shadow-lg">
       <h3 className="text-sm font-medium mb-2">Development Tools</h3>
       <Button
+        title="Database Monitor"
         variant="outline"
         size="sm"
         onClick={() => setShowDatabaseMonitor(!showDatabaseMonitor)}

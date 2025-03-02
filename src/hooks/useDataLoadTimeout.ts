@@ -17,7 +17,7 @@ export const useDataLoadTimeout = ({
   const retryCount = useRef(0);
   const MAX_RETRIES = 3;
 
-  const clearTimeout = useCallback(() => {
+  const clearLoadTimeout = useCallback(() => {
     if (timeoutRef.current) {
       window.clearTimeout(timeoutRef.current);
       timeoutRef.current = undefined;
@@ -57,11 +57,11 @@ export const useDataLoadTimeout = ({
     // Cleanup timeout
     return () => {
       if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
+        window.clearTimeout(timeoutRef.current);
         timeoutRef.current = undefined;
       }
     };
   }, [timeout, source, onTimeout]);
 
-  return { clearTimeout };
+  return { clearTimeout: clearLoadTimeout };
 };

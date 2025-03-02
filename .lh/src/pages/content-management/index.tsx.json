@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/pages/content-management/index.tsx",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1740927740466,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1740927740466,
+            "name": "Commit-0",
+            "content": "//import React from 'react';\r\nimport { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';\r\nimport { Card } from '../../components/ui/card';\r\nimport LessonManager from '../../components/content/LessonManager';\r\n\r\nexport default function ContentManagement() {\r\n  return (\r\n    <div className=\"container mx-auto p-6\">\r\n      <h1 className=\"text-2xl font-semibold mb-6\">Content Management</h1>\r\n      \r\n      <Tabs defaultValue=\"lessons\" className=\"w-full\">\r\n        <TabsList>\r\n          <TabsTrigger value=\"lessons\">Lessons</TabsTrigger>\r\n          <TabsTrigger value=\"resources\">Resources</TabsTrigger>\r\n          <TabsTrigger value=\"assignments\">Assignments</TabsTrigger>\r\n        </TabsList>\r\n        \r\n        <TabsContent value=\"lessons\">\r\n          <Card className=\"p-4\">\r\n            <LessonManager />\r\n          </Card>\r\n        </TabsContent>\r\n        \r\n        {/* Other tabs content will be added later */}\r\n      </Tabs>\r\n    </div>\r\n  );\r\n} "
+        }
+    ]
+}

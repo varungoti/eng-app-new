@@ -1,0 +1,34 @@
+{
+    "sourceFile": "src/modules/lesson-management/components/GradeSelector.tsx",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 4,
+            "patches": [
+                {
+                    "date": 1740925047069,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1740925702375,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -22,9 +22,9 @@\n         ) : (\r\n           <Select \r\n             value={(selectedGrade as Grade | null)?.id} \r\n             onValueChange={(value: string) => {\r\n-              const grade = (grades as Grade[]).find(g => g.id === value);\r\n+              const _grade = (grades as Grade[]).find(g => g.id === value);\r\n               setSelectedGrade(value);\r\n             }}\r\n           >\r\n             <SelectTrigger>\r\n"
+                },
+                {
+                    "date": 1740925708921,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -22,9 +22,9 @@\n         ) : (\r\n           <Select \r\n             value={(selectedGrade as Grade | null)?.id} \r\n             onValueChange={(value: string) => {\r\n-              const _grade = (grades as Grade[]).find(g => g.id === value);\r\n+              const grade = (grades as Grade[]).find(g => g.id === value);\r\n               setSelectedGrade(value);\r\n             }}\r\n           >\r\n             <SelectTrigger>\r\n"
+                },
+                {
+                    "date": 1740925717225,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -23,9 +23,9 @@\n           <Select \r\n             value={(selectedGrade as Grade | null)?.id} \r\n             onValueChange={(value: string) => {\r\n               const grade = (grades as Grade[]).find(g => g.id === value);\r\n-              setSelectedGrade(value);\r\n+              setSelectedGrade(grade || null);\r\n             }}\r\n           >\r\n             <SelectTrigger>\r\n               <SelectValue placeholder=\"Select a grade\" />\r\n"
+                },
+                {
+                    "date": 1740925768440,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -23,9 +23,9 @@\n           <Select \r\n             value={(selectedGrade as Grade | null)?.id} \r\n             onValueChange={(value: string) => {\r\n               const grade = (grades as Grade[]).find(g => g.id === value);\r\n-              setSelectedGrade(grade || null);\r\n+              setSelectedGrade(value || null);\r\n             }}\r\n           >\r\n             <SelectTrigger>\r\n               <SelectValue placeholder=\"Select a grade\" />\r\n"
+                }
+            ],
+            "date": 1740925047069,
+            "name": "Commit-0",
+            "content": "import { useLessonManagementContext } from '../context/LessonManagementContext';\r\nimport { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from \"../../../components/ui/select\";\r\nimport { Card, CardHeader, CardTitle, CardContent } from \"../../../components/ui/card\";\r\nimport { Spinner as LoadingSpinner } from '../../../components/ui/spinner';\r\n\r\ninterface Grade {\r\n  id: string;\r\n  name: string;\r\n}\r\n\r\nexport function GradeSelector() {\r\n  const { grades, selectedGrade, setSelectedGrade, isLoading } = useLessonManagementContext();\r\n\r\n  return (\r\n    <Card>\r\n      <CardHeader>\r\n        <CardTitle>Select Grade</CardTitle>\r\n      </CardHeader>\r\n      <CardContent>\r\n        {isLoading ? (\r\n          <LoadingSpinner />\r\n        ) : (\r\n          <Select \r\n            value={(selectedGrade as Grade | null)?.id} \r\n            onValueChange={(value: string) => {\r\n              const grade = (grades as Grade[]).find(g => g.id === value);\r\n              setSelectedGrade(value);\r\n            }}\r\n          >\r\n            <SelectTrigger>\r\n              <SelectValue placeholder=\"Select a grade\" />\r\n            </SelectTrigger>\r\n            <SelectContent>\r\n              {grades.map((grade) => (\r\n                <SelectItem key={grade.id} value={grade.id}>\r\n                  {grade.name}\r\n                </SelectItem>\r\n              ))}\r\n            </SelectContent>\r\n          </Select>\r\n        )}\r\n      </CardContent>\r\n    </Card>\r\n  );\r\n} "
+        }
+    ]
+}

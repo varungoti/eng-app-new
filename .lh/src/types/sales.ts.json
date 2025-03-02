@@ -1,0 +1,70 @@
+{
+    "sourceFile": "src/types/sales.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 13,
+            "patches": [
+                {
+                    "date": 1740095509969,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1740095530570,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,47 +1,35 @@\n export interface SalesLead {\r\n   id: string;\r\n-  companyName: string;\r\n-  contactName: string;\r\n+  name: string;\r\n+  company: string;\r\n   email: string;\r\n-  phone?: string;\r\n-  status: 'new' | 'contacted' | 'qualified' | 'proposal' | 'negotiation' | 'won' | 'lost';\r\n-  source?: string;\r\n-  assignedTo?: string;\r\n-  estimatedValue?: number;\r\n-  probability?: number;\r\n-  expectedCloseDate?: Date;\r\n-  notes?: string;\r\n-  createdAt: Date;\r\n-  updatedAt: Date;\r\n+  phone: string;\r\n+  status: 'new' | 'contacted' | 'qualified' | 'proposal' | 'closed';\r\n+  source: string;\r\n+  createdAt: string;\r\n+  updatedAt: string;\r\n }\r\n \r\n export interface SalesActivity {\r\n   id: string;\r\n   leadId: string;\r\n-  type: 'call' | 'email' | 'meeting' | 'note' | 'task';\r\n-  subject: string;\r\n-  description?: string;\r\n-  status?: 'planned' | 'completed' | 'cancelled';\r\n-  dueDate?: Date;\r\n-  completedAt?: Date;\r\n-  performedBy: string;\r\n-  createdAt: Date;\r\n+  type: 'call' | 'email' | 'meeting' | 'note';\r\n+  description: string;\r\n+  createdAt: string;\r\n+  updatedAt: string;\r\n }\r\n \r\n export interface SalesOpportunity {\r\n   id: string;\r\n   leadId: string;\r\n   name: string;\r\n-  stage: 'discovery' | 'qualification' | 'proposal' | 'negotiation' | 'closed_won' | 'closed_lost';\r\n-  amount?: number;\r\n-  closeDate?: Date;\r\n-  probability?: number;\r\n-  nextStep?: string;\r\n-  competition?: string;\r\n-  notes?: string;\r\n-  createdAt: Date;\r\n-  updatedAt: Date;\r\n+  value: number;\r\n+  probability: number;\r\n+  status: 'open' | 'won' | 'lost';\r\n+  expectedCloseDate: string;\r\n+  createdAt: string;\r\n+  updatedAt: string;\r\n }\r\n \r\n export interface SalesContact {\r\n   id: string;\r\n"
+                },
+                {
+                    "date": 1740744985356,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,8 +1,8 @@\n export interface SalesLead {\r\n   id: string;\r\n   name: string;\r\n-  company: string;\r\n+  : string;\r\n   email: string;\r\n   phone: string;\r\n   status: 'new' | 'contacted' | 'qualified' | 'proposal' | 'closed';\r\n   source: string;\r\n"
+                },
+                {
+                    "date": 1740744993273,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,8 +1,8 @@\n export interface SalesLead {\r\n   id: string;\r\n   name: string;\r\n-  : string;\r\n+  schoolname: string;\r\n   email: string;\r\n   phone: string;\r\n   status: 'new' | 'contacted' | 'qualified' | 'proposal' | 'closed';\r\n   source: string;\r\n"
+                },
+                {
+                    "date": 1740745014156,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,7 +1,8 @@\n export interface SalesLead {\r\n   id: string;\r\n   name: string;\r\n+  \r\n   schoolname: string;\r\n   email: string;\r\n   phone: string;\r\n   status: 'new' | 'contacted' | 'qualified' | 'proposal' | 'closed';\r\n"
+                },
+                {
+                    "date": 1740745019830,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,8 +1,8 @@\n export interface SalesLead {\r\n   id: string;\r\n   name: string;\r\n-  \r\n+  company: string;\r\n   schoolname: string;\r\n   email: string;\r\n   phone: string;\r\n   status: 'new' | 'contacted' | 'qualified' | 'proposal' | 'closed';\r\n"
+                },
+                {
+                    "date": 1740745043741,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -2,8 +2,9 @@\n   id: string;\r\n   name: string;\r\n   company: string;\r\n   schoolname: string;\r\n+  \r\n   email: string;\r\n   phone: string;\r\n   status: 'new' | 'contacted' | 'qualified' | 'proposal' | 'closed';\r\n   source: string;\r\n"
+                },
+                {
+                    "date": 1740745052220,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -2,9 +2,10 @@\n   id: string;\r\n   name: string;\r\n   company: string;\r\n   schoolname: string;\r\n-  \r\n+  location: string;\r\n+  branch: string;\r\n   email: string;\r\n   phone: string;\r\n   status: 'new' | 'contacted' | 'qualified' | 'proposal' | 'closed';\r\n   source: string;\r\n"
+                },
+                {
+                    "date": 1740745220775,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -50,8 +50,9 @@\n \r\n export interface SalesStats {\r\n   totalLeads: number;\r\n   newLeads: number;\r\n+  \r\n   qualifiedLeads: number;\r\n   proposalsSent: number;\r\n   wonDeals: number;\r\n   lostDeals: number;\r\n"
+                },
+                {
+                    "date": 1740745228113,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -50,13 +50,13 @@\n \r\n export interface SalesStats {\r\n   totalLeads: number;\r\n   newLeads: number;\r\n-  \r\n+  contactedLeads: number;\r\n   qualifiedLeads: number;\r\n-  proposalsSent: number;\r\n-  wonDeals: number;\r\n-  lostDeals: number;\r\n+  proposalLeads: number;\r\n+  closedLeads: number;\r\n+  lostLeads: number;\r\n   totalValue: number;\r\n   avgDealSize: number;\r\n   conversionRate: number;\r\n   pipelineValue: number;\r\n"
+                },
+                {
+                    "date": 1740745235209,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -51,8 +51,9 @@\n export interface SalesStats {\r\n   totalLeads: number;\r\n   newLeads: number;\r\n   contactedLeads: number;\r\n+  \r\n   qualifiedLeads: number;\r\n   proposalLeads: number;\r\n   closedLeads: number;\r\n   lostLeads: number;\r\n"
+                },
+                {
+                    "date": 1740745240604,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -51,9 +51,8 @@\n export interface SalesStats {\r\n   totalLeads: number;\r\n   newLeads: number;\r\n   contactedLeads: number;\r\n-  \r\n   qualifiedLeads: number;\r\n   proposalLeads: number;\r\n   closedLeads: number;\r\n   lostLeads: number;\r\n"
+                },
+                {
+                    "date": 1740899811675,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -12,8 +12,22 @@\n   createdAt: string;\r\n   updatedAt: string;\r\n }\r\n \r\n+\r\n+interface SalesTask {\r\n+  id: string;\r\n+  title: string;\r\n+  description?: string;\r\n+  status: string;\r\n+  priority: string;\r\n+  due_date: string;\r\n+  assigned_to?: string;\r\n+  lead_id?: string;\r\n+  opportunity_id?: string;\r\n+  contact_id?: string;\r\n+  created_at: string;\r\n+}\r\n export interface SalesActivity {\r\n   id: string;\r\n   leadId: string;\r\n   type: 'call' | 'email' | 'meeting' | 'note';\r\n"
+                },
+                {
+                    "date": 1740899818834,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -13,9 +13,9 @@\n   updatedAt: string;\r\n }\r\n \r\n \r\n-interface SalesTask {\r\n+export interface SalesTask {\r\n   id: string;\r\n   title: string;\r\n   description?: string;\r\n   status: string;\r\n"
+                }
+            ],
+            "date": 1740095509969,
+            "name": "Commit-0",
+            "content": "export interface SalesLead {\r\n  id: string;\r\n  companyName: string;\r\n  contactName: string;\r\n  email: string;\r\n  phone?: string;\r\n  status: 'new' | 'contacted' | 'qualified' | 'proposal' | 'negotiation' | 'won' | 'lost';\r\n  source?: string;\r\n  assignedTo?: string;\r\n  estimatedValue?: number;\r\n  probability?: number;\r\n  expectedCloseDate?: Date;\r\n  notes?: string;\r\n  createdAt: Date;\r\n  updatedAt: Date;\r\n}\r\n\r\nexport interface SalesActivity {\r\n  id: string;\r\n  leadId: string;\r\n  type: 'call' | 'email' | 'meeting' | 'note' | 'task';\r\n  subject: string;\r\n  description?: string;\r\n  status?: 'planned' | 'completed' | 'cancelled';\r\n  dueDate?: Date;\r\n  completedAt?: Date;\r\n  performedBy: string;\r\n  createdAt: Date;\r\n}\r\n\r\nexport interface SalesOpportunity {\r\n  id: string;\r\n  leadId: string;\r\n  name: string;\r\n  stage: 'discovery' | 'qualification' | 'proposal' | 'negotiation' | 'closed_won' | 'closed_lost';\r\n  amount?: number;\r\n  closeDate?: Date;\r\n  probability?: number;\r\n  nextStep?: string;\r\n  competition?: string;\r\n  notes?: string;\r\n  createdAt: Date;\r\n  updatedAt: Date;\r\n}\r\n\r\nexport interface SalesContact {\r\n  id: string;\r\n  leadId: string;\r\n  name: string;\r\n  title?: string;\r\n  email?: string;\r\n  phone?: string;\r\n  isPrimary: boolean;\r\n  department?: string;\r\n  notes?: string;\r\n  createdAt: Date;\r\n  updatedAt: Date;\r\n}\r\n\r\nexport interface SalesStats {\r\n  totalLeads: number;\r\n  newLeads: number;\r\n  qualifiedLeads: number;\r\n  proposalsSent: number;\r\n  wonDeals: number;\r\n  lostDeals: number;\r\n  totalValue: number;\r\n  avgDealSize: number;\r\n  conversionRate: number;\r\n  pipelineValue: number;\r\n}"
+        }
+    ]
+}

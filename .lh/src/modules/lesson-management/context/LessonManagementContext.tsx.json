@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/modules/lesson-management/context/LessonManagementContext.tsx",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1740851845680,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1740851845680,
+            "name": "Commit-0",
+            "content": "import { createContext, useContext, useState } from 'react';\r\nimport { useLessonManagement } from '../hooks/useLessonManagement';\r\nimport type { Grade, Topic, Lesson } from '../types';\r\n\r\ninterface LessonManagementContextType<T> {\r\n  grades: T[];\r\n  topics: Topic[];\r\n  lessons: Lesson[];\r\n  selectedGrade: string | null;\r\n  selectedTopic: string | null;\r\n  setSelectedGrade: (gradeId: string | null) => void;\r\n  setSelectedTopic: (topicId: string | null) => void;\r\n  isLoading: boolean;\r\n  error: Error | null;\r\n}\r\n\r\nconst LessonManagementContext = createContext<LessonManagementContextType<any> | undefined>(undefined);\r\n\r\nexport function LessonManagementProvider({ children }: { children: React.ReactNode }) {\r\n  const [selectedGrade, setSelectedGrade] = useState<string | null>(null);\r\n  const [selectedTopic, setSelectedTopic] = useState<string | null>(null);\r\n\r\n  const result = useLessonManagement({\r\n    gradeId: selectedGrade,\r\n    topicId: selectedTopic,\r\n  });\r\n\r\n  return (\r\n    <LessonManagementContext.Provider\r\n      value={{\r\n        grades: result.data?.grades || [],\r\n        topics: result.data?.topics || [],\r\n        lessons: result.data?.lessons || [],\r\n        selectedGrade,\r\n        selectedTopic,\r\n        setSelectedGrade,\r\n        setSelectedTopic,\r\n        isLoading: result.isLoading,\r\n        error: result.error,\r\n      }}\r\n    >\r\n      {children}\r\n    </LessonManagementContext.Provider>\r\n  );\r\n}\r\n\r\nexport function useLessonManagementContext() {\r\n  const context = useContext(LessonManagementContext);\r\n  if (!context) {\r\n    throw new Error('useLessonManagementContext must be used within a LessonManagementProvider');\r\n  }\r\n  return context;\r\n} "
+        }
+    ]
+}

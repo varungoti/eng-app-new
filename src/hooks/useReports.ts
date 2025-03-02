@@ -38,7 +38,8 @@ export const useReports = () => {
 
   return {
     generateReport,
-    getReport, <boltAction type="file" filePath="src/hooks/useReports.ts" contentType="content">    loading,
+    getReport,
+    loading,
     error
   };
 };

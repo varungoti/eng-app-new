@@ -8,7 +8,7 @@ interface SalesExecutiveDashboardProps {
 }
 
 const SalesExecutiveDashboard: React.FC<SalesExecutiveDashboardProps> = ({ settings }) => {
-  const { leads, activities, stats, loading, error } = useSales();
+  const { leads, activities, opportunities, stats, loading } = useSales();
 
   if (loading) {
     return (
@@ -21,11 +21,11 @@ const SalesExecutiveDashboard: React.FC<SalesExecutiveDashboardProps> = ({ setti
     );
   }
 
-  if (error) {
+  if (!leads || !activities || !stats) {
     return (
       <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
         <h3 className="text-lg font-medium text-red-800">Error</h3>
-        <p className="mt-2 text-sm text-red-600">{error}</p>
+        <p className="mt-2 text-sm text-red-600">Failed to load sales data</p>
       </div>
     );
   }
@@ -77,7 +77,7 @@ const SalesExecutiveDashboard: React.FC<SalesExecutiveDashboardProps> = ({ setti
             <div>
               <p className="text-sm font-medium text-gray-600">Deals Won</p>
               <p className="text-2xl font-semibold text-gray-900">
-                {stats?.wonDeals}
+                {stats?.dealsWon}
               </p>
             </div>
             <Target className="h-8 w-8 text-indigo-500" />
@@ -98,7 +98,7 @@ const SalesExecutiveDashboard: React.FC<SalesExecutiveDashboardProps> = ({ setti
                   {activity.type === 'email' && <Mail className="h-5 w-5 text-green-500 mr-3" />}
                   {activity.type === 'meeting' && <Calendar className="h-5 w-5 text-purple-500 mr-3" />}
                   <div>
-                    <p className="text-sm font-medium text-gray-900">{activity.subject}</p>
+                    <p className="text-sm font-medium text-gray-900">{activity.description}</p>
                     <p className="text-xs text-gray-500">
                       {new Date(activity.createdAt).toLocaleTimeString()}
                     </p>
@@ -120,26 +120,34 @@ const SalesExecutiveDashboard: React.FC<SalesExecutiveDashboardProps> = ({ setti
       <div className="bg-white p-6 rounded-lg shadow-md">
         <h3 className="text-lg font-medium text-gray-900 mb-4">My Pipeline</h3>
         <div className="space-y-4">
-          {leads.map((lead) => (
-            <div key={lead.id} className="flex items-center justify-between p-4 border rounded-lg">
-              <div>
-                <p className="font-medium text-gray-900">{lead.companyName}</p>
-                <p className="text-sm text-gray-500">{lead.contactName}</p>
+          {leads.map((lead) => {
+            const leadOpportunity = opportunities.find(opp => opp.leadId === lead.id);
+            return (
+              <div key={lead.id} className="flex items-center justify-between p-4 border rounded-lg">
+                <div>
+                  <p className="font-medium text-gray-900">{lead.company}</p>
+                  <p className="text-sm text-gray-500">{lead.name}</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-sm font-medium text-gray-900">
+                    ${leadOpportunity?.value.toLocaleString() || '0'}
+                  </p>
+                  <span className={`text-xs font-medium px-2 py-1 rounded-full ${
+                    lead.status === 'closed' ? 'bg-green-100 text-green-800' :
+                    lead.status === 'proposal' ? 'bg-blue-100 text-blue-800' :
+                    lead.status === 'contacted' ? 'bg-yellow-100 text-yellow-800' :
+                    lead.status === 'qualified' ? 'bg-purple-100 text-purple-800' :
+                    lead.status === 'new' ? 'bg-red-100 text-red-800' :
+                    lead.status === 'lost' ? 'bg-red-100 text-red-800' :
+                    lead.status === 'in_progress' ? 'bg-violet-100 text-violet-800' :
+                    'bg-gray-100 text-gray-800'
+                  }`}>
+                    {lead.status}
+                  </span>
+                </div>
               </div>
-              <div className="text-right">
-                <p className="text-sm font-medium text-gray-900">
-                  ${lead.estimatedValue?.toLocaleString()}
-                </p>
-                <span className={`text-xs font-medium px-2 py-1 rounded-full ${
-                  lead.status === 'won' ? 'bg-green-100 text-green-800' :
-                  lead.status === 'lost' ? 'bg-red-100 text-red-800' :
-                  'bg-blue-100 text-blue-800'
-                }`}>
-                  {lead.status}
-                </span>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>

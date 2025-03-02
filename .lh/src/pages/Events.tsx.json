@@ -1,0 +1,22 @@
+{
+    "sourceFile": "src/pages/Events.tsx",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1740927384918,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1740927398863,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -2,9 +2,9 @@\n import { useAuth } from '../hooks/useAuth';\r\n import { usePermissions } from '../hooks/usePermissions';\r\n import EventManager from '../components/events/EventManager';\r\n import { Loader2 } from 'lucide-react';\r\n-import { Permissions } from '../types/roles';\r\n+//import { Permissions } from '../types/roles';\r\n \r\n const Events = () => {\r\n   const { user, loading } = useAuth();\r\n   const { can } = usePermissions();\r\n@@ -42,11 +42,11 @@\n         </div>\r\n       </div>\r\n \r\n       <EventManager \r\n-        canCreate={can(\"create\")}\r\n-        canEdit={can(\"edit\")}\r\n-        canDelete={can(\"delete\")}\r\n+        canCreate={can(\"staff\")}\r\n+        canEdit={can(\"staff\")}\r\n+        canDelete={can(\"staff\")}\r\n         userRole={user.role}\r\n       />\r\n     </div>\r\n   );\r\n"
+                }
+            ],
+            "date": 1740927384918,
+            "name": "Commit-0",
+            "content": "//import React from 'react';\r\nimport { useAuth } from '../hooks/useAuth';\r\nimport { usePermissions } from '../hooks/usePermissions';\r\nimport EventManager from '../components/events/EventManager';\r\nimport { Loader2 } from 'lucide-react';\r\nimport { Permissions } from '../types/roles';\r\n\r\nconst Events = () => {\r\n  const { user, loading } = useAuth();\r\n  const { can } = usePermissions();\r\n\r\n  if (loading) {\r\n    return (\r\n      <div className=\"flex items-center justify-center h-[calc(100vh-4rem)]\">\r\n        <div className=\"text-center space-y-2\">\r\n          <Loader2 className=\"h-12 w-12 text-indigo-600 animate-spin mx-auto\" />\r\n          <p className=\"text-gray-600\">Loading...</p>\r\n        </div>\r\n      </div>\r\n    );\r\n  }\r\n\r\n  if (!user) {\r\n    return (\r\n      <div className=\"p-4 bg-red-50 border border-red-200 rounded-lg\">\r\n        <h3 className=\"text-lg font-medium text-red-800\">Authentication Required</h3>\r\n        <p className=\"mt-2 text-sm text-red-600\">\r\n          Please log in to access events.\r\n        </p>\r\n      </div>\r\n    );\r\n  }\r\n\r\n  return (\r\n    <div className=\"space-y-6\">\r\n      <div className=\"flex justify-between items-center\">\r\n        <div>\r\n          <h1 className=\"text-2xl font-semibold text-gray-900\">Events</h1>\r\n          <p className=\"mt-1 text-sm text-gray-500\">\r\n            Manage and track all events across the organization\r\n          </p>\r\n        </div>\r\n      </div>\r\n\r\n      <EventManager \r\n        canCreate={can(\"create\")}\r\n        canEdit={can(\"edit\")}\r\n        canDelete={can(\"delete\")}\r\n        userRole={user.role}\r\n      />\r\n    </div>\r\n  );\r\n};\r\n\r\nexport default Events;"
+        }
+    ]
+}

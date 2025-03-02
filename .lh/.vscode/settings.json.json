@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 1,
+            "activePatchIndex": 8,
             "patches": [
                 {
                     "date": 1739351172044,
@@ -12,6 +12,34 @@
                 {
                     "date": 1739351183587,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -17,8 +17,9 @@\n     \"lessonid\",\n     \"myclasses\",\n     \"PGRST\",\n     \"pkce\",\n+    \"Postgrest\",\n     \"questionid\",\n     \"rollno\",\n     \"roomno\",\n     \"saytext\",\n"
+                },
+                {
+                    "date": 1740066510936,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -8,8 +8,9 @@\n     \"CODEPEN\",\n     \"CODESANDBOX\",\n     \"contentheading\",\n     \"COOLDOWN\",\n+    \"Deletability\",\n     \"dropcursor\",\n     \"Engspiration\",\n     \"fkey\",\n     \"gotrue\",\n"
+                },
+                {
+                    "date": 1740066517011,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -15,8 +15,9 @@\n     \"fkey\",\n     \"gotrue\",\n     \"learningpath\",\n     \"lessonid\",\n+    \"lucide\",\n     \"myclasses\",\n     \"PGRST\",\n     \"pkce\",\n     \"Postgrest\",\n"
+                },
+                {
+                    "date": 1740066522634,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -16,9 +16,11 @@\n     \"gotrue\",\n     \"learningpath\",\n     \"lessonid\",\n     \"lucide\",\n+    \"multiplechoice\",\n     \"myclasses\",\n+    \"onunhandledrejection\",\n     \"PGRST\",\n     \"pkce\",\n     \"Postgrest\",\n     \"questionid\",\n"
+                },
+                {
+                    "date": 1740746069689,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -32,8 +32,9 @@\n     \"speakwell\",\n     \"Studentsprofile\",\n     \"supabase\",\n     \"Teachersprofile\",\n+    \"ttfb\",\n     \"Upserting\",\n     \"Upserts\",\n     \"Wordlist\"\n   ],\n"
+                },
+                {
+                    "date": 1740923193795,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -12,8 +12,9 @@\n     \"Deletability\",\n     \"dropcursor\",\n     \"Engspiration\",\n     \"fkey\",\n+    \"gapi\",\n     \"gotrue\",\n     \"learningpath\",\n     \"lessonid\",\n     \"lucide\",\n@@ -26,8 +27,9 @@\n     \"questionid\",\n     \"rollno\",\n     \"roomno\",\n     \"saytext\",\n+    \"schoolname\",\n     \"shadcn\",\n     \"sonner\",\n     \"speakwell\",\n     \"Studentsprofile\",\n"
+                },
+                {
+                    "date": 1740923199018,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -37,8 +37,9 @@\n     \"Teachersprofile\",\n     \"ttfb\",\n     \"Upserting\",\n     \"Upserts\",\n+    \"VITE\",\n     \"Wordlist\"\n   ],\n   \"deno.enablePaths\": [\n     \"supabase/functions\"\n"
+                },
+                {
+                    "date": 1740923204956,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -23,8 +23,9 @@\n     \"onunhandledrejection\",\n     \"PGRST\",\n     \"pkce\",\n     \"Postgrest\",\n+    \"prereq\",\n     \"questionid\",\n     \"rollno\",\n     \"roomno\",\n     \"saytext\",\n"
                 }
             ],
             "date": 1739351172044,

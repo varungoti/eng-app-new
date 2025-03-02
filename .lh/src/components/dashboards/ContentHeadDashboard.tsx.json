@@ -3,11 +3,15 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 0,
+            "activePatchIndex": 1,
             "patches": [
                 {
                     "date": 1738897994304,
                     "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1740772666849,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -61,12 +61,16 @@\n               <div key={grade} className=\"flex items-center justify-between p-3 bg-gray-50 rounded\">\r\n                 <div>\r\n                   <p className=\"text-sm font-medium text-gray-900\">{grade}</p>\r\n                   <div className=\"mt-1 w-full bg-gray-200 rounded-full h-2\">\r\n-                    <div \r\n-                      className=\"bg-indigo-600 h-2 rounded-full\" \r\n-                      style={{ width: `${Math.floor(Math.random() * 100)}%` }}\r\n-                    />\r\n+                    {(() => {\r\n+                      const width = Math.floor(Math.random() * 100);\r\n+                      return (\r\n+                        <div \r\n+                          className={`bg-indigo-600 h-2 rounded-full w-[${width}%]`}\r\n+                        />\r\n+                      );\r\n+                    })()}\r\n                   </div>\r\n                 </div>\r\n                 <span className=\"text-sm font-medium text-indigo-600\">\r\n                   {Math.floor(Math.random() * 100)}%\r\n@@ -83,12 +87,16 @@\n               <div key={metric} className=\"flex items-center justify-between p-3 bg-gray-50 rounded\">\r\n                 <div>\r\n                   <p className=\"text-sm font-medium text-gray-900\">{metric}</p>\r\n                   <div className=\"mt-1 w-full bg-gray-200 rounded-full h-2\">\r\n-                    <div \r\n-                      className=\"bg-green-600 h-2 rounded-full\" \r\n-                      style={{ width: `${Math.floor(Math.random() * 100)}%` }}\r\n-                    />\r\n+                    {(() => {\r\n+                      const width = Math.floor(Math.random() * 100);\r\n+                      return (\r\n+                        <div \r\n+                          className={`bg-green-600 h-2 rounded-full w-[${width}%]`}\r\n+                        />\r\n+                      );\r\n+                    })()}\r\n                   </div>\r\n                 </div>\r\n                 <span className=\"text-sm font-medium text-green-600\">\r\n                   {Math.floor(Math.random() * 100)}%\r\n"
                 }
             ],
             "date": 1738897994304,

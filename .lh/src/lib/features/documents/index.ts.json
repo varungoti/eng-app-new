@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/lib/features/documents/index.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1740900665305,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1740900665305,
+            "name": "Commit-0",
+            "content": "// Documents feature implementation\r\nimport { supabase } from '../../supabase';\r\nimport { logger } from '../../logger';\r\n\r\nexport interface Document {\r\n  id: string;\r\n  title: string;\r\n  content: string;\r\n  created_at: string;\r\n  updated_at: string;\r\n  author_id: string;\r\n  status: 'draft' | 'published' | 'archived';\r\n  tags?: string[];\r\n}\r\n\r\nexport interface DocumentsFeature {\r\n  getDocuments: () => Promise<Document[]>;\r\n  getDocumentById: (id: string) => Promise<Document | null>;\r\n  createDocument: (doc: Omit<Document, 'id' | 'created_at' | 'updated_at'>) => Promise<Document>;\r\n  updateDocument: (id: string, updates: Partial<Document>) => Promise<Document>;\r\n  deleteDocument: (id: string) => Promise<boolean>;\r\n}\r\n\r\nexport const documentsFeature: DocumentsFeature = {\r\n  getDocuments: async () => {\r\n    try {\r\n      const { data, error } = await supabase\r\n        .from('documents')\r\n        .select('*')\r\n        .order('updated_at', { ascending: false });\r\n\r\n      if (error) throw error;\r\n      return data || [];\r\n    } catch (err) {\r\n      logger.error('Failed to fetch documents', { source: 'DocumentsFeature', error: err });\r\n      return [];\r\n    }\r\n  },\r\n\r\n  getDocumentById: async (id) => {\r\n    try {\r\n      const { data, error } = await supabase\r\n        .from('documents')\r\n        .select('*')\r\n        .eq('id', id)\r\n        .single();\r\n\r\n      if (error) throw error;\r\n      return data;\r\n    } catch (err) {\r\n      logger.error(`Failed to fetch document ${id}`, { source: 'DocumentsFeature', error: err });\r\n      return null;\r\n    }\r\n  },\r\n\r\n  createDocument: async (doc) => {\r\n    try {\r\n      const { data, error } = await supabase\r\n        .from('documents')\r\n        .insert({\r\n          ...doc,\r\n          created_at: new Date().toISOString(),\r\n          updated_at: new Date().toISOString()\r\n        })\r\n        .select()\r\n        .single();\r\n\r\n      if (error) throw error;\r\n      return data;\r\n    } catch (err) {\r\n      logger.error('Failed to create document', { source: 'DocumentsFeature', error: err });\r\n      throw err;\r\n    }\r\n  },\r\n\r\n  updateDocument: async (id, updates) => {\r\n    try {\r\n      const { data, error } = await supabase\r\n        .from('documents')\r\n        .update({\r\n          ...updates,\r\n          updated_at: new Date().toISOString()\r\n        })\r\n        .eq('id', id)\r\n        .select()\r\n        .single();\r\n\r\n      if (error) throw error;\r\n      return data;\r\n    } catch (err) {\r\n      logger.error(`Failed to update document ${id}`, { source: 'DocumentsFeature', error: err });\r\n      throw err;\r\n    }\r\n  },\r\n\r\n  deleteDocument: async (id) => {\r\n    try {\r\n      const { error } = await supabase\r\n        .from('documents')\r\n        .delete()\r\n        .eq('id', id);\r\n\r\n      if (error) throw error;\r\n      return true;\r\n    } catch (err) {\r\n      logger.error(`Failed to delete document ${id}`, { source: 'DocumentsFeature', error: err });\r\n      return false;\r\n    }\r\n  }\r\n}; "
+        }
+    ]
+}

@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 1,
+            "activePatchIndex": 3,
             "patches": [
                 {
                     "date": 1739216754457,
@@ -12,6 +12,14 @@
                 {
                     "date": 1739279212568,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -31,25 +31,25 @@\n \r\n   get(key: string, ignoreTTL: boolean = false): T | null {\r\n     const entry = this.cache.get(key);\r\n     if (!entry) {\r\n-      logger.debug(`Cache miss for key: ${key}`, 'CacheStrategy');\r\n+      logger.debug(`Cache miss for key: ${key}`, { source: 'CacheStrategy' });\r\n       return null;\r\n     }\r\n \r\n     const now = Date.now();\r\n     \r\n     if (!ignoreTTL && now - entry.timestamp > this.options.ttl) {\r\n-      logger.debug(`Cache entry expired for key: ${key}`, 'CacheStrategy');\r\n+      logger.debug(`Cache entry expired for key: ${key}`, { source: 'CacheStrategy' });\r\n       this.cache.delete(key);\r\n       return null;\r\n     }\r\n \r\n     // Update access metadata\r\n     entry.lastAccess = now;\r\n     entry.accessCount++;\r\n     \r\n-    logger.debug(`Cache hit for key: ${key}`, 'CacheStrategy');\r\n+    logger.debug(`Cache hit for key: ${key}`, { source: 'CacheStrategy' });\r\n     return entry.data;\r\n   }\r\n \r\n   set(key: string, data: T): void {\r\n@@ -65,9 +65,9 @@\n       lastAccess: now,\r\n       accessCount: 0\r\n     });\r\n     \r\n-    logger.debug(`Cache set for key: ${key}`, 'CacheStrategy');\r\n+    logger.debug(`Cache set for key: ${key}`, { source: 'CacheStrategy' });\r\n   }\r\n \r\n   private evictLeastRecentlyUsed(): void {\r\n     let oldestKey: string | null = null;\r\n@@ -81,15 +81,15 @@\n     }\r\n \r\n     if (oldestKey) {\r\n       this.cache.delete(oldestKey);\r\n-      logger.debug(`Evicted least recently used cache entry: ${oldestKey}`, 'CacheStrategy');\r\n+      logger.debug(`Evicted least recently used cache entry: ${oldestKey}`, { source: 'CacheStrategy' });\r\n     }\r\n   }\r\n \r\n   clear(): void {\r\n     this.cache.clear();\r\n-    logger.debug('Cache cleared', 'CacheStrategy');\r\n+    logger.debug('Cache cleared', { source: 'CacheStrategy' });\r\n   }\r\n \r\n   has(key: string): boolean {\r\n     return this.cache.has(key);\r\n@@ -124,9 +124,9 @@\n       }\r\n     }\r\n \r\n     if (removedCount > 0) {\r\n-      logger.debug(`Cleaned up ${removedCount} expired cache entries`, 'CacheStrategy');\r\n+      logger.debug(`Cleaned up ${removedCount} expired cache entries`, { source: 'CacheStrategy' });\r\n     }\r\n   }\r\n \r\n   dispose(): void {\r\n"
+                },
+                {
+                    "date": 1740744196424,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -135,5 +135,5 @@\n     }\r\n   }\r\n }\r\n \r\n-export const authCache = new CacheStrategy<any>();\n\\ No newline at end of file\n+export const authCache = new CacheStrategy<Unkonow>();\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1740744205553,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -135,5 +135,5 @@\n     }\r\n   }\r\n }\r\n \r\n-export const authCache = new CacheStrategy<Unkonow>();\n\\ No newline at end of file\n+export const authCache = new CacheStrategy<unknown>();\n\\ No newline at end of file\n"
                 }
             ],
             "date": 1739216754457,

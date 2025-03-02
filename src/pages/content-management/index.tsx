@@ -1,4 +1,4 @@
-import React from 'react';
+//import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
 import { Card } from '../../components/ui/card';
 import LessonManager from '../../components/content/LessonManager';
@@ -17,7 +17,7 @@ export default function ContentManagement() {
         
         <TabsContent value="lessons">
           <Card className="p-4">
-            <LessonManager />
+            <LessonManager lessonId={''} />
           </Card>
         </TabsContent>
         

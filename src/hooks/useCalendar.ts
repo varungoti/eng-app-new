@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from './useAuth';
 import { logger } from '../lib/logger';
@@ -20,12 +20,12 @@ interface CalendarEvent {
 export const useCalendar = () => {
   const { user } = useAuth();
   const [events, setEvents] = useState<CalendarEvent[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { showToast } = useToast();
   const { cache } = useCache();
 
-  const fetchEvents = async () => {
+  const fetchEvents = useCallback(async () => {
     try {
       if (!user) {
         logger.info('No user found, skipping calendar fetch', {
@@ -34,14 +34,14 @@ export const useCalendar = () => {
         return;
       }
 
-      setLoading(true);
+      setIsLoading(true);
       setError(null);
 
       // Check cache first
       const cached = cache.get<CalendarEvent[]>('calendar_events');
       if (cached) {
         setEvents(cached);
-        setLoading(false);
+        setIsLoading(false);
         return;
       }
 
@@ -88,9 +88,9 @@ export const useCalendar = () => {
         source: 'useCalendar'
       });
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
-  };
+  }, [user, cache, showToast]);
 
   const addEvent = async (event: Omit<CalendarEvent, 'id' | 'userId'>) => {
     if (!user) {
@@ -212,15 +212,15 @@ export const useCalendar = () => {
     if (user) {
       fetchEvents();
     }
-  }, [user]);
+  }, [user, fetchEvents]);
 
   return {
     events,
-    loading,
+    isLoading,
     error,
     addEvent,
     updateEvent,
     deleteEvent,
-    refresh: fetchEvents
+    refreshEvents: fetchEvents
   };
 };

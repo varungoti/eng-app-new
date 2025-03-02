@@ -10,18 +10,18 @@ const AUTH_TIMEOUT = 1500; // 1.5 seconds timeout
 const INIT_DEBOUNCE = 100; // 100ms debounce for initialization
 
 interface CachedSession {
-  session: any;
+  session: unknown;
   isValid: boolean;
   timestamp: number;
   windowId?: string;
   lastAuthState?: string;
   lastRoute?: string;
-  sessionContext?: any;
+  sessionContext?: unknown;
 }
 
 interface SessionResult {
   data: {
-    session: any;
+    session: unknown;
   } | null;
   error: Error | null;
 }
@@ -54,7 +54,7 @@ export class InitializationStrategy {
     }
   }
 
-  private static getSessionContext(): any {
+  private static getSessionContext(): unknown {
     try {
       const lessonContext = sessionStorage.getItem('lessonContext');
       return lessonContext ? JSON.parse(lessonContext) : null;

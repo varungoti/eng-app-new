@@ -1,3 +1,5 @@
+/// <reference lib="dom" />
+
 import { ErrorTracker } from './ErrorTracker';
 import { ErrorSeverity } from './types';
 
@@ -9,8 +11,21 @@ interface NetworkError {
   retryCount: number;
 }
 
-interface ExtendedRequestInit extends RequestInit {
+// Using simpler approach with any to avoid DOM type dependencies
+interface ExtendedRequestInit {
   throwOnError?: boolean;
+  body?: any;
+  cache?: string;
+  credentials?: string;
+  headers?: any;
+  integrity?: string;
+  keepalive?: boolean;
+  method?: string;
+  mode?: string;
+  redirect?: string;
+  referrer?: string;
+  referrerPolicy?: string;
+  signal?: any;
 }
 
 class NetworkHandler {

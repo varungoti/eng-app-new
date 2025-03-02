@@ -1,0 +1,42 @@
+{
+    "sourceFile": "src/lib/prisma.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 6,
+            "patches": [
+                {
+                    "date": 1740765392169,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1740765433206,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,7 @@\n import { PrismaClient } from '@prisma/client';\r\n \r\n+\r\n // Prevent multiple instances of Prisma Client in development\r\n declare global {\r\n   let prisma: PrismaClient | undefined;\r\n }\r\n"
+                },
+                {
+                    "date": 1740765439599,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,7 +1,7 @@\n import { PrismaClient } from '@prisma/client';\r\n+import\r\n \r\n-\r\n // Prevent multiple instances of Prisma Client in development\r\n declare global {\r\n   let prisma: PrismaClient | undefined;\r\n }\r\n"
+                },
+                {
+                    "date": 1740765458214,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,6 @@\n import { PrismaClient } from '@prisma/client';\r\n-import\r\n+import prisma from '@prisma/client';\r\n \r\n // Prevent multiple instances of Prisma Client in development\r\n declare global {\r\n   let prisma: PrismaClient | undefined;\r\n"
+                },
+                {
+                    "date": 1740765468006,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,7 +1,7 @@\n import { PrismaClient } from '@prisma/client';\r\n-import prisma from '@prisma/client';\r\n \r\n+\r\n // Prevent multiple instances of Prisma Client in development\r\n declare global {\r\n   let prisma: PrismaClient | undefined;\r\n }\r\n"
+                },
+                {
+                    "date": 1740765497448,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,10 +1,9 @@\n import { PrismaClient } from '@prisma/client';\r\n \r\n-\r\n // Prevent multiple instances of Prisma Client in development\r\n declare global {\r\n-  let prisma: PrismaClient | undefined;\r\n+  var prisma: PrismaClient | undefined;\r\n }\r\n \r\n export const prisma = global.prisma || new PrismaClient();\r\n \r\n"
+                },
+                {
+                    "date": 1740765541917,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,8 +1,9 @@\n import { PrismaClient } from '@prisma/client';\r\n \r\n // Prevent multiple instances of Prisma Client in development\r\n declare global {\r\n+  // eslint-disable-next-line no-var\r\n   var prisma: PrismaClient | undefined;\r\n }\r\n \r\n export const prisma = global.prisma || new PrismaClient();\r\n"
+                }
+            ],
+            "date": 1740765392169,
+            "name": "Commit-0",
+            "content": "import { PrismaClient } from '@prisma/client';\r\n\r\n// Prevent multiple instances of Prisma Client in development\r\ndeclare global {\r\n  let prisma: PrismaClient | undefined;\r\n}\r\n\r\nexport const prisma = global.prisma || new PrismaClient();\r\n\r\nif (process.env.NODE_ENV !== 'production') {\r\n  global.prisma = prisma;\r\n}"
+        }
+    ]
+}

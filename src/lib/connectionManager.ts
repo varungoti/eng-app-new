@@ -1,6 +1,6 @@
 import { supabase } from './supabase';
 import { logger } from './logger';
-import { errorHandler } from './errorHandler';
+//import { errorHandler } from './errorHandler';
 
 interface ConnectionState {
   isConnected: boolean;
@@ -46,7 +46,7 @@ class ConnectionManager {
         throw new Error('Failed to establish initial connection');
       }
     } catch (err) {
-      logger.error('Failed to initialize connection manager', 'ConnectionManager', err);
+      logger.error('Failed to initialize connection manager', { source: 'ConnectionManager', error: err });
       throw err;
     }
 
@@ -89,34 +89,34 @@ class ConnectionManager {
           lastConnected: new Date(),
           reconnectAttempts: 0
         });
-        logger.info('Connection check successful', 'ConnectionManager');
+        logger.info('Connection check successful', { source: 'ConnectionManager' });
 
       }
 
       return isConnected;
     } catch (err) {
       this.updateState({ isConnected: false });
-      logger.error('Connection check failed', 'ConnectionManager', err);
+      logger.error('Connection check failed', { source: 'ConnectionManager', error: err });
       return false;
 
     }
   }
 
   private async handleOnline() {
-    logger.info('Device came online', 'ConnectionManager');
+    logger.info('Device came online', { source: 'ConnectionManager' });
     await this.attemptReconnect();
   }
 
 
   private handleOffline() {
-    logger.warn('Device went offline', 'ConnectionManager');
+    logger.warn('Device went offline', { source: 'ConnectionManager' });
     this.updateState({ isConnected: false });
   }
 
 
   private async attemptReconnect(): Promise<boolean> {
     if (this.state.reconnectAttempts >= this.MAX_RECONNECT_ATTEMPTS) {
-      logger.error(`Max reconnection attempts reached: ${this.state.reconnectAttempts}`, 'ConnectionManager');
+      logger.error(`Max reconnection attempts reached: ${this.state.reconnectAttempts}`, { source: 'ConnectionManager' });
       return false;
     }
 

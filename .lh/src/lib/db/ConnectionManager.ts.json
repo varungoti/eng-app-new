@@ -1,0 +1,22 @@
+{
+    "sourceFile": "src/lib/db/ConnectionManager.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1740692435410,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1740692441751,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -89,5 +89,4 @@\n   }\r\n }\r\n \r\n export const connectionManager = ConnectionManager.getInstance();\r\n-```\n\\ No newline at end of file\n"
+                }
+            ],
+            "date": 1740692435410,
+            "name": "Commit-0",
+            "content": "\r\nimport { supabase } from '../supabase';\r\nimport { logger } from '../logger';\r\nimport { WarningCache } from '../monitoring/WarningCache';\r\n\r\ninterface ConnectionStats {\r\n  totalConnections: number;\r\n  activeConnections: number;\r\n  idleConnections: number;\r\n  waitingRequests: number;\r\n}\r\n\r\nclass ConnectionManager {\r\n  private static instance: ConnectionManager;\r\n  private warningCache = new WarningCache(30000); // 30 second cooldown\r\n  private stats: ConnectionStats = {\r\n    totalConnections: 0,\r\n    activeConnections: 0,\r\n    idleConnections: 0,\r\n    waitingRequests: 0\r\n  };\r\n\r\n  private constructor() {\r\n    this.startMonitoring();\r\n  }\r\n\r\n  public static getInstance(): ConnectionManager {\r\n    if (!ConnectionManager.instance) {\r\n      ConnectionManager.instance = new ConnectionManager();\r\n    }\r\n    return ConnectionManager.instance;\r\n  }\r\n\r\n  private startMonitoring() {\r\n    setInterval(() => this.checkHealth(), 30000); // Check every 30 seconds\r\n  }\r\n\r\n  private async checkHealth(): Promise<boolean> {\r\n    try {\r\n      const { data, error } = await supabase.rpc('update_health_check');\r\n      \r\n      if (error) {\r\n        if (this.warningCache.shouldLog('health_check_failed')) {\r\n          logger.warn('Database health check failed', {\r\n            context: { error },\r\n            source: 'ConnectionManager'\r\n          });\r\n        }\r\n        return false;\r\n      }\r\n\r\n      return data === true;\r\n    } catch (err) {\r\n      logger.error('Health check error', {\r\n        context: { error: err },\r\n        source: 'ConnectionManager'\r\n      });\r\n      return false;\r\n    }\r\n  }\r\n\r\n  public getStats(): ConnectionStats {\r\n    return { ...this.stats };\r\n  }\r\n\r\n  public async executeWithRetry<T>(\r\n    operation: () => Promise<T>,\r\n    maxRetries: number = 3\r\n  ): Promise<T> {\r\n    let attempt = 0;\r\n    let lastError: Error | null = null;\r\n\r\n    while (attempt < maxRetries) {\r\n      try {\r\n        return await operation();\r\n      } catch (err) {\r\n        lastError = err instanceof Error ? err : new Error(String(err));\r\n        attempt++;\r\n\r\n        if (attempt < maxRetries) {\r\n          const delay = Math.min(1000 * Math.pow(2, attempt), 5000);\r\n          await new Promise(resolve => setTimeout(resolve, delay));\r\n          continue;\r\n        }\r\n      }\r\n    }\r\n\r\n    throw lastError;\r\n  }\r\n}\r\n\r\nexport const connectionManager = ConnectionManager.getInstance();\r\n```"
+        }
+    ]
+}

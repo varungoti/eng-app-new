@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 2,
+            "activePatchIndex": 3,
             "patches": [
                 {
                     "date": 1739014143582,
@@ -16,6 +16,10 @@
                 {
                     "date": 1739389655646,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -63,9 +63,9 @@\n     } catch (error) {\r\n       this.metrics.errorCount++;\r\n       this.metrics.connectionStatus = this.metrics.errorCount > 3 ? 'error' : 'degraded';\r\n \r\n-      logger.error('Database health check failed', 'DatabaseMonitor', error);\r\n+      logger.error('Database health check failed', { source: 'DatabaseMonitor', error });\r\n \r\n     }\r\n   }\r\n \r\n@@ -87,9 +87,9 @@\n \r\n   updateConnectionStatus(status: boolean) {\r\n     this.isConnected = status;\r\n     if (this.config.enableLogging) {\r\n-      logger.info(`Database connection status: ${status ? 'connected' : 'disconnected'}`, 'DatabaseMonitor');\r\n+      logger.info(`Database connection status: ${status ? 'connected' : 'disconnected'}`, { source: 'DatabaseMonitor' });\r\n     }\r\n   }\r\n }\r\n \r\n"
+                },
+                {
+                    "date": 1740900280022,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -43,9 +43,9 @@\n   private async checkHealth() {\r\n     const startTime = Date.now();\r\n     \r\n     try {\r\n-      const { data, error } = await this.client\r\n+      const { error } = await this.client\r\n         .rpc('update_health_check');\r\n \r\n       if (error) throw error;\r\n \r\n"
                 }
             ],
             "date": 1739014143582,

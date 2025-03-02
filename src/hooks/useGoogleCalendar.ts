@@ -3,6 +3,13 @@ import { googleCalendarService } from '../lib/calendar/GoogleCalendarService';
 import { useToast } from './useToast';
 import { logger } from '../lib/logger';
 
+// Declare the global gapi object
+declare global {
+  interface Window {
+    gapi: any;
+  }
+}
+
 export const useGoogleCalendar = () => {
   const [events, setEvents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -11,13 +18,30 @@ export const useGoogleCalendar = () => {
   const { showToast } = useToast();
 
   useEffect(() => {
-    checkConnection();
+    // Don't immediately check connection in case GAPI isn't loaded yet
+    const gapiLoadCheck = setInterval(() => {
+      if (window.gapi?.auth2) {
+        clearInterval(gapiLoadCheck);
+        checkConnection();
+      }
+    }, 500);
+    
+    // Clear interval on unmount to prevent memory leaks
+    return () => clearInterval(gapiLoadCheck);
   }, []);
 
   const checkConnection = async () => {
     try {
       const auth = window.gapi?.auth2?.getAuthInstance();
-      setIsConnected(auth?.isSignedIn.get() || false);
+      if (!auth) {
+        logger.info('Google API not fully initialized', {
+          source: 'useGoogleCalendar'
+        });
+        setIsConnected(false);
+        return;
+      }
+      
+      setIsConnected(auth.isSignedIn.get() || false);
     } catch (err) {
       logger.error('Failed to check Google Calendar connection', {
         context: { error: err },

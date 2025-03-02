@@ -38,7 +38,7 @@ export function ExercisePromptView({ prompt, index }: ExercisePromptViewProps) {
       <Card className="overflow-hidden border-primary/10 bg-card/50 backdrop-blur-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
         <CardHeader className="relative overflow-hidden">
           {/* Floating badge with shine effect */}
-          <div className="absolute top-4 left-4 z-10 flex gap-2">
+          <div className="absolute top-4 right-4 z-10 flex gap-2">
             <Badge 
               variant="outline" 
               className="bg-background/80 backdrop-blur-sm border-primary/20"
@@ -89,7 +89,7 @@ export function ExercisePromptView({ prompt, index }: ExercisePromptViewProps) {
           )}
 
           {/* Title and Description */}
-          <div className={cn("space-y-2", prompt.media && "mt-4")}>
+          <div className={cn("space-y-4", prompt.media && "mt-40")}>
             <CardTitle className="text-lg font-semibold leading-tight">
               {prompt.text}
             </CardTitle>
@@ -108,9 +108,9 @@ export function ExercisePromptView({ prompt, index }: ExercisePromptViewProps) {
             <div className="relative p-4 rounded-lg border border-primary/10 bg-background/50 backdrop-blur-sm group-hover:border-primary/20 transition-colors duration-300">
               <div className="flex items-center gap-2 mb-2 text-primary">
                 <Volume2 className="h-4 w-4" />
-                <h4 className="font-medium">Narration</h4>
+                <h4 className="font-medium">Narration:</h4>
               </div>
-              <p className="text-muted-foreground">{prompt.narration}</p>
+              <div className="text-muted-foreground">{prompt.narration}</div>
             </div>
           )}
 

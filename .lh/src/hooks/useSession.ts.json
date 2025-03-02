@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/hooks/useSession.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1740092006379,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1740092006379,
+            "name": "Commit-0",
+            "content": "import { useEffect, useState } from 'react';\r\nimport { supabase } from '@/lib/supabase';\r\nimport type { Session } from '@supabase/supabase-js';\r\n\r\ninterface UseSessionReturn {\r\n  session: Session | null;\r\n  loading: boolean;\r\n  error: Error | null;\r\n}\r\n\r\nexport const useSession = (): UseSessionReturn => {\r\n  const [session, setSession] = useState<Session | null>(null);\r\n  const [loading, setLoading] = useState(true);\r\n  const [error, setError] = useState<Error | null>(null);\r\n\r\n  useEffect(() => {\r\n    // Get initial session\r\n    supabase.auth.getSession()\r\n      .then(({ data: { session }, error }) => {\r\n        if (error) {\r\n          setError(error);\r\n        } else {\r\n          setSession(session);\r\n        }\r\n        setLoading(false);\r\n      });\r\n\r\n    // Listen for auth changes\r\n    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {\r\n      setSession(session);\r\n      setLoading(false);\r\n    });\r\n\r\n    return () => {\r\n      subscription.unsubscribe();\r\n    };\r\n  }, []);\r\n\r\n  return { session, loading, error };\r\n}; "
+        }
+    ]
+}

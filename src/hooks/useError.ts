@@ -1,7 +1,7 @@
 import { useContext } from 'react';
-import { ErrorContext } from '../contexts/ErrorContext';
+import { ErrorContext, type ErrorContextType } from '../contexts/ErrorContext';
 
-export const useError = () => {
+export const useError = (): ErrorContextType => {
   const context = useContext(ErrorContext);
   if (!context) {
     throw new Error('useError must be used within an ErrorProvider');

@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 5,
+            "activePatchIndex": 10,
             "patches": [
                 {
                     "date": 1739299747591,
@@ -28,6 +28,26 @@
                 {
                     "date": 1739908596211,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -54,7 +54,11 @@\n     \"node_modules\",\r\n     \"dist\",\r\n     \"build\"\r\n   ],\r\n-  \"references\": [{ \"path\": \"./tsconfig.node.json\" }]\r\n-\r\n+  \"references\": [{ \"path\": \"./tsconfig.node.json\" }],\r\n+  \"ts-node\": {\r\n+    \"compilerOptions\": {\r\n+      \"module\": \"CommonJS\"\r\n+    }\r\n+  }\r\n }\r\n"
+                },
+                {
+                    "date": 1740041680494,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -45,16 +45,13 @@\n     }\r\n   },\r\n   \"include\": [\r\n     \"src/**/*.ts\",\r\n-    \"src/**/*.tsx\",\r\n-    \"src/types/**/*.d.ts\",\r\n-    \"vite.config.ts\"\r\n+    \"src/**/*.tsx\"\r\n   ],\r\n   \"exclude\": [\r\n     \"node_modules\",\r\n-    \"dist\",\r\n-    \"build\"\r\n+    \"vite.config.ts\"\r\n   ],\r\n   \"references\": [{ \"path\": \"./tsconfig.node.json\" }],\r\n   \"ts-node\": {\r\n     \"compilerOptions\": {\r\n"
+                },
+                {
+                    "date": 1740041710736,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -45,9 +45,11 @@\n     }\r\n   },\r\n   \"include\": [\r\n     \"src/**/*.ts\",\r\n-    \"src/**/*.tsx\"\r\n+    \"src/**/*.tsx\",\r\n+    \"src/types/**/*.d.ts\",\r\n+    \"vite.config.ts\"\r\n   ],\r\n   \"exclude\": [\r\n     \"node_modules\",\r\n     \"vite.config.ts\"\r\n"
+                },
+                {
+                    "date": 1740041724109,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -51,9 +51,10 @@\n     \"vite.config.ts\"\r\n   ],\r\n   \"exclude\": [\r\n     \"node_modules\",\r\n-    \"vite.config.ts\"\r\n+    \"dist\",\r\n+    \"build\"\r\n   ],\r\n   \"references\": [{ \"path\": \"./tsconfig.node.json\" }],\r\n   \"ts-node\": {\r\n     \"compilerOptions\": {\r\n"
+                },
+                {
+                    "date": 1740041740104,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -54,9 +54,9 @@\n     \"node_modules\",\r\n     \"dist\",\r\n     \"build\"\r\n   ],\r\n-  \"references\": [{ \"path\": \"./tsconfig.node.json\" }],\r\n+  //\"references\": [{ \"path\": \"./tsconfig.node.json\" }],\r\n   \"ts-node\": {\r\n     \"compilerOptions\": {\r\n       \"module\": \"CommonJS\"\r\n     }\r\n"
+                },
+                {
+                    "date": 1740850932228,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -46,9 +46,14 @@\n   },\r\n   \"include\": [\r\n     \"src/**/*.ts\",\r\n     \"src/**/*.tsx\",\r\n+    \"src/**/*.d.ts\",\r\n+    \"src/**/*.json\",\r\n     \"src/types/**/*.d.ts\",\r\n+    \"src/lib/utils/lazyLoad.tsx\",\r\n+    \"src/lib/utils/virtualList.tsx\",\r\n+    \"src/data/**/*.json\",\r\n     \"vite.config.ts\"\r\n   ],\r\n   \"exclude\": [\r\n     \"node_modules\",\r\n"
                 }
             ],
             "date": 1739299747591,

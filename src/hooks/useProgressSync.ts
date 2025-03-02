@@ -19,7 +19,6 @@ export function useProgressSync() {
       toast({
         title: "Sync Error",
         description: "Failed to save your progress",
-        variant: "destructive"
       });
     }
   }, [dispatch, toast]);

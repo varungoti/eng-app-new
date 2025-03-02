@@ -1,0 +1,26 @@
+{
+    "sourceFile": "src/features/content-management/components/questions/QuestionTypeSelect.tsx",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 2,
+            "patches": [
+                {
+                    "date": 1740085998281,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1740086227111,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,1 +1,27 @@\n- \n\\ No newline at end of file\n+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';\r\n+import { QUESTION_TYPES } from '../../utils/constants';\r\n+\r\n+interface QuestionTypeSelectProps {\r\n+  value: string;\r\n+  onChange: (value: string) => void;\r\n+}\r\n+\r\n+export const QuestionTypeSelect = ({\r\n+  value,\r\n+  onChange\r\n+}: QuestionTypeSelectProps) => {\r\n+  return (\r\n+    <Select value={value} onValueChange={onChange}>\r\n+      <SelectTrigger className=\"w-[200px]\">\r\n+        <SelectValue placeholder=\"Select question type\" />\r\n+      </SelectTrigger>\r\n+      <SelectContent>\r\n+        {Object.entries(QUESTION_TYPES).map(([type, details]) => (\r\n+          <SelectItem key={type} value={type}>\r\n+            {details.label}\r\n+          </SelectItem>\r\n+        ))}\r\n+      </SelectContent>\r\n+    </Select>\r\n+  );\r\n+}; \n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1740089694833,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,27 +1,63 @@\n-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';\r\n+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';\r\n import { QUESTION_TYPES } from '../../utils/constants';\r\n+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';\r\n+import { HelpCircle } from 'lucide-react';\r\n+import { cn } from '@/lib/utils';\r\n \r\n interface QuestionTypeSelectProps {\r\n   value: string;\r\n   onChange: (value: string) => void;\r\n+  className?: string;\r\n }\r\n \r\n export const QuestionTypeSelect = ({\r\n   value,\r\n-  onChange\r\n+  onChange,\r\n+  className\r\n }: QuestionTypeSelectProps) => {\r\n+  // Group question types by category\r\n+  const groupedTypes = Object.entries(QUESTION_TYPES).reduce((acc, [type, details]) => {\r\n+    const category = details.category || 'Other';\r\n+    if (!acc[category]) {\r\n+      acc[category] = [];\r\n+    }\r\n+    acc[category].push({ type, details });\r\n+    return acc;\r\n+  }, {} as Record<string, { type: string; details: typeof QUESTION_TYPES[keyof typeof QUESTION_TYPES] }[]>);\r\n+\r\n   return (\r\n-    <Select value={value} onValueChange={onChange}>\r\n-      <SelectTrigger className=\"w-[200px]\">\r\n-        <SelectValue placeholder=\"Select question type\" />\r\n-      </SelectTrigger>\r\n-      <SelectContent>\r\n-        {Object.entries(QUESTION_TYPES).map(([type, details]) => (\r\n-          <SelectItem key={type} value={type}>\r\n-            {details.label}\r\n-          </SelectItem>\r\n-        ))}\r\n-      </SelectContent>\r\n-    </Select>\r\n+    <div className={cn(\"flex items-center gap-2\", className)}>\r\n+      <Select value={value} onValueChange={onChange}>\r\n+        <SelectTrigger>\r\n+          <SelectValue placeholder=\"Select question type\" />\r\n+        </SelectTrigger>\r\n+        <SelectContent>\r\n+          {Object.entries(groupedTypes).map(([category, types]) => (\r\n+            <SelectGroup key={category}>\r\n+              <SelectLabel className=\"text-xs uppercase tracking-wider text-muted-foreground\">\r\n+                {category}\r\n+              </SelectLabel>\r\n+              {types.map(({ type, details }) => (\r\n+                <SelectItem key={type} value={type}>\r\n+                  <div className=\"flex items-center justify-between gap-2\">\r\n+                    <span>{details.label}</span>\r\n+                    <TooltipProvider>\r\n+                      <Tooltip>\r\n+                        <TooltipTrigger asChild>\r\n+                          <HelpCircle className=\"h-4 w-4 text-muted-foreground\" />\r\n+                        </TooltipTrigger>\r\n+                        <TooltipContent>\r\n+                          <p>{details.description}</p>\r\n+                        </TooltipContent>\r\n+                      </Tooltip>\r\n+                    </TooltipProvider>\r\n+                  </div>\r\n+                </SelectItem>\r\n+              ))}\r\n+            </SelectGroup>\r\n+          ))}\r\n+        </SelectContent>\r\n+      </Select>\r\n+    </div>\r\n   );\r\n }; \n\\ No newline at end of file\n"
+                }
+            ],
+            "date": 1740085998281,
+            "name": "Commit-0",
+            "content": " "
+        }
+    ]
+}

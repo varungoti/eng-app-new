@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 2,
+            "activePatchIndex": 8,
             "patches": [
                 {
                     "date": 1739009542259,
@@ -16,6 +16,30 @@
                 {
                     "date": 1739009662589,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,7 +1,6 @@\n import { ErrorTracker } from './ErrorTracker';\r\n import { ErrorSeverity } from './types';\r\n-import type { NetworkError } from './types';\r\n \r\n interface NetworkError {\r\n   message: string;\r\n   endpoint?: string;\r\n@@ -9,8 +8,12 @@\n   timestamp: number;\r\n   retryCount: number;\r\n }\r\n \r\n+interface ExtendedRequestInit extends RequestInit {\r\n+  throwOnError?: boolean;\r\n+}\r\n+\r\n class NetworkHandler {\r\n   private static instance: NetworkHandler;\r\n   private errorTracker: ErrorTracker;\r\n   private maxRetries = 3;\r\n@@ -33,9 +36,9 @@\n     const originalFetch = window.fetch;\r\n     window.fetch = async (...args) => {\r\n       const url = typeof args[0] === 'string' ? args[0] : \r\n         args[0] instanceof Request ? args[0].url : args[0].toString();\r\n-      const options = args[1] || {};\r\n+      const options = (args[1] || {}) as ExtendedRequestInit;\r\n \r\n       try {\r\n         const response = await originalFetch(...args);\r\n         if (!response.ok) {\r\n"
+                },
+                {
+                    "date": 1740901690565,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,4 +1,6 @@\n+/// <reference lib=\"dom\" />\r\n+\r\n import { ErrorTracker } from './ErrorTracker';\r\n import { ErrorSeverity } from './types';\r\n \r\n interface NetworkError {\r\n"
+                },
+                {
+                    "date": 1740901723686,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -10,8 +10,24 @@\n   timestamp: number;\r\n   retryCount: number;\r\n }\r\n \r\n+// Define RequestInit for fetch API\r\n+interface RequestInit {\r\n+  body?: BodyInit | null;\r\n+  cache?: RequestCache;\r\n+  credentials?: RequestCredentials;\r\n+  headers?: HeadersInit;\r\n+  integrity?: string;\r\n+  keepalive?: boolean;\r\n+  method?: string;\r\n+  mode?: RequestMode;\r\n+  redirect?: RequestRedirect;\r\n+  referrer?: string;\r\n+  referrerPolicy?: ReferrerPolicy;\r\n+  signal?: AbortSignal | null;\r\n+}\r\n+\r\n interface ExtendedRequestInit extends RequestInit {\r\n   throwOnError?: boolean;\r\n }\r\n \r\n"
+                },
+                {
+                    "date": 1740901874062,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -13,9 +13,9 @@\n \r\n // Define RequestInit for fetch API\r\n interface RequestInit {\r\n   body?: BodyInit | null;\r\n-  cache?: RequestCache;\r\n+  cache?: _RequestCache;\r\n   credentials?: RequestCredentials;\r\n   headers?: HeadersInit;\r\n   integrity?: string;\r\n   keepalive?: boolean;\r\n"
+                },
+                {
+                    "date": 1740901879962,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -13,9 +13,9 @@\n \r\n // Define RequestInit for fetch API\r\n interface RequestInit {\r\n   body?: BodyInit | null;\r\n-  cache?: _RequestCache;\r\n+  cache?: RequestCache;\r\n   credentials?: RequestCredentials;\r\n   headers?: HeadersInit;\r\n   integrity?: string;\r\n   keepalive?: boolean;\r\n"
+                },
+                {
+                    "date": 1740901906791,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -10,9 +10,17 @@\n   timestamp: number;\r\n   retryCount: number;\r\n }\r\n \r\n-// Define RequestInit for fetch API\r\n+// Define fetch API types\r\n+type RequestCache = 'default' | 'no-store' | 'reload' | 'no-cache' | 'force-cache' | 'only-if-cached';\r\n+type RequestCredentials = 'include' | 'same-origin' | 'omit';\r\n+type HeadersInit = Headers | string[][] | Record<string, string>;\r\n+type RequestMode = 'navigate' | 'same-origin' | 'no-cors' | 'cors';\r\n+type RequestRedirect = 'follow' | 'error' | 'manual';\r\n+type ReferrerPolicy = '' | 'no-referrer' | 'no-referrer-when-downgrade' | 'origin' | 'origin-when-cross-origin' | 'same-origin' | 'strict-origin' | 'strict-origin-when-cross-origin' | 'unsafe-url';\r\n+type BodyInit = Blob | BufferSource | FormData | URLSearchParams | ReadableStream | string;\r\n+\r\n interface RequestInit {\r\n   body?: BodyInit | null;\r\n   cache?: RequestCache;\r\n   credentials?: RequestCredentials;\r\n"
+                },
+                {
+                    "date": 1740901968436,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -10,36 +10,25 @@\n   timestamp: number;\r\n   retryCount: number;\r\n }\r\n \r\n-// Define fetch API types\r\n-type RequestCache = 'default' | 'no-store' | 'reload' | 'no-cache' | 'force-cache' | 'only-if-cached';\r\n-type RequestCredentials = 'include' | 'same-origin' | 'omit';\r\n-type HeadersInit = Headers | string[][] | Record<string, string>;\r\n-type RequestMode = 'navigate' | 'same-origin' | 'no-cors' | 'cors';\r\n-type RequestRedirect = 'follow' | 'error' | 'manual';\r\n-type ReferrerPolicy = '' | 'no-referrer' | 'no-referrer-when-downgrade' | 'origin' | 'origin-when-cross-origin' | 'same-origin' | 'strict-origin' | 'strict-origin-when-cross-origin' | 'unsafe-url';\r\n-type BodyInit = Blob | BufferSource | FormData | URLSearchParams | ReadableStream | string;\r\n-\r\n-interface RequestInit {\r\n-  body?: BodyInit | null;\r\n-  cache?: RequestCache;\r\n-  credentials?: RequestCredentials;\r\n-  headers?: HeadersInit;\r\n+// Using simpler approach with any to avoid DOM type dependencies\r\n+interface ExtendedRequestInit {\r\n+  throwOnError?: boolean;\r\n+  body?: any;\r\n+  cache?: string;\r\n+  credentials?: string;\r\n+  headers?: any;\r\n   integrity?: string;\r\n   keepalive?: boolean;\r\n   method?: string;\r\n-  mode?: RequestMode;\r\n-  redirect?: RequestRedirect;\r\n+  mode?: string;\r\n+  redirect?: string;\r\n   referrer?: string;\r\n-  referrerPolicy?: ReferrerPolicy;\r\n-  signal?: AbortSignal | null;\r\n+  referrerPolicy?: string;\r\n+  signal?: any;\r\n }\r\n \r\n-interface ExtendedRequestInit extends RequestInit {\r\n-  throwOnError?: boolean;\r\n-}\r\n-\r\n class NetworkHandler {\r\n   private static instance: NetworkHandler;\r\n   private errorTracker: ErrorTracker;\r\n   private maxRetries = 3;\r\n"
                 }
             ],
             "date": 1739009542259,

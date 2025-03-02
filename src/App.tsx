@@ -1,12 +1,11 @@
 "use client";
 
-import React, { useEffect, memo } from 'react';
+import React from 'react';
 import { 
   Routes, 
   Route, 
   Navigate, 
   useLocation, 
-  useNavigate
 } from 'react-router-dom';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { QueryClient  } from '@tanstack/query-core';
@@ -21,7 +20,6 @@ import ErrorToast from './components/ErrorToast';
 import ErrorBoundary from './components/ErrorBoundary';
 import LessonErrorBoundary from './components/LessonErrorBoundary';
 import LoadingSpinner from './components/LoadingSpinner';
-import ThemeSelector from './components/ThemeSelector';
 import ContentManagementPage from './app/content-management/page' ;
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { ThemeToggle } from "@/components/theme-toggle"
@@ -29,7 +27,7 @@ import { useTheme } from "next-themes"
 import { themes } from "@/lib/themes"
 import { ThemeContextProvider } from './contexts/ThemeContext';
 import { Toaster } from "@/components/ui/toaster";
-import { ToastProvider } from "@/components/ui/toast";
+import { ToastProvider } from "@/components/ui/Toast";
 
 // Import Dashboard page directly to avoid dynamic import issues
 import DashboardPage from './pages/Dashboard';
@@ -94,27 +92,16 @@ const queryClient = new QueryClient({
   },
 });
 
-import { ConsoleMonitor } from '@/utils/consoleMonitor';
+//import { ConsoleMonitor } from '@/utils/consoleMonitor';
 
-function MyApp({ Component, pageProps }: { Component: React.ComponentType; pageProps: any }) {
-  useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
-      ConsoleMonitor.getInstance();
-    }
-  }, []);
-
-  return <Component {...pageProps} />;
-}
 
 
 function AppContent() {
   const { theme, resolvedTheme } = useTheme()
   const currentTheme = themes[theme as keyof typeof themes] || themes[resolvedTheme as keyof typeof themes] || themes.light
   const location = useLocation();
-  const navigate = useNavigate();
 
   // Log initialization
-  console.log('[App] Rendering...');
   logger.info('App initializing', { source: 'App', context: { route: location.pathname } });
 
   return (

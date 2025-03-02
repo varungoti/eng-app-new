@@ -20,6 +20,7 @@ interface CacheItem<T> {
   value: T;
   timestamp: number;
   ttl: number;
+  _size?: number;  // Prefixed with underscore since it's optional and not used directly
 }
 
 export class LocalCache {
@@ -88,7 +89,7 @@ export class LocalCache {
 }
 
 // Memory cache for server-side operations (optional)
-const memoryCache = new Map<string, CacheItem<any>>();
+const memoryCache = new Map<string, CacheItem<unknown>>();
 
 export class MemoryCache {
   static set<T>(key: string, value: T, ttl: number): void {
@@ -185,7 +186,7 @@ export function clearPattern(pattern: string): void {
 
 class DataCache {
   private static instance: DataCache;
-  private cache: Map<string, { data: any; timestamp: number }> = new Map();
+  private cache: Map<string, { data: unknown; timestamp: number }> = new Map();
   private readonly TTL = 5 * 60 * 1000; // 5 minutes
 
   private constructor() {}
@@ -197,18 +198,18 @@ class DataCache {
     return DataCache.instance;
   }
 
-  public set(key: string, data: any): void {
+  public set(key: string, data: unknown): void {
     try {
       this.cache.set(key, {
         data,
         timestamp: Date.now()
       });
     } catch (err) {
-      logger.error(`Failed to cache data for key ${key}: ${err}`, 'DataCache');
+      logger.error(`Failed to cache data for key ${key}: ${err}`, { error: err });
     }
   }
 
-  public get(key: string): any | null {
+  public get(key: string): unknown | null {
     try {
       const cached = this.cache.get(key);
       if (!cached) return null;
@@ -220,7 +221,15 @@ class DataCache {
 
       return cached.data;
     } catch (err) {
-      logger.error(`Failed to retrieve cached data for key ${key}: ${err}`, 'DataCache');
+      logger.error('Failed to retrieve cached data', {
+        error: err,
+        context: { 
+          key, 
+          operation: 'get',
+          type: 'cache' 
+        },
+        source: 'DataCache'
+      });
       return null;
     }
   }

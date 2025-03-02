@@ -3,11 +3,19 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 0,
+            "activePatchIndex": 2,
             "patches": [
                 {
                     "date": 1739278892138,
                     "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1740927328473,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -8,9 +8,9 @@\n import RoleDashboard from '../components/RoleDashboard';\r\n import LoadingSpinner from '../components/LoadingSpinner';\r\n import { logger } from '../lib/logger';\r\n import ErrorBoundary from '../components/ErrorBoundary';\r\n-import type { UserRole } from '@/types/roles';\r\n+//import type { UserRole } from '@/types/roles';\r\n \r\n // Lazy load dashboard components with preload\r\n const dashboardComponents = {\r\n   'super_admin': React.lazy(() => {\r\n"
+                },
+                {
+                    "date": 1740927339128,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,7 +1,7 @@\n \"use client\";\r\n \r\n-import React, { memo, useMemo, useState, useEffect, useCallback } from 'react';\r\n+import React, { memo, useState, useEffect, useCallback } from 'react';\r\n import { Navigate, useLocation } from 'react-router-dom';\r\n import { useAuth } from '@/hooks/useAuth';\r\n import { useQueryClient } from '@tanstack/react-query';\r\n import DashboardSwitcher from '../components/DashboardSwitcher';\r\n@@ -54,9 +54,9 @@\n   const location = useLocation();\r\n   const queryClient = useQueryClient();\r\n   const [selectedRole, setSelectedRole] = useState<string | null>(null);\r\n   const [loadError, setLoadError] = useState<string | null>(null);\r\n-  const [loadProgress, setLoadProgress] = useState<number>(0);\r\n+  const [loadProgress, _setLoadProgress] = useState<number>(0);\r\n \r\n   // Memoized role update handler\r\n   const handleRoleChange = useCallback((newRole: string) => {\r\n     setSelectedRole(newRole);\r\n"
                 }
             ],
             "date": 1739278892138,

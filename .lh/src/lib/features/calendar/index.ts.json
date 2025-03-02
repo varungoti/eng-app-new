@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/lib/features/calendar/index.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1740900648175,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1740900648175,
+            "name": "Commit-0",
+            "content": "// Export calendar module\r\nexport * from './CalendarManager';\r\nexport * from './types'; "
+        }
+    ]
+}

@@ -1,8 +1,19 @@
 import React from 'react';
 import type { RoleSettings } from '../../types/dashboard';
-import { FileText, CheckCircle, Clock, Edit, Badge } from 'lucide-react';
-import { Badge as ShadcnBadge } from "@/components/ui/badge";
-import { DashboardProps } from '@/types/dashboard';
+import { FileText, CheckCircle, Clock, Edit, Badge, Trophy } from 'lucide-react';
+import { Badge as ShadcnBadge } from "../../components/ui/badge";
+
+
+// Define DashboardProps locally with a more flexible settings type
+interface DashboardProps {
+  settings: RoleSettings & {
+    stats?: Record<string, any>;
+    recentActivity?: any[];
+    accountTypes?: any[];
+    recentChanges?: any[];
+    accountTiers?: any[];
+  };
+}
 
 export const ContentHeadDashboard: React.FC<DashboardProps> = ({ settings }) => {
   return (
@@ -176,7 +187,7 @@ export const ContentEditorDashboard: React.FC<DashboardProps> = ({ settings }) =
               <div key={i} className="mb-4 p-3 bg-gray-50 rounded">
                 <div className="flex items-center justify-between">
                   <p className="font-medium text-gray-700">{content.title}</p>
-                  <ShadcnBadge variant={content.status === 'approved' ? 'success' : 'warning'}>
+                  <ShadcnBadge variant={content.status === 'approved' ? 'default' : 'secondary'}>
                     {content.status}
                   </ShadcnBadge>
                 </div>
@@ -201,8 +212,7 @@ export const ContentEditorDashboard: React.FC<DashboardProps> = ({ settings }) =
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
                   <div
-                    className="bg-blue-600 h-2 rounded-full"
-                    style={{ width: `${category.percentage}%` }}
+                    className={`bg-blue-600 h-2 rounded-full w-[${category.percentage}%]`}
                   />
                 </div>
               </div>
@@ -216,12 +226,223 @@ export const ContentEditorDashboard: React.FC<DashboardProps> = ({ settings }) =
 
 export const AccountsDashboard: React.FC<DashboardProps> = ({ settings }) => {
   return (
-    // ... implementation
+    <div className="grid gap-6 p-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <div className="p-6 bg-white rounded-lg shadow">
+          <h3 className="text-xl font-semibold">Account Overview</h3>
+          <div className="mt-4 space-y-2">
+            <div className="flex justify-between">
+              <span>Total Users</span>
+              <span className="font-medium">{settings.stats?.totalUsers || 0}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Active Users</span>
+              <span className="font-medium">{settings.stats?.activeUsers || 0}</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="p-6 bg-white rounded-lg shadow">
+          <h3 className="text-xl font-semibold">Account Health</h3>
+          <div className="mt-4 space-y-2">
+            <div className="flex justify-between">
+              <span>Verified Accounts</span>
+              <span className="font-medium">{settings.stats?.verifiedAccounts || '0%'}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Account Activity</span>
+              <span className="font-medium">{settings.stats?.accountActivity || '0%'}</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="p-6 bg-white rounded-lg shadow">
+          <h3 className="text-xl font-semibold">Support Metrics</h3>
+          <div className="mt-4 space-y-2">
+            <div className="flex justify-between">
+              <span>Open Tickets</span>
+              <span className="font-medium">{settings.stats?.openTickets || 0}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Avg Response Time</span>
+              <span className="font-medium">{settings.stats?.avgResponseTime || '0h'}</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="p-6 bg-white rounded-lg shadow">
+          <h3 className="text-xl font-semibold">Security Status</h3>
+          <div className="mt-4 space-y-2">
+            <div className="flex justify-between">
+              <span>2FA Enabled</span>
+              <span className="font-medium">{settings.stats?.twoFactorEnabled || '0%'}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Security Score</span>
+              <span className="font-medium">{settings.stats?.securityScore || '0%'}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid gap-6 md:grid-cols-2">
+        <div className="p-6 bg-white rounded-lg shadow">
+          <h4 className="mb-4 font-semibold">Recent Account Activity</h4>
+          <div className="space-y-4">
+            {settings.recentActivity?.map((activity, i) => (
+              <div key={i} className="flex items-center gap-4 p-3 bg-gray-50 rounded">
+                <div className="p-2 bg-blue-100 rounded-full">
+                  {activity.type === 'login' && <Badge className="h-5 w-5 text-blue-600" />}
+                  {activity.type === 'update' && <Edit className="h-5 w-5 text-green-600" />}
+                  {activity.type === 'security' && <FileText className="h-5 w-5 text-red-600" />}
+                </div>
+                <div className="flex-1">
+                  <p className="font-medium text-gray-700">{activity.description}</p>
+                  <p className="text-sm text-gray-500">{activity.timestamp}</p>
+                </div>
+                <ShadcnBadge variant={activity.status === 'completed' ? 'default' : 'secondary'}>
+                  {activity.status}
+                </ShadcnBadge>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="p-6 bg-white rounded-lg shadow">
+          <h4 className="mb-4 font-semibold">Account Types Distribution</h4>
+          <div className="space-y-4">
+            {settings.accountTypes?.map((type, i) => (
+              <div key={i} className="space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-sm font-medium text-gray-700">{type.name}</span>
+                  <span className="text-sm font-medium text-gray-700">{type.count}</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div
+                    className={`h-2 rounded-full w-[${type.percentage}%] bg-blue-600`}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 
 export const AccountsExecutiveDashboard: React.FC<DashboardProps> = ({ settings }) => {
   return (
-    // ... implementation
+    <div className="grid gap-6 p-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <div className="p-6 bg-white rounded-lg shadow">
+          <h3 className="text-xl font-semibold">Accounts Overview</h3>
+          <div className="mt-4 space-y-2">
+            <div className="flex justify-between">
+              <span>Total Accounts</span>
+              <span className="font-medium">{settings.stats?.totalAccounts || 0}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>New Accounts</span>
+              <span className="font-medium">{settings.stats?.newAccounts || 0}</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="p-6 bg-white rounded-lg shadow">
+          <h3 className="text-xl font-semibold">Revenue Metrics</h3>
+          <div className="mt-4 space-y-2">
+            <div className="flex justify-between">
+              <span>Monthly Revenue</span>
+              <span className="font-medium">${settings.stats?.monthlyRevenue?.toLocaleString() || 0}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Average Account Value</span>
+              <span className="font-medium">${settings.stats?.avgAccountValue?.toLocaleString() || 0}</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="p-6 bg-white rounded-lg shadow">
+          <h3 className="text-xl font-semibold">Retention</h3>
+          <div className="mt-4 space-y-2">
+            <div className="flex justify-between">
+              <span>Retention Rate</span>
+              <span className="font-medium">{settings.stats?.retentionRate || '0%'}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Churn Rate</span>
+              <span className="font-medium">{settings.stats?.churnRate || '0%'}</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="p-6 bg-white rounded-lg shadow">
+          <h3 className="text-xl font-semibold">Account Health</h3>
+          <div className="mt-4 space-y-2">
+            <div className="flex justify-between">
+              <span>Active Accounts</span>
+              <span className="font-medium">{settings.stats?.activeAccounts || 0}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>At-Risk Accounts</span>
+              <span className="font-medium">{settings.stats?.atRiskAccounts || 0}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid gap-6 md:grid-cols-2">
+        <div className="p-6 bg-white rounded-lg shadow">
+          <h4 className="mb-4 font-semibold">Recent Account Changes</h4>
+          <div className="space-y-4">
+            {settings.recentChanges?.map((change, i) => (
+              <div key={i} className="flex items-center gap-4 p-3 bg-gray-50 rounded">
+                <div className="p-2 bg-blue-100 rounded-full">
+                  {change.type === 'upgrade' && <Trophy className="h-5 w-5 text-blue-600" />}
+                  {change.type === 'downgrade' && <Clock className="h-5 w-5 text-orange-600" />}
+                  {change.type === 'cancellation' && <FileText className="h-5 w-5 text-red-600" />}
+                  {change.type === 'new' && <CheckCircle className="h-5 w-5 text-green-600" />}
+                </div>
+                <div className="flex-1">
+                  <p className="font-medium text-gray-700">{change.accountName}</p>
+                  <p className="text-sm text-gray-500">{change.description}</p>
+                </div>
+                <ShadcnBadge variant={
+                  change.type === 'upgrade' ? 'default' : 
+                  change.type === 'new' ? 'secondary' : 
+                  change.type === 'downgrade' ? 'outline' : 'destructive'
+                }>
+                  {change.type}
+                </ShadcnBadge>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="p-6 bg-white rounded-lg shadow">
+          <h4 className="mb-4 font-semibold">Account Tier Distribution</h4>
+          <div className="space-y-4">
+            {settings.accountTiers?.map((tier, i) => (
+              <div key={i} className="space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-sm font-medium text-gray-700">{tier.name}</span>
+                  <span className="text-sm font-medium text-gray-700">{tier.count} accounts</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div
+                    className={`h-2 rounded-full w-[${tier.percentage}%] ${
+                      tier.name === 'Enterprise' ? 'bg-purple-600' :
+                      tier.name === 'Business' ? 'bg-blue-600' :
+                      tier.name === 'Pro' ? 'bg-green-600' : 'bg-gray-600'
+                    }`}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }; 

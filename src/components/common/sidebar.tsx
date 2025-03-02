@@ -13,7 +13,7 @@ interface SidebarItem {
   href: string;
   label: string;
   icon: LucideIcon;
-  isActive?: boolean;
+  _isActive?: boolean;
   children?: SidebarItem[];
 }
 
@@ -73,7 +73,7 @@ export default function Sidebar({ className = "", sidebarItems, currentPath }: S
       sidebarItems.map(item => ({
         label: item.label,
         href: item.href,
-        isActive: item.isActive
+        isActive: item._isActive
       }))
     );
 
@@ -141,8 +141,8 @@ export default function Sidebar({ className = "", sidebarItems, currentPath }: S
                 href={item.href}
                 isActive={currentPath === item.href}
                 isCollapsed={isCollapsed}
-                children={item.children}
                 currentPath={currentPath}
+                nestedItems={item.children}
               />
             ))}
           </nav>
@@ -182,7 +182,7 @@ function SidebarItem({
   href, 
   isActive, 
   isCollapsed,
-  children,
+  nestedItems,
   currentPath 
 }: { 
   icon: LucideIcon;
@@ -190,7 +190,7 @@ function SidebarItem({
   href: string; 
   isActive: boolean;
   isCollapsed: boolean;
-  children?: SidebarItem[];
+  nestedItems?: SidebarItem[];
   currentPath: string;
 }) {
   const { logError } = useComponentLogger('SidebarItem');
@@ -209,7 +209,7 @@ function SidebarItem({
             isCollapsed ? "justify-center" : "justify-start"
           )}
           onClick={(e) => {
-            if (children && children.length > 0) {
+            if (nestedItems && nestedItems.length > 0) {
               e.preventDefault();
               setIsOpen(!isOpen);
             }
@@ -224,7 +224,7 @@ function SidebarItem({
           {!isCollapsed && (
             <>
               <span className="text-sm flex-1">{label}</span>
-              {children && children.length > 0 && (
+              {nestedItems && nestedItems.length > 0 && (
                 <ChevronDown 
                   className={cn(
                     "h-4 w-4 transition-transform",
@@ -236,15 +236,16 @@ function SidebarItem({
           )}
         </Link>
         
-        {!isCollapsed && isOpen && children && children.length > 0 && (
+        {!isCollapsed && isOpen && nestedItems && nestedItems.length > 0 && (
           <div className="ml-4 mt-1 space-y-1">
-            {children.map((child, index) => (
+            {nestedItems.map((child, index) => (
               <SidebarItem
                 key={`${child.href}-${index}`}
                 {...child}
                 isCollapsed={isCollapsed}
                 isActive={currentPath === child.href}
                 currentPath={currentPath}
+                nestedItems={child.children}
               />
             ))}
           </div>

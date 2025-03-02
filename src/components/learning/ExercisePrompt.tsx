@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Speaker } from "@/components/common/speaker";
+import AnimatedSpeakerIcon from "@/components/common/speaker";
+import { ImagePreview } from '../common/ImagePreview';
 
 interface ExercisePromptProps {
   prompt: {
@@ -11,7 +12,7 @@ interface ExercisePromptProps {
     media?: string;
     type: string;
   };
-  onComplete: () => void;
+  onComplete: (answer?: any) => void;
 }
 
 export function ExercisePrompt({ prompt, onComplete }: ExercisePromptProps) {
@@ -37,7 +38,7 @@ export function ExercisePrompt({ prompt, onComplete }: ExercisePromptProps) {
               onClick={handleNarration}
               className="rounded-full"
             >
-              <Speaker isPlaying={isPlaying} />
+              <AnimatedSpeakerIcon isPlaying={isPlaying} />
             </Button>
           )}
           <p className="text-lg">{prompt.text}</p>
@@ -45,15 +46,15 @@ export function ExercisePrompt({ prompt, onComplete }: ExercisePromptProps) {
         
         {prompt.media && (
           <div className="mb-4">
-            <img 
-              src={prompt.media} 
+            <ImagePreview 
+              imageUrl={prompt.media} 
               alt="Exercise media"
               className="rounded-lg max-w-full" 
             />
           </div>
         )}
         
-        <Button onClick={onComplete} className="mt-4">
+        <Button onClick={() => onComplete({})} className="mt-4">
           Continue
         </Button>
       </CardContent>

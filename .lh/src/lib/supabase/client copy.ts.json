@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 1,
+            "activePatchIndex": 2,
             "patches": [
                 {
                     "date": 1738876510952,
@@ -12,6 +12,10 @@
                 {
                     "date": 1738876537787,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,25 +1,25 @@\n import { createBrowserClient } from '@supabase/ssr'\n import { createClient } from '@supabase/supabase-js';\n \n-export const createClient = () => {\n-  return createBrowserClient(\n-    process.env.NEXT_PUBLIC_SUPABASE_URL!,\n-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!\n-  )\n-} \n+// export const createClient = () => {\n+//   return createBrowserClient(\n+//     process.env.NEXT_PUBLIC_SUPABASE_URL!,\n+//     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!\n+//   )\n+// } \n \n-// const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;\n-// const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;\n+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;\n+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;\n \n-// if (!supabaseUrl || !supabaseAnonKey) {\n-//   throw new Error('Missing Supabase environment variables');\n-// }\n+if (!supabaseUrl || !supabaseAnonKey) {\n\\ No newline at end of file\n+  throw new Error('Missing Supabase environment variables');\n+}\n \n-// export const supabase = createClient(supabaseUrl, supabaseAnonKey, {\n-//   auth: {\n-//     persistSession: true,\n-//     autoRefreshToken: true,\n-//   },\n-// });\n+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {\n+  auth: {\n+    persistSession: true,\n+    autoRefreshToken: true,\n+  },\n+});\n \n-// export default supabase; \n+export default supabase; \n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1740899537896,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,25 +1,25 @@\n-import { createBrowserClient } from '@supabase/ssr'\n-import { createClient } from '@supabase/supabase-js';\n-\n-// export const createClient = () => {\n-//   return createBrowserClient(\n-//     process.env.NEXT_PUBLIC_SUPABASE_URL!,\n-//     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!\n-//   )\n-// } \n-\n-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;\n-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;\n-\n-if (!supabaseUrl || !supabaseAnonKey) {\n-  throw new Error('Missing Supabase environment variables');\n-}\n-\n-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {\n-  auth: {\n-    persistSession: true,\n-    autoRefreshToken: true,\n-  },\n-});\n-\n+//import { createBrowserClient } from '@supabase/ssr'\r\n+import { createClient } from '@supabase/supabase-js';\r\n+\r\n+// export const createClient = () => {\r\n+//   return createBrowserClient(\r\n+//     process.env.NEXT_PUBLIC_SUPABASE_URL!,\r\n+//     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!\r\n+//   )\r\n+// } \r\n+\r\n+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;\r\n+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;\r\n+\r\n+if (!supabaseUrl || !supabaseAnonKey) {\r\n+  throw new Error('Missing Supabase environment variables');\r\n+}\r\n+\r\n+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {\r\n+  auth: {\r\n+    persistSession: true,\r\n+    autoRefreshToken: true,\r\n+  },\r\n+});\r\n+\r\n export default supabase; \n\\ No newline at end of file\n"
                 }
             ],
             "date": 1738876510952,

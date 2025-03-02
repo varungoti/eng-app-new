@@ -2,8 +2,8 @@
 
 
 import { createContext, useContext, useEffect, useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
-import type { SupabaseClient as Client, User as SupabaseUser } from '@supabase/supabase-js'
+import supabase from '@/lib/supabase/client'
+import type { SupabaseClient as Client, User as SupabaseUser, AuthChangeEvent, Session } from '@supabase/supabase-js'
 import { useRouter } from 'next/navigation'
 
 type SupabaseContext = {
@@ -18,14 +18,13 @@ export default function SupabaseProvider({
 }: { 
   children: React.ReactNode 
 }) {
-  const [supabase] = useState(() => createClient())
   const [user, setUser] = useState<SupabaseUser | null>(null)
   const router = useRouter()
 
   useEffect(() => {
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
+    } = supabase.auth.onAuthStateChange((_event: AuthChangeEvent, session: Session | null) => {
       if (session) {
         setUser(session.user)
       } else {
@@ -37,7 +36,7 @@ export default function SupabaseProvider({
     return () => {
       subscription.unsubscribe()
     }
-  }, [supabase, router])
+  }, [router])
 
   return (
     <Context.Provider value={{ supabase, user }}>

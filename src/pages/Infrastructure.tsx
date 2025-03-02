@@ -1,12 +1,12 @@
-import React from 'react';
+//import React from 'react';
 import { Server, Database, Cloud, Activity } from 'lucide-react';
 import { usePermissions } from '../hooks/usePermissions';
-import { Permissions } from '../types/roles';
+//import { Permissions } from '../types/roles';
 
 const Infrastructure = () => {
   const { can } = usePermissions();
 
-  if (!can('infrastructure' as keyof Permissions)) {
+  if (!can("staff")) {
     return (
       <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
         <h3 className="text-lg font-medium text-red-800">Access Denied</h3>
@@ -77,8 +77,7 @@ const Infrastructure = () => {
                 </div>
                 <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
                   <div 
-                    className="h-full bg-indigo-600 rounded-full"
-                    style={{ width: `${metric.value}%` }}
+                    className={`h-full bg-indigo-600 rounded-full w-[${metric.value}%]`}
                   />
                 </div>
               </div>

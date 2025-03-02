@@ -12,7 +12,7 @@ function MyApp({ Component, pageProps }: AppProps) {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       // Initialize console monitoring
-      const monitor = ConsoleMonitor.getInstance();
+      const _monitor = ConsoleMonitor.getInstance();
 
       // Optional: Log initial page load
       console.log('Page loaded:', window.location.pathname);

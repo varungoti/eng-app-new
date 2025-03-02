@@ -47,7 +47,12 @@
   "include": [
     "src/**/*.ts",
     "src/**/*.tsx",
+    "src/**/*.d.ts",
+    "src/**/*.json",
     "src/types/**/*.d.ts",
+    "src/lib/utils/lazyLoad.tsx",
+    "src/lib/utils/virtualList.tsx",
+    "src/data/**/*.json",
     "vite.config.ts"
   ],
   "exclude": [
@@ -55,7 +60,7 @@
     "dist",
     "build"
   ],
-  "references": [{ "path": "./tsconfig.node.json" }],
+  //"references": [{ "path": "./tsconfig.node.json" }],
   "ts-node": {
     "compilerOptions": {
       "module": "CommonJS"

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Calendar, Plus, Edit, Trash2, Upload, Book } from 'lucide-react';
+import { useState } from 'react';
+import { Calendar, Plus, Edit, Trash2, Upload } from 'lucide-react';
 import type { Class } from '../types';
 import { useAuth } from '../hooks/useAuth';
 import ScheduleImport from '../components/schedule/ScheduleImport';
@@ -25,14 +25,14 @@ const Schedule = () => {
   ];
 
   const handleAddClass = (classData: Omit<Class, 'id'>) => {
-    setClasses([...classes, { ...classData, id: Date.now().toString() }]);
+    setClasses([...classes, { ...classData, id: Number(Date.now().toString()) }]);
     setIsAddModalOpen(false);
   };
 
   const handleImportSchedules = (schedules: Omit<Class, 'id'>[]) => {
     const newSchedules = schedules.map(schedule => ({
       ...schedule,
-      id: Date.now().toString()
+      id: Number(Date.now().toString())
     }));
     setClasses([...classes, ...newSchedules]);
     setIsImportModalOpen(false);
@@ -85,7 +85,7 @@ const Schedule = () => {
                         <Calendar className="h-6 w-6 text-indigo-600 mr-3" />
                         <div>
                           <div className="text-sm font-medium text-indigo-600">
-                            Grade {classItem.gradeId}
+                            Grade {classItem.grade_id}
                           </div>
                           <div className="text-sm text-gray-500">
                             Teacher ID: {classItem.teacherId}
@@ -106,7 +106,10 @@ const Schedule = () => {
                     </div>
                     <div className="mt-4 flex-shrink-0 sm:mt-0">
                       <div className="flex space-x-4">
-                        <button className="text-gray-400 hover:text-gray-500">
+                        <button 
+                          className="text-gray-400 hover:text-gray-500"
+                          aria-label="Edit class"
+                        >
                           <Edit className="h-5 w-5" />
                         </button>
                         <button
@@ -114,6 +117,7 @@ const Schedule = () => {
                             setClasses(classes.filter((c) => c.id !== classItem.id));
                           }}
                           className="text-red-400 hover:text-red-500"
+                          aria-label="Delete class"
                         >
                           <Trash2 className="h-5 w-5" />
                         </button>
@@ -140,8 +144,14 @@ const Schedule = () => {
                 const formData = new FormData(e.currentTarget);
                 handleAddClass({
                   schoolId: formData.get('schoolId') as string,
-                  gradeId: formData.get('gradeId') as string,
+                  grade_id: formData.get('gradeId') as string,
                   teacherId: formData.get('teacherId') as string,
+                  name: "",
+                  description: null,
+                  section: null,
+                  created_by: null,
+                  created_at: new Date(),
+                  updated_at: new Date(),
                   schedule: [
                     {
                       dayOfWeek: parseInt(formData.get('dayOfWeek') as string),
@@ -154,45 +164,49 @@ const Schedule = () => {
             >
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">
+                  <label className="block text-sm font-medium text-gray-700" id="schoolId-label">
                     School ID
                   </label>
                   <input
                     type="text"
                     name="schoolId"
                     required
+                    aria-labelledby="schoolId-label"
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">
+                  <label className="block text-sm font-medium text-gray-700" id="gradeId-label">
                     Grade ID
                   </label>
                   <input
                     type="text"
                     name="gradeId"
                     required
+                    aria-labelledby="gradeId-label"
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">
+                  <label className="block text-sm font-medium text-gray-700" id="teacherId-label">
                     Teacher ID
                   </label>
                   <input
                     type="text"
                     name="teacherId"
                     required
+                    aria-labelledby="teacherId-label"
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">
+                  <label className="block text-sm font-medium text-gray-700" id="dayOfWeek-label">
                     Day of Week
                   </label>
                   <select
                     name="dayOfWeek"
                     required
+                    aria-labelledby="dayOfWeek-label"
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   >
                     {daysOfWeek.map((day, index) => (
@@ -203,24 +217,26 @@ const Schedule = () => {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">
+                  <label className="block text-sm font-medium text-gray-700" id="startTime-label">
                     Start Time
                   </label>
                   <input
                     type="time"
                     name="startTime"
                     required
+                    aria-labelledby="startTime-label"
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">
+                  <label className="block text-sm font-medium text-gray-700" id="endTime-label">
                     End Time
                   </label>
                   <input
                     type="time"
                     name="endTime"
                     required
+                    aria-labelledby="endTime-label"
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo -500 focus:ring-indigo-500 sm:text-sm"
                   />
                 </div>

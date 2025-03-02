@@ -3,13 +3,13 @@
 import { useQuery } from '@tanstack/react-query';
 import { Card } from '@/components/ui/card';
 import { LoadingIndicator } from '@/components/LoadingIndicator';
-import { Badge } from '@/components/ui/badge';
-import { formatDistanceToNow } from 'date-fns';
-import { useSupabase } from '@/providers/supabase-provider';
+//import { Badge } from '@/components/ui/badge';
+//import { formatDistanceToNow } from 'date-fns';
+//import { useSupabase } from '@/providers/supabase-provider';
 import type { Class } from '@/types/class';
 
 export default function MyClassesPage() {
-  const { user } = useSupabase();
+  //const { user } = useSupabase();
 
   const { data: classes, isLoading } = useQuery<Class[]>({
     queryKey: ['classes'],

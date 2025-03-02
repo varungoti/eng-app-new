@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 6,
+            "activePatchIndex": 7,
             "patches": [
                 {
                     "date": 1739483119209,
@@ -32,6 +32,10 @@
                 {
                     "date": 1739484023470,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,6 @@\n import { dbConfig } from '../config/db-config'\r\n-import type { Topic, Subtopic, Lesson, Question, ExercisePrompt, Activity } from '@/types/index\r\n+import type { Topic, Subtopic, Lesson, Question, ExercisePrompt, Activity } from '@/types/index;\r\n \r\n export class ValidationError extends Error {\r\n   constructor(message: string) {\r\n     super(message)\r\n"
+                },
+                {
+                    "date": 1740925959028,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,6 @@\n import { dbConfig } from '../config/db-config'\r\n-import type { Topic, Subtopic, Lesson, Question, ExercisePrompt, Activity } from '@/types/index;\r\n+//import type { Topic, Subtopic, Lesson, Question, ExercisePrompt, Activity } from '@/types/index';\r\n \r\n export class ValidationError extends Error {\r\n   constructor(message: string) {\r\n     super(message)\r\n"
                 }
             ],
             "date": 1739483119209,

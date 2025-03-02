@@ -1,7 +1,7 @@
 import type { User, Role } from './user';
-import type { Grade, Topic, Subtopic, Lesson } from './content';
-import { Module } from 'node:vm';
-import { supabase } from '../lib/supabase';
+import type { Topic, Subtopic, Lesson } from './content';
+//import { Module } from 'node:vm';
+//import { supabase } from '../lib/supabase';
 
 export interface School
 {

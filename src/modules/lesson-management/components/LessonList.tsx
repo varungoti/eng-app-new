@@ -1,7 +1,6 @@
 import { Card } from '../../../components/ui/card';
 import { Button } from '../../../components/ui/button';
 import { Icon } from '@/components/ui/icons';
-import { APP_ICONS } from '@/lib/constants/icons';
 import { useLessonManagementContext } from '../context/LessonManagementContext';
 import { Spinner as LoadingSpinner } from '../../../components/ui/spinner';
 
@@ -61,23 +60,23 @@ export function LessonList() {
             <div>
               <h3 className="font-medium">{lesson.title}</h3>
               <p className="text-sm text-muted-foreground mt-1">
-                {lesson.description}
+                {lesson.title || "No description available"}
               </p>
             </div>
             
             <div className="flex justify-between items-center">
               <div className="text-sm text-muted-foreground">
-                {lesson.content.objectives.length} Objectives
+                {0} Objectives
               </div>
               <div className="flex gap-2">
                 <Button variant="ghost" size="sm">
-                  <Icon name={APP_ICONS.EYE} className="w-4 h-4" />
+                  <Icon type="phosphor" name="EYE_SLASH" className="w-4 h-4" />
                 </Button>
                 <Button variant="ghost" size="sm">
-                  <Icon name={APP_ICONS.EDIT} className="w-4 h-4" />
+                  <Icon type="phosphor" name="PENCIL_SIMPLE" className="w-4 h-4" />
                 </Button>
                 <Button variant="ghost" size="sm" className="text-destructive">
-                  <Icon name={APP_ICONS.TRASH} className="w-4 h-4" />
+                  <Icon type="phosphor" name="TRASH_SIMPLE" className="w-4 h-4" />
                 </Button>
               </div>
             </div>

@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 10,
+            "activePatchIndex": 28,
             "patches": [
                 {
                     "date": 1739440467940,
@@ -48,6 +48,78 @@
                 {
                     "date": 1739440987244,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,5 +1,4 @@\n-'use client\";\r\n \r\n import React, { useState } from 'react';\r\n import { School, Plus, Edit, Trash2, MapPin, Phone, Mail, User } from 'lucide-react';\r\n import type { School as SchoolType } from '../types';\r\n"
+                },
+                {
+                    "date": 1740926492430,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,5 +1,4 @@\n-\r\n import React, { useState } from 'react';\r\n import { School, Plus, Edit, Trash2, MapPin, Phone, Mail, User } from 'lucide-react';\r\n import type { School as SchoolType } from '../types';\r\n import LocationSearch from '../components/LocationSearch';\r\n"
+                },
+                {
+                    "date": 1740926505602,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,4 +1,5 @@\n+\r\n import React, { useState } from 'react';\r\n import { School, Plus, Edit, Trash2, MapPin, Phone, Mail, User } from 'lucide-react';\r\n import type { School as SchoolType } from '../types';\r\n import LocationSearch from '../components/LocationSearch';\r\n"
+                },
+                {
+                    "date": 1740926514919,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,6 @@\n \r\n-import React, { useState } from 'react';\r\n+import { useState } from 'react';\r\n import { School, Plus, Edit, Trash2, MapPin, Phone, Mail, User } from 'lucide-react';\r\n import type { School as SchoolType } from '../types';\r\n import LocationSearch from '../components/LocationSearch';\r\n import EditSchoolDialog from '../components/EditSchoolDialog';\r\n@@ -9,9 +9,9 @@\n import GradeSelector from '../components/GradeSelector';\r\n import { useSchools } from '../hooks/useSchools';\r\n import { useToast } from '@/components/ui/use-toast';\r\n import LoadingSpinner from '../components/LoadingSpinner';\r\n-import { Dialog } from '@/components/ui/dialog';\r\n+//import { Dialog } from '@/components/ui/dialog';\r\n \r\n const isSchool = (school: unknown): school is SchoolType => {\r\n   return typeof school === 'object' && school !== null && 'type' in school && 'id' in school;\r\n };\r\n"
+                },
+                {
+                    "date": 1740926522537,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -24,9 +24,9 @@\n   const [selectedSchool, setSelectedSchool] = useState<SchoolType | null>(null);\r\n   const [isAddBranchOpen, setIsAddBranchOpen] = useState(false);\r\n   const [editingSchool, setEditingSchool] = useState<SchoolType | null>(null);\r\n   const [selectedGrades, setSelectedGrades] = useState<string[]>([]);\r\n-  const [isLoading, setIsLoading] = useState(false);\r\n+  const [_isLoading, setIsLoading] = useState(false);\r\n \r\n   const handleEditSchool = (updatedSchool: SchoolType) => {\r\n     console.log('Updating school:', updatedSchool);\r\n     updateSchool.mutate(updatedSchool);\r\n"
+                },
+                {
+                    "date": 1740926538071,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -124,9 +124,8 @@\n       }\r\n     } catch (err) {\r\n       setError(err instanceof Error ? err.message : 'Failed to add school');\r\n       toast({\r\n-        variant: \"destructive\",\r\n         title: \"Error\",\r\n         description: \"Failed to add school\",\r\n       });\r\n     } finally {\r\n"
+                },
+                {
+                    "date": 1740926543746,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -190,8 +190,9 @@\n       <div className=\"flex justify-between items-center mb-6\">\r\n         <h1 className=\"text-2xl font-semibold text-gray-900\">Schools</h1>\r\n         <div className=\"flex space-x-4\">\r\n           <button\r\n+          \r\n             onClick={() => setIsAddModalOpen(true)}\r\n             className=\"inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700\"\r\n           >\r\n             <Plus className=\"h-4 w-4 mr-2\" />\r\n"
+                },
+                {
+                    "date": 1740926557379,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -190,9 +190,10 @@\n       <div className=\"flex justify-between items-center mb-6\">\r\n         <h1 className=\"text-2xl font-semibold text-gray-900\">Schools</h1>\r\n         <div className=\"flex space-x-4\">\r\n           <button\r\n-          \r\n+            title=\"Add School\"\r\n+            type=\"button\"\r\n             onClick={() => setIsAddModalOpen(true)}\r\n             className=\"inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700\"\r\n           >\r\n             <Plus className=\"h-4 w-4 mr-2\" />\r\n@@ -239,8 +240,10 @@\n                   </div>\r\n                   <div className=\"mt-4 flex-shrink-0 sm:mt-0\">\r\n                     <div className=\"flex space-x-4\">\r\n                       <button\r\n+                        title=\"Add branch school\"\r\n+                        type=\"button\"\r\n                         onClick={() => {\r\n                           setSelectedSchool(school);\r\n                           setIsAddBranchOpen(true);\r\n                         }}\r\n"
+                },
+                {
+                    "date": 1740926564564,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -253,8 +253,10 @@\n                       >\r\n                         <Plus className=\"h-5 w-5\" />\r\n                       </button>\r\n                       <button\r\n+                        title=\"Edit school\"\r\n+                        type=\"button\"\r\n                         onClick={() => {\r\n                           setEditingSchool(school);\r\n                           setSelectedGrades(school.grades || []);\r\n                         }}\r\n"
+                },
+                {
+                    "date": 1740926570016,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -248,9 +248,9 @@\n                           setIsAddBranchOpen(true);\r\n                         }}\r\n                         className=\"text-indigo-600 hover:text-indigo-700\"\r\n                         aria-label=\"Add branch school\"\r\n-                        title=\"Add branch school\"\r\n+                        \r\n                       >\r\n                         <Plus className=\"h-5 w-5\" />\r\n                       </button>\r\n                       <button\r\n"
+                },
+                {
+                    "date": 1740926584250,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -248,9 +248,8 @@\n                           setIsAddBranchOpen(true);\r\n                         }}\r\n                         className=\"text-indigo-600 hover:text-indigo-700\"\r\n                         aria-label=\"Add branch school\"\r\n-                        \r\n                       >\r\n                         <Plus className=\"h-5 w-5\" />\r\n                       </button>\r\n                       <button\r\n@@ -299,8 +298,9 @@\n                             <div className=\"text-sm text-gray-500\">{branch.address}</div>\r\n                           </div>\r\n                           <div className=\"flex space-x-2\">\r\n                             <button\r\n+                            \r\n                               onClick={() => {\r\n                                 setEditingSchool(branch);\r\n                                 setSelectedGrades(branch.grades || []);\r\n                               }}\r\n"
+                },
+                {
+                    "date": 1740926590331,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -298,9 +298,9 @@\n                             <div className=\"text-sm text-gray-500\">{branch.address}</div>\r\n                           </div>\r\n                           <div className=\"flex space-x-2\">\r\n                             <button\r\n-                            \r\n+                            t\r\n                               onClick={() => {\r\n                                 setEditingSchool(branch);\r\n                                 setSelectedGrades(branch.grades || []);\r\n                               }}\r\n"
+                },
+                {
+                    "date": 1740926603929,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -298,9 +298,9 @@\n                             <div className=\"text-sm text-gray-500\">{branch.address}</div>\r\n                           </div>\r\n                           <div className=\"flex space-x-2\">\r\n                             <button\r\n-                            t\r\n+                            title = \r\n                               onClick={() => {\r\n                                 setEditingSchool(branch);\r\n                                 setSelectedGrades(branch.grades || []);\r\n                               }}\r\n"
+                },
+                {
+                    "date": 1740926613076,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -298,9 +298,9 @@\n                             <div className=\"text-sm text-gray-500\">{branch.address}</div>\r\n                           </div>\r\n                           <div className=\"flex space-x-2\">\r\n                             <button\r\n-                            title = \r\n+                            \r\n                               onClick={() => {\r\n                                 setEditingSchool(branch);\r\n                                 setSelectedGrades(branch.grades || []);\r\n                               }}\r\n"
+                },
+                {
+                    "date": 1740926618678,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -298,9 +298,10 @@\n                             <div className=\"text-sm text-gray-500\">{branch.address}</div>\r\n                           </div>\r\n                           <div className=\"flex space-x-2\">\r\n                             <button\r\n-                            \r\n+                              title=\"Edit branch school\"\r\n+                              type=\"button\"\r\n                               onClick={() => {\r\n                                 setEditingSchool(branch);\r\n                                 setSelectedGrades(branch.grades || []);\r\n                               }}\r\n@@ -308,8 +309,10 @@\n                             >\r\n                               <Edit className=\"h-4 w-4\" />\r\n                             </button>\r\n                             <button\r\n+                              title=\"Delete branch school\"\r\n+                              type=\"button\"\r\n                               onClick={() => {\r\n                                 deleteSchool.mutate(branch.id);\r\n                               }}\r\n                               className=\"text-red-400 hover:text-red-500\"\r\n"
+                },
+                {
+                    "date": 1740926636568,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -509,8 +509,9 @@\n             </ScrollArea>\r\n             <div className=\"p-6 border-t border-gray-200 bg-gray-50\">\r\n               <div className=\"flex space-x-3\">\r\n                 <button\r\n+                  title=\"Add School\"\r\n                   type=\"submit\"\r\n                   form=\"addSchoolForm\"\r\n                   className=\"inline-flex justify-center w-full rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:text-sm\"\r\n                 >\r\n"
+                },
+                {
+                    "date": 1740926642922,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -517,8 +517,9 @@\n                 >\r\n                   Add School\r\n                 </button>\r\n                 <button\r\n+                  title=\"Cancel\"\r\n                   type=\"button\"\r\n                   onClick={() => setIsAddModalOpen(false)}\r\n                   className=\"inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:text-sm\"\r\n                 >\r\n"
+                },
+                {
+                    "date": 1740926657642,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -672,8 +672,9 @@\n             </div>\r\n             <div className=\"p-6 border-t border-gray-200 bg-gray-50\">\r\n               <div className=\"flex space-x-3\">\r\n                 <button\r\n+                  title=\"Add Branch\"\r\n                   type=\"submit\"\r\n                   form=\"addBranchForm\"\r\n                   className=\"inline-flex justify-center w-full rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:text-sm\"\r\n                 >\r\n"
+                },
+                {
+                    "date": 1740926732713,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,5 +1,4 @@\n-\r\n import { useState } from 'react';\r\n import { School, Plus, Edit, Trash2, MapPin, Phone, Mail, User } from 'lucide-react';\r\n import type { School as SchoolType } from '../types';\r\n import LocationSearch from '../components/LocationSearch';\r\n@@ -266,8 +265,9 @@\n                       <button\r\n                         onClick={() => {\r\n                           deleteSchool.mutate(school.id);\r\n                         }}\r\n+                        title=\"Delete school\"\r\n                         className=\"text-red-400 hover:text-red-500\"\r\n                       >\r\n                         <Trash2 className=\"h-5 w-5\" />\r\n                       </button>\r\n@@ -680,8 +680,9 @@\n                 >\r\n                   Add Branch\r\n                 </button>\r\n                 <button\r\n+                  title=\"Cancel\"\r\n                   type=\"button\"\r\n                   onClick={() => {\r\n                     setIsAddBranchOpen(false);\r\n                     setSelectedSchool(null);\r\n"
                 }
             ],
             "date": 1739440467940,

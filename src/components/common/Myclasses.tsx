@@ -11,10 +11,11 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
 import ClassHeader from "./ClassHeader";
+import Link from "next/link";
+import { Lock, Unlock } from "lucide-react";
 
 interface SubLesson {
   id: number;
@@ -120,12 +121,13 @@ export function MyClasses({ data }: MyClassesProps) {
       }
     );
 
-    lessonRefs.current.forEach((ref) => {
+    const currentRefs = lessonRefs.current;
+    currentRefs.forEach((ref) => {
       if (ref) observer.observe(ref);
     });
 
     return () => {
-      lessonRefs.current.forEach((ref) => {
+      currentRefs.forEach((ref) => {
         if (ref) observer.unobserve(ref);
       });
     };
@@ -136,7 +138,7 @@ export function MyClasses({ data }: MyClassesProps) {
       <ClassHeader
         classes={classesData}
         selectedClass={selectedClass}
-        onClassChange={handleClassChange}
+        onClassChange={handleClassChange as any}
       />
       
       <Card className="text-gray-700 bg-white bg-opacity-15 rounded-3xl mb-4 border-0 shadow">

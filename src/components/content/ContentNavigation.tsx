@@ -1,4 +1,4 @@
-```tsx
+
 import React from 'react';
 import { ChevronDown, Plus, Edit, Trash2 } from 'lucide-react';
 import { ScrollArea } from '../ui/scroll-area';
@@ -71,6 +71,9 @@ export default function ContentNavigation({
             <div className="space-y-1 p-2">
               {grades.map((grade) => (
                 <button
+                  title={grade.name}
+                  aria-label={grade.name}
+                  type="button"
                   key={grade.id}
                   onClick={() => onSelectGrade(grade.id)}
                   className={cn(
@@ -93,6 +96,9 @@ export default function ContentNavigation({
             <div className="p-4 border-b flex justify-between items-center">
               <h2 className="text-sm font-medium text-gray-700">Topics</h2>
               <button 
+                title="Add Topic"
+                aria-label="Add Topic"
+                type="button"
                 onClick={onAddTopic}
                 className="p-1 hover:bg-gray-100 rounded"
               >
@@ -102,7 +108,7 @@ export default function ContentNavigation({
             <ScrollArea className="h-[calc(100vh-12rem)]">
               <div className="space-y-1 p-2">
                 {topics
-                  .filter(topic => topic.gradeId === selectedGrade)
+                  .filter(topic => topic.grade_id === selectedGrade)
                   .map((topic) => (
                     <div
                       key={topic.id}
@@ -114,6 +120,9 @@ export default function ContentNavigation({
                       )}
                     >
                       <button
+                        title={topic.title}
+                        aria-label={topic.title}
+                        type="button"
                         onClick={() => onSelectTopic(topic.id)}
                         className="flex-1 text-left"
                       >
@@ -121,12 +130,18 @@ export default function ContentNavigation({
                       </button>
                       <div className="hidden group-hover:flex items-center space-x-2">
                         <button
+                          title="Edit Topic"
+                          aria-label="Edit Topic"
+                          type="button"
                           onClick={() => onEditTopic(topic)}
                           className="p-1 hover:bg-gray-200 rounded"
                         >
                           <Edit className="h-4 w-4 text-gray-500" />
                         </button>
                         <button
+                          title="Delete Topic"
+                          aria-label="Delete Topic"
+                          type="button"
                           onClick={() => onDeleteTopic(topic.id)}
                           className="p-1 hover:bg-gray-200 rounded"
                         >
@@ -146,6 +161,9 @@ export default function ContentNavigation({
             <div className="p-4 border-b flex justify-between items-center">
               <h2 className="text-sm font-medium text-gray-700">Sub-topics</h2>
               <button 
+                title="Add Sub-topic"
+                aria-label="Add Sub-topic"
+                type="button"
                 onClick={onAddSubTopic}
                 className="p-1 hover:bg-gray-100 rounded"
               >
@@ -167,6 +185,9 @@ export default function ContentNavigation({
                       )}
                     >
                       <button
+                        title={subTopic.title}
+                        aria-label={subTopic.title}
+                        type="button"
                         onClick={() => onSelectSubTopic(subTopic.id)}
                         className="flex-1 text-left"
                       >
@@ -174,12 +195,18 @@ export default function ContentNavigation({
                       </button>
                       <div className="hidden group-hover:flex items-center space-x-2">
                         <button
+                          title="Edit Sub-topic"
+                          aria-label="Edit Sub-topic"
+                          type="button"
                           onClick={() => onEditSubTopic(subTopic)}
                           className="p-1 hover:bg-gray-200 rounded"
                         >
                           <Edit className="h-4 w-4 text-gray-500" />
                         </button>
                         <button
+                          title="Delete Sub-topic"
+                          aria-label="Delete Sub-topic"
+                          type="button"
                           onClick={() => onDeleteSubTopic(subTopic.id)}
                           className="p-1 hover:bg-gray-200 rounded"
                         >
@@ -199,6 +226,9 @@ export default function ContentNavigation({
             <div className="p-4 border-b flex justify-between items-center">
               <h2 className="text-sm font-medium text-gray-700">Lessons</h2>
               <button 
+                title="Add Lesson"
+                aria-label="Add Lesson"
+                type="button"
                 onClick={onAddLesson}
                 className="p-1 hover:bg-gray-100 rounded"
               >
@@ -208,7 +238,7 @@ export default function ContentNavigation({
             <ScrollArea className="h-[calc(100vh-12rem)]">
               <div className="space-y-1 p-2">
                 {lessons
-                  .filter(lesson => lesson.subTopicId === selectedSubTopic)
+                  .filter(lesson => lesson.subtopic_id === selectedSubTopic)
                   .map((lesson) => (
                     <div
                       key={lesson.id}
@@ -220,6 +250,9 @@ export default function ContentNavigation({
                       )}
                     >
                       <button
+                        title={lesson.title}
+                        aria-label={lesson.title}
+                        type="button"
                         onClick={() => onSelectLesson(lesson.id)}
                         className="flex-1 text-left"
                       >
@@ -227,12 +260,18 @@ export default function ContentNavigation({
                       </button>
                       <div className="hidden group-hover:flex items-center space-x-2">
                         <button
+                          title="Edit Lesson"
+                          aria-label="Edit Lesson"
+                          type="button"
                           onClick={() => onEditLesson(lesson)}
                           className="p-1 hover:bg-gray-200 rounded"
                         >
                           <Edit className="h-4 w-4 text-gray-500" />
                         </button>
                         <button
+                          title="Delete Lesson"
+                          aria-label="Delete Lesson"
+                          type="button"
                           onClick={() => onDeleteLesson(lesson.id)}
                           className="p-1 hover:bg-gray-200 rounded"
                         >
@@ -249,4 +288,3 @@ export default function ContentNavigation({
     </div>
   );
 }
-```

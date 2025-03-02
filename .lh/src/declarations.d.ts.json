@@ -1,0 +1,34 @@
+{
+    "sourceFile": "src/declarations.d.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 4,
+            "patches": [
+                {
+                    "date": 1740041615149,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1740847084768,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -72,8 +72,8 @@\n   const _default: any;\r\n   export default _default;\r\n } \r\n \r\n-declare module \"@/lib/logger\" {\r\n-    import { LogLevel } from \"./types/logging\";\r\n-    export const logger: FC<{ level: LogLevel }>;\r\n-}\n\\ No newline at end of file\n+// declare module \"@/lib/logger\" {\r\n+//     import { LogLevel } from \"./types/logging\";\r\n+//     export const logger: FC<{ level: LogLevel }>;\r\n+// }\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1740847255369,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -75,5 +75,5 @@\n \r\n // declare module \"@/lib/logger\" {\r\n //     import { LogLevel } from \"./types/logging\";\r\n //     export const logger: FC<{ level: LogLevel }>;\r\n-// }\n\\ No newline at end of file\n+// } cbvc bgv \n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1740847264601,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -75,5 +75,5 @@\n \r\n // declare module \"@/lib/logger\" {\r\n //     import { LogLevel } from \"./types/logging\";\r\n //     export const logger: FC<{ level: LogLevel }>;\r\n-// } cbvc bgv \n\\ No newline at end of file\n+// }\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1740852193821,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -44,11 +44,11 @@\n declare module \"@/lib/utils\" {\r\n   export function cn(...inputs: any[]): string;\r\n }\r\n \r\n-declare module \"@/lib/supabase\" {\r\n-  export const supabase: any;\r\n-}\r\n+// declare module \"@/lib/supabase\" {\r\n+//   export const supabase: any;\r\n+// }\r\n \r\n declare module \"@/types\" {\r\n   export type Question = any;\r\n   export type Activity = any;\r\n"
+                }
+            ],
+            "date": 1740041615149,
+            "name": "Commit-0",
+            "content": "import { logger } from \"./lib/logger\";\r\n\r\ndeclare module \"@/components/ui/card\" {\r\n  import { FC, ReactNode } from \"react\";\r\n  export const Card: FC<{ children?: ReactNode }>;\r\n  export const CardContent: FC<{ children?: ReactNode }>;\r\n  export const CardHeader: FC<{ children?: ReactNode }>;\r\n  export const CardTitle: FC<{ children?: ReactNode }>;\r\n  const _default: any;\r\n  export default _default;\r\n}\r\n\r\ndeclare module \"@/components/ui/button\" {\r\n  import { FC, ReactNode } from \"react\";\r\n  export const Button: FC<{ children?: ReactNode }>;\r\n  const _default: any;\r\n  export default _default;\r\n}\r\n\r\ndeclare module \"@/components/ui/progress\" {\r\n  import { FC } from \"react\";\r\n  export const Progress: FC<{ value: number; className?: string }>;\r\n  const _default: any;\r\n  export default _default;\r\n}\r\n\r\ndeclare module \"@/components/ui/badge\" {\r\n  import { FC, ReactNode } from \"react\";\r\n  export const Badge: FC<{ variant?: string; className?: string; children?: ReactNode }>;\r\n  const _default: any;\r\n  export default _default;\r\n}\r\n\r\ndeclare module \"@/components/ui/tabs\" {\r\n  import { FC, ReactNode } from \"react\";\r\n  export const Tabs: FC<{ defaultValue: string; className?: string; children?: ReactNode }>;\r\n  export const TabsContent: FC<{ value: string; children?: ReactNode }>;\r\n  export const TabsList: FC<{ className?: string; children?: ReactNode }>;\r\n  export const TabsTrigger: FC<{ value: string; children?: ReactNode }>;\r\n  const _default: any;\r\n  export default _default;\r\n}\r\n\r\ndeclare module \"@/lib/utils\" {\r\n  export function cn(...inputs: any[]): string;\r\n}\r\n\r\ndeclare module \"@/lib/supabase\" {\r\n  export const supabase: any;\r\n}\r\n\r\ndeclare module \"@/types\" {\r\n  export type Question = any;\r\n  export type Activity = any;\r\n  export type ExercisePrompt = any;\r\n  export type UserRole = string;\r\n}\r\n\r\ndeclare module \"@/hooks/useAuth\" {\r\n  export function useAuth(): { user: any; loading: boolean };\r\n}\r\n\r\ndeclare module \"@/components/LessonErrorBoundary\" {\r\n  import { FC, ReactNode } from \"react\";\r\n  const LessonErrorBoundary: FC<{ source?: string; children?: ReactNode }>;\r\n  export default LessonErrorBoundary;\r\n}\r\n\r\ndeclare module \"@/components/LoadingSpinner\" {\r\n  import { FC } from \"react\";\r\n  export const LoadingSpinner: FC<{ message: string; showProgress?: boolean; progress?: number; timeout?: number; onRetry?: () => void }>;\r\n  const _default: any;\r\n  export default _default;\r\n} \r\n\r\ndeclare module \"@/lib/logger\" {\r\n    import { LogLevel } from \"./types/logging\";\r\n    export const logger: FC<{ level: LogLevel }>;\r\n}"
+        }
+    ]
+}

@@ -10,7 +10,7 @@ export const useToast = () => {
   const { addError, clearError } = useError();
 
   const showToast = (message: unknown, options: ToastOptions = {}) => {
-    const { timeout = 3000, type = 'info', position = 'top' } = options;
+    const { timeout = 3000 } = options;
     
     // Convert any message type to string safely
     const safeMessage = (() => {
@@ -34,6 +34,7 @@ export const useToast = () => {
       }
     })();
 
+    // Use only the parameters that addError accepts
     addError(safeMessage, timeout);
   };
 

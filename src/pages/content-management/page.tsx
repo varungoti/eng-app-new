@@ -3,7 +3,7 @@
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import type { UseQueryResult } from '@tanstack/react-query';
+//import type { UseQueryResult } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import ErrorBoundary from '@/components/ErrorBoundary';

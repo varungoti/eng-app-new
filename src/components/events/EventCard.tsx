@@ -79,12 +79,16 @@ const EventCard: React.FC<EventCardProps> = ({
       {canEdit && (
         <div className="mt-4 flex justify-end space-x-2">
           <button
+            type="button"
+            title="Edit"
             onClick={() => onEdit?.(event)}
             className="px-3 py-1 text-sm text-indigo-600 hover:text-indigo-900"
           >
             Edit
           </button>
           <button
+            type="button"
+            title="Delete"
             onClick={() => onDelete?.(event.id)}
             className="px-3 py-1 text-sm text-red-600 hover:text-red-900"
           >

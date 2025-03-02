@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/contexts/ErrorContext.tsx",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1740775226660,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1740775226660,
+            "name": "Commit-0",
+            "content": "import React, { createContext, useState, useContext } from 'react';\r\nimport { logger } from '../lib/logger';\r\n\r\nexport interface ErrorContextType {\r\n  error: string | null;\r\n  setError: (error: string | null) => void;\r\n  clearError: () => void;\r\n  addError: (error: string, timeout?: number) => void;\r\n}\r\n\r\nconst ErrorContext = createContext<ErrorContextType>({\r\n  error: null,\r\n  setError: () => {},\r\n  clearError: () => {},\r\n  addError: () => {},\r\n});\r\n\r\nexport const useError = () => {\r\n  const context = useContext(ErrorContext);\r\n  if (!context) {\r\n    throw new Error('useError must be used within an ErrorProvider');\r\n  }\r\n  return context;\r\n};\r\n\r\nexport const ErrorProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {\r\n  const [error, setError] = useState<string | null>(null);\r\n  const [timeoutId, setTimeoutId] = useState<number | null>(null);\r\n\r\n  const handleSetError = (newError: string | null) => {\r\n    if (newError) {\r\n      logger.error(newError, {\r\n        source: 'ErrorContext'\r\n      });\r\n    }\r\n    // Clear any existing timeout\r\n    if (timeoutId) {\r\n      clearTimeout(timeoutId);\r\n      setTimeoutId(null);\r\n    }\r\n    setError(newError);\r\n  };\r\n\r\n  const clearError = () => {\r\n    if (timeoutId) {\r\n      clearTimeout(timeoutId);\r\n      setTimeoutId(null);\r\n    }\r\n    setError(null);\r\n  };\r\n\r\n  const addError = (newError: string, timeout = 5000) => {\r\n    handleSetError(newError);\r\n    const id = window.setTimeout(clearError, timeout);\r\n    setTimeoutId(id);\r\n  };\r\n\r\n  return (\r\n    <ErrorContext.Provider value={{ error, setError: handleSetError, clearError, addError }}>\r\n      {children}\r\n    </ErrorContext.Provider>\r\n  );\r\n};\r\n\r\nexport { ErrorContext };"
+        }
+    ]
+}

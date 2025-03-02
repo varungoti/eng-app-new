@@ -44,7 +44,7 @@ export class DatabaseMonitor {
     const startTime = Date.now();
     
     try {
-      const { data, error } = await this.client
+      const { error } = await this.client
         .rpc('update_health_check');
 
       if (error) throw error;

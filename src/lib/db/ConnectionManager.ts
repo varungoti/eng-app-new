@@ -1,4 +1,4 @@
-```typescript
+
 import { supabase } from '../supabase';
 import { logger } from '../logger';
 import { WarningCache } from '../monitoring/WarningCache';
@@ -90,4 +90,3 @@ class ConnectionManager {
 }
 
 export const connectionManager = ConnectionManager.getInstance();
-```

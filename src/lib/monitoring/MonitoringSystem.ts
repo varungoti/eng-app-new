@@ -1,9 +1,14 @@
-import { type SupabaseClient } from '@supabase/supabase-js';
+import { type SupabaseClient, PostgrestError } from '@supabase/supabase-js';
+
+// Define more specific types for Supabase client
+type Database = Record<string, unknown>;
+type SchemaTypes = Record<string, unknown>;
 
 interface MonitoringConfig {
   supabaseUrl: string;
   supabaseKey: string;
-  supabase: SupabaseClient<any, "public", any>;
+  // Use type assertion to avoid typing issues while maintaining type safety
+  supabase: SupabaseClient;
   enableLogging?: boolean;
   logLevel?: 'debug' | 'info' | 'warn' | 'error';
   sampleRate?: number;
@@ -196,7 +201,7 @@ export class MonitoringSystem {
               start_time: timestamp,
               status: 'loading'
             }])
-            .then(({ error }: { error: any }) => {
+            .then(({ error }: { error: PostgrestError | null }) => {
               if (error && this.config.enableLogging) {
                 console.error('Error recording loading start:', error);
               }

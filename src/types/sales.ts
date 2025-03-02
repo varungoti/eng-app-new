@@ -1,46 +1,51 @@
 export interface SalesLead {
   id: string;
-  companyName: string;
-  contactName: string;
+  name: string;
+  company: string;
+  schoolname: string;
+  location: string;
+  branch: string;
   email: string;
-  phone?: string;
-  status: 'new' | 'contacted' | 'qualified' | 'proposal' | 'negotiation' | 'won' | 'lost';
-  source?: string;
-  assignedTo?: string;
-  estimatedValue?: number;
-  probability?: number;
-  expectedCloseDate?: Date;
-  notes?: string;
-  createdAt: Date;
-  updatedAt: Date;
+  phone: string;
+  status: 'new' | 'contacted' | 'qualified' | 'proposal' | 'closed';
+  source: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
+
+export interface SalesTask {
+  id: string;
+  title: string;
+  description?: string;
+  status: string;
+  priority: string;
+  due_date: string;
+  assigned_to?: string;
+  lead_id?: string;
+  opportunity_id?: string;
+  contact_id?: string;
+  created_at: string;
+}
 export interface SalesActivity {
   id: string;
   leadId: string;
-  type: 'call' | 'email' | 'meeting' | 'note' | 'task';
-  subject: string;
-  description?: string;
-  status?: 'planned' | 'completed' | 'cancelled';
-  dueDate?: Date;
-  completedAt?: Date;
-  performedBy: string;
-  createdAt: Date;
+  type: 'call' | 'email' | 'meeting' | 'note';
+  description: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface SalesOpportunity {
   id: string;
   leadId: string;
   name: string;
-  stage: 'discovery' | 'qualification' | 'proposal' | 'negotiation' | 'closed_won' | 'closed_lost';
-  amount?: number;
-  closeDate?: Date;
-  probability?: number;
-  nextStep?: string;
-  competition?: string;
-  notes?: string;
-  createdAt: Date;
-  updatedAt: Date;
+  value: number;
+  probability: number;
+  status: 'open' | 'won' | 'lost';
+  expectedCloseDate: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface SalesContact {
@@ -60,10 +65,11 @@ export interface SalesContact {
 export interface SalesStats {
   totalLeads: number;
   newLeads: number;
+  contactedLeads: number;
   qualifiedLeads: number;
-  proposalsSent: number;
-  wonDeals: number;
-  lostDeals: number;
+  proposalLeads: number;
+  closedLeads: number;
+  lostLeads: number;
   totalValue: number;
   avgDealSize: number;
   conversionRate: number;

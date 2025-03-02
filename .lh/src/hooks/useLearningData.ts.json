@@ -1,0 +1,30 @@
+{
+    "sourceFile": "src/hooks/useLearningData.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 3,
+            "patches": [
+                {
+                    "date": 1740923279209,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1740923285993,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,10 +1,10 @@\n import { useEffect } from 'react';\r\n-import { useLearning } from '@/contexts/LearningContext';\r\n+import { useLearning, LearningState } from '@/contexts/LearningContext';\r\n import { fetchLearningPath, fetchUserActivities } from '@/lib/api/learning';\r\n import { useToast } from '@/components/ui/use-toast';\r\n \r\n-export function useLearningData(userId: string) {\r\n+export function useLearningData(userId: string): LearningState {\r\n   const { state, dispatch } = useLearning();\r\n   const { toast } = useToast();\r\n \r\n   useEffect(() => {\r\n"
+                },
+                {
+                    "date": 1740923292940,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,10 +1,14 @@\n import { useEffect } from 'react';\r\n-import { useLearning, LearningState } from '@/contexts/LearningContext';\r\n+import { useLearning } from '@/contexts/LearningContext';\r\n import { fetchLearningPath, fetchUserActivities } from '@/lib/api/learning';\r\n import { useToast } from '@/components/ui/use-toast';\r\n \r\n-export function useLearningData(userId: string): LearningState {\r\n+// Use ReturnType to infer the state type from useLearning\r\n+type LearningReturnType = ReturnType<typeof useLearning>;\r\n+type LearningStateType = LearningReturnType['state']; \r\n+\r\n+export function useLearningData(userId: string): LearningStateType {\r\n   const { state, dispatch } = useLearning();\r\n   const { toast } = useToast();\r\n \r\n   useEffect(() => {\r\n"
+                },
+                {
+                    "date": 1740923315276,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -25,10 +25,9 @@\n       } catch (error) {\r\n         console.error('Error loading learning data:', error);\r\n         toast({\r\n           title: \"Error\",\r\n-          description: \"Failed to load learning content\",\r\n-          variant: \"destructive\"\r\n+          description: \"Failed to load learning content\"\r\n         });\r\n         dispatch({ type: 'SET_ERROR', payload: error as Error });\r\n       } finally {\r\n         dispatch({ type: 'SET_LOADING', payload: false });\r\n"
+                }
+            ],
+            "date": 1740923279209,
+            "name": "Commit-0",
+            "content": "import { useEffect } from 'react';\r\nimport { useLearning } from '@/contexts/LearningContext';\r\nimport { fetchLearningPath, fetchUserActivities } from '@/lib/api/learning';\r\nimport { useToast } from '@/components/ui/use-toast';\r\n\r\nexport function useLearningData(userId: string) {\r\n  const { state, dispatch } = useLearning();\r\n  const { toast } = useToast();\r\n\r\n  useEffect(() => {\r\n    async function loadData() {\r\n      dispatch({ type: 'SET_LOADING', payload: true });\r\n      try {\r\n        const [topics, _activities] = await Promise.all([\r\n          fetchLearningPath(),\r\n          fetchUserActivities(userId)\r\n        ]);\r\n\r\n        dispatch({ type: 'SET_TOPICS', payload: topics });\r\n        // Add more dispatch actions for activities if needed\r\n      } catch (error) {\r\n        console.error('Error loading learning data:', error);\r\n        toast({\r\n          title: \"Error\",\r\n          description: \"Failed to load learning content\",\r\n          variant: \"destructive\"\r\n        });\r\n        dispatch({ type: 'SET_ERROR', payload: error as Error });\r\n      } finally {\r\n        dispatch({ type: 'SET_LOADING', payload: false });\r\n      }\r\n    }\r\n\r\n    loadData();\r\n  }, [userId, dispatch, toast]);\r\n\r\n  return state;\r\n} "
+        }
+    ]
+}

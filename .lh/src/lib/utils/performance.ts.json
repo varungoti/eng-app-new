@@ -1,0 +1,38 @@
+{
+    "sourceFile": "src/lib/utils/performance.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 5,
+            "patches": [
+                {
+                    "date": 1740826586370,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1740826776749,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -60,9 +60,12 @@\n   callback: T,\r\n   delay: number\r\n ) => {\r\n   return useCallback(\r\n-    debounce(callback, delay),\r\n+    (...args: Parameters<T>) => {\r\n+      const debouncedFn = debounce(callback, delay);\r\n+      return debouncedFn(...args);\r\n+    },\r\n     [callback, delay]\r\n   );\r\n };\r\n \r\n"
+                },
+                {
+                    "date": 1740847511594,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,6 @@\n import { useCallback, useEffect, useRef } from 'react';\r\n-import { logger } from '../logger';\r\n+import { defaultLogger } from '../logger';\r\n import { performanceMonitor } from '../monitoring/PerformanceMonitor';\r\n \r\n const PERFORMANCE_SAMPLE_RATE = 0.1; // Sample 10% of performance measurements\r\n \r\n@@ -46,28 +46,36 @@\n export const useThrottledCallback = <T extends (...args: any[]) => any>(\r\n   callback: T,\r\n   delay: number\r\n ) => {\r\n-  return useCallback(\r\n-    (...args: Parameters<T>) => {\r\n-      const throttledFn = throttle(callback, delay);\r\n-      return throttledFn(...args);\r\n-    },\r\n-    [callback, delay]\r\n-  );\r\n+  const throttledCallbackRef = useRef<((...args: Parameters<T>) => void) | null>(null);\r\n+  \r\n+  // Create or update the throttled callback when dependencies change\r\n+  useEffect(() => {\r\n+    throttledCallbackRef.current = throttle(callback, delay);\r\n+  }, [callback, delay]);\r\n+\r\n+  // Return a stable function reference that calls the current throttled function\r\n+  return useCallback((...args: Parameters<T>) => {\r\n+    throttledCallbackRef.current?.(...args);\r\n+  }, []);\r\n };\r\n \r\n export const useDebouncedCallback = <T extends (...args: any[]) => any>(\r\n   callback: T,\r\n   delay: number\r\n ) => {\r\n-  return useCallback(\r\n-    (...args: Parameters<T>) => {\r\n-      const debouncedFn = debounce(callback, delay);\r\n-      return debouncedFn(...args);\r\n-    },\r\n-    [callback, delay]\r\n-  );\r\n+  const debouncedCallbackRef = useRef<((...args: Parameters<T>) => void) | null>(null);\r\n+  \r\n+  // Create or update the debounced callback when dependencies change\r\n+  useEffect(() => {\r\n+    debouncedCallbackRef.current = debounce(callback, delay);\r\n+  }, [callback, delay]);\r\n+\r\n+  // Return a stable function reference that calls the current debounced function\r\n+  return useCallback((...args: Parameters<T>) => {\r\n+    debouncedCallbackRef.current?.(...args);\r\n+  }, []);\r\n };\r\n \r\n export const useIsFirstRender = () => {\r\n   const isFirst = useRef(true);\r\n"
+                },
+                {
+                    "date": 1740847543898,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,6 @@\n import { useCallback, useEffect, useRef } from 'react';\r\n-import { defaultLogger } from '../logger';\r\n+import { logger } from '../logger';\r\n import { performanceMonitor } from '../monitoring/PerformanceMonitor';\r\n \r\n const PERFORMANCE_SAMPLE_RATE = 0.1; // Sample 10% of performance measurements\r\n \r\n"
+                },
+                {
+                    "date": 1740847567808,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -32,15 +32,15 @@\n ): ((...args: Parameters<T>) => void) => {\r\n   let waiting = false;\r\n   \r\n   return function throttledFunction(...args: Parameters<T>) {\r\n-    if (!waiting) {\r\n-      func(...args);\r\n-      waiting = true;\r\n-      setTimeout(() => {\r\n-        waiting = false;\r\n-      }, limit);\r\n-    }\r\n+    if (waiting) return;\r\n+    \r\n+    func(...args);\r\n+    waiting = true;\r\n+    setTimeout(() => {\r\n+      waiting = false;\r\n+    }, limit);\r\n   };\r\n };\r\n \r\n export const useThrottledCallback = <T extends (...args: any[]) => any>(\r\n"
+                },
+                {
+                    "date": 1740850771513,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,10 +1,7 @@\n import { useCallback, useEffect, useRef } from 'react';\r\n-import { logger } from '../logger';\r\n import { performanceMonitor } from '../monitoring/PerformanceMonitor';\r\n \r\n-const PERFORMANCE_SAMPLE_RATE = 0.1; // Sample 10% of performance measurements\r\n-\r\n export const measurePerformance = (name: string, metadata?: Record<string, any>) => {\r\n   const id = performanceMonitor.startOperation(name, 'Performance', metadata);\r\n   return () => performanceMonitor.endOperation(id);\r\n };\r\n"
+                }
+            ],
+            "date": 1740826586370,
+            "name": "Commit-0",
+            "content": "import { useCallback, useEffect, useRef } from 'react';\r\nimport { logger } from '../logger';\r\nimport { performanceMonitor } from '../monitoring/PerformanceMonitor';\r\n\r\nconst PERFORMANCE_SAMPLE_RATE = 0.1; // Sample 10% of performance measurements\r\n\r\nexport const measurePerformance = (name: string, metadata?: Record<string, any>) => {\r\n  const id = performanceMonitor.startOperation(name, 'Performance', metadata);\r\n  return () => performanceMonitor.endOperation(id);\r\n};\r\n\r\nexport const debounce = <T extends (...args: any[]) => any>(\r\n  func: T,\r\n  wait: number\r\n): ((...args: Parameters<T>) => void) => {\r\n  let timeout: NodeJS.Timeout;\r\n\r\n  return function executedFunction(...args: Parameters<T>) {\r\n    const later = () => {\r\n      clearTimeout(timeout);\r\n      func(...args);\r\n    };\r\n\r\n    clearTimeout(timeout);\r\n    timeout = setTimeout(later, wait);\r\n  };\r\n};\r\n\r\nexport const throttle = <T extends (...args: any[]) => any>(\r\n  func: T,\r\n  limit: number\r\n): ((...args: Parameters<T>) => void) => {\r\n  let waiting = false;\r\n  \r\n  return function throttledFunction(...args: Parameters<T>) {\r\n    if (!waiting) {\r\n      func(...args);\r\n      waiting = true;\r\n      setTimeout(() => {\r\n        waiting = false;\r\n      }, limit);\r\n    }\r\n  };\r\n};\r\n\r\nexport const useThrottledCallback = <T extends (...args: any[]) => any>(\r\n  callback: T,\r\n  delay: number\r\n) => {\r\n  return useCallback(\r\n    (...args: Parameters<T>) => {\r\n      const throttledFn = throttle(callback, delay);\r\n      return throttledFn(...args);\r\n    },\r\n    [callback, delay]\r\n  );\r\n};\r\n\r\nexport const useDebouncedCallback = <T extends (...args: any[]) => any>(\r\n  callback: T,\r\n  delay: number\r\n) => {\r\n  return useCallback(\r\n    debounce(callback, delay),\r\n    [callback, delay]\r\n  );\r\n};\r\n\r\nexport const useIsFirstRender = () => {\r\n  const isFirst = useRef(true);\r\n\r\n  useEffect(() => {\r\n    isFirst.current = false;\r\n  }, []);\r\n\r\n  return isFirst.current;\r\n};"
+        }
+    ]
+}

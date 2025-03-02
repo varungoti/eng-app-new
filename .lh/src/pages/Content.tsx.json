@@ -1,0 +1,26 @@
+{
+    "sourceFile": "src/pages/Content.tsx",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 2,
+            "patches": [
+                {
+                    "date": 1740927405233,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1740927425193,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -8,9 +8,9 @@\n \r\n const Content: React.FC = () => {\r\n   const { showToast } = useToast();\r\n \r\n-  const handleContentUpload = async (data: any) => {\r\n+  const _handleContentUpload = async (data: any) => {\r\n     try {\r\n       // Handle content upload logic here\r\n       showToast('Content uploaded successfully', { type: 'success' });\r\n     } catch (error) {\r\n"
+                },
+                {
+                    "date": 1740928913537,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -8,9 +8,9 @@\n \r\n const Content: React.FC = () => {\r\n   const { showToast } = useToast();\r\n \r\n-  const _handleContentUpload = async (data: any) => {\r\n+  const _handleContentUpload = async (_data: any) => {\r\n     try {\r\n       // Handle content upload logic here\r\n       showToast('Content uploaded successfully', { type: 'success' });\r\n     } catch (error) {\r\n"
+                }
+            ],
+            "date": 1740927405233,
+            "name": "Commit-0",
+            "content": "import React from 'react';\r\n\r\nimport ContentSelectionDropdowns from '../components/content/ContentSelectionDropdowns';\r\n//import { ContentSelectionDropdowns } from '@/components/content/ContentSelectionDropdowns';\r\nimport { ContentUploadDialog } from '../components/content/ContentUploadDialog';\r\nimport { useToast } from '../hooks/useToast';\r\nimport { logger } from '../lib/logger';\r\n\r\nconst Content: React.FC = () => {\r\n  const { showToast } = useToast();\r\n\r\n  const handleContentUpload = async (data: any) => {\r\n    try {\r\n      // Handle content upload logic here\r\n      showToast('Content uploaded successfully', { type: 'success' });\r\n    } catch (error) {\r\n      logger.error('Failed to upload content', {\r\n        context: { error },\r\n        source: 'ContentPage'\r\n      });\r\n      showToast('Failed to upload content', { type: 'error' });\r\n    }\r\n  };\r\n\r\n  return (\r\n    <div className=\"container mx-auto p-6\">\r\n      <h1 className=\"text-2xl font-bold mb-6\">Content Management</h1>\r\n      \r\n      <div className=\"space-y-6\">\r\n        <ContentSelectionDropdowns \r\n          grades={[]}  // Add your grades data\r\n          topics={[]}  // Add your topics data\r\n          subTopics={[]} // Add your subTopics data\r\n          lessons={[]}   // Add your lessons data\r\n          onGradeSelect={() => {}}\r\n          onTopicSelect={() => {}}\r\n          onSubTopicSelect={() => {}}\r\n          onLessonSelect={() => {}}\r\n        />\r\n\r\n        <ContentUploadDialog \r\n          open={false}\r\n          onOpenChange={() => {}}\r\n        />\r\n      </div>\r\n    </div>\r\n  );\r\n};\r\n\r\nexport default Content;\r\n"
+        }
+    ]
+}

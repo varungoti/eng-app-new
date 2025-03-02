@@ -1,6 +1,6 @@
 "use client";
 
-import React, { memo, useMemo, useState, useEffect, useCallback } from 'react';
+import React, { memo, useState, useEffect, useCallback } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useQueryClient } from '@tanstack/react-query';
@@ -9,7 +9,7 @@ import RoleDashboard from '../components/RoleDashboard';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { logger } from '../lib/logger';
 import ErrorBoundary from '../components/ErrorBoundary';
-import type { UserRole } from '@/types/roles';
+//import type { UserRole } from '@/types/roles';
 
 // Lazy load dashboard components with preload
 const dashboardComponents = {
@@ -55,7 +55,7 @@ const Dashboard: React.FC = () => {
   const queryClient = useQueryClient();
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
-  const [loadProgress, setLoadProgress] = useState<number>(0);
+  const [loadProgress, _setLoadProgress] = useState<number>(0);
 
   // Memoized role update handler
   const handleRoleChange = useCallback((newRole: string) => {

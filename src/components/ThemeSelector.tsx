@@ -7,9 +7,7 @@ import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icons';
 
-interface ThemeSelectorProps extends React.HTMLAttributes<HTMLDivElement> {}
-
-export function ThemeSelector({ className, ...props }: ThemeSelectorProps) {
+export function ThemeSelector({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   const { theme, setTheme } = useTheme();
 
   return (

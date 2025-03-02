@@ -1,0 +1,42 @@
+{
+    "sourceFile": "src/hooks/useToast.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 6,
+            "patches": [
+                {
+                    "date": 1740924548641,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1740924557619,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -9,9 +9,9 @@\n export const useToast = () => {\r\n   const { addError, clearError } = useError();\r\n \r\n   const showToast = (message: unknown, options: ToastOptions = {}) => {\r\n-    const { timeout = 3000, _type = 'info', position = 'top' } = options;\r\n+    const { timeout = 3000, type = 'info', _position = 'top' } = options;\r\n     \r\n     // Convert any message type to string safely\r\n     const safeMessage = (() => {\r\n       try {\r\n"
+                },
+                {
+                    "date": 1740924628219,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -9,9 +9,9 @@\n export const useToast = () => {\r\n   const { addError, clearError } = useError();\r\n \r\n   const showToast = (message: unknown, options: ToastOptions = {}) => {\r\n-    const { timeout = 3000, type = 'info', _position = 'top' } = options;\r\n+    const { timeout = 3000, type = 'info', position = 'top' } = options;\r\n     \r\n     // Convert any message type to string safely\r\n     const safeMessage = (() => {\r\n       try {\r\n@@ -33,9 +33,9 @@\n         return 'An error occurred';\r\n       }\r\n     })();\r\n \r\n-    addError(safeMessage, timeout);\r\n+    addError(safeMessage, timeout, type, position);\r\n   };\r\n \r\n   return {\r\n     showToast,\r\n"
+                },
+                {
+                    "date": 1740924660613,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -33,9 +33,10 @@\n         return 'An error occurred';\r\n       }\r\n     })();\r\n \r\n-    addError(safeMessage, timeout, type, position);\r\n+    // Use only the parameters that addError accepts\r\n+    addError(safeMessage, timeout);\r\n   };\r\n \r\n   return {\r\n     showToast,\r\n"
+                },
+                {
+                    "date": 1740924714130,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -9,10 +9,9 @@\n export const useToast = () => {\r\n   const { addError, clearError } = useError();\r\n \r\n   const showToast = (message: unknown, options: ToastOptions = {}) => {\r\n-    const { timeout = 3000, type = 'info', position = 'top' } = options;\r\n-    \r\n+    const { timeout = 3000, type = 'info', position = 'top'\r\n     // Convert any message type to string safely\r\n     const safeMessage = (() => {\r\n       try {\r\n         if (message instanceof Error) {\r\n"
+                },
+                {
+                    "date": 1740924724484,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -9,9 +9,10 @@\n export const useToast = () => {\r\n   const { addError, clearError } = useError();\r\n \r\n   const showToast = (message: unknown, options: ToastOptions = {}) => {\r\n-    const { timeout = 3000, type = 'info', position = 'top'\r\n+    const { timeout = 3000' } = options;\r\n+    \r\n     // Convert any message type to string safely\r\n     const safeMessage = (() => {\r\n       try {\r\n         if (message instanceof Error) {\r\n"
+                },
+                {
+                    "date": 1740924734662,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -9,9 +9,9 @@\n export const useToast = () => {\r\n   const { addError, clearError } = useError();\r\n \r\n   const showToast = (message: unknown, options: ToastOptions = {}) => {\r\n-    const { timeout = 3000' } = options;\r\n+    const { timeout = 3000 } = options;\r\n     \r\n     // Convert any message type to string safely\r\n     const safeMessage = (() => {\r\n       try {\r\n"
+                }
+            ],
+            "date": 1740924548641,
+            "name": "Commit-0",
+            "content": "import { useError } from './useError';\r\n\r\ninterface ToastOptions {\r\n  timeout?: number;\r\n  type?: 'error' | 'success' | 'warning' | 'info'; \r\n  position?: 'top' | 'bottom';\r\n}\r\n\r\nexport const useToast = () => {\r\n  const { addError, clearError } = useError();\r\n\r\n  const showToast = (message: unknown, options: ToastOptions = {}) => {\r\n    const { timeout = 3000, _type = 'info', position = 'top' } = options;\r\n    \r\n    // Convert any message type to string safely\r\n    const safeMessage = (() => {\r\n      try {\r\n        if (message instanceof Error) {\r\n          return message.message;\r\n        }\r\n        if (typeof message === 'string') {\r\n          return message;\r\n        }\r\n        if (message && typeof message === 'object') {\r\n          const clean: Record<string | symbol, unknown> = { ...message };\r\n          Object.getOwnPropertySymbols(message).forEach(sym => {\r\n            delete clean[sym];\r\n          });\r\n          return JSON.stringify(clean);\r\n        }\r\n        return String(message);\r\n      } catch (err) {\r\n        return 'An error occurred';\r\n      }\r\n    })();\r\n\r\n    addError(safeMessage, timeout);\r\n  };\r\n\r\n  return {\r\n    showToast,\r\n    clearToast: clearError\r\n  };\r\n};"
+        }
+    ]
+}

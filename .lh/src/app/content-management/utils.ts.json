@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/app/content-management/utils.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1740056774165,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1740056774165,
+            "name": "Commit-0",
+            "content": "import { type Question } from './types';\r\nimport { QUESTION_TYPES, type QuestionType } from './constants';\r\n\r\ninterface ValidationResult {\r\n  isValid: boolean;\r\n  isDraft: boolean;\r\n  errors: string[];\r\n}\r\n\r\nexport const validateQuestion = (question: Question): ValidationResult => {\r\n  const errors: string[] = [];\r\n  const result: ValidationResult = {\r\n    isValid: true,\r\n    isDraft: false,\r\n    errors: []\r\n  };\r\n\r\n  // Check if question type is valid\r\n  if (!question.type || !(question.type in QUESTION_TYPES)) {\r\n    errors.push('Invalid question type');\r\n    result.isValid = false;\r\n    result.isDraft = true;\r\n  }\r\n\r\n  // Validate required fields\r\n  if (!question.data?.prompt?.trim()) {\r\n    errors.push('Question prompt is required');\r\n    result.isValid = false;\r\n    result.isDraft = true;\r\n  }\r\n\r\n  if (!question.data?.teacher_script?.trim()) {\r\n    errors.push('Teacher script is required');\r\n    result.isValid = false;\r\n    result.isDraft = true;\r\n  }\r\n\r\n  // Type-specific validation\r\n  const questionType = question.type as QuestionType;\r\n  if (questionType === 'speaking' && !question.metadata?.sampleAnswer?.trim()) {\r\n    errors.push('Sample answer is required for speaking questions');\r\n    result.isValid = false;\r\n    result.isDraft = true;\r\n  }\r\n\r\n  if (questionType === 'multipleChoice') {\r\n    if (!Array.isArray(question.metadata?.options) || question.metadata?.options?.length < 2) {\r\n      errors.push('Multiple choice questions require at least 2 options');\r\n      result.isValid = false;\r\n      result.isDraft = true;\r\n    }\r\n  }\r\n\r\n  if (questionType === 'grammarSpeaking') {\r\n    if (!Array.isArray(question.metadata?.keywords) || question.metadata?.keywords?.length === 0) {\r\n      errors.push('Grammar speaking questions require at least 1 keyword');\r\n      result.isValid = false;\r\n      result.isDraft = true;\r\n    }\r\n  }\r\n\r\n  if (questionType === 'fillInTheBlank') {\r\n    if (!question.metadata?.sampleAnswer?.trim()) {\r\n      errors.push('Fill in the blank questions require an answer');\r\n      result.isValid = false;\r\n      result.isDraft = true;\r\n    }\r\n  }\r\n\r\n  result.errors = errors;\r\n  return result;\r\n}; "
+        }
+    ]
+}

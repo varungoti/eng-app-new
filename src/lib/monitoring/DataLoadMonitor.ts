@@ -1,6 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { supabase } from '../supabase';
-import type { MonitoringConfig, DataLoadMetrics } from './types';
+import { logger } from '../logger';
+import type { MonitoringConfig } from './types';
 
 interface LoadMetric {
   duration: number;
@@ -47,10 +48,16 @@ export class DataLoadMonitor {
       }
 
       if (this.config.enableLogging) {
-        console.log(`Data load: ${table}, Records: ${records}, Duration: ${duration}ms`);
+        logger.info(`Data load: ${table}, Records: ${records}, Duration: ${duration}ms`, {
+          source: 'DataLoadMonitor',
+          context: { table, records, duration, success }
+        });
       }
     } catch (error) {
-      console.warn('Failed to record data load:', error);
+      logger.warn('Failed to record data load:', {
+        source: 'DataLoadMonitor',
+        context: { error, table }
+      });
     }
   }
 

@@ -1,7 +1,7 @@
 import React, { createContext, useState, useContext } from 'react';
 import { logger } from '../lib/logger';
 
-interface ErrorContextType {
+export interface ErrorContextType {
   error: string | null;
   setError: (error: string | null) => void;
   clearError: () => void;

@@ -16,7 +16,13 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [isResetMode, setIsResetMode] = useState(false);
   const [isSignUpMode, setIsSignUpMode] = useState(false);
-  const auth = useAuth();
+  const auth = useAuth() as {
+    user: any;
+    loading: boolean;
+    signUp: (data: { email: string; password: string; name: string }) => Promise<void>;
+    login: (data: { email: string; password: string }) => Promise<void>;
+    resetPassword: (data: { email: string }) => Promise<void>;
+  };
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from?.pathname || '/dashboard';

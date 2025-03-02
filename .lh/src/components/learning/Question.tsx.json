@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 4,
+            "activePatchIndex": 8,
             "patches": [
                 {
                     "date": 1739453246030,
@@ -24,6 +24,22 @@
                 {
                     "date": 1739453280750,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -2,9 +2,9 @@\n import { Card, CardContent, CardHeader, CardTitle } from \"@/components/ui/card\";\r\n import { ExercisePrompt } from './ExercisePrompt';\r\n import { Button } from \"@/components/ui/button\";\r\n import { Progress } from \"@/components/ui/progress\";\r\n-import type { Question, ExercisePrompt as ExercisePromptType } from '../types/learning';\r\n+import type { Question, ExercisePrompt as ExercisePromptType } from '@/types/learning';\r\n \r\n interface QuestionProps {\r\n   question: Question & {\r\n     exercise_prompts: ExercisePromptType[];\r\n"
+                },
+                {
+                    "date": 1740775890738,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -2,9 +2,9 @@\n import { Card, CardContent, CardHeader, CardTitle } from \"@/components/ui/card\";\r\n import { ExercisePrompt } from './ExercisePrompt';\r\n import { Button } from \"@/components/ui/button\";\r\n import { Progress } from \"@/components/ui/progress\";\r\n-import type { Question, ExercisePrompt as ExercisePromptType } from '@/types/learning';\r\n+import type { Question, ExercisePrompt as ExercisePromptType } from '@/types';\r\n \r\n interface QuestionProps {\r\n   question: Question & {\r\n     exercise_prompts: ExercisePromptType[];\r\n"
+                },
+                {
+                    "date": 1740775896956,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -2,9 +2,9 @@\n import { Card, CardContent, CardHeader, CardTitle } from \"@/components/ui/card\";\r\n import { ExercisePrompt } from './ExercisePrompt';\r\n import { Button } from \"@/components/ui/button\";\r\n import { Progress } from \"@/components/ui/progress\";\r\n-import type { Question, ExercisePrompt as ExercisePromptType } from '@/types';\r\n+import type { Question, ExercisePrompt as ExercisePromptType } from '@/types/exercise';\r\n \r\n interface QuestionProps {\r\n   question: Question & {\r\n     exercise_prompts: ExercisePromptType[];\r\n"
+                },
+                {
+                    "date": 1740775905760,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -2,9 +2,9 @@\n import { Card, CardContent, CardHeader, CardTitle } from \"@/components/ui/card\";\r\n import { ExercisePrompt } from './ExercisePrompt';\r\n import { Button } from \"@/components/ui/button\";\r\n import { Progress } from \"@/components/ui/progress\";\r\n-import type { Question, ExercisePrompt as ExercisePromptType } from '@/types/exercise';\r\n+import type { Question, ExercisePrompt as ExercisePromptType } from '@/types/';\r\n \r\n interface QuestionProps {\r\n   question: Question & {\r\n     exercise_prompts: ExercisePromptType[];\r\n"
+                },
+                {
+                    "date": 1740775919418,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -32,9 +32,9 @@\n \r\n   return (\r\n     <Card className=\"w-full max-w-3xl mx-auto\">\r\n       <CardHeader>\r\n-        <CardTitle>{question.text}</CardTitle>\r\n+        <CardTitle>{question.title}</CardTitle>\r\n         <Progress \r\n           value={(currentPromptIndex / question.exercise_prompts.length) * 100} \r\n           className=\"w-full\"\r\n         />\r\n"
                 }
             ],
             "date": 1739453246030,

@@ -29,7 +29,7 @@ export const validateQuestion = (question: Question): ValidationResult => {
     result.isDraft = true;
   }
 
-  if (!question.data?.teacherScript?.trim()) {
+  if (!question.data?.teacher_script?.trim()) {
     errors.push('Teacher script is required');
     result.isValid = false;
     result.isDraft = true;

@@ -81,18 +81,24 @@ const EventCalendar: React.FC<EventCalendarProps> = ({ events, onEventClick }) =
           </div>
           <div className="flex space-x-2">
             <button
+              type="button"
+              title="Previous Month"
               onClick={() => setCurrentDate(new Date(currentDate.setMonth(currentDate.getMonth() - 1)))}
               className="p-2 hover:bg-gray-100 rounded-full"
             >
               <ChevronLeft className="h-5 w-5 text-gray-600" />
             </button>
             <button
+              type="button"
+              title="Today"
               onClick={() => setCurrentDate(new Date())}
               className="px-3 py-1 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-md"
             >
               Today
             </button>
             <button
+              type="button"
+              title="Next Month"
               onClick={() => setCurrentDate(new Date(currentDate.setMonth(currentDate.getMonth() + 1)))}
               className="p-2 hover:bg-gray-100 rounded-full"
             >
@@ -134,6 +140,8 @@ const EventCalendar: React.FC<EventCalendarProps> = ({ events, onEventClick }) =
                 <div className="mt-1 space-y-1">
                   {dayEvents.map((event) => (
                     <button
+                      type="button"
+                      title={event.title}
                       key={event.id}
                       onClick={() => onEventClick(event)}
                       className="w-full text-left px-2 py-1 text-xs rounded bg-indigo-50 text-indigo-700 hover:bg-indigo-100 truncate"
