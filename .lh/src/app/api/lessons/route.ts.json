@@ -1,0 +1,22 @@
+{
+    "sourceFile": "src/app/api/lessons/route.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1740946262651,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1740946269096,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -2,9 +2,9 @@\n import { supabase } from '@/lib/supabase';\r\n //import { Lesson } from '@/lib/models/lesson';\r\n import { logger } from '@/lib/logger';\r\n \r\n-export async function GET(request: Request) {\r\n+export async function GET(_request: Request) {\r\n   try {\r\n     const { data: lessons, error } = await supabase\r\n       .from('lessons')\r\n       .select()\r\n"
+                }
+            ],
+            "date": 1740946262651,
+            "name": "Commit-0",
+            "content": "import { NextResponse } from 'next/server';\r\nimport { supabase } from '@/lib/supabase';\r\n//import { Lesson } from '@/lib/models/lesson';\r\nimport { logger } from '@/lib/logger';\r\n\r\nexport async function GET(request: Request) {\r\n  try {\r\n    const { data: lessons, error } = await supabase\r\n      .from('lessons')\r\n      .select()\r\n      .order('createdAt', { ascending: false });\r\n\r\n    if (error) {\r\n      throw new Error('Failed to fetch lessons');\r\n    }\r\n\r\n    return NextResponse.json(lessons);\r\n  } catch (error) {\r\n    logger.error('Failed to fetch lessons', {\r\n      context: { error },\r\n      source: 'LessonsAPI'\r\n    });\r\n\r\n    return NextResponse.json(\r\n      { error: 'Failed to fetch lessons' },\r\n      { status: 500 }\r\n    );\r\n  }\r\n}\r\n\r\nexport async function POST(request: Request) {\r\n  try {\r\n    const { data } = await request.json();\r\n    const { data: lesson, error } = await supabase.from('lessons').insert(data);\r\n\r\n    if (error) {\r\n      throw new Error('Failed to create lesson');\r\n    }\r\n\r\n    return NextResponse.json(lesson);\r\n  } catch (error) {\r\n    logger.error('Failed to create lesson', {\r\n      context: { error },\r\n      source: 'LessonsAPI'\r\n    });\r\n\r\n    return NextResponse.json(\r\n      { error: 'Failed to create lesson' },\r\n      { status: 500 }\r\n    );\r\n  }\r\n} "
+        }
+    ]
+}

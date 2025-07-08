@@ -1,0 +1,1 @@
+Please provide the current implementation of togglePlayback and toggleMute to help debug the issue

@@ -1,0 +1,18 @@
+{
+    "sourceFile": "MIGRATION.md",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1741206069884,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1741206069884,
+            "name": "Commit-0",
+            "content": "# MongoDB to Supabase Migration Guide\r\n\r\nThis document outlines the process of migrating from MongoDB to Supabase in the SpeakWell application.\r\n\r\n## Overview\r\n\r\nThe application has been migrated from using MongoDB with Mongoose to Supabase for data storage. This migration involved:\r\n\r\n1. Creating Supabase type definitions based on the database schema\r\n2. Implementing repository functions for CRUD operations\r\n3. Updating API routes to use the new Supabase models\r\n4. Creating a compatibility layer for backward compatibility\r\n\r\n## New Structure\r\n\r\n### Database Models\r\n\r\nThe new database models are defined in `src/lib/models/database.ts`. This file contains:\r\n\r\n- Type definitions for all entities (Grade, Topic, Subtopic, Lesson, etc.)\r\n- Repository classes for each entity with methods for CRUD operations\r\n\r\n### API Routes\r\n\r\nAPI routes have been updated to use the new Supabase models. Changes include:\r\n\r\n- Removing MongoDB connection code\r\n- Updating validation schemas to match Supabase field names\r\n- Modifying error handling for PostgreSQL-specific error codes\r\n\r\n### Compatibility Layer\r\n\r\nA compatibility layer has been created in `src/lib/db/mongodb.ts` to ensure backward compatibility with any code still using the MongoDB connection. This layer:\r\n\r\n- Provides a no-op `connectToDatabase` function that logs warnings\r\n- Returns stub objects with common MongoDB methods\r\n- Mocks the mongoose global object\r\n\r\n## Migration Steps\r\n\r\nTo complete the migration:\r\n\r\n1. Update all remaining API routes to use the new Supabase models\r\n2. Update any frontend code that directly references MongoDB models\r\n3. Test all functionality to ensure data is correctly stored and retrieved\r\n4. Monitor logs for any calls to the compatibility layer and update those code paths\r\n\r\n## Database Schema\r\n\r\nThe Supabase database schema includes the following tables:\r\n\r\n- `grades`: Stores information about grade levels\r\n- `topics`: Stores topics associated with grades\r\n- `subtopics`: Stores subtopics associated with topics\r\n- `lessons`: Stores lessons associated with subtopics\r\n- `questions`: Stores questions associated with lessons\r\n- `exercise_prompts`: Stores exercise prompts associated with questions\r\n\r\n## Error Handling\r\n\r\nError handling has been updated to account for PostgreSQL-specific error codes:\r\n\r\n- `23505`: Unique violation (replaces MongoDB's `11000` error code)\r\n\r\n## Future Improvements\r\n\r\n- Remove the MongoDB compatibility layer once all code has been migrated\r\n- Implement more advanced Supabase features like real-time subscriptions\r\n- Add database migrations for schema changes "
+        }
+    ]
+}

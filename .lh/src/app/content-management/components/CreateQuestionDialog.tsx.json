@@ -3,11 +3,19 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 0,
+            "activePatchIndex": 2,
             "patches": [
                 {
                     "date": 1739138875950,
                     "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1740946478885,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -3,9 +3,9 @@\n import { useState } from 'react';\r\n import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';\r\n import { Button } from '@/components/ui/button';\r\n import { Input } from '@/components/ui/input';\r\n-import { Textarea } from '@/components/ui/textarea';\r\n+//import { Textarea } from '@/components/ui/textarea';\r\n import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';\r\n import { useToast } from '@/hooks/use-toast';\r\n import { contentService } from '@/lib/content/ContentService';\r\n import { useMutation, useQueryClient } from '@tanstack/react-query';\r\n"
+                },
+                {
+                    "date": 1740946491786,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -7,10 +7,10 @@\n //import { Textarea } from '@/components/ui/textarea';\r\n import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';\r\n import { useToast } from '@/hooks/use-toast';\r\n import { contentService } from '@/lib/content/ContentService';\r\n-import { useMutation, useQueryClient } from '@tanstack/react-query';\r\n-import { Icon } from '@/components/ui/icons';\r\n+//import { useMutation, useQueryClient } from '@tanstack/react-query';\r\n+//import { Icon } from '@/components/ui/icons';\r\n import { QuestionFormats } from '@/components/formats/Formats';\r\n \r\n // Create a type for available formats\r\n type QuestionFormat = keyof typeof QuestionFormats;\r\n"
                 }
             ],
             "date": 1739138875950,

@@ -1,0 +1,26 @@
+{
+    "sourceFile": "next.config.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 2,
+            "patches": [
+                {
+                    "date": 1741341198737,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1741342182602,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,12 +1,1 @@\n-/** @type {import('next').NextConfig} */\r\n-const nextConfig = {\r\n-  images: {\r\n-    domains: [\r\n-      'i.pinimg.com',\r\n-      'gifsec.com',\r\n-      'gifdb.com'\r\n-    ],\r\n-  },\r\n-}\r\n-\r\n-module.exports = nextConfig \n\\ No newline at end of file\n+ \n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1741863587461,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,1 +1,34 @@\n- \n\\ No newline at end of file\n+/** @type {import('next').NextConfig} */\r\n+const nextConfig = {\r\n+  reactStrictMode: true,\r\n+  swcMinify: true,\r\n+  images: {\r\n+    domains: [\r\n+      'usagif.com',\r\n+      'gifsec.com', \r\n+      'gifdb.com',\r\n+      'supabase.co',\r\n+      'images.unsplash.com',\r\n+      'fastly.picsum.photos',\r\n+      'loremflickr.com',\r\n+      'placekitten.com',\r\n+      'placehold.co'\r\n+    ],\r\n+    remotePatterns: [\r\n+      {\r\n+        protocol: 'https',\r\n+        hostname: '**',\r\n+      },\r\n+      {\r\n+        protocol: 'http',\r\n+        hostname: '**',\r\n+      }\r\n+    ],\r\n+  },\r\n+  experimental: {\r\n+    // Ensure we can use external images\r\n+    externalDir: true,\r\n+  },\r\n+};\r\n+\r\n+module.exports = nextConfig; \n\\ No newline at end of file\n"
+                }
+            ],
+            "date": 1741341198737,
+            "name": "Commit-0",
+            "content": "/** @type {import('next').NextConfig} */\r\nconst nextConfig = {\r\n  images: {\r\n    domains: [\r\n      'i.pinimg.com',\r\n      'gifsec.com',\r\n      'gifdb.com'\r\n    ],\r\n  },\r\n}\r\n\r\nmodule.exports = nextConfig "
+        }
+    ]
+}

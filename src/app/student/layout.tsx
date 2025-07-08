@@ -2,9 +2,9 @@
 
 import React from 'react';
 import Sidebar from '@/components/common/sidebar';
-import Header from '@/components/common/Header/Header';
-import RightSection from '@/components/common/right-section';
-import { Home, AlignLeft, Trophy, Target, ShoppingBag, User, Sun, Moon, Book, Zap, BookOpen, Briefcase, Award, Mic } from "lucide-react";
+// import Header from '@/components/common/Header/Header';
+// import RightSection from '@/components/common/right-section';
+import { Home, Trophy, Target, Book, Zap, BookOpen, Briefcase, Award, Mic } from "lucide-react";
 
 export default function StudentLayout({ children }: { children: React.ReactNode }) {
 

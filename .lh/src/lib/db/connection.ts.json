@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/lib/db/connection.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1740944447662,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1740944447662,
+            "name": "Commit-0",
+            "content": "//import { supabase } from '../supabase';\r\nimport { logger } from '../logger';\r\nimport { DatabaseMonitor } from '../monitoring/DatabaseMonitor';\r\nimport { checkDatabaseHealth } from './healthCheck';\r\nimport { RetryStrategy } from './retryStrategy';\r\nimport { monitors } from '../monitoring';\r\n\r\nexport class DatabaseConnection {\r\n  private static instance: DatabaseConnection;\r\n  private connectionPromise: Promise<boolean> | null = null;\r\n  private isConnected: boolean = false;\r\n  private retryStrategy: RetryStrategy;\r\n\r\n  private constructor() {\r\n    this.retryStrategy = new RetryStrategy({\r\n      maxRetries: 3,\r\n      baseDelay: 1000,\r\n      maxDelay: 5000\r\n    });\r\n  }\r\n\r\n  public static getInstance(): DatabaseConnection {\r\n    if (!DatabaseConnection.instance) {\r\n      DatabaseConnection.instance = new DatabaseConnection();\r\n    }\r\n    return DatabaseConnection.instance;\r\n  }\r\n\r\n  public async initialize(): Promise<boolean> {\r\n    if (this.connectionPromise) {\r\n      return this.connectionPromise;\r\n    }\r\n\r\n    logger.info('Initializing database connection...', {\r\n      source: 'DatabaseConnection'\r\n    });\r\n\r\n    this.connectionPromise = this.retryStrategy.execute(async () => {\r\n      const isHealthy = await checkDatabaseHealth();\r\n      \r\n      if (isHealthy) {\r\n        this.isConnected = true;\r\n        monitors.databaseMonitor.updateConnectionStatus(true);\r\n        logger.info('Database connection initialized successfully', {\r\n          source: 'DatabaseConnection'\r\n        });\r\n        return true;\r\n      }\r\n      \r\n      throw new Error('Database health check failed');\r\n    }).catch(err => {\r\n      logger.error('Failed to initialize database connection', {\r\n        context: { \r\n          error: err,\r\n          url: process.env.NEXT_PUBLIC_SUPABASE_URL,\r\n          retryAttempts: this.retryStrategy.getAttempts()\r\n        },\r\n        source: 'DatabaseConnection'\r\n      });\r\n      this.isConnected = false;\r\n      monitors.databaseMonitor.updateConnectionStatus(false);\r\n      return false;\r\n    });\r\n\r\n    const result = await this.connectionPromise;\r\n    this.connectionPromise = null;\r\n    return result;\r\n  }\r\n\r\n  public isHealthy(): boolean {\r\n    return this.isConnected;\r\n  }\r\n}\r\n\r\nexport const dbConnection = DatabaseConnection.getInstance();"
+        }
+    ]
+}

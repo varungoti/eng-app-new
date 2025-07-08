@@ -4,7 +4,7 @@ import React from 'react';
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { Button } from "@/components/ui/button";
+//import { Button } from "@/components/ui/button";
 import {
   Brain,
   Sparkles,
@@ -16,7 +16,6 @@ import {
   Gauge,
   Mic,
   BookOpen,
-  Keyboard,
   Languages
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -185,6 +184,18 @@ export function EnhancedAIFeedback({
   feedback,
   onRecommendationSelect
 }: EnhancedAIFeedbackProps) {
+  // Map feedback categories to their corresponding icons
+  const categoryIcons = {
+    pronunciation: <Mic className="h-5 w-5" />,
+    grammar: <BookOpen className="h-5 w-5" />,
+    vocabulary: <Languages className="h-5 w-5" />,
+    fluency: <Gauge className="h-5 w-5" />,
+    comprehension: <Brain className="h-5 w-5" />,
+    achievements: <Trophy className="h-5 w-5" />,
+    improvement: <Sparkles className="h-5 w-5" />,
+    excellence: <Star className="h-5 w-5" />
+  };
+
   const getAgeAppropriateExplanation = (text: string) => {
     if (studentAge <= 6) {
       // Simplify language for young children
@@ -198,15 +209,15 @@ export function EnhancedAIFeedback({
     return text;
   };
 
-  const renderMetricCard = (title: string, score: number, icon: React.ReactNode, details: any) => (
+  const renderMetricCard = (title: string, score: number, category: keyof typeof categoryIcons, details: any) => (
     <Card className="overflow-hidden">
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            {icon}
-            <CardTitle className="text-lg">{title}</CardTitle>
-          </div>
-          <div className="flex items-center gap-2">
+          <CardTitle className="text-md flex items-center gap-2">
+            {categoryIcons[category]}
+            {title}
+          </CardTitle>
+          <div>
             <span className="text-2xl font-bold">{Math.round(score)}%</span>
           </div>
         </div>
@@ -279,25 +290,25 @@ export function EnhancedAIFeedback({
         {renderMetricCard(
           'Pronunciation',
           feedback.pronunciation.overall,
-          <Mic className="h-5 w-5 text-blue-500" />,
+          'pronunciation',
           feedback.pronunciation.details
         )}
         {renderMetricCard(
           'Grammar',
           feedback.grammar.overall,
-          <BookOpen className="h-5 w-5 text-green-500" />,
+          'grammar',
           feedback.grammar.details
         )}
         {renderMetricCard(
           'Vocabulary',
           feedback.vocabulary.overall,
-          <Languages className="h-5 w-5 text-purple-500" />,
+          'vocabulary',
           feedback.vocabulary.details
         )}
         {renderMetricCard(
           'Fluency',
           feedback.fluency.overall,
-          <Gauge className="h-5 w-5 text-orange-500" />,
+          'fluency',
           feedback.fluency.details
         )}
       </div>

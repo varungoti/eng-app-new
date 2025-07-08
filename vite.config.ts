@@ -7,12 +7,40 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
+      '@/components': path.resolve(__dirname, './src/components'),
+      '@/lib': path.resolve(__dirname, './src/lib'),
+      '@/types': path.resolve(__dirname, './src/types'),
+      '@/hooks': path.resolve(__dirname, './src/hooks'),
+      '@/utils': path.resolve(__dirname, './src/utils'),
+      '@/config': path.resolve(__dirname, './src/config'),
+      '@/app': path.resolve(__dirname, './src/app'),
+      '@/contexts': path.resolve(__dirname, './src/contexts'),
+      '@/pages': path.resolve(__dirname, './src/pages'),
+      // TipTap JSX runtime workaround
+      '@tiptap/core/jsx-runtime': path.resolve(__dirname, './src/lib/tiptap-jsx-runtime.js'),
+
+      // Gradio package mocks
+      '@gradio/atoms': path.resolve(__dirname, './src/gradio-mock/atoms.js'),
+      '@gradio/code': path.resolve(__dirname, './src/gradio-mock/code.js'),
+      '@gradio/statustracker': path.resolve(__dirname, './src/gradio-mock/statustracker.js'),
+      '@gradio/core': path.resolve(__dirname, './src/gradio-mock/core.js'),
+      '@gradio/theme': path.resolve(__dirname, './src/gradio-mock/theme'),
+      '@gradio/theme/reset.css': path.resolve(__dirname, './src/gradio-mock/reset.css'),
+      '@gradio/theme/global.css': path.resolve(__dirname, './src/gradio-mock/global.css'),
+      '@gradio/theme/pollen.css': path.resolve(__dirname, './src/gradio-mock/pollen.css'),
+      '@gradio/theme/typography.css': path.resolve(__dirname, './src/gradio-mock/typography.css'),
+      '@gradio/wasm': path.resolve(__dirname, './src/gradio-mock/wasm.js'),
+      '@gradio/wasm/network': path.resolve(__dirname, './src/gradio-mock/wasm-network.js'),
+      '@gradio/client': path.resolve(__dirname, './src/gradio-mock/client.js'),
+
+      // Keep the old aliases for backward compatibility
       '@components': path.resolve(__dirname, './src/components'),
       '@lib': path.resolve(__dirname, './src/lib'),
       '@types': path.resolve(__dirname, './src/types'),
       '@hooks': path.resolve(__dirname, './src/hooks'),
       '@utils': path.resolve(__dirname, './src/utils')
-    }
+    },
+    extensions: ['.js', '.jsx', '.ts', '.tsx', '.json']
   },
   server: {
     port: 5173,
@@ -76,7 +104,24 @@ export default defineConfig({
     chunkSizeWarningLimit: 1000
   },
   optimizeDeps: {
-    //exclude: ['react-dom/client'],
+    exclude: [
+      // Exclude problematic TipTap dependencies
+      '@tiptap/extension-list',
+      '@tiptap/extensions',
+      '@tiptap/core/jsx-runtime',
+      '@tiptap/pm',
+      // Exclude problematic Gradio dependencies
+      '@gradio/atoms',
+      '@gradio/code',
+      '@gradio/statustracker',
+      '@gradio/theme',
+      '@gradio/wasm',
+      '@gradio/client',
+      '@gradio/core',
+      'gradio.whl',
+      'gradio_client.whl',
+      '@self/spa'
+    ],
     include: [
       'lucide-react',
       'react',
@@ -85,7 +130,10 @@ export default defineConfig({
       '@tanstack/react-query',
       '@supabase/ssr',
       '@supabase/supabase-js',
-      '@supabase/gotrue-js'
+      '@supabase/gotrue-js',
+      // Include TipTap core packages
+      '@tiptap/core',
+      '@tiptap/react'
     ]
   },
   envDir: './',
@@ -97,6 +145,6 @@ export default defineConfig({
     'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
     'process.browser': true,
     'import.meta.env.DEV': JSON.stringify(process.env.NODE_ENV === 'development'),
-    
+
   }
 });

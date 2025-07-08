@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/db/seed/exercise-prompts.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1746702324477,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1746702324477,
+            "name": "Commit-0",
+            "content": "import { faker } from '@faker-js/faker';\r\nimport { SupabaseClient } from '@supabase/supabase-js';\r\n\r\ninterface ExercisePrompt {\r\n  id: string;\r\n  text: string;\r\n  media: string | null;\r\n  type: 'multiple_choice' | 'open_ended' | 'true_false' | 'matching';\r\n  narration: string | null;\r\n  saytext: string | null;\r\n  question_id: string | null;\r\n  lesson_id: string;\r\n  order_index: number;\r\n  voice_id: string | null;\r\n  metadata: any;\r\n  created_at: string;\r\n  updated_at: string;\r\n}\r\n\r\ninterface Lesson {\r\n  id: string;\r\n}\r\n\r\nexport async function seedExercisePrompts(\r\n  supabase: SupabaseClient,\r\n  lessons: Lesson[]\r\n): Promise<ExercisePrompt[]> {\r\n  try {\r\n    const prompts: Omit<ExercisePrompt, 'id'>[] = [];\r\n    const promptTypes: ExercisePrompt['type'][] = [\r\n      'multiple_choice',\r\n      'open_ended',\r\n      'true_false',\r\n      'matching'\r\n    ];\r\n\r\n    // Create prompts for each lesson\r\n    lessons.forEach(lesson => {\r\n      const promptCount = faker.number.int({ min: 3, max: 8 });\r\n      \r\n      for (let i = 0; i < promptCount; i++) {\r\n        const type = faker.helpers.arrayElement(promptTypes);\r\n        const hasMedia = faker.datatype.boolean();\r\n        const hasNarration = faker.datatype.boolean();\r\n\r\n        prompts.push({\r\n          text: faker.lorem.sentence(),\r\n          media: hasMedia ? faker.image.url() : null,\r\n          type,\r\n          narration: hasNarration ? faker.lorem.paragraph() : null,\r\n          saytext: faker.helpers.maybe(() => faker.lorem.sentence()),\r\n          question_id: null, // This would be linked to a question if needed\r\n          lesson_id: lesson.id,\r\n          order_index: i + 1,\r\n          voice_id: null, // This would be linked to a voice if needed\r\n          metadata: {\r\n            difficulty: faker.helpers.arrayElement(['easy', 'medium', 'hard']),\r\n            points: faker.number.int({ min: 1, max: 10 }),\r\n            time_limit: faker.number.int({ min: 30, max: 300 }),\r\n            hints: Array.from(\r\n              { length: faker.number.int({ min: 0, max: 2 }) },\r\n              () => faker.lorem.sentence()\r\n            )\r\n          },\r\n          created_at: new Date().toISOString(),\r\n          updated_at: new Date().toISOString()\r\n        });\r\n      }\r\n    });\r\n\r\n    // Insert prompts\r\n    const { data: insertedPrompts, error } = await supabase\r\n      .from('exercise_prompts')\r\n      .insert(prompts)\r\n      .select();\r\n\r\n    if (error) {\r\n      throw new Error(`Failed to insert exercise prompts: ${error.message}`);\r\n    }\r\n\r\n    if (!insertedPrompts) {\r\n      throw new Error('No exercise prompts were inserted');\r\n    }\r\n\r\n    return insertedPrompts;\r\n  } catch (error) {\r\n    console.error('Error seeding exercise prompts:', error);\r\n    throw error;\r\n  }\r\n} "
+        }
+    ]
+}

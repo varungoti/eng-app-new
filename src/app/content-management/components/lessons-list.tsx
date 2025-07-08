@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-import { Edit2, Trash2, Eye } from "lucide-react";
+import {  Trash2, Eye } from "lucide-react";
 import { toast } from "sonner";
 
 import {

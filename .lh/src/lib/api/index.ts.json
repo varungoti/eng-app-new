@@ -1,0 +1,50 @@
+{
+    "sourceFile": "src/lib/api/index.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 8,
+            "patches": [
+                {
+                    "date": 1740944095083,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1740944104424,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,5 +1,5 @@\n-import { prisma } from '..//db';\r\n+import { prisma } from '../db/db';\r\n import { logger } from '../logger';\r\n \r\n export class APIError extends Error {\r\n   constructor(message: string, public statusCode: number) {\r\n"
+                },
+                {
+                    "date": 1740944118055,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,5 +1,5 @@\n-import { prisma } from '../db/db';\r\n+import { prisma } from './db';\r\n import { logger } from '../logger';\r\n \r\n export class APIError extends Error {\r\n   constructor(message: string, public statusCode: number) {\r\n"
+                },
+                {
+                    "date": 1740944155005,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,5 +1,5 @@\n-import { prisma } from './db';\r\n+//import { prisma } from './db';\r\n import { logger } from '../logger';\r\n \r\n export class APIError extends Error {\r\n   constructor(message: string, public statusCode: number) {\r\n"
+                },
+                {
+                    "date": 1740944160223,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,5 +1,5 @@\n-//import { prisma } from './db';\r\n+import { prisma } from './db';\r\n import { logger } from '../logger';\r\n \r\n export class APIError extends Error {\r\n   constructor(message: string, public statusCode: number) {\r\n"
+                },
+                {
+                    "date": 1740944181723,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,5 +1,5 @@\n-import { prisma } from './db';\r\n+import { prisma } from '.';\r\n import { logger } from '../logger';\r\n \r\n export class APIError extends Error {\r\n   constructor(message: string, public statusCode: number) {\r\n"
+                },
+                {
+                    "date": 1740944196332,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,5 +1,5 @@\n-import { prisma } from '.';\r\n+import { prisma } from '@lib/';\r\n import { logger } from '../logger';\r\n \r\n export class APIError extends Error {\r\n   constructor(message: string, public statusCode: number) {\r\n"
+                },
+                {
+                    "date": 1740944210518,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,5 +1,5 @@\n-import { prisma } from '@lib/';\r\n+import { prisma } from '@lib/db';\r\n import { logger } from '../logger';\r\n \r\n export class APIError extends Error {\r\n   constructor(message: string, public statusCode: number) {\r\n"
+                },
+                {
+                    "date": 1740944219810,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,5 +1,5 @@\n-import { prisma } from '@lib/db/';\r\n+import { prisma } from '@/lib/db/';\r\n import { logger } from '../logger';\r\n \r\n export class APIError extends Error {\r\n   constructor(message: string, public statusCode: number) {\r\n"
+                }
+            ],
+            "date": 1740944095083,
+            "name": "Commit-0",
+            "content": "import { prisma } from '..//db';\r\nimport { logger } from '../logger';\r\n\r\nexport class APIError extends Error {\r\n  constructor(message: string, public statusCode: number) {\r\n    super(message);\r\n    this.name = 'APIError';\r\n  }\r\n}\r\n\r\nexport const api = {\r\n  async get<T>(path: string, options: { where?: any; include?: any; orderBy?: any } = {}): Promise<T[]> {\r\n    try {\r\n      const data = await prisma[path].findMany({\r\n        where: { deletedAt: null, ...options.where },\r\n        include: options.include,\r\n        orderBy: options.orderBy,\r\n      });\r\n      return data;\r\n    } catch (err) {\r\n      logger.error(`Failed to fetch ${path}`, {\r\n        context: { error: err, options },\r\n        source: 'api.get'\r\n      });\r\n      throw new APIError(`Failed to fetch ${path}`, 500);\r\n    }\r\n  },\r\n\r\n  async getById<T>(path: string, id: string, options: { include?: any } = {}): Promise<T | null> {\r\n    try {\r\n      const data = await prisma[path].findUnique({\r\n        where: { id, deletedAt: null },\r\n        include: options.include,\r\n      });\r\n      return data;\r\n    } catch (err) {\r\n      logger.error(`Failed to fetch ${path} by id`, {\r\n        context: { error: err, id, options },\r\n        source: 'api.getById'\r\n      });\r\n      throw new APIError(`Failed to fetch ${path} by id`, 500);\r\n    }\r\n  },\r\n\r\n  async post<T>(path: string, data: any, options: { include?: any } = {}): Promise<T> {\r\n    try {\r\n      const result = await prisma[path].create({\r\n        data,\r\n        include: options.include,\r\n      });\r\n      return result;\r\n    } catch (err) {\r\n      logger.error(`Failed to create ${path}`, {\r\n        context: { error: err, data, options },\r\n        source: 'api.post'\r\n      });\r\n      throw new APIError(`Failed to create ${path}`, 500);\r\n    }\r\n  },\r\n\r\n  async put<T>(path: string, id: string, data: any, options: { include?: any } = {}): Promise<T> {\r\n    try {\r\n      const result = await prisma[path].update({\r\n        where: { id },\r\n        data,\r\n        include: options.include,\r\n      });\r\n      return result;\r\n    } catch (err) {\r\n      logger.error(`Failed to update ${path}`, {\r\n        context: { error: err, id, data, options },\r\n        source: 'api.put'\r\n      });\r\n      throw new APIError(`Failed to update ${path}`, 500);\r\n    }\r\n  },\r\n\r\n  async delete(path: string, id: string): Promise<boolean> {\r\n    try {\r\n      await prisma[path].delete({\r\n        where: { id }\r\n      });\r\n      return true;\r\n    } catch (err) {\r\n      logger.error(`Failed to delete ${path}`, {\r\n        context: { error: err, id },\r\n        source: 'api.delete'\r\n      });\r\n      throw new APIError(`Failed to delete ${path}`, 500);\r\n    }\r\n  },\r\n\r\n  async transaction<T>(callback: (tx: typeof prisma) => Promise<T>): Promise<T> {\r\n    try {\r\n      return await prisma.$transaction(callback);\r\n    } catch (err) {\r\n      logger.error('Transaction failed', {\r\n        context: { error: err },\r\n        source: 'api.transaction'\r\n      });\r\n      throw new APIError('Transaction failed', 500);\r\n    }\r\n  }\r\n};"
+        }
+    ]
+}

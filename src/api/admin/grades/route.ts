@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
-import { Repository } from '@/lib/db/repository';
 import { successResponse, errorResponse } from '@/lib/api-response';
 import { z } from 'zod';
+import { models } from '@/lib/models/database';
 
 // Validation schema for grade creation
 const createGradeSchema = z.object({
@@ -12,7 +12,7 @@ const createGradeSchema = z.object({
   description: z.string()
     .max(500, 'Description cannot be more than 500 characters')
     .optional(),
-  order: z.number().min(0).optional()
+  level: z.number().min(0).optional().default(0)
 });
 
 export async function GET(request: Request) {
@@ -31,7 +31,13 @@ export async function GET(request: Request) {
       return errorResponse('Invalid page size', 'VALIDATION_ERROR', 400);
     }
 
-    const result = await Repository.getGrades({ page, pageSize, includeContent });
+    // Use the new Supabase models
+    const result = await models.GradeRepository.findAll({ 
+      page, 
+      pageSize, 
+      includeContent 
+    });
+    
     console.log('GET /api/admin/grades - Success:', {
       gradesCount: result.grades.length,
       pagination: result.pagination
@@ -60,8 +66,8 @@ export async function POST(request: Request) {
     // Validate request body
     const validatedData = createGradeSchema.parse(body);
     
-    // Check if grade with same name exists
-    const existingGrade = await Repository.findGradeByName(validatedData.name);
+    // Check if grade with same name exists using the Supabase model
+    const existingGrade = await models.GradeRepository.findByName(validatedData.name);
     if (existingGrade) {
       return errorResponse(
         'A grade with this name already exists',
@@ -70,8 +76,8 @@ export async function POST(request: Request) {
       );
     }
 
-    // Create grade
-    const grade = await Repository.createGrade(validatedData);
+    // Create grade using the Supabase model
+    const grade = await models.GradeRepository.create(validatedData);
     
     console.log('POST /api/admin/grades - Success:', {
       gradeId: grade.id,
@@ -91,8 +97,8 @@ export async function POST(request: Request) {
       );
     }
 
-    // Handle duplicate key errors from MongoDB
-    if (error.code === 11000) {
+    // Handle database errors
+    if (error.code === '23505') {  // PostgreSQL unique violation error
       return errorResponse(
         'A grade with this name already exists',
         'DUPLICATE_ERROR',

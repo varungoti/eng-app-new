@@ -1,8 +1,8 @@
 import { supabase } from '../supabase';
-import { sessionMonitor } from './SessionMonitor';
+//import { sessionMonitor } from './SessionMonitor';
 import { logger } from '../logger';
 import { errorTracker } from '../errorTracker';
-import type { UserRole } from '../../types/roles';
+//import type { UserRole } from '../../types/roles';
 
 export class AuthError extends Error {
   constructor(message: string, public code?: string) {

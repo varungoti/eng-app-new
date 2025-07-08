@@ -1,0 +1,2174 @@
+"use client"
+
+import React, { useState, useRef, useEffect, useCallback, Fragment, useMemo } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { LoadingSpinner } from '@/components/LoadingSpinner';
+import { 
+  RefreshCw, X, BookOpen, Clock, CheckCircle2, ChevronRight, 
+  Lightbulb, Volume2, VolumeX, Play, Pause,  ArrowRight,
+  CheckCircle, HelpCircle, Award,  ImageIcon, PenTool,
+  Mic, Video,  Pencil, Book, MessageCircle, Brain,
+  Headphones, Type, Layers, Target, Presentation, Sparkles,
+  Maximize2, Minimize2, GripVertical, GripHorizontal, XCircle
+} from 'lucide-react';
+import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Progress } from "@/components/ui/progress";
+import { motion, AnimatePresence } from "framer-motion";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { logger } from "@/lib/logger";
+import { useToast } from "@/components/ui/use-toast";
+//import { QuestionTypeIcon } from "@/components/ui/question-type-icons";
+import { QUESTION_TYPES, isQuestionType } from "@/app/content-management/constants";
+//import { RichTextEditor } from '@/components/editor/RichTextEditor';
+import {  RadioGroupItem } from "@/components/ui/radio-group";
+//import { Label } from "@/components/ui/label";
+//import { Input } from "@/components/ui/input";
+//import { Textarea } from "@/components/ui/textarea";
+//import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible";
+//import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Sheet, SheetContent} from "@/components/ui/sheet";
+//import { ExercisePromptCard } from "@/app/content-management/components/exercise-prompt-card";
+import { ExercisePromptView } from "@/components/exercise-prompt-view";
+import { ImagePreview } from '../common/ImagePreview';
+import speechService from '@/lib/fish-speech';
+// Add this import at the top with other imports
+import Image from 'next/image';
+
+// Question Types from question-form.tsx
+interface QuestionMetadata {
+  prompt?: string;
+  teacher_script?: string;
+  sample_answer?: string;
+  options?: string[];
+  correct_answer?: string | number;
+  image_url?: string;
+  video_url?: string;
+  audio_content?: string;
+  transcript?: string;
+  passage?: string;
+  questions?: string[];
+  writingPrompt?: string;
+  speakingPrompt?: string;
+  listeningPrompt?: string;
+  grammarPoint?: string;
+  example?: string;
+  difficulty?: 'beginner' | 'intermediate' | 'advanced';
+  points?: number;
+  type?: string;
+  data?: any;
+  // Additional fields for various question types
+  sentence?: string;
+  blanks?: string[];
+  items?: string[];
+  descriptions?: string[];
+  topic?: string;
+  position?: string;
+  keyPoints?: string[];
+  idiom?: string;
+  meaning?: string;
+  usageNotes?: string;
+  storyPrompt?: string;
+  keywords?: string[];
+  wordlistPrompt?: any[];
+  exercise_prompts?: Array<{
+    id: string;
+    text: string;
+    type?: string;
+    media?: string;
+    content?: {
+      instructions?: string;
+      writingPrompt?: string;
+      speakingPrompt?: string;
+    };
+    difficulty?: 'beginner' | 'intermediate' | 'advanced';
+  }>;
+}
+
+interface Question {
+  id: string;
+  title: string;
+  content: string;
+  type: string;
+  data: {
+    prompt: string;
+    teacher_script: string;
+    sample_answer?: string;
+    followup_prompt?: string[];
+    image_url?: string; // Add image_url as an optional property
+    [key: string]: any; // Allow for additional properties
+  };
+  metadata?: {
+    difficulty?: string;
+    timeLimit?: number;
+    points?: number;
+    imageUrl?: string;
+    videoUrl?: string;
+    audioUrl?: string;
+    options?: string[];
+    correctAnswer?: string;
+    passage?: string;
+    grammarPoint?: string;
+    example?: string;
+    speakingPrompt?: string;
+    listeningPrompt?: string;
+  };
+  exercise_prompts: ExercisePrompt[];
+}
+
+interface ExercisePrompt {
+  id: string;
+  text: string;
+  type: 'image' | 'video' | 'gif';
+  media: string | null;
+  narration: string | null;
+  saytext: string | null;
+  title?: string; // Add title property that's used in the code
+  data?: any; // Add data property that's used in the code
+  content?: {
+    instructions?: string;
+    writingPrompt?: string;
+    speakingPrompt?: string;
+    imageUrl?: string; // Add imageUrl property that's used in the code
+  };
+  metadata?: {
+    difficulty?: 'beginner' | 'intermediate' | 'advanced';
+    estimatedTime?: number;
+    imageUrl?: string; // Add imageUrl property that's used in the code
+  };
+}
+
+interface ContentItem {
+  id: string;
+  text: string;
+  type: string;
+  sourceId: string;
+  url?: string; // Add url property as it's used in the code
+}
+
+// Add CurrentMedia type definition
+interface CurrentMedia {
+  sourceId: string;
+  type: string;
+  url: string;
+  title: string; // Add title property as it's used throughout the code
+  isExternalDomain?: boolean; // Add flag for external domains
+  isPermanent?: boolean; // Add flag to indicate if this media was manually selected
+  mediaUrl?: string; // Add mediaUrl property to match usage in the code
+}
+
+interface MediaData {
+  mediaUrl: string;
+  sourceType: string;
+  sourceId: string;
+  isPermanent?: boolean;
+  title?: string;
+  type?: string;
+  url?: string;
+  isExternalDomain?: boolean;
+}
+
+interface LessonDialogProps {
+  isOpen: boolean;
+  onClose: () => void;
+  lessonContent: {
+    content: any;
+    isLoading: boolean;
+    error: string | null;
+  };
+  currentLessonId: string | null;
+  onRetry: () => void;
+}
+
+// Add this type definition at the top of the file
+type QuestionType = keyof typeof QUESTION_TYPES;
+
+// At the top of the file, with other constants
+const FALLBACK_IMAGE = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="800" height="450" viewBox="0 0 800 450"%3E%3Crect width="800" height="450" fill="%23f0f0f0"/%3E%3Ctext x="400" y="225" font-family="Arial" font-size="24" text-anchor="middle" fill="%23888888"%3ENo Image Available%3C/text%3E%3C/svg%3E';
+
+// Add a declaration for window.__PERMANENT_MEDIA__
+declare global {
+  interface Window {
+    __PERMANENT_MEDIA__?: any;
+  }
+}
+
+// Add EventListener type if it's missing
+declare global {
+  interface EventListener {
+    (evt: Event): void;
+  }
+}
+
+export function LessonDialog({
+  isOpen,
+  onClose,
+  lessonContent,
+  currentLessonId,
+  onRetry
+}: LessonDialogProps) {
+  const dialogId = React.useId();
+  const titleId = `${dialogId}-title`;
+  const descriptionId = `${dialogId}-description`;
+  const { toast } = useToast();
+  const audioRef = useRef<HTMLAudioElement>(null);
+
+  // Set up state variables
+  const [activeTab, setActiveTab] = useState<string>("content");
+  const [currentMedia, setCurrentMedia] = useState<CurrentMedia | null>(null);
+  const [isAudioReady, setIsAudioReady] = useState<boolean>(false);
+  const [isPlaying, setIsPlaying] = useState<boolean>(false);
+  const [isMuted, setIsMuted] = useState<boolean>(false);
+  const [audioVolume, setAudioVolume] = useState<number>(0.8);
+  const [currentAudioTime, setCurrentAudioTime] = useState<number>(0);
+  const [audioDuration, setAudioDuration] = useState<number>(0);
+  const [selectedVoice, setSelectedVoice] = useState<SpeechSynthesisVoice | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [currentlyHighlightedContentId, setCurrentlyHighlightedContentId] = useState<string | null>(null);
+  const [showRightPanel, setShowRightPanel] = useState<boolean>(false);
+  const [leftPanelWidth, setLeftPanelWidth] = useState<number>(50);
+  const [isDragging, setIsDragging] = useState<boolean>(false);
+  const [selectedQuestionIndex, setSelectedQuestionIndex] = useState<number | null>(null);
+  const [wasPlayingBeforeMute, setWasPlayingBeforeMute] = useState(false);
+  const [contentQueue, setContentQueue] = useState<ContentItem[]>([]);
+  const [currentContentItem, setCurrentContentItem] = useState<number>(-1);
+  const [useBrowserTTS, setUseBrowserTTS] = useState<boolean>(false);
+
+  // Add these state variables in the LessonDialog component
+  const [isMediaFullscreen, setIsMediaFullscreen] = useState(false);
+  const [startResizing, setStartResizing] = useState(false);
+  const resizeRef = useRef<HTMLDivElement>(null);
+
+  // Add this new state for resize hover effect
+  const [isResizeHovered, setIsResizeHovered] = useState(false);
+
+  // Add additional state for voice control and text highlighting
+  const [availableVoices, setAvailableVoices] = useState<SpeechSynthesisVoice[]>([]);
+  const [currentlyHighlightedId, setCurrentlyHighlightedId] = useState<string | null>(null);
+  const contentRef = useRef<{[key: string]: HTMLElement}>({});
+
+  // Initialize references for audio handling
+  const audioBufferRef = useRef<any | null>(null); // Use 'any' type to avoid audioBuffer type conflicts
+  const audioSourceRef = useRef<AudioBufferSourceNode | null>(null);
+
+  // Create a state variable for voice initialization
+  const [isVoiceInitialized, setIsVoiceInitialized] = useState<boolean>(false);
+  
+  // Add a ref to track the previously processed tab/question combination
+  const processedMediaRef = useRef<{
+    tabId: string | null;
+    questionId: string | null;
+    lastPermanentMedia?: CurrentMedia;
+    wasPlayingBeforeMute?: boolean;
+  }>({
+    tabId: null,
+    questionId: null
+  });
+  
+  // Helper function to determine media type from URL
+  const getMediaType = useCallback((url: string): string => {
+    if (!url) return 'unknown';
+    
+    const extension = url.split('.').pop()?.toLowerCase();
+    if (!extension) return 'unknown';
+    
+    if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(extension)) {
+      return 'image';
+    } else if (['mp4', 'webm', 'ogg', 'mov'].includes(extension)) {
+      return 'video';
+    } else if (['mp3', 'wav', 'ogg', 'aac'].includes(extension)) {
+      return 'audio';
+    }
+    
+    return 'unknown';
+  }, []);
+
+  // Add this useRef to track if we're already in the fallback process
+  const isFallingBackRef = useRef<boolean>(false);
+
+  // Helper function to ensure speech synthesis works reliably across browsers
+  const ensureSpeechSynthesisStability = useCallback(() => {
+    if (!window.speechSynthesis) return;
+    
+    // Some browsers (especially mobile) may pause speech synthesis when the page is in background
+    // This function ensures it stays active
+    const keepAlive = () => {
+      // Resume if paused
+      if (window.speechSynthesis.paused) {
+        window.speechSynthesis.resume();
+      }
+    };
+    
+    // Set up an interval to keep speech synthesis alive
+    const keepAliveInterval = setInterval(keepAlive, 1000);
+    
+    // Return cleanup function
+    return () => {
+      clearInterval(keepAliveInterval);
+      
+      // Make sure to cancel any ongoing speech on cleanup
+      if (window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, []);
+  
+  // Set up speech synthesis stability
+  useEffect(() => {
+    const cleanupSpeechSynthesis = ensureSpeechSynthesisStability();
+    
+    return () => {
+      if (cleanupSpeechSynthesis) {
+        cleanupSpeechSynthesis();
+      }
+    };
+  }, [ensureSpeechSynthesisStability]);
+
+  // Add a function to safely stop all audio playback
+  const stopAllAudioPlayback = useCallback(() => {
+    try {
+      // Stop Fish-Speech audio
+      if (audioSourceRef.current) {
+        try {
+          audioSourceRef.current.stop();
+          audioSourceRef.current = null;
+          logger.info('Stopped Fish-Speech audio playback', {
+            source: 'LessonDialog'
+          });
+        } catch (error) {
+          console.error('Error stopping Fish-Speech audio:', error);
+        }
+      }
+      
+      // Stop HTML audio element
+      if (audioRef.current && !audioRef.current.paused) {
+        try {
+          audioRef.current.pause();
+          logger.info('Paused HTML audio element', {
+            source: 'LessonDialog'
+          });
+        } catch (error) {
+          console.error('Error pausing HTML audio element:', error);
+        }
+      }
+      
+      // Cancel browser speech synthesis
+      try {
+        if (window.speechSynthesis) {
+          window.speechSynthesis.cancel();
+          logger.info('Cancelled browser speech synthesis', {
+            source: 'LessonDialog'
+          });
+        }
+      } catch (error) {
+        console.error('Error cancelling speech synthesis:', error);
+      }
+      
+      // Clear highlight
+      setCurrentlyHighlightedId(null);
+      
+      // Reset the fallback flag
+      isFallingBackRef.current = false;
+    } catch (error) {
+      console.error('Error in stopAllAudioPlayback:', error);
+    }
+  }, []);
+
+  // Create a helper function to initialize speech synthesis
+  const initializeSpeechSynthesis = useCallback(() => {
+    // Ensure speech synthesis is initialized
+    if (window.speechSynthesis) {
+      try {
+        // Cancel any ongoing speech
+        window.speechSynthesis.cancel();
+        
+        // Get available voices
+        const voices = window.speechSynthesis.getVoices();
+        if (voices.length === 0) {
+          // Force voices to load if none are available
+          console.log('No voices available, trying to force load');
+          
+          // Speak and immediately cancel to trigger voice loading
+          const dummyUtterance = new SpeechSynthesisUtterance('');
+          window.speechSynthesis.speak(dummyUtterance);
+          window.speechSynthesis.cancel();
+          
+          // Try again after a short delay
+          setTimeout(() => {
+            const newVoices = window.speechSynthesis.getVoices();
+            setAvailableVoices(newVoices);
+            console.log(`Loaded ${newVoices.length} voices after initialization`);
+          }, 100);
+        } else {
+          setAvailableVoices(voices);
+          console.log(`Speech synthesis initialized with ${voices.length} voices`);
+        }
+        
+        // Make sure the speech synthesis service is working by testing with a silent utterance
+        const testUtterance = new SpeechSynthesisUtterance('');
+        testUtterance.volume = 0; // Silent
+        testUtterance.onend = () => console.log('Speech synthesis test successful');
+        testUtterance.onerror = (e) => console.warn('Speech synthesis test failed:', e);
+        window.speechSynthesis.speak(testUtterance);
+      } catch (error) {
+        console.error('Error initializing speech synthesis:', error);
+      }
+    } else {
+      console.warn('Speech synthesis not available in this browser');
+    }
+  }, []);
+
+  // Initialize speech synthesis on component mount
+  useEffect(() => {
+    initializeSpeechSynthesis();
+    
+    // Also set up event listener for when voices change (happens async in some browsers)
+    if (window.speechSynthesis) {
+      window.speechSynthesis.onvoiceschanged = initializeSpeechSynthesis;
+      
+      return () => {
+        window.speechSynthesis.onvoiceschanged = null;
+      };
+    }
+  }, [initializeSpeechSynthesis]);
+
+  // Get the best voice available - prioritize natural voices
+  const getBestVoice = () => {
+    if (availableVoices.length === 0) return null;
+    
+    // Try to find a good English voice that sounds natural
+    const preferredVoices = availableVoices.filter(voice => 
+      voice.lang.includes('en') && !voice.name.includes('Google')
+    );
+    
+    // If no preferred voices found, pick any English voice
+    if (preferredVoices.length === 0) {
+      const englishVoices = availableVoices.filter(voice => voice.lang.includes('en'));
+      return englishVoices.length > 0 ? englishVoices[0] : availableVoices[0];
+    }
+    
+    return preferredVoices[0];
+  };
+  
+  // Fix the voice initialization function
+  useEffect(() => {
+    // Initialize Fish-Speech voice on component mount
+    const initializeVoice = async () => {
+      try {
+        console.log('Initializing Fish-Speech voice...');
+        
+        // Always set a default voice to ensure we have one
+        console.log('Setting default voice: en-US-female-1');
+        await speechService.setVoice("en-US-female-1");
+        console.log('Default voice set successfully');
+        
+        setIsVoiceInitialized(true);
+      } catch (error) {
+        console.error('Error initializing Fish-Speech voice:', error);
+        setIsVoiceInitialized(false);
+      }
+    };
+
+    initializeVoice();
+    
+    // Clean up on unmount - cancel any pending speech
+    return () => {
+      stopAllAudioPlayback();
+    };
+  }, [stopAllAudioPlayback]);
+  
+  // Function to handle direct media display from exercise prompts
+  const displayMediaFromExercise = useCallback((exercisePrompt: ExercisePrompt) => {
+    // If no exercise prompt provided, exit early
+    if (!exercisePrompt) {
+      console.log("No exercise prompt provided");
+      return;
+    }
+    
+    // Check if this media has already been displayed with the same ID
+    if (currentMedia?.sourceId === exercisePrompt.id) {
+      console.log("Media already displayed for this exercise prompt, not redisplaying");
+      return;
+    }
+    
+    console.log("Displaying media from exercise prompt:", exercisePrompt.id || 'unknown');
+    
+    // Log full exercise prompt for debug
+    console.log("📝 Full exercise prompt:", exercisePrompt);
+    
+    // Extract media URL from the prompt
+    let mediaUrl: string | null = null;
+    let mediaType: string = 'image';
+    
+    // Try various possible locations for media URL
+    if (exercisePrompt.media && typeof exercisePrompt.media === 'string') {
+      // Direct media URL
+      console.log("📸 Media from direct media property");
+      mediaUrl = exercisePrompt.media;
+    } else if (exercisePrompt.metadata?.imageUrl) {
+      // Metadata with imageUrl
+      console.log("📸 Media from metadata.imageUrl");
+      mediaUrl = exercisePrompt.metadata.imageUrl;
+    } else if (exercisePrompt.content?.imageUrl) {
+      // Content with imageUrl
+      console.log("📸 Media from content.imageUrl");
+      mediaUrl = exercisePrompt.content.imageUrl as string;
+    } else if (exercisePrompt.data?.imageUrl) {
+      // Data with imageUrl
+      console.log("📸 Media from data.imageUrl");
+      mediaUrl = exercisePrompt.data.imageUrl;
+    } else if (exercisePrompt.data?.image_url) {
+      // Data with image_url
+      console.log("📸 Media from data.image_url");
+      mediaUrl = exercisePrompt.data.image_url;
+    }
+    
+    // If no media URL found in the exercise prompt, check if we should use the lesson title image
+    if (!mediaUrl && lessonContent?.content?.media_url) {
+      console.log("📸 Using lesson title image as fallback");
+      mediaUrl = lessonContent.content.media_url;
+    }
+    
+    // If still no media URL and we want to retain the previous image, exit without changing
+    if (!mediaUrl && currentMedia && currentMedia.url && currentMedia.url !== FALLBACK_IMAGE) {
+      console.log("📸 No media URL found, but retaining previous image:", currentMedia.url);
+      // Force the right panel to be visible if it's not already
+      if (!showRightPanel) {
+        console.log("Setting showRightPanel to true for retained image");
+        setShowRightPanel(false);
+      }
+      return;
+    }
+    
+    if (!mediaUrl) {
+      console.log("❌ No media URL found in exercise prompt and no fallback available");
+      return;
+    }
+    
+    // Generate a unique identifier to ensure media updates
+    const timestamp = new Date().getTime();
+    
+    // Add a timestamp parameter to force media refresh
+    if (mediaUrl.includes('?')) {
+      mediaUrl = `${mediaUrl}&_t=${timestamp}`;
+    } else {
+      mediaUrl = `${mediaUrl}?_t=${timestamp}`;
+    }
+    
+    // Log the final URL we're using
+    console.log("🖼️ Using media URL:", mediaUrl);
+    
+    // Determine media type
+    if (typeof exercisePrompt.type === 'string' && ['image', 'video', 'gif'].includes(exercisePrompt.type)) {
+      mediaType = exercisePrompt.type as 'image' | 'video' | 'gif';
+    } else if (mediaUrl) {
+      const detectedType = getMediaType(mediaUrl);
+      if (detectedType === 'video' || detectedType === 'gif') {
+        mediaType = detectedType as 'video' | 'gif';
+      }
+    }
+    
+    console.log("🖼️ Media type determined as:", mediaType);
+    
+    // Check if URL is from external domains that need special handling
+    const isExternalDomain = mediaUrl.includes('gifsec.com') || mediaUrl.includes('gifdb.com');
+    
+    // DIRECTLY set the current media state
+    setCurrentMedia({
+      url: mediaUrl,
+      type: mediaType,
+      title: exercisePrompt.title || exercisePrompt.text || 'Exercise Media',
+      sourceId: exercisePrompt.id || 'unknown',
+      isExternalDomain,
+      isPermanent: true // Mark as permanent so it won't be overridden
+    });
+    
+    // Force the right panel to be visible
+    if (!showRightPanel) {
+      console.log("Setting showRightPanel to true");
+      setShowRightPanel(false);
+    }
+    
+    // Also dispatch the event as a fallback
+    const mediaEvent = new CustomEvent('displayMediaInRightPanel', {
+      detail: {
+        mediaUrl: mediaUrl,
+        mediaType: mediaType,
+        mediaTitle: exercisePrompt.title || exercisePrompt.text || 'Exercise Media',
+        sourceId: exercisePrompt.id || 'unknown',
+        isExternalDomain,
+        isPermanent: true
+      }
+    });
+    
+    // Dispatch the event to both document and window for compatibility
+    document.dispatchEvent(mediaEvent);
+    window.dispatchEvent(mediaEvent);
+  }, [lessonContent, currentMedia, showRightPanel, getMediaType, FALLBACK_IMAGE]);
+
+  // Improve the debug effect to better log exercise prompts
+  useEffect(() => {
+    // Only run this effect once on mount
+    if (!currentMedia && lessonContent?.content) {
+      console.log("🚨 FORCE DISPLAY MEDIA: Emergency debug function to force display media");
+      
+      // Log what content we have
+      console.log("Content structure:", {
+        hasQuestions: !!lessonContent.content.questions,
+        questionsLength: lessonContent.content.questions?.length || 0,
+        hasExercisePrompts: !!lessonContent.content.exercise_prompts,
+        exercisePromptsLength: lessonContent.content.exercise_prompts?.length || 0,
+        contentKeys: Object.keys(lessonContent.content || {})
+      });
+      
+      // Log the actual exercise prompts if they exist
+      if (lessonContent.content.exercise_prompts?.length > 0) {
+        console.log("Exercise prompts array:", 
+          lessonContent.content.exercise_prompts.map((prompt: { 
+            id: string; 
+            text?: string; 
+            type?: string; 
+            media?: any;
+          }) => ({
+            id: prompt.id,
+            text: prompt.text?.substring(0, 30),
+            type: prompt.type,
+            hasMedia: !!prompt.media,
+            mediaValue: prompt.media,
+            mediaType: typeof prompt.media
+          }))
+        );
+      }
+      
+      // Try to find ANY media and display it directly
+      const findAndDisplayAnyMedia = () => {
+        // Skip the permanent media check for now to avoid linter errors
+        console.log("Looking for any media in the content");
+        
+        // Let's start with lesson title image
+        if (lessonContent?.content?.media_url) {
+          console.log("Found lesson title image:", lessonContent.content.media_url);
+          setCurrentMedia({
+            url: lessonContent.content.media_url,
+            type: 'image',
+            title: lessonContent.content.title || 'Lesson Image',
+            sourceId: 'lesson-title'
+          });
+          return true;
+        }
+        
+        // Try exercise_prompts first
+        if (lessonContent.content.exercise_prompts?.length > 0) {
+          for (const prompt of lessonContent.content.exercise_prompts) {
+            console.log("Checking exercise prompt for media:", prompt.id, {
+              media: prompt.media,
+              type: prompt.type
+            });
+            
+            if (prompt.media) {
+              console.log("✅ FOUND MEDIA IN EXERCISE PROMPT:", prompt.id, prompt.media);
+              displayMediaFromExercise(prompt);
+              return true;
+            }
+          }
+        }
+        
+        // Try questions next
+        if (lessonContent.content.questions?.length > 0) {
+          for (const question of lessonContent.content.questions) {
+            console.log("Checking question for media:", question.id, {
+              hasMetadata: !!question.metadata,
+              hasImageUrl: !!question.metadata?.imageUrl,
+              hasVideoUrl: !!question.metadata?.videoUrl,
+              hasImageUrlInData: !!question.data?.image_url
+            });
+            
+            // Check metadata
+            if (question.metadata?.imageUrl) {
+              console.log("✅ FOUND IMAGE URL IN QUESTION:", question.id);
+              displayMediaFromExercise({
+                id: question.id,
+                text: question.title || 'Question',
+                media: question.metadata.imageUrl,
+                type: 'image'
+              } as ExercisePrompt);
+              return true;
+            }
+            
+            if (question.metadata?.videoUrl) {
+              console.log("✅ FOUND VIDEO URL IN QUESTION:", question.id);
+              displayMediaFromExercise({
+                id: question.id,
+                text: question.title || 'Question',
+                media: question.metadata.videoUrl,
+                type: 'video'
+              } as ExercisePrompt);
+              return true;
+            }
+            
+            // Check if question has media in image_url field
+            if (question.data?.image_url) {
+              console.log("✅ FOUND IMAGE URL IN QUESTION DATA:", question.id);
+              displayMediaFromExercise({
+                id: question.id,
+                text: question.title || 'Question',
+                media: question.data.image_url,
+                type: 'image'
+              } as ExercisePrompt);
+              return true;
+            }
+          }
+        }
+        
+        // As a last resort, create a placeholder media
+        console.log("⚠️ NO MEDIA FOUND! Using placeholder image");
+        setCurrentMedia({
+          url: FALLBACK_IMAGE,
+          type: 'image',
+          title: 'Placeholder Image',
+          sourceId: 'placeholder'
+        });
+        return true;
+      };
+      
+      // Try to find and display any media
+      findAndDisplayAnyMedia();
+    }
+  }, [lessonContent, currentMedia, displayMediaFromExercise, lessonContent.content?.exercise_prompts]);
+
+  // Create a ref for playNextContentItemHelper to break circular dependency
+  const playNextContentItemHelperRef = useRef<(() => void) | null>(null);
+
+  // Function for speech synthesis - DEFINE BEFORE playNextContentItem
+  const speakWithFishSpeech = useCallback(async (text: string, elementId?: string) => {
+    if (!text) {
+      console.log('No text provided for speech');
+      return; // Don't call playNextContentItem here to avoid circular dependency
+    }
+
+    // Log detailed debug info for content queue progress
+    console.log(`Speaking item with text: "${text.substring(0, 30)}...", currentContentItem: ${currentContentItem}, queue length: ${contentQueue.length}`);
+
+    // Check if we're already in fallback process to prevent duplicate audio playback
+    if (isFallingBackRef.current) {
+      console.log('Already in fallback process, skipping duplicate call');
+      return;
+    }
+
+    // Force isPlaying to true when speaking
+    if (!isPlaying) {
+      setIsPlaying(true);
+    }
+
+    // Cancel any ongoing speech before starting new speech to prevent multiple playbacks
+    stopAllAudioPlayback();
+
+    // Log the isPlaying state to help with debugging
+    console.log(`Current play state before TTS attempt: ${isPlaying ? 'playing' : 'not playing'}`);
+
+    try {
+      console.log(`Speaking with Fish-Speech: "${text.substring(0, 30)}..."`);
+      
+      // Generate audio with Fish-Speech
+      const audioBuffer = await speechService.textToSpeech(text);
+      
+      // Double-check if we're still playing after the API call completes
+      // This prevents audio from playing if user clicked pause while audio was generating
+      if (!isPlaying) {
+        console.log('Playback was cancelled during audio generation');
+        return;
+      }
+      
+      // Play the audio
+      if (audioBuffer) {
+        // Store the buffer for cleanup
+        audioBufferRef.current = audioBuffer;
+        
+        // Play the audio
+        const audioSource = await speechService.playAudio(audioBuffer);
+        audioSourceRef.current = audioSource;
+        
+        // Set up event handlers
+        if (elementId) {
+          // Highlight the element being spoken
+          setCurrentlyHighlightedId(elementId);
+          
+          // Scroll to the element
+          const element = document.getElementById(elementId);
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        }
+        
+        // Add ended event handler
+        audioSource.onended = () => {
+          // Clear highlight
+          setCurrentlyHighlightedId(null);
+          audioSourceRef.current = null;
+          
+          // Move to the next content item only if we're still in playing mode
+          if (isPlaying && playNextContentItemHelperRef.current) {
+            // Update content item index and play next
+            playNextContentItemHelperRef.current();
+          }
+        };
+      } else {
+        console.error('No audio buffer generated');
+        throw new Error('No audio buffer generated, falling back to browser speech synthesis');
+      }
+    } catch (error) {
+      console.error('Error in Fish-Speech playback:', error);
+      
+      // Set the fallback flag before trying browser speech synthesis to prevent duplicate calls
+      isFallingBackRef.current = true;
+      
+      // Fall back to browser's Speech Synthesis
+      try {
+        console.log('Falling back to browser Speech Synthesis');
+        setUseBrowserTTS(true);
+        
+        // Force isPlaying to true to ensure playback works
+        setIsPlaying(true);
+        
+        // Make sure any ongoing speech is canceled before starting new speech
+        if (window.speechSynthesis) {
+          window.speechSynthesis.cancel();
+        }
+        
+        // Create a new utterance for fallback
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = 0.9;
+        utterance.pitch = 1;
+        
+        // Track if the speech has completed
+        let speechCompleted = false;
+        
+        // Get a voice if possible
+        const voice = getBestVoice();
+        if (voice) {
+          console.log(`Using voice: ${voice.name}`);
+          utterance.voice = voice;
+        } else {
+          console.log('No suitable voice found for speech synthesis');
+        }
+        
+        // Function to clean up and move to next item
+        const finishSpeechAndAdvance = () => {
+          if (speechCompleted) return; // Prevent multiple calls
+          speechCompleted = true;
+          
+          // Clear highlight
+          setCurrentlyHighlightedId(null);
+          
+          // Reset fallback flag
+          isFallingBackRef.current = false;
+          
+          // Move to next item if we're still playing
+          if (isPlaying && playNextContentItemHelperRef.current) {
+            // Small delay to prevent rapid consecutive speech
+            setTimeout(() => {
+              playNextContentItemHelperRef.current?.();
+            }, 200);
+          }
+        };
+        
+        // Add event handlers
+        utterance.onstart = () => {
+          console.log('Browser speech synthesis started');
+          if (elementId) {
+            setCurrentlyHighlightedId(elementId);
+          }
+        };
+        
+        utterance.onend = () => {
+          console.log('Browser speech synthesis ended');
+          finishSpeechAndAdvance();
+        };
+        
+        utterance.onerror = (event) => {
+          console.error('Browser speech synthesis error:', event);
+          finishSpeechAndAdvance();
+        };
+        
+        // Speak the text
+        console.log('Speaking with browser speech synthesis...');
+        window.speechSynthesis.speak(utterance);
+        
+        // Set a backup timeout to advance to next item in case the speech synthesis events don't fire
+        // This is a safety measure to ensure we don't get stuck
+        const timeoutDuration = Math.max(2000, text.length * 100); // Estimate based on text length
+        const backupTimeout = setTimeout(() => {
+          console.log('Backup timeout reached, advancing to next item');
+          finishSpeechAndAdvance();
+        }, timeoutDuration);
+        
+        // Clear the timeout when speech completes or errors
+        utterance.onend = () => {
+          clearTimeout(backupTimeout);
+          console.log('Browser speech synthesis ended');
+          finishSpeechAndAdvance();
+        };
+        
+        utterance.onerror = (event) => {
+          clearTimeout(backupTimeout);
+          console.error('Browser speech synthesis error:', event);
+          finishSpeechAndAdvance();
+        };
+      } catch (fallbackError) {
+        console.error('Error in speech synthesis fallback:', fallbackError);
+        // Reset fallback flag in case of error
+        isFallingBackRef.current = false;
+        
+        // We failed with both TTS methods, move to next content item
+        if (isPlaying && playNextContentItemHelperRef.current) {
+          setTimeout(() => {
+            playNextContentItemHelperRef.current?.();
+          }, 500);
+        }
+      }
+    }
+  }, [contentQueue, currentContentItem, isPlaying, getBestVoice, stopAllAudioPlayback]);
+
+  // Simple helper function to play the next content item
+  const playNextContentItemHelper = useCallback(() => {
+    setCurrentContentItem(prevIndex => {
+      // Get the next index
+      const nextIndex = prevIndex + 1;
+      console.log(`Advancing to item ${nextIndex + 1} of ${contentQueue.length}`);
+      
+      // Check if we have a next item
+      if (nextIndex < contentQueue.length) {
+        const nextItem = contentQueue[nextIndex];
+        console.log(`Next item to play: ${nextItem.text?.substring(0, 30)}...`);
+        
+        // Display media for the next item if needed
+        if (nextItem.type === 'exercise') {
+          const exercise = lessonContent.content?.exercise_prompts?.find(
+            (p: any) => p.id === nextItem.sourceId
+          );
+          
+          if (exercise && exercise.media) {
+            displayMediaFromExercise(exercise);
+          }
+        }
+        
+        // Delay before playing the next item to ensure smooth transitions
+        setTimeout(() => {
+          if (isPlaying) {
+            // Play the next item's speech
+            speakWithFishSpeech(nextItem.text, nextItem.id);
+          }
+        }, 200);
+        
+        // Return the new index
+        return nextIndex;
+      }
+      
+      // If we've reached the end of the queue, return the current index
+      console.log('Reached end of content queue');
+      return prevIndex;
+    });
+  }, [contentQueue, isPlaying, displayMediaFromExercise, lessonContent.content?.exercise_prompts, speakWithFishSpeech]);
+
+  // Update the ref with the latest function
+  useEffect(() => {
+    playNextContentItemHelperRef.current = playNextContentItemHelper;
+  }, [playNextContentItemHelper]);
+
+  // Now define playNextContentItem as the simple wrapper
+  const playNextContentItem = useCallback(() => {
+    if (playNextContentItemHelperRef.current) {
+      playNextContentItemHelperRef.current();
+    }
+  }, []);
+
+  // Add a useEffect to check for saved media on component initialization
+  useEffect(() => {
+    try {
+      // Check if we have saved media in localStorage
+      const savedMedia = localStorage.getItem('lastSelectedMedia');
+      if (savedMedia) {
+        const parsedMedia = JSON.parse(savedMedia);
+        console.log("Found saved media:", parsedMedia);
+        setCurrentMedia({
+          url: parsedMedia.mediaUrl || parsedMedia.url,
+          type: parsedMedia.mediaType || parsedMedia.type || 'image',
+          title: parsedMedia.mediaTitle || parsedMedia.title || 'Media',
+          sourceId: parsedMedia.sourceId || 'unknown',
+          isExternalDomain: parsedMedia.isExternalDomain || false,
+          isPermanent: true
+        });
+        setShowRightPanel(true);
+      }
+    } catch (e) {
+      console.warn("Error loading saved media:", e);
+    }
+  }, []);
+  
+  // Existing handler for the custom event to display media in the right panel
+  const handleMediaDisplayEvent = (event: CustomEvent) => {
+    if (event.detail) {
+      console.log("Media display event received:", event.detail);
+      const mediaData = event.detail;
+      
+      // Always update the media, even if the sourceId is the same
+      // This ensures different prompts with the same sourceId still update the image
+      const newMedia = {
+        url: mediaData.mediaUrl || mediaData.url,
+        type: mediaData.mediaType || mediaData.type || getMediaType(mediaData.mediaUrl || mediaData.url) || 'image',
+        title: mediaData.mediaTitle || mediaData.title || 'Media',
+        sourceId: mediaData.sourceId || 'unknown',
+        isExternalDomain: mediaData.isExternalDomain || false,
+        isPermanent: mediaData.isPermanent || false // Track if this was manually selected
+      };
+      
+      // Set the media state
+      setCurrentMedia(newMedia);
+      
+      // If this is permanent media, store it in localStorage as well
+      if (mediaData.isPermanent) {
+        try {
+          console.log("Storing permanent media in localStorage");
+          localStorage.setItem('lastSelectedMedia', JSON.stringify(mediaData));
+          
+          // Store a global variable that we can check from anywhere
+          // This is a desperate measure to ensure media persists
+          window.__PERMANENT_MEDIA__ = newMedia;
+        } catch (e) {
+          console.warn("Failed to store media in localStorage:", e);
+        }
+      }
+      
+      // Make sure the right panel is visible
+      setShowRightPanel(true);
+      setIsMediaFullscreen(false);
+    }
+  };
+  
+  // Helper function to convert custom event handler to standard EventListener
+  const asEventListener = <T,>(handler: (e: CustomEvent<T>) => void): EventListener => {
+    return ((e: Event) => {
+      handler(e as unknown as CustomEvent<T>);
+    }) as EventListener;
+  };
+
+  // Add the event listener with proper conversion
+  useEffect(() => {
+    // Define the event handler inside the useEffect
+    const handleMediaDisplayEvent = (event: CustomEvent) => {
+      // Original function logic here
+      console.log('Media display event received:', event.detail);
+      // Rest of your handler logic
+    };
+    
+    // Add event listeners to document and window for better compatibility
+    document.addEventListener('displayMediaInRightPanel', handleMediaDisplayEvent as unknown as EventListener);
+    window.addEventListener('displayMediaInRightPanel', handleMediaDisplayEvent as unknown as EventListener);
+    
+    // Cleanup on unmount
+    return () => {
+      document.removeEventListener('displayMediaInRightPanel', handleMediaDisplayEvent as unknown as EventListener);
+      window.removeEventListener('displayMediaInRightPanel', handleMediaDisplayEvent as unknown as EventListener);
+    };
+  }, []); // Empty dependency array since function is now defined inside
+
+  // Audio event handlers
+  const handleTimeUpdate = () => {
+    if (audioRef.current) {
+      const progress = (audioRef.current.currentTime / audioRef.current.duration) * 100;
+      setAudioDuration(audioRef.current.duration);
+      setCurrentAudioTime(progress);
+      
+      logger.info('Audio progress updated', {
+        source: 'LessonDialog',
+        context: { 
+          progress: Math.round(progress),
+          currentAudioIndex: 0,
+          totalAudios: contentQueue.length,
+          lessonId: currentLessonId
+        }
+      });
+    }
+  };
+
+  const handleAudioEnded = () => {
+    if (currentAudioTime < audioDuration - 1) {
+      // Play next audio in queue
+      setCurrentAudioTime(prev => prev + 1);
+      setIsPlaying(true);
+      const nextAudioIndex = currentAudioTime + 1;
+      if (audioRef.current && nextAudioIndex < contentQueue.length) {
+        // Use optional chaining and provide a fallback empty string if url is undefined
+        audioRef.current.src = contentQueue[nextAudioIndex].url || '';
+        audioRef.current.play();
+      }
+    } else {
+      // All audio completed
+      setIsPlaying(false);
+      setCurrentAudioTime(0);
+      
+      toast({
+        title: " Lesson Complete!",
+        description: "You've finished listening to this lesson.",
+        action: (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setActiveTab("questions")}
+          >
+            Start Questions
+          </Button>
+        )
+      });
+    }
+  };
+
+  // Function to handle tab change with logging
+  const handleTabChange = (value: string) => {
+    logger.info('Tab changed in lesson dialog', {
+      source: 'LessonDialog',
+      context: { 
+        previousTab: activeTab,
+        newTab: value,
+        lessonId: currentLessonId
+      }
+    });
+    setActiveTab(value);
+  };
+
+  // Add CSS for highlighted content
+  const highlightStyle = `
+    .highlight-active-content {
+      background-color: rgba(var(--primary-rgb), 0.1);
+      border-left: 3px solid hsl(var(--primary));
+      box-shadow: 0 0 8px rgba(var(--primary-rgb), 0.2);
+      transition: all 0.3s ease;
+    }
+  `;
+
+  // Tailwind doesn't handle dynamic widths directly, so we use CSS variables
+  const panelStyles = `
+    :root {
+      --left-panel-width: ${leftPanelWidth}%;
+      --right-panel-width: ${100 - leftPanelWidth}%;
+    }
+    .left-panel-width {
+      width: var(--left-panel-width);
+    }
+    .right-panel-width {
+      width: var(--right-panel-width);
+    }
+    
+    /* Media query for mobile devices */
+    @media (max-width: 768px) {
+      .mobile-layout {
+        flex-direction: column !important;
+      }
+      .left-panel-width, .right-panel-width {
+        width: 100% !important;
+      }
+      .mobile-top-panel {
+        height: var(--right-panel-width) !important;
+        min-height: 200px;
+        max-height: 50vh;
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 0.5rem;
+      }
+      .mobile-bottom-panel {
+        height: var(--left-panel-width) !important;
+        overflow-y: auto;
+      }
+      .mobile-resize-handle {
+        width: 100% !important;
+        height: 10px !important;
+        cursor: row-resize !important;
+      }
+      .mobile-media-container {
+        max-height: calc(50vh - 80px);
+        margin: 0 auto;
+        width: 100% !important;
+      }
+      .mobile-media-controls {
+        position: absolute;
+        bottom: 8px;
+        right: 8px;
+        display: flex;
+        z-index: 20;
+      }
+    }
+  `;
+
+  // Update the debugExercisePrompts function to more aggressively find and display media
+  const debugExercisePrompts = () => {
+    console.log("🔍 DEBUG ALL EXERCISE PROMPTS AND QUESTIONS");
+    
+    // Log complete structure of lesson content to debug
+    console.log("FULL LESSON CONTENT:", lessonContent);
+    
+    // Add a more robust exercise prompt search function
+    const findAndDisplayAnyMedia = () => {
+      // HARDCODED MEDIA CHECK: Directly try to see if there's an exercise_prompts array
+      if (lessonContent?.content?.exercise_prompts) {
+        console.log("Direct exercise_prompts found:", lessonContent.content.exercise_prompts);
+        
+        for (const prompt of lessonContent.content.exercise_prompts) {
+          console.log("Checking prompt:", prompt);
+          
+          // Check all possible media paths
+          if (prompt.media) {
+            // Set direct media display without any helper function
+            console.log("FOUND MEDIA:", prompt.media);
+            
+            const mediaUrl = typeof prompt.media === 'string' 
+              ? prompt.media 
+              : typeof prompt.media === 'object' && 'url' in prompt.media 
+                ? (prompt.media as any).url 
+                : null;
+            
+            if (mediaUrl) {
+              // Direct media display
+              console.log("DIRECTLY SETTING MEDIA URL:", mediaUrl);
+              setCurrentMedia({
+                url: mediaUrl,
+                type: 'image',
+                title: prompt.text || 'Exercise Media',
+                sourceId: prompt.id || 'unknown'
+              });
+              return true;
+            }
+          }
+        }
+      }
+      
+      // Check question exercise prompts
+      if (lessonContent?.content?.questions) {
+        console.log("Questions found:", lessonContent.content.questions.length);
+        
+        for (const question of lessonContent.content.questions) {
+          // Check question metadata first
+          if (question.metadata?.imageUrl) {
+            console.log("FOUND QUESTION IMAGE URL:", question.metadata.imageUrl);
+            setCurrentMedia({
+              url: question.metadata.imageUrl,
+              type: 'image',
+              title: question.title || 'Question Image',
+              sourceId: question.id
+            });
+            return true;
+          }
+          
+          // Then check question exercise prompts
+          if (question.exercise_prompts && question.exercise_prompts.length > 0) {
+            console.log("Question has exercise prompts:", question.exercise_prompts);
+            
+            for (const prompt of question.exercise_prompts) {
+              if (prompt.media) {
+                const mediaUrl = typeof prompt.media === 'string' 
+                  ? prompt.media 
+                  : typeof prompt.media === 'object' && 'url' in prompt.media 
+                    ? (prompt.media as any).url 
+                    : null;
+                
+                if (mediaUrl) {
+                  console.log("FOUND MEDIA IN QUESTION EXERCISE PROMPT:", mediaUrl);
+                  setCurrentMedia({
+                    url: mediaUrl,
+                    type: 'image',
+                    title: prompt.text || 'Exercise Media',
+                    sourceId: prompt.id
+                  });
+                  return true;
+                }
+              }
+            }
+          }
+        }
+      }
+      
+      console.log("NO MEDIA FOUND IN EXPECTED LOCATIONS - USING FALLBACK");
+      
+      // Use a data URL as the fallback image (won't fail to load)
+      setCurrentMedia({
+        url: FALLBACK_IMAGE,
+        type: 'image',
+        title: 'No Media Available',
+        sourceId: 'fallback'
+      });
+      
+      return false;
+    };
+    
+    findAndDisplayAnyMedia();
+  };
+
+  // Add a useEffect to display media when the component mounts
+  useEffect(() => {
+    // Only run this if we don't have media, the content is loaded, and no permanent media has been selected
+    const hasPermanentMedia = currentMedia?.isPermanent || processedMediaRef.current.lastPermanentMedia;
+    
+    if (!currentMedia && lessonContent?.content && !lessonContent.isLoading && !hasPermanentMedia) {
+      console.log("Component mounted - looking for media to display");
+      // Use a small delay to ensure everything is initialized
+      const timer = setTimeout(() => {
+        debugExercisePrompts();
+      }, 300);
+      
+      return () => clearTimeout(timer);
+    }
+    
+    // If we have permanent media in the ref but not in the state, restore it
+    if (!currentMedia && processedMediaRef.current.lastPermanentMedia) {
+      console.log("Restoring permanently selected media");
+      setCurrentMedia(processedMediaRef.current.lastPermanentMedia as CurrentMedia);
+    }
+  }, [lessonContent?.content, currentMedia, lessonContent.isLoading]);
+
+  // Function to display media from a question
+  const displayMediaFromQuestion = useCallback((question: Question) => {
+    if (!question) {
+      console.log("No question provided");
+      return;
+    }
+    
+    console.log("Displaying media from question:", question.id);
+    
+    // Check if this media has already been displayed with the same ID
+    if (currentMedia?.sourceId === question.id) {
+      console.log("Media already displayed for this question, not redisplaying");
+      return;
+    }
+    
+    // Extract media URL from the question
+    let mediaUrl: string | null = null;
+    let mediaType: string = 'image';
+    
+    // Try various possible locations for media URL
+    if (question.metadata?.imageUrl) {
+      mediaUrl = question.metadata.imageUrl;
+      mediaType = 'image';
+    } else if (question.metadata?.videoUrl) {
+      mediaUrl = question.metadata.videoUrl;
+      mediaType = 'video';
+    } else if (question.metadata?.audioUrl) {
+      mediaUrl = question.metadata.audioUrl;
+      mediaType = 'audio';
+    } else if (question.data?.image_url) {
+      mediaUrl = question.data.image_url;
+      mediaType = 'image';
+    }
+    
+    // If no media URL found in the question, check if we should use the lesson title image
+    if (!mediaUrl && lessonContent?.content?.media_url) {
+      console.log("Using lesson title image as fallback");
+      mediaUrl = lessonContent.content.media_url;
+    }
+    
+    // If no media URL found, exit
+    if (!mediaUrl) {
+      console.log("No media URL found in question");
+      return;
+    }
+    
+    // Generate a unique identifier to ensure media updates
+    const timestamp = new Date().getTime();
+    
+    // Add a timestamp parameter to force media refresh
+    if (mediaUrl.includes('?')) {
+      mediaUrl = `${mediaUrl}&_t=${timestamp}`;
+    } else {
+      mediaUrl = `${mediaUrl}?_t=${timestamp}`;
+    }
+    
+    // Check if URL is from external domains that need special handling
+    const isExternalDomain = mediaUrl.includes('gifsec.com') || mediaUrl.includes('gifdb.com');
+    
+    // Set the current media state
+    setCurrentMedia({
+      url: mediaUrl,
+      type: mediaType,
+      title: question.title || 'Question Media',
+      sourceId: question.id,
+      isExternalDomain,
+      isPermanent: false
+    });
+    
+    // Force the right panel to be visible
+    if (!showRightPanel) {
+      setShowRightPanel(true);
+    }
+  }, [currentMedia, lessonContent, showRightPanel]);
+  
+  // Function to handle question selection
+  const handleQuestionSelect = useCallback((index: number) => {
+    setSelectedQuestionIndex(index);
+    
+    if (lessonContent.content?.questions && index !== null) {
+      const selectedQuestion = lessonContent.content.questions[index];
+      displayMediaFromQuestion(selectedQuestion);
+    }
+  }, [lessonContent.content?.questions, displayMediaFromQuestion]);
+  
+  // Function to toggle mute state
+  const toggleMute = useCallback(() => {
+    setIsMuted(prev => !prev);
+    
+    if (audioRef.current) {
+      audioRef.current.muted = !isMuted;
+    }
+  }, [isMuted]);
+  
+  // Function to toggle playback state
+  const togglePlayback = useCallback(() => {
+    setIsPlaying(prev => {
+      const newPlayState = !prev;
+      
+      if (!newPlayState) {
+        // If we're pausing, make sure to stop all audio playback
+        console.log('Pausing playback - stopping all audio');
+        stopAllAudioPlayback();
+      } else if (contentQueue.length > 0 && currentContentItem >= 0 && currentContentItem < contentQueue.length) {
+        // Only start playback if we have content in the queue and a valid current item
+        console.log('Starting playback from current item');
+        setTimeout(() => {
+          // Small delay to ensure state update has completed
+          speakWithFishSpeech(contentQueue[currentContentItem]?.text || "", contentQueue[currentContentItem]?.id);
+        }, 50);
+      }
+      
+      return newPlayState;
+    });
+  }, [contentQueue, currentContentItem, speakWithFishSpeech, stopAllAudioPlayback]);
+  
+  // Add a reference to the lesson content to simplify access
+  const content = useMemo(() => lessonContent?.content || {}, [lessonContent?.content]);
+  
+  // Function to display the lesson title image
+  const displayLessonTitleImage = useCallback(() => {
+    if (!content?.media_url) return;
+    
+    try {
+      const isExternalDomain = content.media_url.includes('gifsec.com') || content.media_url.includes('gifdb.com');
+      
+      // Create a custom event to display the media
+      const mediaEvent = new CustomEvent('displayMediaInRightPanel', {
+        bubbles: true,
+        composed: true,
+        detail: {
+          mediaUrl: content.media_url,
+          mediaType: 'image',
+          mediaTitle: content.title || 'Lesson Image',
+          sourceId: 'lesson-title',
+          isExternalDomain
+        }
+      });
+      
+      // Dispatch the event to both document and window for compatibility
+      document.dispatchEvent(mediaEvent);
+      window.dispatchEvent(mediaEvent);
+    } catch (err) {
+      console.error("Error dispatching lesson title image event:", err);
+    }
+  }, [content]);
+  
+  // Function to toggle playback state
+  const togglePlayback = useCallback(() => {
+    setIsPlaying(prev => {
+      const newPlayState = !prev;
+      
+      if (!newPlayState) {
+        // If we're pausing, make sure to stop all audio playback
+        console.log('Pausing playback - stopping all audio');
+        stopAllAudioPlayback();
+      } else if (contentQueue.length > 0 && currentContentItem >= 0 && currentContentItem < contentQueue.length) {
+        // Only start playback if we have content in the queue and a valid current item
+        console.log('Starting playback from current item');
+        setTimeout(() => {
+          // Small delay to ensure state update has completed
+          speakWithFishSpeech(contentQueue[currentContentItem]?.text || "", contentQueue[currentContentItem]?.id);
+        }, 50);
+      }
+      
+      return newPlayState;
+    });
+  }, [contentQueue, currentContentItem, speakWithFishSpeech, stopAllAudioPlayback]);
+  
+  // Display the lesson title image when the component mounts
+  useEffect(() => {
+    if (content?.media_url) {
+      displayLessonTitleImage();
+    }
+  }, [content?.media_url, displayLessonTitleImage]);
+
+  // Function to handle tab changes and check for existing media
+  useEffect(() => {
+    // Only log real tab changes
+    if (activeTab !== processedMediaRef.current.tabId) {
+      console.log("Tab changed to:", activeTab);
+      processedMediaRef.current.tabId = activeTab;
+    }
+    
+    // Skip if we're not on the questions tab or if there's no content
+    if (activeTab !== "questions" || !lessonContent?.content?.questions?.length) {
+      return;
+    }
+    
+    // Don't override permanent media
+    if (currentMedia?.isPermanent) {
+      console.log("Not changing media on tab change because permanent media is selected");
+      return;
+    }
+    
+    // Only process selected question if we're on the questions tab
+    if (selectedQuestionIndex !== null) {
+      const selectedQuestion = lessonContent.content.questions[selectedQuestionIndex];
+      
+      // Skip if we're already displaying media for this question
+      if (currentMedia && currentMedia.sourceId === selectedQuestion.id) {
+        console.log("Already displaying media for question:", selectedQuestion.id);
+        return;
+      }
+      
+      console.log("Displaying media for selected question:", selectedQuestion.id);
+      
+      // Call the declared displayMediaFromQuestion function
+      displayMediaFromQuestion(selectedQuestion);
+    }
+  }, [activeTab, selectedQuestionIndex, showRightPanel, currentMedia, lessonContent?.content?.questions, displayMediaFromQuestion]);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
+      className="space-y-8"
+    >
+      <Card className="prose prose-sm max-w-none dark:prose-invert border-primary/10 shadow-md">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <BookOpen className="h-5 w-5 text-primary" />
+            Lesson Content
+          </CardTitle>
+          {content?.title && (
+            <div className="text-2xl font-bold flex items-center gap-4">
+              {content.title}
+              {content.media_url && (
+                <div 
+                  className="relative h-12 w-12 rounded-md overflow-hidden cursor-pointer border border-primary/20 hover:border-primary/50 transition-colors"
+                  onClick={displayLessonTitleImage}
+                >
+                  <Image
+                    src={content.media_url}
+                    alt={content.title || 'Lesson Image'}
+                    fill
+                    className="object-cover"
+                    unoptimized={content.media_url.includes('gifsec.com') || content.media_url.includes('gifdb.com')}
+                    onError={(e) => {
+                      console.error("Error loading lesson title image");
+                      (e.target as HTMLImageElement).src = FALLBACK_IMAGE;
+                    }}
+                  />
+                </div>
+              )}
+            </div>
+          )}
+        </CardHeader>
+        <CardContent>
+          <div 
+            className="mt-4"
+            dangerouslySetInnerHTML={{ 
+              __html: content?.content || 'No content available' 
+            }} 
+          />
+        </CardContent>
+      </Card>
+    </motion.div>
+  );
+}
+
+// Questions Tab Component
+function QuestionsTab({ 
+  questions, 
+  selectedIndex,
+  onQuestionSelect,
+  onNextLesson,
+  currentlyHighlightedId,
+  onQuestionExpand
+}: { 
+  questions: Question[],
+  selectedIndex: number | null,
+  onQuestionSelect: (index: number) => void,
+  onNextLesson: () => void,
+  currentlyHighlightedId: string | null,
+  onQuestionExpand?: (question: Question) => void
+}) {
+  const [expandedQuestions, setExpandedQuestions] = useState<Record<string, boolean>>({});
+  const [progress, setProgress] = useState<Record<string, number>>({});
+  
+  const toggleQuestion = (questionId: string) => {
+    setExpandedQuestions(prev => ({
+      ...prev,
+      [questionId]: !prev[questionId]
+    }));
+    
+    // Find the question in the array
+    const questionIndex = questions.findIndex(q => q.id === questionId);
+    if (questionIndex !== -1 && onQuestionSelect) {
+      onQuestionSelect(questionIndex);
+    }
+    
+    // If we have an onQuestionExpand handler, call it
+    if (onQuestionExpand && questionIndex !== -1) {
+      onQuestionExpand(questions[questionIndex]);
+    }
+  };
+  
+  const handleQuestionAnswer = (questionId: string, progress: number) => {
+    setProgress(prev => ({
+      ...prev,
+      [questionId]: progress
+    }));
+  };
+
+  if (!questions || questions.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center gap-4 h-40">
+        <div className="p-4 rounded-full bg-primary/10">
+          <HelpCircle className="h-6 w-6 text-primary" />
+        </div>
+        <p className="text-center text-muted-foreground">No questions available for this lesson</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      {questions.map((question, idx) => (
+        <QuestionCard
+          key={question.id}
+          question={question}
+          index={idx + 1}
+          isExpanded={!!expandedQuestions[question.id]}
+          onToggle={() => toggleQuestion(question.id)}
+          onAnswer={(value) => handleQuestionAnswer(question.id, value)}
+          progress={progress[question.id] || 0}
+          id={`question-${question.id}`}
+          className={selectedIndex === idx ? 'ring-2 ring-primary' : ''}
+          onMediaDisplay={onQuestionExpand}
+        />
+      ))}
+      {/* Next lesson button */}
+      <div className="mt-8 flex justify-center">
+          <Button
+            onClick={onNextLesson}
+          className="gap-2"
+          size="lg"
+          >
+          Go to Exercises <ArrowRight className="h-4 w-4" />
+          </Button>
+      </div>
+    </div>
+  );
+}
+
+// Exercises Tab Component
+function ExercisesTab({ 
+  exercises,
+  currentlyHighlightedId
+}: { 
+  exercises: any[],
+  currentlyHighlightedId: string | null
+}) {
+  if (!exercises?.length) {
+    return (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.2 }}
+        className="flex flex-col items-center justify-center h-[50vh] text-center"
+      >
+        <Award className="h-12 w-12 text-muted-foreground mb-4" />
+        <p className="text-muted-foreground">No exercises available for this lesson</p>
+      </motion.div>
+    );
+  }
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
+      className="space-y-6"
+    >
+      {exercises.map((exercise, index) => (
+        <motion.div
+          key={exercise.id}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          transition={{ delay: index * 0.1 }}
+          id={`exercise-${exercise.id}`}
+          className={currentlyHighlightedId === `exercise-${exercise.id}` ? 'highlight-active-content' : ''}
+        >
+          <ExercisePromptView prompt={exercise} index={index} />
+        </motion.div>
+      ))}
+    </motion.div>
+  );
+}
+
+// Add this component before the QuestionsTab component
+
+function QuestionCard({ 
+  question,
+  index,
+  isExpanded,
+  onToggle,
+  onAnswer,
+  progress,
+  id,
+  className,
+  onMediaDisplay
+}: { 
+  question: Question;
+  index: number;
+  isExpanded: boolean;
+  onToggle: () => void;
+  onAnswer: (progress: number) => void;
+  progress: number;
+  id: string;
+  className: string;
+  onMediaDisplay?: (question: Question) => void
+}): React.JSX.Element {
+  const mediaDisplayedRef = useRef(false);
+  
+  // Reset the ref when the question changes
+  useEffect(() => {
+    mediaDisplayedRef.current = false;
+  }, [question.id]);
+  
+  // Trigger media display when expanded
+  useEffect(() => {
+    if (isExpanded && onMediaDisplay && !mediaDisplayedRef.current && question) {
+      console.log(`Displaying media on expand for question: ${question.id || 'unknown'}`);
+      mediaDisplayedRef.current = true;
+      onMediaDisplay(question);
+    }
+  }, [isExpanded, onMediaDisplay, question.id]);
+
+  const [activeFollowup, setActiveFollowup] = useState<number | null>(null);
+  
+  // Handle hover to display media
+  const handleMouseEnter = () => {
+    // Display media on every hover, not just the first time
+    if (onMediaDisplay && question) {
+      console.log(`Displaying media on hover for question: ${question.id || 'unknown'}`);
+      // We're setting mediaDisplayedRef.current to true only for expanded state tracking
+      // but still allowing every hover to trigger media display
+      onMediaDisplay(question);
+    }
+  };
+
+  // Add a useEffect to trigger media display when expanded
+  useEffect(() => {
+    if (isExpanded && onMediaDisplay && question) {
+      // Add a small delay to avoid triggering too often
+      const timer = setTimeout(() => {
+        onMediaDisplay(question);
+      }, 200);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [isExpanded, onMediaDisplay, question.id]);
+
+  // Early return if question is invalid
+  if (!question || typeof question !== 'object') {
+    return (
+      <Card className="border-destructive/50">
+        <CardHeader>
+          <CardTitle className="text-destructive">Invalid Question Data</CardTitle>
+          <CardDescription>This question cannot be displayed due to invalid data.</CardDescription>
+        </CardHeader>
+      </Card>
+    );
+  }
+
+  const getQuestionIcon = (type: string) => {
+    if (!isQuestionType(type)) return <Target className="h-5 w-5" />;
+    
+    switch (type) {
+      // Speaking related
+      case 'speaking':
+      case 'speakingAndWriting':
+      case 'speakingAndListening':
+      case 'speakingWithAPartner':
+      case 'speakingAndSpeaking':
+        return <Mic className="h-5 w-5" />;
+        
+      // Writing related
+      case 'writing':
+        return <Pencil className="h-5 w-5" />;
+        
+      // Reading related
+      case 'reading':
+      case 'readingAndSpeaking':
+        return <Book className="h-5 w-5" />;
+        
+      // Listening related
+      case 'listening':
+      case 'listenAndRepeat':
+        return <Headphones className="h-5 w-5" />;
+        
+      // Multiple choice and matching
+      case 'multipleChoice':
+      case 'fillInTheBlank':
+      case 'matching':
+      case 'trueOrFalse':
+        return <Layers className="h-5 w-5" />;
+        
+      // Grammar related
+      case 'grammarSpeaking':
+      case 'sentenceFormation':
+      case 'sentenceTransformation':
+      case 'sentenceCompletion':
+      case 'sentenceTransformationAndCompletion':
+        return <Type className="h-5 w-5" />;
+        
+      // Vocabulary related
+      case 'vocabularyAndSpeaking':
+      case 'vocabularyAndWordlist':
+        return <Brain className="h-5 w-5" />;
+        
+      // Presentation
+      case 'presentation':
+        return <Presentation className="h-5 w-5" />;
+        
+      // Story related
+      case 'storytelling':
+        return <BookOpen className="h-5 w-5" />;
+        
+      // Visual related
+      case 'lookAndSpeak':
+      case 'watchAndSpeak':
+        return <Video className="h-5 w-5" />;
+        
+      // Interactive
+      case 'debate':
+      case 'actionAndSpeaking':
+      case 'objectAndSpeaking':
+      case 'objectActionAndSpeaking':
+        return <MessageCircle className="h-5 w-5" />;
+        
+      // Idioms
+      case 'idiomPractice':
+        return <Sparkles className="h-5 w-5" />;
+        
+      default:
+        return <Target className="h-5 w-5" />;
+    }
+  };
+
+  const renderQuestionContent = () => {
+    if (!question.data) return null;
+
+    return (
+      <div className="space-y-6">
+        {/* Main Question Content - Always show these first */}
+        <div className="space-y-4">
+          {/* Prompt - Always required */}
+          <Card className="bg-background/50 backdrop-blur-sm">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-2 mb-2 text-primary">
+                <MessageCircle className="h-4 w-4" />
+                <h4 className="font-medium">Prompt</h4>
+              </div>
+              <p className="text-muted-foreground">{question.data.prompt}</p>
+            </CardContent>
+          </Card>
+
+          {/* Teacher Script - Always required */}
+          <Card className="bg-muted/50 backdrop-blur-sm">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-2 mb-2 text-primary">
+                <PenTool className="h-4 w-4" />
+                <h4 className="font-medium">Teacher Script</h4>
+              </div>
+              <p className="text-muted-foreground">{question.data.teacher_script}</p>
+            </CardContent>
+          </Card>
+
+          {/* Sample Answer - Optional */}
+          {question.data.sample_answer && (
+            <Card className="bg-primary/5">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-2 mb-2 text-primary">
+                  <CheckCircle className="h-4 w-4" />
+                  <h4 className="font-medium">Sample Answer</h4>
+                </div>
+                <p className="text-muted-foreground">{question.data.sample_answer}</p>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+
+        {/* Question Type Specific Content */}
+        {question.metadata && (
+          <Card className="border-primary/10">
+            <CardContent className="p-4">
+              {renderQuestionTypeContent(question)}
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Exercise Prompts - If available */}
+        {question.exercise_prompts?.length > 0 && (
+          <div className="mt-6 space-y-4">
+            <div className="flex items-center gap-2 text-primary">
+              <Award className="h-5 w-5" />
+              <h3 className="font-medium">Practice Exercises</h3>
+            </div>
+            <div className="grid gap-4">
+              {question.exercise_prompts.map((prompt, idx) => (
+                <ExercisePromptView
+                  key={prompt.id}
+                  prompt={prompt}
+                  index={idx}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  // Helper function to render type-specific content
+  const renderQuestionTypeContent = (question: Question) => {
+    if (!question.metadata) return null;
+
+    switch (question.type.toLowerCase()) {
+      case 'multiplechoice':
+        return (
+          <div className="space-y-4">
+            {question.metadata.options?.map((option, idx) => (
+              <RadioGroupItem
+                key={idx}
+                value={option}
+                className="w-full p-4 rounded-lg border hover:bg-accent"
+              >
+                {option}
+              </RadioGroupItem>
+            ))}
+          </div>
+        );
+
+      case 'speaking':
+        return (
+          <div className="space-y-4">
+            {question.metadata.speakingPrompt && (
+              <div className="bg-accent/5 p-4 rounded-lg">
+                <h4 className="font-medium mb-2">Speaking Prompt</h4>
+                <p>{question.metadata.speakingPrompt}</p>
+              </div>
+            )}
+          </div>
+        );
+
+      // Add more cases for other question types...
+
+      default:
+        return null;
+    }
+  };
+
+  const getQuestionColor = (type: string): string => {
+    switch (type) {
+      // Speaking related
+      case 'speaking':
+      case 'speakingAndWriting':
+      case 'speakingAndListening':
+      case 'speakingWithAPartner':
+      case 'speakingAndSpeaking':
+        return 'from-blue-500/10 to-indigo-500/10 hover:from-blue-500/20 hover:to-indigo-500/20';
+      
+      // Writing related
+      case 'writing':
+      case 'writingAndSpeaking':
+        return 'from-emerald-500/10 to-green-500/10 hover:from-emerald-500/20 hover:to-green-500/20';
+      
+      // Reading related
+      case 'reading':
+      case 'readingAndSpeaking':
+        return 'from-amber-500/10 to-orange-500/10 hover:from-amber-500/20 hover:to-orange-500/20';
+      
+      // Listening related
+      case 'listening':
+      case 'listenAndRepeat':
+        return 'from-purple-500/10 to-pink-500/10 hover:from-purple-500/20 hover:to-pink-500/20';
+      
+      // Multiple choice and matching
+      case 'multipleChoice':
+      case 'matching':
+      case 'fillInTheBlank':
+      case 'trueOrFalse':
+        return 'from-cyan-500/10 to-blue-500/10 hover:from-cyan-500/20 hover:to-blue-500/20';
+      
+      // Grammar related
+      case 'grammarSpeaking':
+      case 'sentenceFormation':
+        return 'from-teal-500/10 to-emerald-500/10 hover:from-teal-500/20 hover:to-emerald-500/20';
+      
+      // Vocabulary related
+      case 'vocabularyAndSpeaking':
+      case 'vocabularyAndWordlist':
+        return 'from-violet-500/10 to-purple-500/10 hover:from-violet-500/20 hover:to-purple-500/20';
+      
+      // Presentation and debate
+      case 'presentation':
+      case 'debate':
+        return 'from-rose-500/10 to-pink-500/10 hover:from-rose-500/20 hover:to-pink-500/20';
+      
+      // Story and idiom
+      case 'storytelling':
+      case 'idiomPractice':
+        return 'from-yellow-500/10 to-amber-500/10 hover:from-yellow-500/20 hover:to-amber-500/20';
+      
+      default:
+        return 'from-gray-500/10 to-slate-500/10 hover:from-gray-500/20 hover:to-slate-500/20';
+    }
+  };
+
+  return (
+    <div
+      id={id}
+      className={cn(
+        "w-full rounded-lg mb-2 overflow-hidden border shadow-sm",
+        isExpanded ? "border-primary bg-card" : "bg-background hover:bg-accent/50 border-border",
+        className
+      )}
+      onMouseEnter={handleMouseEnter}
+    >
+      <CardHeader 
+        className={cn(
+          "cursor-pointer select-none p-6",
+          "transition-all duration-300",
+          "hover:bg-primary/5 backdrop-blur-sm",
+          isExpanded && "bg-primary/5"
+        )}
+        onClick={onToggle}
+      >
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3 flex-wrap">
+            <Badge 
+              variant="outline" 
+              className={cn(
+                "px-3 py-1 text-sm font-medium rounded-full",
+                "bg-background/50 backdrop-blur-sm shadow-sm",
+                "border border-primary/20",
+                "transition-all duration-300",
+                "group-hover:bg-primary/10 group-hover:border-primary/20",
+                "animate-in zoom-in-50 duration-300"
+              )}
+            >
+              Question {index}
+            </Badge>
+            <Badge 
+              variant="outline" 
+              className={cn(
+                "flex items-center gap-2 px-3 py-1",
+                "bg-background/50 backdrop-blur-sm shadow-sm",
+                "border border-primary/20",
+                "transition-all duration-300",
+                "group-hover:bg-primary/10 group-hover:border-primary/20",
+                "animate-in zoom-in-50 duration-300 delay-100"
+              )}
+            >
+              {getQuestionIcon(question.type)}
+              <span className="capitalize">
+                {isQuestionType(question.type) ? QUESTION_TYPES[question.type as QuestionType]?.label : question.type}
+              </span>
+            </Badge>
+          </div>
+          <motion.div
+            animate={{ rotate: isExpanded ? 90 : 0 }}
+            transition={{ duration: 0.3, type: "spring", stiffness: 200 }}
+            className={cn(
+              "bg-background/50 backdrop-blur-sm p-2 rounded-full",
+              "transition-all duration-300",
+              "group-hover:bg-primary/10",
+              "shadow-sm border border-primary/20"
+            )}
+          >
+            <ChevronRight className="h-5 w-5 text-primary" />
+          </motion.div>
+        </div>
+      </CardHeader>
+      <AnimatePresence>
+        {isExpanded && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            transition={{ duration: 0.3 }}
+          >
+            <CardContent>
+              <div className="mt-4 space-y-3">
+                <CardTitle className="text-xl group-hover:text-primary transition-colors duration-300">
+                  {question.title || 'Untitled Question'}
+                </CardTitle>
+                <div className="relative">
+                  <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-primary/10 rounded-full" />
+                  <Progress 
+                    value={progress} 
+                    className={cn(
+                      "h-2 rounded-full",
+                      "transition-all duration-300",
+                      progress === 100 
+                        ? "bg-green-500/20" 
+                        : "bg-primary/10"
+                    )}
+                  />
+                  <p className="text-sm text-muted-foreground mt-2 flex items-center gap-2">
+                    {progress === 100 ? (
+                      <motion.span 
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        className="flex items-center gap-1 text-green-500"
+                      >
+                        <CheckCircle2 className="h-4 w-4" />
+                        Completed
+                      </motion.span>
+                    ) : (
+                      <motion.span
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="flex items-center gap-1"
+                      >
+                        <Clock className="h-4 w-4" />
+                        {`${Math.round(progress)}% complete`}
+                      </motion.span>
+                    )}
+                  </p>
+                </div>
+                <p className="text-muted-foreground">{question.content || 'No content available.'}</p>
+              </div>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="bg-background/80 backdrop-blur-sm rounded-lg p-4 border border-primary/10 shadow-sm"
+              >
+                {renderQuestionContent()}
+              </motion.div>
+            </CardContent>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+} 

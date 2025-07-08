@@ -1513,41 +1513,22 @@ export function LearningPathTeacher() {
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogContent 
             className="sm:max-w-[700px] max-h-[85vh] p-0"
-            aria-labelledby="lesson-selection-title"
-            aria-describedby="lesson-selection-description"
           >
+            <DialogHeader className="p-6 pb-4 flex-shrink-0 border-b">
+              <DialogTitle className="text-2xl flex items-center gap-3">
+                <BookOpen className="h-6 w-6 text-primary" />
+                {selectedSubtopic?.title || 'Select a Lesson'}
+              </DialogTitle>
+              <DialogDescription className="text-base font-medium text-foreground/90 mt-2">
+                {selectedSubtopic?.description || 'Choose a lesson to view or start teaching'}
+              </DialogDescription>
+            </DialogHeader>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
               className="flex flex-col h-full"
             >
-              <DialogHeader className="p-6 pb-4 flex-shrink-0 border-b">
-                <DialogTitle id="lesson-selection-title" className="text-2xl flex items-center gap-3">
-                  <BookOpen className="h-6 w-6 text-primary" />
-                  {selectedSubtopic?.title || 'Select a Lesson'}
-                </DialogTitle>
-                <DialogDescription id="lesson-selection-description" className="text-base font-medium text-foreground/90 mt-2">
-                  {selectedTopic && selectedSubtopic ? (
-                    <>
-                      Select a lesson from <span className="font-bold">{selectedTopic.title}</span> ➡️ <span className="font-bold">{selectedSubtopic.title}</span> to begin learning. Each lesson includes interactive content, questions, and activities.
-                    </>
-                  ) : (
-                    <>Select a lesson to begin learning.</>
-                  )}
-                </DialogDescription>
-                <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
-                  <div className="flex items-center gap-1">
-                    <Clock className="h-4 w-4" />
-                    <span>{selectedSubtopic?.duration || 0} minutes</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <BookOpen className="h-4 w-4" />
-                    <span>{selectedSubtopic?.lessons?.length || 0} Lessons</span>
-                  </div>
-                </div>
-              </DialogHeader>
-
               <div className="flex-1 overflow-y-auto">
                 <div className="p-6 space-y-4">
                   {selectedSubtopic?.lessons?.map((lesson, index) => (

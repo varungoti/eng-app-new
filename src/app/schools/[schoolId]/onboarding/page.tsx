@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { useParams } from 'next/navigation';
-import { useOnboarding } from '@/hooks/useOnboarding';
+import { useOnboardingWithSchoolId } from '@/hooks/useOnboarding';
 import OnboardingProgress from '@/components/OnboardingProgress';
 import OnboardingSteps from '@/components/school/OnboardingSteps';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
@@ -17,20 +17,20 @@ export default function SchoolOnboardingPage() {
     error,
     updateProgress,
     refresh 
-  } = useOnboarding(schoolId as string);
+  } = useOnboardingWithSchoolId(schoolId as string);
 
   useEffect(() => {
     refresh();
-  }, [schoolId]);
+  }, [schoolId, refresh]);
 
   if (loading) {
     return <LoadingSpinner />;
   }
 
-  if (error) {
+  if (error || !tasks || !stats) {
     return (
       <div className="p-4 bg-red-50 rounded-lg">
-        <p className="text-red-600">{error}</p>
+        <p className="text-red-600">{error || "Failed to load onboarding data"}</p>
       </div>
     );
   }
@@ -48,7 +48,7 @@ export default function SchoolOnboardingPage() {
           <div>
             <p className="text-sm text-gray-600">Overall Progress</p>
             <p className="text-2xl font-semibold text-primary">
-              {Math.round(stats?.progress || 0)}%
+              {Math.round((stats?.completedTasks / (stats?.totalTasks || 1)) * 100)}%
             </p>
           </div>
           <div>
@@ -60,7 +60,7 @@ export default function SchoolOnboardingPage() {
           <div>
             <p className="text-sm text-gray-600">Pending Tasks</p>
             <p className="text-2xl font-semibold text-yellow-600">
-              {stats?.pendingTasks || 0}
+              {(stats?.totalTasks || 0) - (stats?.completedTasks || 0)}
             </p>
           </div>
           <div>
@@ -75,8 +75,7 @@ export default function SchoolOnboardingPage() {
       {/* Onboarding Steps */}
       <OnboardingSteps
         schoolId={schoolId as string}
-        currentStep={stats?.completedTasks || 0}
-        onStepComplete={refresh}
+        onComplete={() => refresh()}
       />
 
       {/* Task Progress */}

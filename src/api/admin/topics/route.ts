@@ -1,6 +1,20 @@
 import { NextResponse } from 'next/server';
-import { Repository } from '@/lib/db/repository';
 import { successResponse, errorResponse } from '@/lib/api-response';
+import { models } from '@/lib/models/database';
+import { z } from 'zod';
+
+// Validation schema for topic creation
+const createTopicSchema = z.object({
+  title: z.string()
+    .min(2, 'Title must be at least 2 characters')
+    .max(100, 'Title cannot be more than 100 characters')
+    .trim(),
+  description: z.string()
+    .max(500, 'Description cannot be more than 500 characters')
+    .optional(),
+  grade_id: z.string().uuid('Grade ID must be a valid UUID'),
+  order_index: z.number().min(0).optional().default(0)
+});
 
 export async function GET(request: Request) {
   try {
@@ -18,7 +32,9 @@ export async function GET(request: Request) {
     }
 
     console.log('GET /api/admin/topics - Fetching topics for grade:', gradeId);
-    const topics = await Repository.getTopics(gradeId, { 
+    
+    // Use Supabase models to get topics
+    const topics = await models.TopicRepository.findByGradeId(gradeId, { 
       includeContent,
       includeBasic,
       includeDetails,
@@ -51,26 +67,30 @@ export async function POST(request: Request) {
   try {
     console.log('POST /api/admin/topics - Starting');
     const body = await request.json();
-    const { name, description, gradeId, order } = body;
-
-    if (!name || !gradeId) {
-      return errorResponse('Name and Grade ID are required', 'VALIDATION_ERROR', 400);
-    }
-
-    const topic = await Repository.createTopic({
-      name,
-      description,
-      gradeId,
-      order: order || 0
-    });
+    
+    // Validate request body
+    const validatedData = createTopicSchema.parse(body);
+    
+    // Create topic using Supabase models
+    const topic = await models.TopicRepository.create(validatedData);
 
     return successResponse(topic);
   } catch (error: any) {
     console.error('Error creating topic:', error);
 
-    if (error.code === 11000) {
+    // Handle validation errors
+    if (error instanceof z.ZodError) {
       return errorResponse(
-        'A topic with this name already exists in this grade',
+        error.errors[0].message,
+        'VALIDATION_ERROR',
+        400
+      );
+    }
+
+    // Handle database errors - PostgreSQL unique violation
+    if (error.code === '23505') {
+      return errorResponse(
+        'A topic with this title already exists in this grade',
         'DUPLICATE_ERROR',
         409
       );

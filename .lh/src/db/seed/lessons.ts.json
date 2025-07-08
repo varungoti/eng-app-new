@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/db/seed/lessons.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1746702310409,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1746702310409,
+            "name": "Commit-0",
+            "content": "import { faker } from '@faker-js/faker';\r\nimport { SupabaseClient } from '@supabase/supabase-js';\r\n\r\ninterface Lesson {\r\n  id: string;\r\n  title: string;\r\n  description: string;\r\n  topic_id: string;\r\n  created_by: string;\r\n  content: any;\r\n  difficulty_level: 'beginner' | 'intermediate' | 'advanced';\r\n  duration_minutes: number;\r\n  prerequisites: string[];\r\n  learning_objectives: string[];\r\n  created_at: string;\r\n  updated_at: string;\r\n}\r\n\r\ninterface Topic {\r\n  id: string;\r\n}\r\n\r\ninterface Staff {\r\n  id: string;\r\n}\r\n\r\nexport async function seedLessons(\r\n  supabase: SupabaseClient,\r\n  topics: Topic[],\r\n  staff: Staff[]\r\n): Promise<Lesson[]> {\r\n  try {\r\n    const lessons: Omit<Lesson, 'id'>[] = [];\r\n    const lessonCount = 30; // Number of lessons to create\r\n    const difficultyLevels: Lesson['difficulty_level'][] = ['beginner', 'intermediate', 'advanced'];\r\n\r\n    for (let i = 0; i < lessonCount; i++) {\r\n      const topic = faker.helpers.arrayElement(topics);\r\n      const teacher = faker.helpers.arrayElement(staff);\r\n      const difficulty = faker.helpers.arrayElement(difficultyLevels);\r\n\r\n      lessons.push({\r\n        title: faker.lorem.sentence(),\r\n        description: faker.lorem.paragraphs(2),\r\n        topic_id: topic.id,\r\n        created_by: teacher.id,\r\n        content: {\r\n          sections: Array.from({ length: faker.number.int({ min: 3, max: 6 }) }, () => ({\r\n            title: faker.lorem.sentence(),\r\n            content: faker.lorem.paragraphs(3),\r\n            media: faker.helpers.maybe(() => ({\r\n              type: faker.helpers.arrayElement(['image', 'video', 'audio']),\r\n              url: faker.image.url()\r\n            }))\r\n          }))\r\n        },\r\n        difficulty_level: difficulty,\r\n        duration_minutes: faker.number.int({ min: 30, max: 120 }),\r\n        prerequisites: Array.from(\r\n          { length: faker.number.int({ min: 0, max: 3 }) },\r\n          () => faker.lorem.sentence()\r\n        ),\r\n        learning_objectives: Array.from(\r\n          { length: faker.number.int({ min: 2, max: 5 }) },\r\n          () => faker.lorem.sentence()\r\n        ),\r\n        created_at: new Date().toISOString(),\r\n        updated_at: new Date().toISOString()\r\n      });\r\n    }\r\n\r\n    // Insert lessons\r\n    const { data: insertedLessons, error } = await supabase\r\n      .from('lessons')\r\n      .insert(lessons)\r\n      .select();\r\n\r\n    if (error) {\r\n      throw new Error(`Failed to insert lessons: ${error.message}`);\r\n    }\r\n\r\n    if (!insertedLessons) {\r\n      throw new Error('No lessons were inserted');\r\n    }\r\n\r\n    return insertedLessons;\r\n  } catch (error) {\r\n    console.error('Error seeding lessons:', error);\r\n    throw error;\r\n  }\r\n} "
+        }
+    ]
+}

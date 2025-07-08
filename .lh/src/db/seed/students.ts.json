@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/db/seed/students.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1746702271063,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1746702271063,
+            "name": "Commit-0",
+            "content": "import { faker } from '@faker-js/faker';\r\nimport { SupabaseClient } from '@supabase/supabase-js';\r\n\r\ninterface Student {\r\n  id: string;\r\n  first_name: string;\r\n  last_name: string;\r\n  roll_number: string;\r\n  school_id: string;\r\n  grade_id: string;\r\n  gender: 'male' | 'female' | 'other';\r\n  date_of_birth: string;\r\n  contact_number: string;\r\n  email: string;\r\n  address: string;\r\n  guardian_name: string;\r\n  guardian_contact: string;\r\n  created_at: string;\r\n  updated_at: string;\r\n}\r\n\r\ninterface School {\r\n  id: string;\r\n}\r\n\r\ninterface Grade {\r\n  id: string;\r\n}\r\n\r\nexport async function seedStudents(\r\n  supabase: SupabaseClient,\r\n  schools: School[],\r\n  grades: Grade[]\r\n): Promise<Student[]> {\r\n  try {\r\n    const students: Omit<Student, 'id'>[] = [];\r\n    const studentCount = 50; // Number of students to create\r\n\r\n    for (let i = 0; i < studentCount; i++) {\r\n      const school = faker.helpers.arrayElement(schools);\r\n      const grade = faker.helpers.arrayElement(grades);\r\n      const gender = faker.helpers.arrayElement(['male', 'female', 'other'] as const);\r\n      const firstName = faker.person.firstName(gender === 'male' ? 'male' : 'female');\r\n      const lastName = faker.person.lastName();\r\n\r\n      students.push({\r\n        first_name: firstName,\r\n        last_name: lastName,\r\n        roll_number: faker.string.numeric(6),\r\n        school_id: school.id,\r\n        grade_id: grade.id,\r\n        gender,\r\n        date_of_birth: faker.date.birthdate({ min: 5, max: 18 }).toISOString().split('T')[0],\r\n        contact_number: faker.phone.number(),\r\n        email: faker.internet.email({ firstName, lastName }),\r\n        address: faker.location.streetAddress(),\r\n        guardian_name: faker.person.fullName(),\r\n        guardian_contact: faker.phone.number(),\r\n        created_at: new Date().toISOString(),\r\n        updated_at: new Date().toISOString()\r\n      });\r\n    }\r\n\r\n    // Insert students\r\n    const { data: insertedStudents, error } = await supabase\r\n      .from('students')\r\n      .insert(students)\r\n      .select();\r\n\r\n    if (error) {\r\n      throw new Error(`Failed to insert students: ${error.message}`);\r\n    }\r\n\r\n    if (!insertedStudents) {\r\n      throw new Error('No students were inserted');\r\n    }\r\n\r\n    return insertedStudents;\r\n  } catch (error) {\r\n    console.error('Error seeding students:', error);\r\n    throw error;\r\n  }\r\n} "
+        }
+    ]
+}

@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/db/seed/grades.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1746702258428,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1746702258428,
+            "name": "Commit-0",
+            "content": "import { faker } from '@faker-js/faker';\r\nimport { SupabaseClient } from '@supabase/supabase-js';\r\n\r\ninterface Grade {\r\n  id: string;\r\n  name: string;\r\n  level: 'elementary' | 'middle' | 'high';\r\n  description: string;\r\n  created_at: string;\r\n  updated_at: string;\r\n}\r\n\r\nexport async function seedGrades(supabase: SupabaseClient): Promise<Grade[]> {\r\n  try {\r\n    const gradeLevels = ['elementary', 'middle', 'high'];\r\n    const grades: Omit<Grade, 'id'>[] = [];\r\n\r\n    // Create grades for each level\r\n    gradeLevels.forEach(level => {\r\n      const gradeCount = level === 'elementary' ? 5 : level === 'middle' ? 3 : 4;\r\n      \r\n      for (let i = 1; i <= gradeCount; i++) {\r\n        grades.push({\r\n          name: `${level.charAt(0).toUpperCase() + level.slice(1)} ${i}`,\r\n          level: level as 'elementary' | 'middle' | 'high',\r\n          description: faker.lorem.sentence(),\r\n          created_at: new Date().toISOString(),\r\n          updated_at: new Date().toISOString()\r\n        });\r\n      }\r\n    });\r\n\r\n    // Insert grades\r\n    const { data: insertedGrades, error } = await supabase\r\n      .from('grades')\r\n      .insert(grades)\r\n      .select();\r\n\r\n    if (error) {\r\n      throw new Error(`Failed to insert grades: ${error.message}`);\r\n    }\r\n\r\n    if (!insertedGrades) {\r\n      throw new Error('No grades were inserted');\r\n    }\r\n\r\n    return insertedGrades;\r\n  } catch (error) {\r\n    console.error('Error seeding grades:', error);\r\n    throw error;\r\n  }\r\n} "
+        }
+    ]
+}

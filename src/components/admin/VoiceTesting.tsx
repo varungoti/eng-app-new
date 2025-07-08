@@ -1,6 +1,6 @@
 "use client";
 
-import React from 'react';
+//import React from 'react';
 import { Volume2, Pause } from 'lucide-react';
 import { useVoiceTesting } from '@/hooks/useVoiceTesting';
 import { useToast } from '@/components/ui/use-toast';
@@ -26,31 +26,46 @@ export function VoiceTesting({ schoolId }: VoiceTestingProps) {
 
   const handleTest = async () => {
     try {
+      console.log(`Testing voice for school: ${schoolId}`);
       await testVoice();
     } catch (error) {
       toast({
         title: "Error",
         description: error instanceof Error ? error.message : "Failed to test voice",
-        variant: "destructive",
+        
       });
     }
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4" data-selected-voice-id={selectedVoiceId} data-school-id={schoolId}>
       <div>
         <label htmlFor="test-text" className="block text-sm font-medium text-gray-700">
           Test Text
         </label>
         <textarea
           id="test-text"
-          rows={3}
+          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
           value={text}
           onChange={(e) => setText(e.target.value)}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-          placeholder="Enter text to test the voice..."
-          aria-label="Text to test the voice"
+          rows={3}
         />
+      </div>
+      
+      <div>
+        <label htmlFor="voice-select" className="block text-sm font-medium text-gray-700">
+          Voice
+        </label>
+        <select
+          id="voice-select"
+          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+          value={selectedVoiceId || ''}
+          onChange={(e) => setSelectedVoice(e.target.value)}
+        >
+          <option value="default">Default Voice</option>
+          <option value="voice1">Voice 1</option>
+          <option value="voice2">Voice 2</option>
+        </select>
       </div>
 
       <div>

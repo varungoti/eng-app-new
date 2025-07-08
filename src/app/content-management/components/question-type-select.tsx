@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import  { useState, useEffect } from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { isQuestionType, QUESTION_TYPES } from '@/app/content-management/constants';
 import { logger } from '@/lib/logger';
@@ -77,12 +77,7 @@ export function QuestionTypeSelect({ value, onChange }: QuestionTypeSelectProps)
                     className="absolute left-full top-0 ml-2 z-[9999]"
                   >
                     <div
-                      style={{
-                        opacity: 1,
-                        transform: 'translateX(0)',
-                        transition: 'all 0.15s ease-out'
-                      }}
-                      className="bg-popover border rounded-md shadow-md"
+                      className="bg-popover border rounded-md shadow-md opacity-100 translate-x-0 transition-all duration-150 ease-out"
                     >
                       {renderPreview(type)}
                     </div>

@@ -1,24 +1,21 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
+//import { Progress } from "@/components/ui/progress";
 import {
   Mic,
-  Volume2,
+  
   Play,
   Pause,
   AudioWaveform as Waveform,
   ArrowRight,
-  ArrowDown,
-  Circle,
-  CheckCircle,
-  XCircle,
-  RefreshCw,
+   XCircle,
 
-  Sparkles
+  Sparkles,
+  Keyboard
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -86,11 +83,30 @@ export function RealTimePronunciationTrainer({
   const [visualizations, setVisualizations] = useState<PhonemeVisualization[]>([]);
   const [attempts, setAttempts] = useState(0);
   const [streak, setStreak] = useState(0);
+  const [audio] = useState<HTMLAudioElement | null>(() => audioUrl ? new Audio(audioUrl) : null);
 
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  // Handle audio playback
+  useEffect(() => {
+    if (audio) {
+      if (isPlaying) {
+        audio.play();
+      } else {
+        audio.pause();
+        audio.currentTime = 0;
+      }
+    }
+    return () => {
+      if (audio) {
+        audio.pause();
+        audio.currentTime = 0;
+      }
+    };
+  }, [isPlaying, audio]);
 
   // Initialize audio context
   useEffect(() => {
@@ -101,7 +117,7 @@ export function RealTimePronunciationTrainer({
     }
   }, []);
 
-  const startRecording = async () => {
+  const startRecording = useCallback(async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       
@@ -126,14 +142,31 @@ export function RealTimePronunciationTrainer({
     } catch (error) {
       console.error('Error accessing microphone:', error);
     }
-  };
+  }, []);
 
-  const stopRecording = () => {
+  const stopRecording = useCallback(() => {
     if (mediaRecorderRef.current && isRecording) {
       mediaRecorderRef.current.stop();
       setIsRecording(false);
     }
-  };
+  }, [isRecording]);
+
+  // Add keyboard event handling
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      if (e.code === 'Space' && !e.repeat) {
+        e.preventDefault();
+        if (isRecording) {
+          stopRecording();
+        } else {
+          startRecording();
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [isRecording, startRecording, stopRecording]);
 
   const startVisualization = () => {
     if (!canvasRef.current || !analyserRef.current) return;
@@ -283,10 +316,15 @@ export function RealTimePronunciationTrainer({
               <p className="text-sm text-muted-foreground mt-1">/{phonetics}/</p>
             </div>
             {streak > 0 && (
-              <div className="flex items-center gap-2">
-                <Sparkles className="h-5 w-5 text-yellow-500" />
+              <motion.div 
+                className="flex items-center gap-2"
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ type: "spring" }}
+              >
+                <Sparkles className="h-5 w-5 text-yellow-500 animate-pulse" />
                 <span className="font-bold text-yellow-500">{streak}x Streak!</span>
-              </div>
+              </motion.div>
             )}
           </div>
         </CardHeader>
@@ -367,6 +405,17 @@ export function RealTimePronunciationTrainer({
           </div>
         </CardContent>
       </Card>
+
+      {/* Input Method Toggle */}
+      <motion.div 
+        className="flex items-center justify-end gap-2 text-sm text-muted-foreground"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.5 }}
+      >
+        <Keyboard className="h-4 w-4 animate-bounce" />
+        <span>Press spacebar to start/stop recording</span>
+      </motion.div>
 
       {/* Visualization */}
       <Card>

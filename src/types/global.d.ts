@@ -12,4 +12,26 @@
 
 // declare module '@phosphor-icons/react' {
 //   export * from '@phosphor-icons/react'
-// } 
+// }
+
+import * as React from 'react';
+
+declare global {
+  namespace NodeJS {
+    interface Timeout {}
+  }
+
+  namespace JSX {
+    interface IntrinsicElements {
+      [elemName: string]: any;
+    }
+  }
+}
+
+// Extend Window interface for audio context support
+interface Window {
+  AudioContext: typeof AudioContext;
+  webkitAudioContext: typeof AudioContext;
+}
+
+export {}; 

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,15 +8,10 @@ import { Input } from "@/components/ui/input";
 import { Avatar } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
 import {
-  Bot,
   Mic,
   Send,
   Volume2,
   VolumeX,
-  RefreshCw,
-  ThumbsUp,
-  ThumbsDown,
-  HelpCircle,
   Star
 } from "lucide-react";
 import { 
@@ -58,15 +53,36 @@ export function AIConversationSystem({
 
   // Initialize conversation based on mode
   useEffect(() => {
+    // Helper function to get age-appropriate topics
+    const getTopicForLevel = (level: number, age: number): string => {
+      const topics = {
+        beginner: {
+          young: ['Colors', 'Animals', 'Family', 'Numbers', 'Food'],
+          older: ['Hobbies', 'School', 'Friends', 'Weather', 'Sports']
+        },
+        intermediate: {
+          young: ['Daily Routine', 'Favorite Books', 'Pets', 'Holidays', 'Seasons'],
+          older: ['Movies', 'Music', 'Technology', 'Travel', 'Environment']
+        },
+        advanced: {
+          young: ['Story Creation', 'Science Facts', 'World Culture', 'Space', 'Nature'],
+          older: ['Current Events', 'Social Media', 'Future Goals', 'Global Issues', 'Technology Trends']
+        }
+      };
+
+      const ageGroup = age <= 8 ? 'young' : 'older';
+      const levelTopics = topics[skillLevel][ageGroup];
+      return levelTopics[level % levelTopics.length];
+    };
+
     const initializeConversation = async () => {
       onLoading(true);
       try {
+        const initialTopic = getTopicForLevel(Number(skillLevel), Number(studentAge));
         const initialMessage: Message = {
           id: '1',
           role: 'system',
-          content: mode === 'assessment' 
-            ? "Hi! I'm your English assessment assistant. Let's check your language skills!"
-            : "Hello! I'm your English learning buddy. Ready to play some fun language games?",
+          content: `You are now in ${mode} mode. Let's discuss the topic: ${initialTopic}.`,
         };
         setMessages([initialMessage]);
       } catch (error) {
@@ -77,29 +93,7 @@ export function AIConversationSystem({
     };
 
     initializeConversation();
-  }, [mode, onLoading]);
-
-  // Helper function to get age-appropriate topics
-  const getTopicForLevel = (level: number, age: number): string => {
-    const topics = {
-      beginner: {
-        young: ['Colors', 'Animals', 'Family', 'Numbers', 'Food'],
-        older: ['Hobbies', 'School', 'Friends', 'Weather', 'Sports']
-      },
-      intermediate: {
-        young: ['Daily Routine', 'Favorite Books', 'Pets', 'Holidays', 'Seasons'],
-        older: ['Movies', 'Music', 'Technology', 'Travel', 'Environment']
-      },
-      advanced: {
-        young: ['Story Creation', 'Science Facts', 'World Culture', 'Space', 'Nature'],
-        older: ['Current Events', 'Social Media', 'Future Goals', 'Global Issues', 'Technology Trends']
-      }
-    };
-
-    const ageGroup = age <= 8 ? 'young' : 'older';
-    const levelTopics = topics[skillLevel][ageGroup];
-    return levelTopics[level % levelTopics.length];
-  };
+  }, [mode, onLoading, studentAge, skillLevel]);
 
   // Handle user input submission
   const handleSubmit = async () => {
@@ -143,9 +137,17 @@ export function AIConversationSystem({
   const processWithAI = async (message: string): Promise<AIResponse> => {
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // Log the incoming message for debugging
+    console.log(`Processing message: ${message}`);
+
+    // Create a response that references the user's message
+    const response = message.length > 0
+      ? `I understand what you said about "${message.substring(0, 30)}${message.length > 30 ? '...' : ''}". Let's practice that together!`
+      : "I understand! Let's practice that together...";
 
     return {
-      message: "I understand! Let's practice that together...",
+      message: response,
       feedback: {
         pronunciation: 85,
         grammar: 90,

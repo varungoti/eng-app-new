@@ -1,0 +1,34 @@
+{
+    "sourceFile": "src/app/learning/lesson/[lessonId]/page.tsx",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 4,
+            "patches": [
+                {
+                    "date": 1740947472749,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1740947479121,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -8,7 +8,7 @@\n       <Suspense fallback={<div>Loading...</div>}>\r\n         <LessonComponent />\r\n       </Suspense>\r\n     </div>\r\n-    \r\n+    <Suspense fallback={<div>Loading...</div>}></Suspense>\r\n   );\r\n } \n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1740947487916,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -9,6 +9,7 @@\n         <LessonComponent />\r\n       </Suspense>\r\n     </div>\r\n     <Suspense fallback={<div>Loading...</div>}></Suspense>\r\n+    \r\n   );\r\n } \n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1740947499885,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -8,8 +8,10 @@\n       <Suspense fallback={<div>Loading...</div>}>\r\n         <LessonComponent />\r\n       </Suspense>\r\n     </div>\r\n-    <Suspense fallback={<div>Loading...</div>}></Suspense>\r\n+    <Suspense fallback={<div>Loading...</div>}>\r\n+      <QuizComponent />\r\n+    </Suspense>\r\n     \r\n   );\r\n } \n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1740947518442,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -3,15 +3,16 @@\n import { QuizComponent } from \"@/components/learning/QuizComponent\";\r\n \r\n export default function LessonPage() {\r\n   return (\r\n-    <div className=\"container mx-auto p-6\">\r\n+    <>\r\n+      <div className=\"container mx-auto p-6\">\r\n+        <Suspense fallback={<div>Loading...</div>}>\r\n+          <LessonComponent />\r\n+        </Suspense>\r\n+      </div>\r\n       <Suspense fallback={<div>Loading...</div>}>\r\n-        <LessonComponent />\r\n+        <QuizComponent questions={[]} onComplete={() => {}} />\r\n       </Suspense>\r\n-    </div>\r\n-    <Suspense fallback={<div>Loading...</div>}>\r\n-      <QuizComponent />\r\n-    </Suspense>\r\n-    \r\n+    </>\r\n   );\r\n } \n\\ No newline at end of file\n"
+                }
+            ],
+            "date": 1740947472749,
+            "name": "Commit-0",
+            "content": "import { Suspense } from \"react\";\r\nimport { LessonComponent } from \"@/components/learning/Lesson\";\r\nimport { QuizComponent } from \"@/components/learning/QuizComponent\";\r\n\r\nexport default function LessonPage() {\r\n  return (\r\n    <div className=\"container mx-auto p-6\">\r\n      <Suspense fallback={<div>Loading...</div>}>\r\n        <LessonComponent />\r\n      </Suspense>\r\n    </div>\r\n    \r\n  );\r\n} "
+        }
+    ]
+}

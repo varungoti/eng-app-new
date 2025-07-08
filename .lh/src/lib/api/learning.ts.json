@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/lib/api/learning.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1740944344572,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1740944344572,
+            "name": "Commit-0",
+            "content": "import { supabase } from \"@/lib/supabase\";\r\nimport type { \r\n  Topic, \r\n  Lesson, \r\n  LessonProgress, \r\n  Activity,\r\n  Question \r\n} from \"@/types/\";\r\n\r\nexport async function fetchLearningPath() {\r\n  const { data, error } = await supabase\r\n    .from('topics')\r\n    .select(`\r\n      *,\r\n      subtopics (\r\n        *,\r\n        lessons (*)\r\n      )\r\n    `)\r\n    .order('order');\r\n\r\n  if (error) throw error;\r\n  return data as Topic[];\r\n}\r\n\r\nexport async function fetchLessonWithQuestions(lessonId: string) {\r\n  const { data, error } = await supabase\r\n    .from('lessons')\r\n    .select(`\r\n      *,\r\n      questions!inner (\r\n        *,\r\n        exercise_prompts!inner (*)\r\n      )\r\n    `)\r\n    .eq('id', lessonId)\r\n    .single();\r\n\r\n  if (error) throw error;\r\n  return data as Lesson & { questions: Question[] };\r\n}\r\n\r\nexport async function updateLessonProgress(\r\n  progressId: string,\r\n  updates: Partial<LessonProgress>\r\n) {\r\n  const { error } = await supabase\r\n    .from('lesson_progress')\r\n    .update(updates)\r\n    .eq('id', progressId);\r\n\r\n  if (error) throw error;\r\n}\r\n\r\nexport async function fetchUserActivities(userId: string) {\r\n  const { data, error } = await supabase\r\n    .from('activities')\r\n    .select('*')\r\n    .eq('user_id', userId)\r\n    .order('created_at', { ascending: false });\r\n\r\n  if (error) throw error;\r\n  return data as Activity[];\r\n}\r\n\r\nexport async function fetchAnalytics(userId: string) {\r\n  const { data, error } = await supabase\r\n    .from('analytics')\r\n    .select('*')\r\n    .eq('user_id', userId)\r\n    .single();\r\n\r\n  if (error) throw error;\r\n  return data;\r\n} "
+        }
+    ]
+}

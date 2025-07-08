@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { ChevronDown, ChevronRight, HomeIcon, Minimize2, Maximize2, Volume2, MessageCircle, Clock, Video } from 'lucide-react';
+import { ChevronDown, ChevronRight, Minimize2, Maximize2, Volume2, MessageCircle, Clock, Video } from 'lucide-react';
 import { ExercisePromptCardProps } from '../types';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
@@ -15,6 +15,7 @@ import { ImageIcon, PlayCircle, FileText } from 'lucide-react';
 import { Icon } from '@/components/ui/icons';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { ImagePreview } from '@/components/common/ImagePreview';
 
 type ExercisePromptType =  'image' | 'video' | 'audio' ;
 
@@ -82,8 +83,8 @@ const ViewMode: React.FC<ViewModeProps> = ({ prompt, promptIndex }) => {
             >
               {prompt.type === 'image' && (
                 <div className="relative overflow-hidden">
-                  <img
-                    src={prompt.media}
+                  <ImagePreview
+                    imageUrl={prompt.media}
                     alt={prompt.text}
                     className="w-full h-full object-cover transition-all duration-500 group-hover/media:scale-110"
                   />
@@ -103,6 +104,7 @@ const ViewMode: React.FC<ViewModeProps> = ({ prompt, promptIndex }) => {
               
               {/* Floating control button with hover effect */}
               <Button
+                title="Toggle Media"
                 variant="ghost"
                 size="icon"
                 className="absolute bottom-4 right-4 bg-background/80 backdrop-blur-sm hover:bg-primary hover:text-white transform hover:scale-110 transition-all duration-300 ease-out"
@@ -311,8 +313,8 @@ export const ExercisePromptCard: React.FC<ExercisePromptCardProps> = ({
     if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(extension || '')) {
       return (
         <div className="relative h-[200px] rounded-lg overflow-hidden bg-muted">
-          <img 
-            src={url} 
+          <ImagePreview
+            imageUrl={url} 
             alt="Media preview" 
             className="object-contain w-full h-full"
             onError={(e) => {
@@ -354,6 +356,25 @@ export const ExercisePromptCard: React.FC<ExercisePromptCardProps> = ({
     order_index: promptIndex,
     metadata: { estimatedTime: prompt?.metadata?.estimatedTime || 5 }
   };
+
+  // Use the viewMode prop to conditionally render
+  if (viewMode) {
+    return (
+      <ViewMode 
+        prompt={{
+          ...prompt,
+          order_index: promptIndex,
+          // Ensure type is compatible with ExercisePromptType
+          type: prompt.type === 'gif' ? 'image' : prompt.type as ExercisePromptType
+        }} 
+        promptIndex={promptIndex}
+        onStart={onStart}
+        onWatch={onWatch}
+        onListen={onListen}
+        onHelp={onHelp}
+      />
+    );
+  }
 
   return (
     <Card className={cn(

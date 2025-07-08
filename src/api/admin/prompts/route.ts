@@ -1,27 +1,26 @@
 import { NextResponse } from 'next/server';
-import { connectToDatabase } from '@/lib/mongodb';
-import { models } from '@/lib/db/models';
+import { models } from '@/lib/models/database';
 import { z } from 'zod';
 
 // Schema for validating prompt data
 const promptSchema = z.object({
   text: z.string().min(1, 'Text is required'),
   narration: z.string().optional(),
-  sayText: z.string().optional(),
+  saytext: z.string().optional(),
   media: z.string().optional(),
-  type: z.enum(['image', 'gif', 'video']).default('image')
+  type: z.enum(['image', 'gif', 'video']).default('image'),
+  order_index: z.number().default(0)
 });
 
 export async function POST(req: Request) {
   try {
-    // Connect to database
-    await connectToDatabase();
+    // No need to connect to database - Supabase handles connection
 
     // Parse and validate request body
     const body = await req.json();
     const validatedData = promptSchema.parse(body);
 
-    // Create new prompt
+    // Create new prompt using Supabase repository
     const prompt = await models.ExercisePrompt.create(validatedData);
 
     return NextResponse.json({

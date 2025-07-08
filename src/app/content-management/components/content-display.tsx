@@ -16,10 +16,10 @@ import type { Topic, Subtopic, Lesson } from '@/types/content';
 import { CreateQuestionDialog } from './CreateQuestionDialog';
 import { CreateActivityDialog } from '@/app/content-management/components/CreateActivityDialog';
 import { useQueryClient } from '@tanstack/react-query';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+//import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Trash } from 'lucide-react';
 
-interface ContentItem {
+export interface ContentItem {
   id: string;
   title: string;
   description?: string;
@@ -45,7 +45,7 @@ export function ContentDisplay() {
   const [lessonContent, setLessonContent] = React.useState('');
   const [isQuestionDialogOpen, setIsQuestionDialogOpen] = React.useState(false);
   const [isActivityDialogOpen, setIsActivityDialogOpen] = React.useState(false);
-  const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
+  const [_deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
   const [itemToDelete, setItemToDelete] = useState<{
     id: string;
     type: 'topic' | 'subtopic' | 'lesson';
@@ -97,7 +97,7 @@ export function ContentDisplay() {
     setIsEditing(false);
   };
 
-  const handleDelete = async () => {
+  const _handleDelete = async () => {
     if (!itemToDelete) return;
 
     try {

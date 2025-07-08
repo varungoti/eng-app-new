@@ -20,7 +20,7 @@ const WINDOW_ID = `window_${Date.now()}_${Math.random().toString(36).substr(2, 9
 const BROADCAST_CHANNEL_NAME = 'auth_sync_channel';
 
 export class AuthLoader {
-  private loadingMonitor: LoadingMonitor;
+  private _loadingMonitor: LoadingMonitor;
   private loadingStrategy: LoadingStrategy;
   private cacheStrategy: CacheStrategy<AuthState>;
   private initialized: boolean = false;
@@ -32,7 +32,7 @@ export class AuthLoader {
   private isChildWindow: boolean = false;
 
   constructor() {
-    this.loadingMonitor = new LoadingMonitor(supabase, { 
+    this._loadingMonitor = new LoadingMonitor(supabase, { 
       retryCount: 3,
       retryInterval: 1000,
       timeoutMs: INIT_TIMEOUT 

@@ -1,0 +1,22 @@
+{
+    "sourceFile": "src/db/migrate.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1746701431881,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1746701716254,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -2,12 +2,22 @@\n import fs from 'fs';\r\n import path from 'path';\r\n \r\n const supabaseUrl = 'https://pxjhsbezqybrksmcpwmx.supabase.co';\r\n-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB4amhzYmV6cXlicmtzbWNwd214Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzU4MzQ5NDksImV4cCI6MjA1MTQxMDk0OX0.BKjZ4-IqOK9Tdo7CN1mRS-sTtVxKJvbgxrz2ItDDVJM';\r\n+const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY;\r\n \r\n-const supabase = createClient(supabaseUrl, supabaseKey);\r\n+if (!supabaseServiceKey) {\r\n+  console.error('❌ SUPABASE_SERVICE_KEY environment variable is not set');\r\n+  process.exit(1);\r\n+}\r\n \r\n+const supabase = createClient(supabaseUrl, supabaseServiceKey, {\r\n+  auth: {\r\n+    autoRefreshToken: false,\r\n+    persistSession: false,\r\n+  },\r\n+});\r\n+\r\n async function runMigration() {\r\n   try {\r\n     console.log('🔄 Running database migration...');\r\n \r\n@@ -23,12 +33,14 @@\n \r\n     // Execute each statement\r\n     for (const statement of statements) {\r\n       console.log(`\\n🔨 Executing statement:\\n${statement}`);\r\n-      const { error } = await supabase.rpc('exec_sql', { sql: statement });\r\n+      const { data, error } = await supabase.rpc('exec_sql', { sql: statement });\r\n       if (error) {\r\n+        console.error('Error executing statement:', error);\r\n         throw new Error(`Failed to execute statement: ${error.message}`);\r\n       }\r\n+      console.log('Statement executed successfully:', data);\r\n     }\r\n \r\n     console.log('\\n✅ Migration completed successfully!');\r\n   } catch (error) {\r\n"
+                }
+            ],
+            "date": 1746701431881,
+            "name": "Commit-0",
+            "content": "import { createClient } from '@supabase/supabase-js';\r\nimport fs from 'fs';\r\nimport path from 'path';\r\n\r\nconst supabaseUrl = 'https://pxjhsbezqybrksmcpwmx.supabase.co';\r\nconst supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB4amhzYmV6cXlicmtzbWNwd214Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzU4MzQ5NDksImV4cCI6MjA1MTQxMDk0OX0.BKjZ4-IqOK9Tdo7CN1mRS-sTtVxKJvbgxrz2ItDDVJM';\r\n\r\nconst supabase = createClient(supabaseUrl, supabaseKey);\r\n\r\nasync function runMigration() {\r\n  try {\r\n    console.log('🔄 Running database migration...');\r\n\r\n    // Read the migration file\r\n    const migrationPath = path.join(__dirname, 'migrations', '20240410-initial-schema.sql');\r\n    const migrationSql = fs.readFileSync(migrationPath, 'utf8');\r\n\r\n    // Split the migration into individual statements\r\n    const statements = migrationSql\r\n      .split(';')\r\n      .map(statement => statement.trim())\r\n      .filter(statement => statement.length > 0);\r\n\r\n    // Execute each statement\r\n    for (const statement of statements) {\r\n      console.log(`\\n🔨 Executing statement:\\n${statement}`);\r\n      const { error } = await supabase.rpc('exec_sql', { sql: statement });\r\n      if (error) {\r\n        throw new Error(`Failed to execute statement: ${error.message}`);\r\n      }\r\n    }\r\n\r\n    console.log('\\n✅ Migration completed successfully!');\r\n  } catch (error) {\r\n    console.error('\\n❌ Error running migration:', error);\r\n    if (error instanceof Error) {\r\n      console.error('Error details:', {\r\n        message: error.message,\r\n        stack: error.stack,\r\n      });\r\n    }\r\n    process.exit(1);\r\n  }\r\n}\r\n\r\n// Run migration if this file is executed directly\r\nif (process.argv[1] === new URL(import.meta.url).pathname) {\r\n  runMigration();\r\n}\r\n\r\nexport { runMigration }; "
+        }
+    ]
+}

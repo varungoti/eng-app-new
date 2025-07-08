@@ -34,4 +34,8 @@ export interface OnboardingStats {
   completedTasks: number;
   totalTasks: number;
   completionPercentage: number;
+  pendingTasks?: number;
+  blockedTasks?: number;
+  remainingRequired?: number;
+  nextTask?: OnboardingTask;
 }

@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/db/seed/topics.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1746702296539,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1746702296539,
+            "name": "Commit-0",
+            "content": "import { faker } from '@faker-js/faker';\r\nimport { SupabaseClient } from '@supabase/supabase-js';\r\n\r\ninterface Topic {\r\n  id: string;\r\n  name: string;\r\n  description: string;\r\n  subject: string;\r\n  grade_level: string;\r\n  created_at: string;\r\n  updated_at: string;\r\n}\r\n\r\nexport async function seedTopics(supabase: SupabaseClient): Promise<Topic[]> {\r\n  try {\r\n    const topics: Omit<Topic, 'id'>[] = [];\r\n    const subjects = ['Mathematics', 'Science', 'English', 'History', 'Geography'];\r\n    const gradeLevels = ['elementary', 'middle', 'high'];\r\n\r\n    // Create topics for each subject and grade level\r\n    subjects.forEach(subject => {\r\n      gradeLevels.forEach(level => {\r\n        const topicCount = faker.number.int({ min: 3, max: 6 });\r\n        \r\n        for (let i = 0; i < topicCount; i++) {\r\n          topics.push({\r\n            name: faker.helpers.arrayElement([\r\n              `${subject} Fundamentals`,\r\n              `Advanced ${subject}`,\r\n              `${subject} Basics`,\r\n              `${subject} Applications`,\r\n              `${subject} Theory`,\r\n              `${subject} Practice`\r\n            ]),\r\n            description: faker.lorem.paragraph(),\r\n            subject,\r\n            grade_level: level,\r\n            created_at: new Date().toISOString(),\r\n            updated_at: new Date().toISOString()\r\n          });\r\n        }\r\n      });\r\n    });\r\n\r\n    // Insert topics\r\n    const { data: insertedTopics, error } = await supabase\r\n      .from('topics')\r\n      .insert(topics)\r\n      .select();\r\n\r\n    if (error) {\r\n      throw new Error(`Failed to insert topics: ${error.message}`);\r\n    }\r\n\r\n    if (!insertedTopics) {\r\n      throw new Error('No topics were inserted');\r\n    }\r\n\r\n    return insertedTopics;\r\n  } catch (error) {\r\n    console.error('Error seeding topics:', error);\r\n    throw error;\r\n  }\r\n} "
+        }
+    ]
+}

@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 8,
+            "activePatchIndex": 11,
             "patches": [
                 {
                     "date": 1739020168333,
@@ -40,6 +40,18 @@
                 {
                     "date": 1739279441956,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -120,17 +120,17 @@\n     }\r\n \r\n     return null;\r\n   } catch (err) {\r\n-    logger.error(`Failed to get current session: ${err instanceof Error ? err.message : String(err)}`, 'Auth');\r\n+    logger.error(`Failed to get current session: ${err instanceof Error ? err.message : String(err)}`, { source: 'AuthUtils' });\r\n     return null;\r\n   }\r\n };\r\n \r\n export async function updateUserRole(userId: string, newRole: string) {\r\n   try {\r\n     // Log the attempt\r\n-    logger.info(`Attempting role update for user ${userId} to ${newRole}`, 'auth.utils');\r\n+    logger.info(`Attempting role update for user ${userId} to ${newRole}`, { source: 'auth.utils' });\r\n \r\n     const { error } = await supabase.auth.admin.updateUserById(\r\n       userId,\r\n       { user_metadata: { role: newRole } }\r\n"
+                },
+                {
+                    "date": 1740941026911,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,6 @@\n import { supabase } from '../supabase';\r\n-import { sessionMonitor } from './SessionMonitor';\r\n+//import { sessionMonitor } from './SessionMonitor';\r\n import { logger } from '../logger';\r\n import { errorTracker } from '../errorTracker';\r\n import type { UserRole } from '../../types/roles';\r\n \r\n"
+                },
+                {
+                    "date": 1740941033886,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,8 +1,8 @@\n import { supabase } from '../supabase';\r\n //import { sessionMonitor } from './SessionMonitor';\r\n import { logger } from '../logger';\r\n-import { errorTracker } from '../errorTracker';\r\n+//import { errorTracker } from '../errorTracker';\r\n import type { UserRole } from '../../types/roles';\r\n \r\n export class AuthError extends Error {\r\n   constructor(message: string, public code?: string) {\r\n"
+                },
+                {
+                    "date": 1740941041243,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,9 +1,9 @@\n import { supabase } from '../supabase';\r\n //import { sessionMonitor } from './SessionMonitor';\r\n import { logger } from '../logger';\r\n-//import { errorTracker } from '../errorTracker';\r\n-import type { UserRole } from '../../types/roles';\r\n+import { errorTracker } from '../errorTracker';\r\n+//import type { UserRole } from '../../types/roles';\r\n \r\n export class AuthError extends Error {\r\n   constructor(message: string, public code?: string) {\r\n     super(message);\r\n"
                 }
             ],
             "date": 1739020168333,

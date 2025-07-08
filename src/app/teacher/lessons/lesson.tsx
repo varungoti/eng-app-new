@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from 'next-themes';
@@ -46,6 +46,8 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSound } from 'use-sound';
 import { ImagePreview } from '@/components/common/ImagePreview';
+import Head from 'next/head';
+import { DialogDescription, DialogTitle } from '@radix-ui/react-dialog';
 //import { Question } from '@/types/index.ts';
 
 // Types
@@ -228,6 +230,15 @@ const LessonPage: React.FC = () => {
   // Add new state variables
   const [playSuccess] = useSound('/sounds/success.mp3', { volume: 0.5 });
   const [isExercisesLoading, setIsExercisesLoading] = useState(true);
+
+  // Add new state variables
+  const [playbackQueue, setPlaybackQueue] = useState<{
+    type: 'question' | 'exercise';
+    text: string;
+    id: string;
+    index: number;
+  }[]>([]);
+  const [currentPlayingItem, setCurrentPlayingItem] = useState<number>(-1);
 
   // Add keyboard shortcuts
   useHotkeys('alt+left', () => {
@@ -533,15 +544,121 @@ const LessonPage: React.FC = () => {
     }
   };
 
+  // Prepare the play queue for sequential playback
+  const preparePlaybackQueue = useCallback(() => {
+    const queue: {
+      type: 'question' | 'exercise';
+      text: string;
+      id: string;
+      index: number;
+    }[] = [];
+    
+    // Add questions to the queue
+    if (lessonState?.lesson.questions) {
+      lessonState.lesson.questions.forEach((question, index) => {
+        queue.push({
+          type: 'question',
+          text: question.content || question.title,
+          id: question.id,
+          index
+        });
+      });
+    }
+    
+    // Add exercise prompts to the queue
+    if (lessonState?.lesson.exercise_prompts) {
+      lessonState.lesson.exercise_prompts.forEach((prompt, index) => {
+        queue.push({
+          type: 'exercise',
+          text: prompt.text,
+          id: prompt.id,
+          index
+        });
+      });
+    }
+    
+    setPlaybackQueue(queue);
+    return queue;
+  }, [lessonState?.lesson.questions, lessonState?.lesson.exercise_prompts]);
+  
+  // Play the next item in the queue
+  const playNextInQueue = useCallback(() => {
+    const nextIndex = currentPlayingItem + 1;
+    
+    if (nextIndex < playbackQueue.length) {
+      const item = playbackQueue[nextIndex];
+      setCurrentPlayingItem(nextIndex);
+      
+      // Scroll to the item
+      const element = document.getElementById(`${item.type}-${item.id}`);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        element.classList.add('highlight-animation');
+        setTimeout(() => element.classList.remove('highlight-animation'), 2000);
+      }
+      
+      // Play the text
+      handleTextToSpeech(item.text);
+      
+      // Highlight the element visually
+      return true;
+    } else {
+      // End of queue reached
+      setCurrentPlayingItem(-1);
+      setIsPlaying(false);
+      return false;
+    }
+  }, [currentPlayingItem, playbackQueue, handleTextToSpeech]);
+  
+  // Handle audio ending to move to next item
+  useEffect(() => {
+    const audioElement = audioRef.current;
+    
+    const handleAudioEnded = () => {
+      if (isPlaying && currentPlayingItem >= 0) {
+        setTimeout(() => {
+          playNextInQueue();
+        }, 1000); // Add a small pause between items
+      }
+    };
+    
+    if (audioElement) {
+      audioElement.addEventListener('ended', handleAudioEnded);
+    }
+    
+    return () => {
+      if (audioElement) {
+        audioElement.removeEventListener('ended', handleAudioEnded);
+      }
+    };
+  }, [isPlaying, currentPlayingItem, playNextInQueue]);
+  
+  // Update the existing togglePlayPause function
   const togglePlayPause = () => {
     if (audioRef.current) {
       if (isPlaying) {
+        // Pause playback
         audioRef.current.pause();
+        setIsPlaying(false);
       } else {
-        const currentContent = lessonState?.lesson.content || '';
-        handleTextToSpeech(currentContent);
+        // Start or resume playback
+        if (currentPlayingItem < 0) {
+          // Start from beginning
+          const queue = preparePlaybackQueue();
+          if (queue.length > 0) {
+            setCurrentPlayingItem(-1); // Will be incremented to 0 in playNextInQueue
+            playNextInQueue();
+          } else {
+            // Fallback to lesson content if no queue items
+            const currentContent = lessonState?.lesson.content || '';
+            handleTextToSpeech(currentContent);
+          }
+        } else {
+          // Resume current item
+          audioRef.current.play();
+        }
+        setIsPlaying(true);
       }
-      setIsPlaying(!isPlaying);
     }
   };
 
@@ -599,6 +716,8 @@ const LessonPage: React.FC = () => {
   const ImageZoomDialog = () => (
     <Dialog open={!!showZoomedImage} onOpenChange={() => setShowZoomedImage(null)}>
       <DialogContent className="max-w-[90vw] max-h-[90vh] p-0">
+        <DialogTitle className="sr-only">Zoomed Image</DialogTitle>
+        <DialogDescription className="sr-only">View a larger version of the selected image</DialogDescription>
         {showZoomedImage && (
           <motion.img
             src={showZoomedImage}
@@ -757,7 +876,7 @@ const LessonPage: React.FC = () => {
     if (!question.data) return null;
 
     return (
-      <div className="space-y-4">
+      <div id={`question-${question.id}`} className="space-y-4">
         {/* Question Title and Type */}
         <div className="flex items-center gap-2">
           <Badge variant="outline">{question.type}</Badge>
@@ -877,549 +996,430 @@ const LessonPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-purple-50 dark:from-gray-900 dark:to-gray-800">
-      <div className="container mx-auto px-4 py-8 relative">
-        {/* Progress Bar */}
-        <motion.div
-          className="fixed top-0 left-0 right-0 h-1 bg-primary/20"
-          initial={{ scaleX: 0 }}
-          animate={{ scaleX: contentProgress / 100 }}
-          transition={{ duration: 0.2 }}
-        />
+    <>
+      <Head>
+        <style>
+          {`
+            @keyframes highlightAnimation {
+              0% { background-color: rgba(var(--primary-rgb), 0.1); }
+              50% { background-color: rgba(var(--primary-rgb), 0.2); }
+              100% { background-color: transparent; }
+            }
+            .highlight-animation {
+              animation: highlightAnimation 2s ease;
+            }
+          `}
+        </style>
+      </Head>
+      
+      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-purple-50 dark:from-gray-900 dark:to-gray-800">
+        <div className="container mx-auto px-4 py-8 relative">
+          {/* Progress Bar */}
+          <motion.div
+            className="fixed top-0 left-0 right-0 h-1 bg-primary/20"
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: contentProgress / 100 }}
+            transition={{ duration: 0.2 }}
+          />
 
-        {/* Header Section with enhanced animations */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="mb-8"
-        >
-          <div className="flex flex-col items-start gap-4">
-            <div className="flex items-center gap-2">
-              <motion.div whileHover={{ scale: 1.05 }}>
-                <Badge variant="outline" className="bg-blue-500 text-white hover:bg-blue-600 transition-colors">
-                  {lessonState?.topic?.title || 'Topic'}
-                </Badge>
-              </motion.div>
-              <ChevronRight className="w-4 h-4 text-gray-400" />
-              <motion.div whileHover={{ scale: 1.05 }}>
-                <Badge variant="outline" className="bg-purple-500 text-white hover:bg-purple-600 transition-colors">
-                  {lessonState?.subtopic?.title || 'Subtopic'}
-                </Badge>
-              </motion.div>
-            </div>
-            <h1 className="text-4xl font-bold text-gray-800 dark:text-white">
-              {lessonState?.lesson.contentheading || lessonState?.lesson.title || 'Lesson Content'}
-            </h1>
-            <div className="flex items-center gap-4 text-sm text-muted-foreground">
+          {/* Header Section with enhanced animations */}
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="mb-8"
+          >
+            <div className="flex flex-col items-start gap-4">
               <div className="flex items-center gap-2">
-                <Clock className="h-4 w-4" />
-                <span>15 minutes</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <BookOpen className="h-4 w-4" />
-                <span>{lessonState?.lesson.questions?.length || 0} Questions</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Progress value={contentProgress} className="w-24 h-2" />
-                <span>{Math.round(contentProgress)}% Complete</span>
-              </div>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left Section - Lesson Content */}
-          <div className="lg:col-span-2 space-y-6">
-            <Card className="overflow-hidden border-2 border-primary/10">
-              <CardHeader className="bg-primary/5 border-b">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="flex items-center gap-2">
-                    <BookOpen className="w-5 h-5 text-primary" />
-                    Lesson Content
-                  </CardTitle>
-                  <div className="flex items-center gap-2">
-                    <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
-              <Button
-                variant="ghost"
-                size="icon"
-                        onClick={toggleMute}
-                        className="hover:bg-primary/10"
-                      >
-                        {isMuted ? (
-                          <VolumeX className="w-4 h-4" />
-                        ) : (
-                          <Volume2 className="w-4 h-4" />
-                        )}
-              </Button>
-                    </motion.div>
-                    <motion.div whileHover={{ scale: 1.2 }} whileTap={{ scale: 0.95 }}>
-              <Button 
-                        variant="ghost"
-                        size="icon"
-                        onClick={togglePlayPause}
-                        className="hover:bg-primary/10"
-                      >
-                        {isPlaying ? (
-                          <Pause className="w-4 h-4" />
-                        ) : (
-                          <Play className="w-4 h-4" />
-                        )}
-              </Button>
-                    </motion.div>
-            </div>
-          </div>
-                </CardHeader>
-              <CardContent className="p-0">
-                <ScrollArea 
-                  ref={contentRef}
-                  className="h-[60vh]"
-                  onScrollCapture={() => {
-                    logger.info('Content scrolled', {
-                      source: 'LessonPage',
-                      context: { timestamp: new Date().toISOString() }
-                    });
-                  }}
-                >
-                  <div className="p-6 prose dark:prose-invert max-w-none">
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ duration: 0.5 }}
-                    >
-                      {lessonState?.lesson.content || 'No content available'}
-                    </motion.div>
-                    </div>
-                </ScrollArea>
-              </CardContent>
-            </Card>
-
-            {/* Questions Section with Animations */}
-            <AnimatePresence mode="wait">
-              {lessonState?.lesson.questions?.map((question, index) => (
-                          <motion.div
-                  key={question.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                            transition={{ delay: index * 0.1 }}
-                >
-                  <Card className="border border-primary/10 overflow-hidden">
-                    <CardHeader 
-                            className={cn(
-                        "cursor-pointer transition-colors",
-                        activeQuestionIndex === index ? "bg-primary/10" : "hover:bg-primary/5"
-                      )}
-                      onClick={() => setActiveQuestionIndex(activeQuestionIndex === index ? null : index)}
-                    >
-                      <CardTitle className="text-lg flex items-center justify-between">
-                        <span>Question {index + 1}: {question.title}</span>
-                        <motion.div
-                          animate={{ rotate: activeQuestionIndex === index ? 180 : 0 }}
-                          transition={{ duration: 0.2 }}
-                        >
-                          <ChevronRight className="w-5 h-5" />
-                        </motion.div>
-                      </CardTitle>
-                    </CardHeader>
-                    <AnimatePresence>
-                      {activeQuestionIndex === index && (
-                        <motion.div
-                          initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: "auto", opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }}
-                          transition={{ duration: 0.3 }}
-                        >
-                          <CardContent className="p-6">
-                            {renderQuestion({
-                              ...question,
-                              data: {
-                                ...question.data
-                              }
-                            })}
-                          </CardContent>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-              </Card>
+                <motion.div whileHover={{ scale: 1.05 }}>
+                  <Badge variant="outline" className="bg-blue-500 text-white hover:bg-blue-600 transition-colors">
+                    {lessonState?.topic?.title || 'Topic'}
+                  </Badge>
                 </motion.div>
-              ))}
-            </AnimatePresence>
+                <ChevronRight className="w-4 h-4 text-gray-400" />
+                <motion.div whileHover={{ scale: 1.05 }}>
+                  <Badge variant="outline" className="bg-purple-500 text-white hover:bg-purple-600 transition-colors">
+                    {lessonState?.subtopic?.title || 'Subtopic'}
+                  </Badge>
+                </motion.div>
+              </div>
+              <h1 className="text-4xl font-bold text-gray-800 dark:text-white">
+                {lessonState?.lesson.contentheading || lessonState?.lesson.title || 'Lesson Content'}
+              </h1>
+              <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                <div className="flex items-center gap-2">
+                  <Clock className="h-4 w-4" />
+                  <span>15 minutes</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <BookOpen className="h-4 w-4" />
+                  <span>{lessonState?.lesson.questions?.length || 0} Questions</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Progress value={contentProgress} className="w-24 h-2" />
+                  <span>{Math.round(contentProgress)}% Complete</span>
+                </div>
+              </div>
+            </div>
+          </motion.div>
 
-            {/* Exercise Prompts Section */}
-            {lessonState?.lesson.exercise_prompts && lessonState.lesson.exercise_prompts.length > 0 && (
-              <Card className="border-2 border-primary/10">
+          {/* Main Content Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Left Section - Lesson Content */}
+            <div className="lg:col-span-2 space-y-6">
+              <Card className="overflow-hidden border-2 border-primary/10">
                 <CardHeader className="bg-primary/5 border-b">
-                  <CardTitle className="flex items-center gap-2">
-                    <PenTool className="w-5 h-5 text-primary" />
-                    Interactive Exercises
-                  </CardTitle>
-                  <CardDescription>
-                    Complete these exercises to practice what you've learned
-                  </CardDescription>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="flex items-center gap-2">
+                      <BookOpen className="w-5 h-5 text-primary" />
+                      Lesson Content
+                    </CardTitle>
+                    <div className="flex items-center gap-2">
+                      <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={toggleMute}
+                          className="hover:bg-primary/10"
+                        >
+                          {isMuted ? (
+                            <VolumeX className="w-4 h-4" />
+                          ) : (
+                            <Volume2 className="w-4 h-4" />
+                          )}
+                        </Button>
+                      </motion.div>
+                      <motion.div whileHover={{ scale: 1.2 }} whileTap={{ scale: 0.95 }}>
+                        <Button 
+                          variant="ghost"
+                          size="icon"
+                          onClick={togglePlayPause}
+                          className="hover:bg-primary/10"
+                        >
+                          {isPlaying ? (
+                            <Pause className="w-4 h-4" />
+                          ) : (
+                            <Play className="w-4 h-4" />
+                          )}
+                        </Button>
+                      </motion.div>
+                    </div>
+                  </div>
                 </CardHeader>
                 <CardContent className="p-0">
-                  <ScrollArea className="h-[60vh]">
-                    <div className="p-6 space-y-6">
-                      {isExercisesLoading ? (
-                        <ExerciseSkeleton />
-                      ) : (
-                <AnimatePresence mode="wait">
-                          {lessonState.lesson.exercise_prompts.map((prompt: any, index) => {
-                            const transformedPrompt: ExercisePrompt = {
-                              ...prompt,
-                              type: prompt.type as ExercisePrompt['type'],
-                              content: {
-                                question: prompt.text,
-                                options: prompt.options || [],
-                                instructions: prompt.narration,
-                                hints: prompt.hints || []
-                              },
-                              metadata: {
-                                estimatedTime: 5
-                              }
-                            };
-                            
-                            return (
-                  <motion.div
-                                key={transformedPrompt.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                                transition={{ delay: index * 0.1 }}
-                              >
-                                <Card 
-                                  id={`exercise-${index}`}
-                                  className={cn(
-                                    "border border-primary/10 overflow-hidden transition-all duration-300",
-                                    "hover:shadow-lg hover:border-primary/30",
-                                    activeExerciseIndex === index && [
-                                      "border-primary shadow-lg bg-primary/5",
-                                      "animate-pulse-subtle"
-                                    ]
-                                  )}
-                                >
-                                  <CardHeader 
-                                    className="cursor-pointer"
-                                    onClick={() => {
-                                      setActiveExerciseIndex(
-                                        activeExerciseIndex === index ? null : index
-                                      );
-                                      logger.info('Exercise header clicked', {
-                                        source: 'LessonPage',
-                                        context: { 
-                                          exerciseId: transformedPrompt.id,
-                                          index,
-                                          timestamp: new Date().toISOString()
-                                        }
-                                      });
-                                    }}
-                                  >
-                          <div className="flex items-center justify-between">
-                                      <div className="flex items-center gap-4">
-                                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                                          <span className="font-semibold">{index + 1}</span>
-                            </div>
-                                        <div>
-                                          <CardTitle className="text-lg">
-                                            {transformedPrompt.content?.question || transformedPrompt.text || `Exercise ${index + 1}`}
-                          </CardTitle>
-                                          <CardDescription>
-                                            {transformedPrompt.type} • {transformedPrompt.metadata?.estimatedTime || 5} mins
-                                          </CardDescription>
-                            </div>
-                                      </div>
-                                      <motion.div
-                                        animate={{ rotate: activeExerciseIndex === index ? 180 : 0 }}
-                                        transition={{ duration: 0.2 }}
-                                      >
-                                        <ChevronDown className="w-5 h-5" />
-                                      </motion.div>
-                              </div>
-                                  </CardHeader>
-
-                                  <AnimatePresence>
-                                    {activeExerciseIndex === index && (
-                                      <motion.div
-                                        initial={{ height: 0, opacity: 0 }}
-                                        animate={{ height: "auto", opacity: 1 }}
-                                        exit={{ height: 0, opacity: 0 }}
-                                        transition={{ duration: 0.3 }}
-                                      >
-                                        <CardContent className="p-6">
-                                          {/* Exercise Content */}
-                                          <div className="space-y-6">
-                                            {/* Instructions */}
-                                            <motion.div
-                                              initial={{ opacity: 0, y: -10 }}
-                                              animate={{ opacity: 1, y: 0 }}
-                                              transition={{ delay: 0.2 }}
-                                              className="bg-primary/5 p-4 rounded-lg"
-                                            >
-                                              <h4 className="font-semibold mb-2 flex items-center gap-2">
-                                                <Info className="w-4 h-4" />
-                                                Instructions
-                                              </h4>
-                                              <p className="text-sm text-muted-foreground">
-                                                {transformedPrompt.narration || 'Complete the exercise below.'}
-                                              </p>
-                                            </motion.div>
-
-                                            {/* Exercise Media */}
-                                            {transformedPrompt.media && (
-                                              <motion.div
-                                                initial={{ opacity: 0, scale: 0.95 }}
-                                                animate={{ opacity: 1, scale: 1 }}
-                                                transition={{ duration: 0.3 }}
-                                              >
-                                                <Card className="overflow-hidden">
-                                                  {transformedPrompt.type === 'image' && (
-                                                    <ImagePreview
-                                                      imageUrl={transformedPrompt.media}
-                                                      alt={transformedPrompt.text}
-                                                      className="w-full h-48 object-cover transition-transform hover:scale-105"
-                                                      loading="lazy"
-                                                    />
-                                                  )}
-                                                  {transformedPrompt.type === 'video' && (
-                                                    <video
-                                                      src={transformedPrompt.media}
-                                                      controls
-                                                      className="w-full"
-                                                      preload="metadata"
-                                                    />
-                                                  )}
-                      </Card>
-                                              </motion.div>
-                                            )}
-
-                                             {/*Exercise Input Based on Type
-                                            <div className="space-y-4">
-                                              {question.type === 'multiple-choice' && question.content?.options && (
-                                                <RadioGroup
-                                                  value={exerciseResponses[transformedPrompt.id] || ''}
-                                                  onValueChange={(value: string) => {
-                                                    setExerciseResponses(prev => ({
-                                                      ...prev,
-                                                      [transformedPrompt.id]: value
-                                                    }));
-                                                    setExerciseProgress(prev => ({
-                                                      ...prev,
-                                                      [transformedPrompt.id]: 100
-                                                    }));
-                                                    
-                                                    logger.info('Exercise answer selected', {
-                                                      source: 'LessonPage',
-                                                      context: {
-                                                        exerciseId: transformedPrompt.id,
-                                                        type: transformedPrompt.type,
-                                                        timestamp: new Date().toISOString()
-                                                      }
-                                                    });
-                                                  }}
-                                                >
-                                                  <div className="space-y-2">
-                                                    {transformedPrompt.content.options.map((option: string, optIndex: number) => (
-                                                      <motion.div
-                                                        key={optIndex}
-                                                        whileHover={{ scale: 1.01 }}
-                                                        whileTap={{ scale: 0.99 }}
-                                                      >
-                                                        <RadioGroupItem
-                                                          value={option}
-                                                          id={`${transformedPrompt.id}-${optIndex}`}
-                                                          className="peer hidden"
-                                                        />
-                                                        <Label
-                                                          htmlFor={`${transformedPrompt.id}-${optIndex}`}
-                                                          className={cn(
-                                                            "flex items-center gap-4 p-4 rounded-lg border-2 cursor-pointer",
-                                                            "transition-colors hover:bg-primary/5",
-                                                            "peer-checked:border-primary peer-checked:bg-primary/5"
-                                                          )}
-                                                        >
-                                                          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                                                            {String.fromCharCode(65 + optIndex)}
-                            </div>
-                                                          <span>{option}</span>
-                                                        </Label>
-                                                      </motion.div>
-                                                    ))}
-                          </div>
-                                                </RadioGroup>
-                                              )}
-
-                                              {question.type === 'writing' && (
-                              <div className="space-y-4">
-                                                  <Textarea
-                                                    placeholder="Type your answer here..."
-                                                    value={exerciseResponses[transformedPrompt.id] || ''}
-                                                    onChange={(e) => {
-                                                      const value = e.target.value;
-                                                      setExerciseResponses(prev => ({
-                                                        ...prev,
-                                                        [transformedPrompt.id]: value
-                                                      }));
-                                                      
-                                                      // Calculate progress based on word count
-                                                      const wordCount = value.trim().split(/\s+/).length;
-                                                      const targetWordCount = 50; // Adjust as needed
-                                                      const progress = Math.min((wordCount / targetWordCount) * 100, 100);
-                                                      setExerciseProgress(prev => ({
-                                                        ...prev,
-                                                        [transformedPrompt.id]: progress
-                                                      }));
-
-                                                      logger.info('Writing exercise progress', {
-                                                        source: 'LessonPage',
-                                                        context: {
-                                                          exerciseId: transformedPrompt.id,
-                                                          wordCount,
-                                                          progress,
-                                                          timestamp: new Date().toISOString()
-                                                        }
-                                                      });
-                                                    }}
-                                                    className="min-h-[150px]"
-                                                  />
-                                                  <div className="flex items-center justify-between text-sm text-muted-foreground">
-                                                    <span>
-                                                      {exerciseResponses[transformedPrompt.id]?.trim().split(/\s+/).length || 0} words
-                                                    </span>
-                                                    <Progress 
-                                                      value={exerciseProgress[transformedPrompt.id] || 0} 
-                                                      className="w-24 h-2"
-                                                    />
-                                  </div>
-                                                </div>
-                                              )}
-
-                                              {/* Hints Section */}
-                                              {/* {transformedPrompt.content?.hints && transformedPrompt.content.hints.length > 0 && (
-                                                <div className="mt-6">
-                                                  <Collapsible>
-                                                    <CollapsibleTrigger asChild>
-                                                      <Button variant="outline" className="w-full justify-between">
-                                                        <span className="flex items-center gap-2">
-                                                          <Lightbulb className="w-4 h-4" />
-                                                          Need a hint?
-                                                        </span>
-                                                        <ChevronDown className="w-4 h-4" />
-                                                      </Button>
-                                                    </CollapsibleTrigger>
-                                                    <CollapsibleContent className="mt-4 space-y-2">
-                                                      {transformedPrompt.content.hints.map((hint: string, hintIndex: number) => (
-                                                        <motion.div
-                                                          key={hintIndex}
-                                                          initial={{ opacity: 0, y: -10 }}
-                                                          animate={{ opacity: 1, y: 0 }}
-                                                          transition={{ delay: hintIndex * 0.1 }}
-                                                        >
-                                                          <Card className="p-3 bg-muted">
-                                                            <p className="text-sm">
-                                                              <span className="font-semibold">Hint {hintIndex + 1}:</span>{' '}
-                                                              {hint}
-                                                            </p>
-                                                          </Card>
-                                                        </motion.div>
-                                                      ))}
-                                                    </CollapsibleContent>
-                                                  </Collapsible>
-                              </div>
-                            )}
-                                            </div> */} 
-                          </div>
-                        </CardContent>
-                                      </motion.div>
-                                    )}
-                                  </AnimatePresence>
-                      </Card>
-                  </motion.div>
-                            );
-                          })}
-                </AnimatePresence>
-                      )}
+                  <ScrollArea 
+                    ref={contentRef}
+                    className="h-[60vh]"
+                    onScrollCapture={() => {
+                      logger.info('Content scrolled', {
+                        source: 'LessonPage',
+                        context: { timestamp: new Date().toISOString() }
+                      });
+                    }}
+                  >
+                    <div className="p-6 prose dark:prose-invert max-w-none">
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.5 }}
+                      >
+                        {lessonState?.lesson.content || 'No content available'}
+                      </motion.div>
                     </div>
                   </ScrollArea>
                 </CardContent>
               </Card>
-            )}
-          </div>
 
-          {/* Right Section - Media */}
-          <div className="lg:col-span-1">
-            <Card className="sticky top-4">
-              <CardHeader className="bg-primary/5 border-b">
-                <CardTitle className="flex items-center gap-2">
-                  <ImageIcon className="w-5 h-5 text-primary" />
-                  Media
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-0">
-                <ScrollArea className="h-[70vh]">
-                  <div className="p-6 space-y-4">
-                    <AnimatePresence>
-                      {lessonState?.lesson.questions?.map((question, index) => (
-                        <React.Fragment key={`media-${index}`}>
-                          {question.metadata?.imageUrl && (
-                            <motion.div
-                              initial={{ opacity: 0, scale: 0.9 }}
-                              animate={{ opacity: 1, scale: 1 }}
-                              transition={{ delay: index * 0.1 }}
-                              whileHover={{ scale: 1.02 }}
-                              className="cursor-pointer"
-                            >
-                              <Card className="overflow-hidden">
-                                <ImagePreview
-                                  imageUrl={question.metadata.imageUrl}
-                                  alt={`Media ${index + 1}`}
-                                  className="w-full h-48 object-cover transition-transform hover:scale-105"
-                                  loading="lazy"
-                                />
-                              </Card>
-                            </motion.div>
-                          )}
-                          {question.metadata?.videoUrl && (
-                            <motion.div
-                              initial={{ opacity: 0, scale: 0.9 }}
-                              animate={{ opacity: 1, scale: 1 }}
-                              transition={{ delay: index * 0.1 }}
-                            >
-                              <Card className="overflow-hidden">
-                                <video
-                                  src={question.metadata.videoUrl}
-                                  controls
-                                  className="w-full"
-                                  preload="metadata"
-                                />
-                              </Card>
-                            </motion.div>
-                          )}
-                        </React.Fragment>
-                      ))}
-                    </AnimatePresence>
-              </div>
-                </ScrollArea>
-              </CardContent>
-            </Card>
+              {/* Questions Section with Animations */}
+              <AnimatePresence mode="wait">
+                {lessonState?.lesson.questions?.map((question, index) => (
+                  <motion.div
+                    key={question.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ delay: index * 0.1 }}
+                  >
+                    <Card className="border border-primary/10 overflow-hidden">
+                      <CardHeader 
+                        className={cn(
+                          "cursor-pointer transition-colors",
+                          activeQuestionIndex === index ? "bg-primary/10" : "hover:bg-primary/5"
+                        )}
+                        onClick={() => setActiveQuestionIndex(activeQuestionIndex === index ? null : index)}
+                      >
+                        <CardTitle className="text-lg flex items-center justify-between">
+                          <span>Question {index + 1}: {question.title}</span>
+                          <motion.div
+                            animate={{ rotate: activeQuestionIndex === index ? 180 : 0 }}
+                            transition={{ duration: 0.2 }}
+                          >
+                            <ChevronRight className="w-5 h-5" />
+                          </motion.div>
+                        </CardTitle>
+                      </CardHeader>
+                      <AnimatePresence>
+                        {activeQuestionIndex === index && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: "auto", opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{ duration: 0.3 }}
+                          >
+                            <CardContent className="p-6">
+                              {renderQuestion({
+                                ...question,
+                                data: {
+                                  ...question.data
+                                }
+                              })}
+                            </CardContent>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </Card>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+
+              {/* Exercise Prompts Section */}
+              {lessonState?.lesson.exercise_prompts && lessonState.lesson.exercise_prompts.length > 0 && (
+                <Card className="border-2 border-primary/10">
+                  <CardHeader className="bg-primary/5 border-b">
+                    <CardTitle className="flex items-center gap-2">
+                      <PenTool className="w-5 h-5 text-primary" />
+                      Interactive Exercises
+                    </CardTitle>
+                    <CardDescription>
+                      Complete these exercises to practice what you've learned
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="p-0">
+                    <ScrollArea className="h-[60vh]">
+                      <div className="p-6 space-y-6">
+                        {isExercisesLoading ? (
+                          <ExerciseSkeleton />
+                        ) : (
+                          <AnimatePresence mode="wait">
+                            {lessonState.lesson.exercise_prompts.map((prompt: any, index) => {
+                              const transformedPrompt: ExercisePrompt = {
+                                ...prompt,
+                                type: prompt.type as ExercisePrompt['type'],
+                                content: {
+                                  question: prompt.text,
+                                  options: prompt.options || [],
+                                  instructions: prompt.narration,
+                                  hints: prompt.hints || []
+                                },
+                                metadata: {
+                                  estimatedTime: 5
+                                }
+                              };
+                              
+                              return (
+                                <motion.div
+                                  key={transformedPrompt.id}
+                                  initial={{ opacity: 0, y: 20 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  exit={{ opacity: 0, y: -20 }}
+                                  transition={{ delay: index * 0.1 }}
+                                >
+                                  <Card 
+                                    id={`exercise-${index}`}
+                                    className={cn(
+                                      "border border-primary/10 overflow-hidden transition-all duration-300",
+                                      "hover:shadow-lg hover:border-primary/30",
+                                      activeExerciseIndex === index && [
+                                        "border-primary shadow-lg bg-primary/5",
+                                        "animate-pulse-subtle"
+                                      ]
+                                    )}
+                                  >
+                                    <CardHeader 
+                                      className="cursor-pointer"
+                                      onClick={() => {
+                                        setActiveExerciseIndex(
+                                          activeExerciseIndex === index ? null : index
+                                        );
+                                        logger.info('Exercise header clicked', {
+                                          source: 'LessonPage',
+                                          context: { 
+                                            exerciseId: transformedPrompt.id,
+                                            index,
+                                            timestamp: new Date().toISOString()
+                                          }
+                                        });
+                                      }}
+                                    >
+                                      <div className="flex items-center justify-between">
+                                        <div className="flex items-center gap-4">
+                                          <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                                            <span className="font-semibold">{index + 1}</span>
+                                          </div>
+                                          <div>
+                                            <CardTitle className="text-lg">
+                                              {transformedPrompt.content?.question || transformedPrompt.text || `Exercise ${index + 1}`}
+                                            </CardTitle>
+                                            <CardDescription>
+                                              {transformedPrompt.type} • {transformedPrompt.metadata?.estimatedTime || 5} mins
+                                            </CardDescription>
+                                          </div>
+                                        </div>
+                                        <motion.div
+                                          animate={{ rotate: activeExerciseIndex === index ? 180 : 0 }}
+                                          transition={{ duration: 0.2 }}
+                                        >
+                                          <ChevronDown className="w-5 h-5" />
+                                        </motion.div>
+                                      </div>
+                                    </CardHeader>
+
+                                    <AnimatePresence>
+                                      {activeExerciseIndex === index && (
+                                        <motion.div
+                                          initial={{ height: 0, opacity: 0 }}
+                                          animate={{ height: "auto", opacity: 1 }}
+                                          exit={{ height: 0, opacity: 0 }}
+                                          transition={{ duration: 0.3 }}
+                                        >
+                                          <CardContent className="p-6">
+                                            {/* Exercise Content */}
+                                            <div className="space-y-6">
+                                              {/* Instructions */}
+                                              <motion.div
+                                                initial={{ opacity: 0, y: -10 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                transition={{ delay: 0.2 }}
+                                                className="bg-primary/5 p-4 rounded-lg"
+                                              >
+                                                <h4 className="font-semibold mb-2 flex items-center gap-2">
+                                                  <Info className="w-4 h-4" />
+                                                  Instructions
+                                                </h4>
+                                                <p className="text-sm text-muted-foreground">
+                                                  {transformedPrompt.narration || 'Complete the exercise below.'}
+                                                </p>
+                                              </motion.div>
+
+                                              {/* Exercise Media */}
+                                              {transformedPrompt.media && (
+                                                <motion.div
+                                                  initial={{ opacity: 0, scale: 0.95 }}
+                                                  animate={{ opacity: 1, scale: 1 }}
+                                                  transition={{ duration: 0.3 }}
+                                                >
+                                                  <Card className="overflow-hidden">
+                                                    {transformedPrompt.type === 'image' && (
+                                                      <ImagePreview
+                                                        imageUrl={transformedPrompt.media}
+                                                        alt={transformedPrompt.text}
+                                                        className="w-full h-48 object-cover transition-transform hover:scale-105"
+                                                        loading="lazy"
+                                                      />
+                                                    )}
+                                                    {transformedPrompt.type === 'video' && (
+                                                      <video
+                                                        src={transformedPrompt.media}
+                                                        controls
+                                                        className="w-full"
+                                                        preload="metadata"
+                                                      />
+                                                    )}
+                                                  </Card>
+                                                </motion.div>
+                                              )}
+                                            </div>
+                                          </CardContent>
+                                        </motion.div>
+                                      )}
+                                    </AnimatePresence>
+                                  </Card>
+                                </motion.div>
+                              );
+                            })}
+                          </AnimatePresence>
+                        )}
+                      </div>
+                    </ScrollArea>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+
+            {/* Right Section - Media */}
+            <div className="lg:col-span-1">
+              <Card className="sticky top-4">
+                <CardHeader className="bg-primary/5 border-b">
+                  <CardTitle className="flex items-center gap-2">
+                    <ImageIcon className="w-5 h-5 text-primary" />
+                    Media
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-0">
+                  <ScrollArea className="h-[70vh]">
+                    <div className="p-6 space-y-4">
+                      <AnimatePresence>
+                        {lessonState?.lesson.questions?.map((question, index) => (
+                          <React.Fragment key={`media-${index}`}>
+                            {question.metadata?.imageUrl && (
+                              <motion.div
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ delay: index * 0.1 }}
+                                whileHover={{ scale: 1.02 }}
+                                className="cursor-pointer"
+                              >
+                                <Card className="overflow-hidden">
+                                  <ImagePreview
+                                    imageUrl={question.metadata.imageUrl}
+                                    alt={`Media ${index + 1}`}
+                                    className="w-full h-48 object-cover transition-transform hover:scale-105"
+                                    loading="lazy"
+                                  />
+                                </Card>
+                              </motion.div>
+                            )}
+                            {question.metadata?.videoUrl && (
+                              <motion.div
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ delay: index * 0.1 }}
+                              >
+                                <Card className="overflow-hidden">
+                                  <video
+                                    src={question.metadata.videoUrl}
+                                    controls
+                                    className="w-full"
+                                    preload="metadata"
+                                  />
+                                </Card>
+                              </motion.div>
+                            )}
+                          </React.Fragment>
+                        ))}
+                      </AnimatePresence>
+                    </div>
+                  </ScrollArea>
+                </CardContent>
+              </Card>
             </div>
           </div>
 
-        {/* Audio Element */}
-        <audio
-          ref={audioRef}
-          onEnded={() => setIsPlaying(false)}
-          onError={(e) => {
-            logger.error('Audio playback error', {
-              source: 'LessonPage',
-              context: { error: e }
-            });
-            setIsPlaying(false);
-          }}
-        />
+          {/* Audio Element */}
+          <audio
+            ref={audioRef}
+            onEnded={() => setIsPlaying(false)}
+            onError={(e) => {
+              logger.error('Audio playback error', {
+                source: 'LessonPage',
+                context: { error: e }
+              });
+              setIsPlaying(false);
+            }}
+          />
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

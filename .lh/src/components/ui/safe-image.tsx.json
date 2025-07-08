@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/components/ui/safe-image.tsx",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1741863624231,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1741863624231,
+            "name": "Commit-0",
+            "content": "\"use client\";\r\n\r\nimport React, { useState } from 'react';\r\nimport Image, { ImageProps } from 'next/image';\r\nimport { cn } from '@/lib/utils';\r\n\r\n// Fallback image to use when the main image fails to load\r\nconst FALLBACK_IMAGE = 'https://placehold.co/600x400?text=Image+Not+Available';\r\n\r\nexport interface SafeImageProps extends Omit<ImageProps, 'onError'> {\r\n  fallbackSrc?: string;\r\n  containerClassName?: string;\r\n}\r\n\r\n/**\r\n * A wrapper for Next.js Image component that handles errors and external domains gracefully\r\n */\r\nexport function SafeImage({\r\n  src,\r\n  alt,\r\n  fallbackSrc = FALLBACK_IMAGE,\r\n  className,\r\n  containerClassName,\r\n  fill = false,\r\n  width,\r\n  height,\r\n  ...props\r\n}: SafeImageProps) {\r\n  const [imgSrc, setImgSrc] = useState<string | null>(typeof src === 'string' ? src : null);\r\n  const [isError, setIsError] = useState(false);\r\n\r\n  // Handle image load error by switching to fallback image\r\n  const handleError = () => {\r\n    console.warn(`Image failed to load: ${imgSrc}`);\r\n    setImgSrc(fallbackSrc);\r\n    setIsError(true);\r\n  };\r\n\r\n  // Always set unoptimized to true for external domains\r\n  // This bypasses Next.js Image optimization which requires domain configuration\r\n  const isExternalUrl = typeof imgSrc === 'string' && (\r\n    imgSrc.startsWith('http://') || \r\n    imgSrc.startsWith('https://') || \r\n    imgSrc.startsWith('//')\r\n  );\r\n\r\n  // Determine if we're using fill mode or explicit dimensions\r\n  if (fill) {\r\n    return (\r\n      <div className={cn(\"relative\", containerClassName)}>\r\n        <Image\r\n          src={imgSrc || fallbackSrc}\r\n          alt={alt}\r\n          className={cn(isError ? \"opacity-80\" : \"\", className)}\r\n          fill\r\n          onError={handleError}\r\n          unoptimized={isExternalUrl}\r\n          {...props}\r\n        />\r\n      </div>\r\n    );\r\n  }\r\n\r\n  // Regular image with width and height\r\n  return (\r\n    <Image\r\n      src={imgSrc || fallbackSrc}\r\n      alt={alt}\r\n      width={width || 300}\r\n      height={height || 200}\r\n      className={cn(isError ? \"opacity-80\" : \"\", className)}\r\n      onError={handleError}\r\n      unoptimized={isExternalUrl}\r\n      {...props}\r\n    />\r\n  );\r\n}\r\n\r\nexport default SafeImage; "
+        }
+    ]
+}

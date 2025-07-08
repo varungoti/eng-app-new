@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/db/seed/staff.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1746702284402,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1746702284402,
+            "name": "Commit-0",
+            "content": "import { faker } from '@faker-js/faker';\r\nimport { SupabaseClient } from '@supabase/supabase-js';\r\n\r\ninterface Staff {\r\n  id: string;\r\n  first_name: string;\r\n  last_name: string;\r\n  email: string;\r\n  phone: string;\r\n  school_id: string;\r\n  role: 'teacher' | 'principal' | 'admin' | 'counselor';\r\n  department: string;\r\n  qualification: string;\r\n  experience_years: number;\r\n  joining_date: string;\r\n  address: string;\r\n  emergency_contact: string;\r\n  created_at: string;\r\n  updated_at: string;\r\n}\r\n\r\ninterface School {\r\n  id: string;\r\n}\r\n\r\nexport async function seedStaff(\r\n  supabase: SupabaseClient,\r\n  schools: School[]\r\n): Promise<Staff[]> {\r\n  try {\r\n    const staff: Omit<Staff, 'id'>[] = [];\r\n    const staffCount = 20; // Number of staff members to create\r\n    const departments = ['Mathematics', 'Science', 'English', 'History', 'Physical Education', 'Arts'];\r\n    const roles: Staff['role'][] = ['teacher', 'principal', 'admin', 'counselor'];\r\n\r\n    for (let i = 0; i < staffCount; i++) {\r\n      const school = faker.helpers.arrayElement(schools);\r\n      const role = faker.helpers.arrayElement(roles);\r\n      const firstName = faker.person.firstName();\r\n      const lastName = faker.person.lastName();\r\n\r\n      staff.push({\r\n        first_name: firstName,\r\n        last_name: lastName,\r\n        email: faker.internet.email({ firstName, lastName }),\r\n        phone: faker.phone.number(),\r\n        school_id: school.id,\r\n        role,\r\n        department: role === 'teacher' ? faker.helpers.arrayElement(departments) : 'Administration',\r\n        qualification: faker.helpers.arrayElement(['B.Ed', 'M.Ed', 'PhD', 'MA', 'MS']),\r\n        experience_years: faker.number.int({ min: 1, max: 30 }),\r\n        joining_date: faker.date.past({ years: 5 }).toISOString().split('T')[0],\r\n        address: faker.location.streetAddress(),\r\n        emergency_contact: faker.phone.number(),\r\n        created_at: new Date().toISOString(),\r\n        updated_at: new Date().toISOString()\r\n      });\r\n    }\r\n\r\n    // Insert staff\r\n    const { data: insertedStaff, error } = await supabase\r\n      .from('staff')\r\n      .insert(staff)\r\n      .select();\r\n\r\n    if (error) {\r\n      throw new Error(`Failed to insert staff: ${error.message}`);\r\n    }\r\n\r\n    if (!insertedStaff) {\r\n      throw new Error('No staff members were inserted');\r\n    }\r\n\r\n    return insertedStaff;\r\n  } catch (error) {\r\n    console.error('Error seeding staff:', error);\r\n    throw error;\r\n  }\r\n} "
+        }
+    ]
+}

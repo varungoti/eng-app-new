@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/app/student/page.tsx",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1740948241224,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1740948241224,
+            "name": "Commit-0",
+            "content": "// import React from 'react';\r\n// import Link from 'next/link';\r\n// import { Book, Target, Zap, Trophy, Award, BarChart2 } from 'lucide-react';\r\n\r\nexport default function StudentDashboard() {\r\n  return (\r\n    <div className=\"space-y-6\">\r\n      <h1 className=\"text-3xl font-bold\">Welcome back, John!</h1>\r\n      \r\n   </div>\r\n  );\r\n}\r\n "
+        }
+    ]
+}

@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/db/create-tables.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1746701554156,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1746701554156,
+            "name": "Commit-0",
+            "content": "import { createClient } from '@supabase/supabase-js';\r\nimport fs from 'fs';\r\nimport path from 'path';\r\n\r\nconst supabaseUrl = 'https://pxjhsbezqybrksmcpwmx.supabase.co';\r\nconst supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY;\r\n\r\nif (!supabaseServiceKey) {\r\n  console.error('❌ SUPABASE_SERVICE_KEY environment variable is not set');\r\n  process.exit(1);\r\n}\r\n\r\nconst supabase = createClient(supabaseUrl, supabaseServiceKey, {\r\n  auth: {\r\n    autoRefreshToken: false,\r\n    persistSession: false,\r\n  },\r\n});\r\n\r\nasync function createTables() {\r\n  try {\r\n    console.log('🔄 Creating tables...');\r\n\r\n    // Read the migration file\r\n    const migrationPath = path.join(__dirname, 'migrations', '20240410-initial-schema.sql');\r\n    const migrationSql = fs.readFileSync(migrationPath, 'utf8');\r\n\r\n    // Split the migration into individual statements\r\n    const statements = migrationSql\r\n      .split(';')\r\n      .map(statement => statement.trim())\r\n      .filter(statement => statement.length > 0);\r\n\r\n    // Execute each statement\r\n    for (const statement of statements) {\r\n      console.log(`\\n🔨 Executing statement:\\n${statement}`);\r\n      const { data, error } = await supabase.rpc('exec_sql', {\r\n        query: statement,\r\n      });\r\n\r\n      if (error) {\r\n        console.error('Error executing statement:', error);\r\n        throw new Error(`Failed to execute statement: ${error.message}`);\r\n      }\r\n\r\n      console.log('Statement executed successfully:', data);\r\n    }\r\n\r\n    console.log('\\n✅ Tables created successfully!');\r\n  } catch (error) {\r\n    console.error('\\n❌ Error creating tables:', error);\r\n    if (error instanceof Error) {\r\n      console.error('Error details:', {\r\n        message: error.message,\r\n        stack: error.stack,\r\n      });\r\n    }\r\n    process.exit(1);\r\n  }\r\n}\r\n\r\n// Run if this file is executed directly\r\nif (process.argv[1] === new URL(import.meta.url).pathname) {\r\n  createTables();\r\n}\r\n\r\nexport { createTables }; "
+        }
+    ]
+}

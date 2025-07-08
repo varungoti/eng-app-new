@@ -42,12 +42,12 @@ export function ActivityEditor({ activity, onUpdate, onDelete }: ActivityEditorP
         <div>
           <Label>Teacher Script</Label>
           <Textarea
-            value={activity.data?.teacherScript}
+            value={activity.data?.teacher_script}
             onChange={(e) => onUpdate({
               ...activity,
               data: { 
                 prompt: activity.data?.prompt || '',
-                teacherScript: e.target.value,
+                teacher_script: e.target.value,
                 media: activity.data?.media || []
               }
             })}

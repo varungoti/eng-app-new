@@ -14,6 +14,7 @@ import { cn } from '@/lib/utils';
 import { logger } from '@/lib/logger';
 import React from 'react';
 import { Icon } from '@/components/ui/icons';
+import { ImagePreview } from '@/components/common/ImagePreview';
 
 export const ExercisePromptCard: React.FC<ExercisePromptCardProps> = ({
   prompt,
@@ -88,8 +89,8 @@ export const ExercisePromptCard: React.FC<ExercisePromptCardProps> = ({
     if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(extension || '')) {
       return (
         <div className="relative h-[200px] rounded-lg overflow-hidden bg-muted">
-          <img 
-            src={url} 
+          <ImagePreview  
+            imageUrl={url} 
             alt="Media preview" 
             className="object-contain w-full h-full"
             onError={(e) => {
@@ -137,7 +138,7 @@ export const ExercisePromptCard: React.FC<ExercisePromptCardProps> = ({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="w-6 h-6 flex items-center justify-center rounded-full bg-primary/10 text-sm font-medium">
-              {index + 1}
+              {promptIndex + 1}
             </span>
             <span className="text-sm text-muted-foreground line-clamp-1">
               {prompt.text || 'No prompt text'}

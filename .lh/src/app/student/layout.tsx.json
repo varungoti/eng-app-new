@@ -1,0 +1,22 @@
+{
+    "sourceFile": "src/app/student/layout.tsx",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1740948218699,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1740948226126,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,11 +1,11 @@\n \"use client\"\r\n \r\n import React from 'react';\r\n import Sidebar from '@/components/common/sidebar';\r\n-import Header from '@/components/common/Header/Header';\r\n-import RightSection from '@/components/common/right-section';\r\n-import { Home, AlignLeft, Trophy, Target, Book, Zap, BookOpen, Briefcase, Award, Mic } from \"lucide-react\";\r\n+// import Header from '@/components/common/Header/Header';\r\n+// import RightSection from '@/components/common/right-section';\r\n+import { Home, Trophy, Target, Book, Zap, BookOpen, Briefcase, Award, Mic } from \"lucide-react\";\r\n \r\n export default function StudentLayout({ children }: { children: React.ReactNode }) {\r\n \r\n \r\n"
+                }
+            ],
+            "date": 1740948218699,
+            "name": "Commit-0",
+            "content": "\"use client\"\r\n\r\nimport React from 'react';\r\nimport Sidebar from '@/components/common/sidebar';\r\nimport Header from '@/components/common/Header/Header';\r\nimport RightSection from '@/components/common/right-section';\r\nimport { Home, AlignLeft, Trophy, Target, Book, Zap, BookOpen, Briefcase, Award, Mic } from \"lucide-react\";\r\n\r\nexport default function StudentLayout({ children }: { children: React.ReactNode }) {\r\n\r\n\r\nconst sidebarItems = [\r\n  { icon: Home, label: \"Dashboard\", href: \"/student/dashboard\" },\r\n  { icon: Book, label: \"Lessons\", href: \"/student/lessons\" },\r\n  { icon: Target, label: \"Practice\", href: \"/student/practice\" },\r\n  { icon: BookOpen, label: \"Grammar Guide\", href: \"/student/grammar-guide\" },\r\n  { icon: Briefcase, label: \"Vocabulary\", href: \"/student/vocabulary\" },\r\n  { icon: Mic, label: \"Spell Bee\", href: \"/student/spell-bee\" },\r\n  { icon: Zap, label: \"AI Conversation\", href: \"/student/ai-conversation\" },\r\n  { icon: Trophy, label: \"Leaderboard\", href: \"/student/leaderboard\" },\r\n  { icon: Award, label: \"Achievements\", href: \"/student/achievements\" },\r\n];\r\n\r\n  return (\r\n    <div className=\"flex flex-col h-screen text-black dark:text-white bg-white dark:bg-gray-900\">\r\n      <div className=\"flex flex-1 overflow-hidden\">\r\n        <nav className=\"hidden md:flex flex-col border-r border-gray-200 dark:border-gray-800 p-4 space-y-4\">\r\n          <Sidebar  sidebarItems={sidebarItems} className=\"w-full md:w-64 flex-shrink-0\" currentPath=\"/student\" />\r\n        </nav> \r\n          <div className='flex w-full'>\r\n            <main className=\"flex-1 overflow-auto \">\r\n              {children}\r\n            </main> \r\n          </div> \r\n      </div>\r\n    </div>\r\n  );\r\n}"
+        }
+    ]
+}

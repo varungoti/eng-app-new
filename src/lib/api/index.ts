@@ -1,4 +1,4 @@
-import { prisma } from '../db';
+import { prisma } from '@/lib/prisma';
 import { logger } from '../logger';
 
 export class APIError extends Error {

@@ -73,6 +73,13 @@ export interface Class {
   gradeId: string;
   section?: string;
   students: ClassStudent[];
+  assignedContent: AssignedContent[];
+  assignedTeachers: {
+    id: string;
+    name: string;
+    email?: string;
+    role?: string;
+  }[];
   createdBy: string;
   createdAt: Date;
   updatedAt: Date;

@@ -243,7 +243,7 @@ function Classes() {
       toast({
         title: "Error",
         description: (error as Error)?.message || "Failed to select class",
-        variant: "destructive",
+        //variant: "destructive",
       });
     }
   }, [classes, toast, navigate]);

@@ -17,7 +17,7 @@ interface QuestionManagerProps {
 export function QuestionManager({ lessonId }: QuestionManagerProps) {
   const [isCreateQuestionOpen, setIsCreateQuestionOpen] = React.useState(false);
 
-  const { data: questions, isLoading } = useQuery({
+  const { data: questions } = useQuery({
     queryKey: ['questions', lessonId],
     queryFn: () => contentService.fetchQuestions(lessonId),
     enabled: !!lessonId

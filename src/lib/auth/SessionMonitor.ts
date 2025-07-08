@@ -1,6 +1,6 @@
 import { supabase } from '../supabase';
 import { logger } from '../logger';
-import { errorTracker } from '../errorTracker';
+//import { errorTracker } from '../errorTracker';
 import { Session } from '@supabase/supabase-js';
 import { SessionLoader } from './strategies/SessionLoader';
 import { RetryStrategy } from './strategies/RetryStrategy';
@@ -86,7 +86,7 @@ export class SessionMonitor {
       
       if (session) {
         await this.persistSession(session);
-        this.updateState({
+        this.debouncedUpdateState({
           isAuthenticated: true,
           currentRole: session.user?.role as string | undefined,
           lastActivity: new Date(),
@@ -136,19 +136,19 @@ export class SessionMonitor {
     }
   }
 
-  private async verifySession() {
-    try {
-      const { data: { session }, error } = await supabase.auth.getSession();
-      if (error || !session) {
-        this.handleSessionLoss();
-        return false;
-      }
-      return true;
-    } catch (err) {
-      this.handleSessionLoss();
-      return false;
-    }
-  }
+  // private async _verifySession() {
+  //   try {
+  //     const { data: { session }, error } = await supabase.auth.getSession();
+  //     if (error || !session) {
+  //       this.handleSessionLoss();
+  //       return false;
+  //     }
+  //     return true;
+  //   } catch (err) {
+  //     this.handleSessionLoss();
+  //     return false;
+  //   }
+  // }
 
   private async checkSession() {
     const now = new Date();
@@ -168,7 +168,7 @@ export class SessionMonitor {
     }
   }
 
-  private async attemptSessionRecovery() {
+  private async _attemptSessionRecovery() {
     try {
       // First try to refresh the session
       const { data: { session }, error } = await supabase.auth.refreshSession();
@@ -210,7 +210,7 @@ export class SessionMonitor {
   }
 
   private handleSessionLoss() {
-    this.updateState({
+    this.debouncedUpdateState({
       isAuthenticated: false,
       currentRole: undefined,
       lastActivity: new Date(),
@@ -234,7 +234,7 @@ export class SessionMonitor {
   private async handleSignIn(session: Session) {
     try {
       await this.persistSession(session);
-      this.updateState({
+      this.debouncedUpdateState({
         isAuthenticated: true,
         currentRole: session.user?.role as string,
         lastActivity: new Date(),
@@ -250,7 +250,7 @@ export class SessionMonitor {
   private async handleSignOut() {
     try {
       localStorage.removeItem(SessionMonitor.STORAGE_KEY);
-      this.updateState({
+      this.debouncedUpdateState({
         isAuthenticated: false,
         currentRole: undefined,
         lastActivity: new Date(),
@@ -294,7 +294,7 @@ export class SessionMonitor {
   }
 
   private trackOperation(type: string, success: boolean, error?: string) {
-    this.updateState({
+    this.debouncedUpdateState({
       lastOperation: {
         type,
         timestamp: new Date(),
@@ -321,7 +321,7 @@ export class SessionMonitor {
         
         if (session) {
           await this.persistSession(session);
-          this.updateState({
+          this.debouncedUpdateState({
             isAuthenticated: true,
             currentRole: session.user?.role as string | undefined,
             lastActivity: new Date(),
@@ -341,7 +341,7 @@ export class SessionMonitor {
     }
   }
 
-  private isValidSession(session: any): boolean {
+  private _isValidSession(session: any): boolean {
     if (!session || !session.user || !session.access_token) {
       return false;
     }

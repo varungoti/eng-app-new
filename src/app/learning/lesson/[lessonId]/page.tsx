@@ -4,10 +4,15 @@ import { QuizComponent } from "@/components/learning/QuizComponent";
 
 export default function LessonPage() {
   return (
-    <div className="container mx-auto p-6">
+    <>
+      <div className="container mx-auto p-6">
+        <Suspense fallback={<div>Loading...</div>}>
+          <LessonComponent />
+        </Suspense>
+      </div>
       <Suspense fallback={<div>Loading...</div>}>
-        <LessonComponent />
+        <QuizComponent questions={[]} onComplete={() => {}} />
       </Suspense>
-    </div>
+    </>
   );
 } 

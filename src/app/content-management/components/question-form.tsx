@@ -7,16 +7,16 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { logger } from '@/lib/logger';
-import { Plus, Trash as Trash2, ChevronDown, ChevronRight, X, Check, Loader } from 'lucide-react';
+import { Plus, Trash as Trash2, ChevronDown, ChevronRight, X } from 'lucide-react';
 
 import { ExercisePromptCard } from './exercise-prompt-card';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { Icon } from '@/components/ui/icons';
-import { ImageIcon } from 'lucide-react';
+//import { ImageIcon } from 'lucide-react';
 import { Question, QuestionType, QuestionFormProps, TextBlock } from "@/app/content-management/types";
 import { QUESTION_TYPES } from "@/app/content-management/constants";
-import { Select, SelectValue, SelectTrigger, SelectItem, SelectContent } from '@/components/ui/select';
+//import { Select, SelectValue, SelectTrigger, SelectItem, SelectContent } from '@/components/ui/select';
 import { RichTextEditor, RichTextEditorProps } from '@/components/editor/RichTextEditor';
 import { QuestionTypeIcon } from "@/components/ui/question-type-icons";
 
@@ -240,7 +240,7 @@ interface QuestionMetadata {
     }>;
 }
 
-interface QuestionData {
+export interface QuestionData {
   data?: {
     prompt?: string;
     teacherScript?: string;
@@ -318,14 +318,14 @@ export function QuestionForm({
     });
   };
 
-  const handleQuestionTypeChange = (type: string, defaultData: any) => {
+  const _handleQuestionTypeChange = (_type: string, defaultData: any) => {
     const updatedQuestion: Question = {
       ...question,
       data: {
         ...defaultData,
         prompt: question.data?.prompt || '',
-        teacherScript: question.data?.teacherScript || '',
-        sampleAnswer: question.data?.sampleAnswer || ''
+        teacher_script: question.data?.teacher_script || '',
+        sample_answer: question.data?.sample_answer || ''
       }
     };
     onUpdate(index, updatedQuestion);
@@ -1720,8 +1720,8 @@ export function QuestionForm({
                     </div>
                   </div>
                   <Textarea
-                    value={question.data?.teacherScript || ''}
-                    onChange={(e) => handleFieldChange('teacherScript', e.target.value)}
+                    value={question.data?.teacher_script || ''}
+                    onChange={(e) => handleFieldChange('teacher_script', e.target.value)}
                     placeholder="Enter the teacher script"
                     className="min-h-[80px] resize-none"
                   />
@@ -1731,15 +1731,15 @@ export function QuestionForm({
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => handleFieldChange('sampleAnswer', question.data?.sampleAnswer ? '' : 'Sample answer here...')}
+                    onClick={() => handleFieldChange('sampleAnswer', question.data?.sample_answer ? '' : 'Sample answer here...')}
                     className="gap-2"
                   >
-                    {question.data?.sampleAnswer ? <X className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
-                    {question.data?.sampleAnswer ? 'Remove Sample Answer' : 'Add Sample Answer'}
+                    {question.data?.sample_answer ? <X className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+                    {question.data?.sample_answer ? 'Remove Sample Answer' : 'Add Sample Answer'}
                   </Button>
                 </div>
 
-                {question.data?.sampleAnswer && (
+                {question.data?.sample_answer && (
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
                       <Label>Sample Answer</Label>
@@ -1762,8 +1762,8 @@ export function QuestionForm({
                       </div>
                     </div>
                     <Textarea
-                      value={question.data?.sampleAnswer || ''}
-                      onChange={(e) => handleFieldChange('sampleAnswer', e.target.value)}
+                      value={question.data?.sample_answer || ''}
+                      onChange={(e) => handleFieldChange('sample_answer', e.target.value)}
                       placeholder="Enter a sample answer"
                       className="min-h-[100px]"
                     />

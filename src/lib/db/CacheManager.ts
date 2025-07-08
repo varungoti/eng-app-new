@@ -53,7 +53,7 @@ class CacheManager {
     }
   }
 
-  public set<T>(key: string, data: T, ttl: number = 5 * 60 * 1000): void {
+  public set<T>(key: string, data: T, _ttl: number = 5 * 60 * 1000): void {
     try {
       const size = this.calculateSize(data);
 

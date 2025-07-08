@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/lib/api/db.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1740944072773,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1740944072773,
+            "name": "Commit-0",
+            "content": "import { createClient } from '@supabase/supabase-js';\r\nimport { logger } from '../logger';\r\nimport type { QueryConfig } from '../../types';\r\n\r\nconst supabase = createClient(\r\n  process.env.NEXT_PUBLIC_SUPABASE_URL!,\r\n  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!\r\n);\r\n\r\nexport const query = async <T>(\r\n  sql: string,\r\n  params?: any[],\r\n  config: QueryConfig = {}\r\n): Promise<T[]> => {\r\n  try {\r\n    const { data, error } = await supabase\r\n      .from(config.table || '')\r\n      .select(config.select || '*')\r\n      .order(config.orderBy || 'created_at', { ascending: false });\r\n\r\n    if (error) throw error;\r\n    return data as T[];\r\n  } catch (err) {\r\n    logger.error('Database query failed', {\r\n      context: { error: err, sql, params },\r\n      source: 'Database'\r\n    });\r\n    throw err;\r\n  }\r\n};\r\n\r\nexport const execute = async (\r\n  sql: string,\r\n  params?: any[],\r\n  _config: QueryConfig = {}\r\n): Promise<void> => {\r\n  try {\r\n    const { error } = await supabase.rpc(sql, params);\r\n    if (error) throw error;\r\n  } catch (err) {\r\n    logger.error('Database execute failed', {\r\n      context: { error: err, sql, params },\r\n      source: 'Database'\r\n    });\r\n    throw err;\r\n  }\r\n};"
+        }
+    ]
+}

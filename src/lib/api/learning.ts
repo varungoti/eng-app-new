@@ -5,7 +5,7 @@ import type {
   LessonProgress, 
   Activity,
   Question 
-} from "@/types/learning";
+} from "@/types/";
 
 export async function fetchLearningPath() {
   const { data, error } = await supabase

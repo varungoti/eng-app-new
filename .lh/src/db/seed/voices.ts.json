@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/db/seed/voices.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1746702337938,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1746702337938,
+            "name": "Commit-0",
+            "content": "import { faker } from '@faker-js/faker';\r\nimport { SupabaseClient } from '@supabase/supabase-js';\r\n\r\ninterface Voice {\r\n  id: string;\r\n  name: string;\r\n  language: string;\r\n  gender: 'male' | 'female';\r\n  accent: string;\r\n  age_group: 'child' | 'young_adult' | 'adult' | 'senior';\r\n  description: string;\r\n  sample_url: string | null;\r\n  is_active: boolean;\r\n  created_at: string;\r\n  updated_at: string;\r\n}\r\n\r\nexport async function seedVoices(supabase: SupabaseClient): Promise<Voice[]> {\r\n  try {\r\n    const voices: Omit<Voice, 'id'>[] = [];\r\n    const languages = ['en-US', 'en-GB', 'en-AU', 'es-ES', 'fr-FR', 'de-DE'];\r\n    const accents = ['American', 'British', 'Australian', 'Indian', 'Spanish', 'French', 'German'];\r\n    const ageGroups: Voice['age_group'][] = ['child', 'young_adult', 'adult', 'senior'];\r\n    const voiceCount = 15; // Number of voices to create\r\n\r\n    for (let i = 0; i < voiceCount; i++) {\r\n      const gender = faker.helpers.arrayElement(['male', 'female'] as const);\r\n      const language = faker.helpers.arrayElement(languages);\r\n      const accent = faker.helpers.arrayElement(accents);\r\n      const ageGroup = faker.helpers.arrayElement(ageGroups);\r\n      const firstName = faker.person.firstName(gender === 'male' ? 'male' : 'female');\r\n\r\n      voices.push({\r\n        name: `${firstName} ${faker.person.lastName()}`,\r\n        language,\r\n        gender,\r\n        accent,\r\n        age_group: ageGroup,\r\n        description: faker.lorem.sentence(),\r\n        sample_url: faker.helpers.maybe(() => faker.internet.url()),\r\n        is_active: faker.datatype.boolean(),\r\n        created_at: new Date().toISOString(),\r\n        updated_at: new Date().toISOString()\r\n      });\r\n    }\r\n\r\n    // Insert voices\r\n    const { data: insertedVoices, error } = await supabase\r\n      .from('voices')\r\n      .insert(voices)\r\n      .select();\r\n\r\n    if (error) {\r\n      throw new Error(`Failed to insert voices: ${error.message}`);\r\n    }\r\n\r\n    if (!insertedVoices) {\r\n      throw new Error('No voices were inserted');\r\n    }\r\n\r\n    return insertedVoices;\r\n  } catch (error) {\r\n    console.error('Error seeding voices:', error);\r\n    throw error;\r\n  }\r\n} "
+        }
+    ]
+}

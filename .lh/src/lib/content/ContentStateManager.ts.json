@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/lib/content/ContentStateManager.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1740944414848,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1740944414848,
+            "name": "Commit-0",
+            "content": "import { create } from 'zustand';\r\n//import type { Grade, Topic, SubTopic, Lesson } from '../../types';\r\n\r\ninterface ContentState {\r\n  selectedGrade?: string;\r\n  selectedTopic?: string;\r\n  selectedSubTopic?: string;\r\n  selectedLesson?: string;\r\n  setSelectedGrade: (id?: string) => void;\r\n  setSelectedTopic: (id?: string) => void;\r\n  setSelectedSubTopic: (id?: string) => void;\r\n  setSelectedLesson: (id?: string) => void;\r\n  reset: () => void;\r\n}\r\n\r\nexport const useContentStore = create<ContentState>((set) => ({\r\n  selectedGrade: undefined,\r\n  selectedTopic: undefined,\r\n  selectedSubTopic: undefined,\r\n  selectedLesson: undefined,\r\n  setSelectedGrade: (id) => set({ selectedGrade: id, selectedTopic: undefined, selectedSubTopic: undefined, selectedLesson: undefined }),\r\n  setSelectedTopic: (id) => set({ selectedTopic: id, selectedSubTopic: undefined, selectedLesson: undefined }),\r\n  setSelectedSubTopic: (id) => set({ selectedSubTopic: id, selectedLesson: undefined }),\r\n  setSelectedLesson: (id) => set({ selectedLesson: id }),\r\n  reset: () => set({ selectedGrade: undefined, selectedTopic: undefined, selectedSubTopic: undefined, selectedLesson: undefined })\r\n}));"
+        }
+    ]
+}

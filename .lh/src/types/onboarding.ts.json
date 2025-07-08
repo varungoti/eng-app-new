@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 2,
+            "activePatchIndex": 3,
             "patches": [
                 {
                     "date": 1740095813600,
@@ -16,6 +16,10 @@
                 {
                     "date": 1740926747916,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -25,14 +25,8 @@\n   school_id: string;\n   name: string;\n   url: string;\n   type: string;\n-  status?: string;\n-  notes?: string;\n-  uploadedBy?: string;\n-  reviewedBy?: string;\n-  reviewedAt?: Date;\n-  validUntil?: Date;\n   created_at: string;\n   updated_at: string;\n }\n \n"
+                },
+                {
+                    "date": 1740948073180,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -33,5 +33,9 @@\n export interface OnboardingStats {\n   completedTasks: number;\n   totalTasks: number;\n   completionPercentage: number;\n+  pendingTasks?: number;\n+  blockedTasks?: number;\n+  remainingRequired?: number;\n+  nextTask?: OnboardingTask;\n }\n\\ No newline at end of file\n"
                 }
             ],
             "date": 1740095813600,

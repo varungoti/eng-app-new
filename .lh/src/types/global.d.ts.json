@@ -1,0 +1,22 @@
+{
+    "sourceFile": "src/types/global.d.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1741204227523,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1741209466828,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,37 +1,37 @@\n-/// <reference types=\"vite/client\" />\r\n-/// <reference types=\"react\" />\r\n-/// <reference types=\"react-dom\" />\r\n-\r\n-// declare module '@supabase/supabase-js' {\r\n-//   export * from '@supabase/supabase-js'\r\n-// }\r\n-\r\n-// declare module '@tanstack/react-query' {\r\n-//   export * from '@tanstack/react-query'\r\n-// }\r\n-\r\n-// declare module '@phosphor-icons/react' {\r\n-//   export * from '@phosphor-icons/react'\r\n-// }\r\n-\r\n-import * as React from 'react';\r\n-\r\n-declare global {\r\n-  namespace NodeJS {\r\n-    interface Timeout {}\r\n-  }\r\n-\r\n-  namespace JSX {\r\n-    interface IntrinsicElements {\r\n-      [elemName: string]: any;\r\n-    }\r\n-  }\r\n-}\r\n-\r\n-// Extend Window interface for audio context support\r\n-interface Window {\r\n-  AudioContext: typeof AudioContext;\r\n-  webkitAudioContext: typeof AudioContext;\r\n-}\r\n-\r\n+/// <reference types=\"vite/client\" />\n+/// <reference types=\"react\" />\n+/// <reference types=\"react-dom\" />\n+\n+// declare module '@supabase/supabase-js' {\n+//   export * from '@supabase/supabase-js'\n+// }\n+\n+// declare module '@tanstack/react-query' {\n+//   export * from '@tanstack/react-query'\n+// }\n+\n+// declare module '@phosphor-icons/react' {\n+//   export * from '@phosphor-icons/react'\n+// }\n+\n+import * as React from 'react';\n+\n+declare global {\n+  namespace NodeJS {\n+    interface Timeout {}\n+  }\n+\n+  namespace JSX {\n+    interface IntrinsicElements {\n+      [elemName: string]: any;\n+    }\n+  }\n+}\n+\n+// Extend Window interface for audio context support\n+interface Window {\n+  AudioContext: typeof AudioContext;\n+  webkitAudioContext: typeof AudioContext;\n+}\n+\n export {}; \n\\ No newline at end of file\n"
+                }
+            ],
+            "date": 1741204227523,
+            "name": "Commit-0",
+            "content": "/// <reference types=\"vite/client\" />\r\n/// <reference types=\"react\" />\r\n/// <reference types=\"react-dom\" />\r\n\r\n// declare module '@supabase/supabase-js' {\r\n//   export * from '@supabase/supabase-js'\r\n// }\r\n\r\n// declare module '@tanstack/react-query' {\r\n//   export * from '@tanstack/react-query'\r\n// }\r\n\r\n// declare module '@phosphor-icons/react' {\r\n//   export * from '@phosphor-icons/react'\r\n// }\r\n\r\nimport * as React from 'react';\r\n\r\ndeclare global {\r\n  namespace NodeJS {\r\n    interface Timeout {}\r\n  }\r\n\r\n  namespace JSX {\r\n    interface IntrinsicElements {\r\n      [elemName: string]: any;\r\n    }\r\n  }\r\n}\r\n\r\n// Extend Window interface for audio context support\r\ninterface Window {\r\n  AudioContext: typeof AudioContext;\r\n  webkitAudioContext: typeof AudioContext;\r\n}\r\n\r\nexport {}; "
+        }
+    ]
+}

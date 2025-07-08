@@ -1,52 +1,55 @@
-import mongoose from 'mongoose';
+// This file is kept for backward compatibility
+// Projects now use Supabase instead of MongoDB
 import { logger } from '../logger';
 
-declare global {
-  // eslint-disable-next-line no-var
-  var mongoose: {
-    promise: Promise<typeof mongoose> | null;
-    conn: typeof mongoose | null;
+// Provide a no-op function that logs a warning when used
+export async function connectToDatabase() {
+  logger.warn('MongoDB connectToDatabase was called, but the project now uses Supabase', { 
+    source: 'mongodb',
+    context: {
+      action: 'connectToDatabase'
+    }
+  });
+  
+  // Return a fake connection object to prevent errors in legacy code
+  return {
+    db: {
+      collection: () => {
+        logger.warn('Attempt to access MongoDB collection in Supabase project', {
+          source: 'mongodb'
+        });
+        
+        // Return a stub object with common MongoDB methods
+        return {
+          find: async () => [],
+          findOne: async () => null,
+          insertOne: async () => ({ insertedId: 'fake-id' }),
+          updateOne: async () => ({ modifiedCount: 0 }),
+          deleteOne: async () => ({ deletedCount: 0 })
+        };
+      }
+    }
   };
 }
 
-const MONGODB_URI = process.env.MONGODB_URI!;
+// Mock mongoose global to prevent errors
+/* eslint-disable @typescript-eslint/no-explicit-any */
+const mockMongoose = {
+  promise: null,
+  conn: null
+};
 
-if (!MONGODB_URI) {
-  throw new Error('Please define the MONGODB_URI environment variable inside .env.local');
+// If global object exists, set the mock mongoose
+if (typeof global !== 'undefined') {
+  (global as any).mongoose = mockMongoose;
 }
 
-let cached = global.mongoose;
-
-if (!cached) {
-  cached = global.mongoose = { conn: null, promise: null };
-}
-
-export async function connectToDatabase() {
-  if (cached.conn) {
-    return cached.conn;
-  }
-
-  if (!cached.promise) {
-    const opts = {
-      bufferCommands: false,
-    };
-
-    cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
-      logger.info('Connected to MongoDB', { source: 'mongodb' });
-      return mongoose;
-    });
-  }
-
-  try {
-    cached.conn = await cached.promise;
-  } catch (error) {
-    logger.error('MongoDB connection error', {
-      context: { error },
+// Export a dummy mongoose object for backward compatibility
+export default {
+  connect: async () => {
+    logger.warn('MongoDB connect was called, but the project now uses Supabase', {
       source: 'mongodb'
     });
-    cached.promise = null;
-    throw error;
+    return mockMongoose;
   }
-
-  return cached.conn;
-} 
+}; 

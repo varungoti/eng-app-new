@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { Grade, Topic, SubTopic, Lesson } from '../../types';
+//import type { Grade, Topic, SubTopic, Lesson } from '../../types';
 
 interface ContentState {
   selectedGrade?: string;

@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/db/seed/analytics.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1746698799680,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1746698799680,
+            "name": "Commit-0",
+            "content": "import { SupabaseClient } from '@supabase/supabase-js';\r\nimport { faker } from '@faker-js/faker';\r\n\r\ninterface ContentAnalytics {\r\n  content_id: string;\r\n  view_count: number;\r\n  completion_count: number;\r\n  average_completion_time: number;\r\n  difficulty_rating: number;\r\n  engagement_score: number;\r\n}\r\n\r\ninterface SchoolAnalytics {\r\n  school_id: string;\r\n  total_students: number;\r\n  active_students: number;\r\n  total_teachers: number;\r\n  active_teachers: number;\r\n  total_lessons: number;\r\n  completed_lessons: number;\r\n  average_engagement_score: number;\r\n}\r\n\r\nexport async function seedAnalytics(supabase: SupabaseClient) {\r\n  console.log('Seeding analytics...');\r\n\r\n  // Get all content IDs\r\n  const { data: lessons, error: lessonsError } = await supabase\r\n    .from('lessons')\r\n    .select('id');\r\n\r\n  if (lessonsError) {\r\n    throw new Error(`Error fetching lessons: ${lessonsError.message}`);\r\n  }\r\n\r\n  // Create content analytics\r\n  const contentAnalytics: ContentAnalytics[] = lessons.map(lesson => ({\r\n    content_id: lesson.id,\r\n    view_count: faker.number.int({ min: 10, max: 1000 }),\r\n    completion_count: faker.number.int({ min: 5, max: 500 }),\r\n    average_completion_time: faker.number.int({ min: 300, max: 3600 }), // 5-60 minutes\r\n    difficulty_rating: faker.number.float({ min: 0.1, max: 1.0, precision: 0.1 }),\r\n    engagement_score: faker.number.float({ min: 0.1, max: 1.0, precision: 0.1 }),\r\n  }));\r\n\r\n  const { error: contentAnalyticsError } = await supabase\r\n    .from('content_analytics')\r\n    .insert(contentAnalytics);\r\n\r\n  if (contentAnalyticsError) {\r\n    throw new Error(`Error seeding content analytics: ${contentAnalyticsError.message}`);\r\n  }\r\n\r\n  // Get all school IDs\r\n  const { data: schools, error: schoolsError } = await supabase\r\n    .from('schools')\r\n    .select('id');\r\n\r\n  if (schoolsError) {\r\n    throw new Error(`Error fetching schools: ${schoolsError.message}`);\r\n  }\r\n\r\n  // Create school analytics\r\n  const schoolAnalytics: SchoolAnalytics[] = schools.map(school => ({\r\n    school_id: school.id,\r\n    total_students: faker.number.int({ min: 50, max: 1000 }),\r\n    active_students: faker.number.int({ min: 30, max: 800 }),\r\n    total_teachers: faker.number.int({ min: 5, max: 50 }),\r\n    active_teachers: faker.number.int({ min: 3, max: 40 }),\r\n    total_lessons: faker.number.int({ min: 10, max: 200 }),\r\n    completed_lessons: faker.number.int({ min: 5, max: 150 }),\r\n    average_engagement_score: faker.number.float({ min: 0.1, max: 1.0, precision: 0.1 }),\r\n  }));\r\n\r\n  const { error: schoolAnalyticsError } = await supabase\r\n    .from('school_analytics')\r\n    .insert(schoolAnalytics);\r\n\r\n  if (schoolAnalyticsError) {\r\n    throw new Error(`Error seeding school analytics: ${schoolAnalyticsError.message}`);\r\n  }\r\n\r\n  console.log('Analytics seeded successfully!');\r\n  return {\r\n    contentAnalytics,\r\n    schoolAnalytics,\r\n  };\r\n} "
+        }
+    ]
+}

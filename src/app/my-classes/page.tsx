@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -28,9 +28,43 @@ export default function MyClassesPage() {
     queryFn: async () => {
       const response = await fetch('/api/classes');
       if (!response.ok) throw new Error('Failed to fetch classes');
-      return response.json();
+      const classData = await response.json();
+      
+      // Default empty arrays for assignedContent and assignedTeachers if not present
+      return classData.map((classItem: any) => ({
+        ...classItem,
+        assignedContent: classItem.assignedContent || [],
+        assignedTeachers: classItem.assignedTeachers || []
+      }));
     }
   });
+  
+  // Function to assign content to a class
+  const assignContentToClass = async (classId: string, contentId: string, contentType: 'TOPIC' | 'SUBTOPIC' | 'LESSON') => {
+    try {
+      const response = await fetch('/api/classes/assign-content', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          classId,
+          contentId,
+          contentType
+        }),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to assign content');
+      }
+      
+      // Refresh data after assignment
+      return response.json();
+    } catch (error) {
+      console.error('Error assigning content:', error);
+      throw error;
+    }
+  };
 
   if (isLoading) {
     return <LoadingIndicator />;
@@ -55,7 +89,7 @@ export default function MyClassesPage() {
               <div>
                 <h3 className="text-lg font-semibold">{classItem.name}</h3>
                 <p className="text-sm text-muted-foreground">
-                  {classItem.grade.name}
+                  {classItem.gradeId}
                 </p>
               </div>
               <Badge variant="outline">
@@ -72,12 +106,23 @@ export default function MyClassesPage() {
             <div className="space-y-2">
               <div className="text-sm">
                 <span className="font-medium">Teachers:</span>{' '}
-                {classItem.assignedTeachers.map(t => t.name).join(', ')}
+                {classItem.assignedTeachers.map((t: { name: string }) => t.name).join(', ')}
               </div>
               <div className="text-sm">
                 <span className="font-medium">Created:</span>{' '}
                 {formatDistanceToNow(new Date(classItem.createdAt), { addSuffix: true })}
               </div>
+            </div>
+            
+            <div className="mt-4 flex justify-end">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => assignContentToClass(classItem.id, "sample-content-id", "LESSON")}
+              >
+                <Icon type="phosphor" name="PLUS" className="h-3 w-3 mr-1" />
+                Assign Content
+              </Button>
             </div>
 
             <div className="mt-4 flex gap-2">

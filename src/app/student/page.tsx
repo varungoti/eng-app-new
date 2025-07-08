@@ -1,6 +1,6 @@
-import React from 'react';
-import Link from 'next/link';
-import { Book, Target, Zap, Trophy, Award, BarChart2 } from 'lucide-react';
+// import React from 'react';
+// import Link from 'next/link';
+// import { Book, Target, Zap, Trophy, Award, BarChart2 } from 'lucide-react';
 
 export default function StudentDashboard() {
   return (

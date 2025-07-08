@@ -32,7 +32,7 @@ export const query = async <T>(
 export const execute = async (
   sql: string,
   params?: any[],
-  config: QueryConfig = {}
+  _config: QueryConfig = {}
 ): Promise<void> => {
   try {
     const { error } = await supabase.rpc(sql, params);

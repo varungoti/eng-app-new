@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
-import { Lesson } from '@/lib/models/lesson';
+//import { Lesson } from '@/lib/models/lesson';
 import { logger } from '@/lib/logger';
 
-export async function GET(request: Request) {
+export async function GET(_request: Request) {
   try {
     const { data: lessons, error } = await supabase
       .from('lessons')

@@ -1,6 +1,20 @@
 import { NextResponse } from 'next/server';
-import { Repository } from '@/lib/db/repository';
 import { successResponse, errorResponse } from '@/lib/api-response';
+import { models } from '@/lib/models/database';
+import { z } from 'zod';
+
+// Validation schema for subtopic creation
+const createSubtopicSchema = z.object({
+  title: z.string()
+    .min(2, 'Title must be at least 2 characters')
+    .max(100, 'Title cannot be more than 100 characters')
+    .trim(),
+  description: z.string()
+    .max(500, 'Description cannot be more than 500 characters')
+    .optional(),
+  topic_id: z.string().uuid('Topic ID must be a valid UUID'),
+  order_index: z.number().min(0).optional().default(0)
+});
 
 export async function GET(request: Request) {
   try {
@@ -13,7 +27,8 @@ export async function GET(request: Request) {
       return errorResponse('Topic ID is required', 'VALIDATION_ERROR', 400);
     }
 
-    const subtopics = await Repository.getSubTopics(topicId, { includeContent });
+    // Use Supabase models to get subtopics
+    const subtopics = await models.SubtopicRepository.findByTopicId(topicId, includeContent);
     console.log('GET /api/admin/subtopics - Success');
     return successResponse(subtopics);
   } catch (error) {
@@ -31,27 +46,31 @@ export async function POST(request: Request) {
   try {
     console.log('POST /api/admin/subtopics - Starting');
     const body = await request.json();
-    const { name, description, topicId, order } = body;
-
-    if (!name || !topicId) {
-      return errorResponse('Name and Topic ID are required', 'VALIDATION_ERROR', 400);
-    }
-
-    const subtopic = await Repository.createSubTopic({
-      name,
-      description,
-      topicId,
-      order: order || 0
-    });
+    
+    // Validate request body
+    const validatedData = createSubtopicSchema.parse(body);
+    
+    // Create subtopic using Supabase models
+    const subtopic = await models.SubtopicRepository.create(validatedData);
 
     console.log('POST /api/admin/subtopics - Success');
     return successResponse(subtopic);
   } catch (error: any) {
     console.error('Error creating subtopic:', error);
 
-    if (error.code === 11000) {
+    // Handle validation errors
+    if (error instanceof z.ZodError) {
       return errorResponse(
-        'A subtopic with this name already exists in this topic',
+        error.errors[0].message,
+        'VALIDATION_ERROR',
+        400
+      );
+    }
+
+    // Handle database errors - PostgreSQL unique violation
+    if (error.code === '23505') {
+      return errorResponse(
+        'A subtopic with this title already exists in this topic',
         'DUPLICATE_ERROR',
         409
       );
